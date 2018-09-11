@@ -1,4 +1,4 @@
-from flask_restplus import fields, reqparse
+from flask_restplus import fields, reqparse, inputs
 from sokannonser.rest import api
 from sokannonser import settings
 from datetime import datetime
@@ -105,8 +105,10 @@ sok_platsannons_query = reqparse.RequestParser()
 sok_platsannons_query.add_argument(settings.APIKEY, location='headers', required=True,
                                    default=settings.APIKEY_BACKDOOR)
 
-sok_platsannons_query.add_argument(settings.OFFSET, type=int, default=0)
-sok_platsannons_query.add_argument(settings.LIMIT, type=int, default=10)
+sok_platsannons_query.add_argument(settings.OFFSET,
+                                   type=inputs.int_range(0, 10000), default=0)
+sok_platsannons_query.add_argument(settings.LIMIT,
+                                   type=inputs.int_range(0, 200), default=10)
 sok_platsannons_query.add_argument(settings.SORT,
                                    choices=list(settings.sort_options.keys()))
 sok_platsannons_query.add_argument(settings.PUBLISHED_BEFORE,

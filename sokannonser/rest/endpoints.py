@@ -10,7 +10,6 @@ from sokannonser.rest.models import pbapi_lista, simple_lista, \
                                     sok_platsannons_query, taxonomy_query
 
 
-
 @api.route('/sok')
 class Search(Resource):
     method_decorators = [check_api_key]
@@ -18,8 +17,9 @@ class Search(Resource):
     @api.doc(
         params={
             settings.APIKEY: "Nyckel som krävs för att använda API:et",
-            settings.OFFSET: "Börja lista resultat från denna position",
-            settings.LIMIT: "Antal resultat att visa",
+            settings.OFFSET: "Börja lista resultat från denna position "
+            "(0-%d)" % settings.MAX_OFFSET,
+            settings.LIMIT: "Antal resultat att visa (0-%d)" % settings.MAX_LIMIT,
             settings.SORT: "Sortering.\ndate-desc: publiceringsdatum, nyast först\n"
             "date-asc: publiceringsdatum, äldst först\nrelevance: Relevans (poäng)",
             settings.PUBLISHED_AFTER: "Visa annonser publicerade efter angivet datum "

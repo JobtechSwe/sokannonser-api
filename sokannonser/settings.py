@@ -33,6 +33,9 @@ PLACE_RADIUS = 'plats.radie'
 WORKTIME_EXTENT = 'arbetstidsomfattning'
 DATASET = 'dataset'
 
+MAX_OFFSET = 2000
+MAX_LIMIT = 1000
+
 # For taxonomy
 LANGUAGE = 'sprak'
 SHOW_COUNT = 'visa-antal'

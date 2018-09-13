@@ -17,7 +17,7 @@ Gå till http://localhost:5000 för att testa med Swagger-API:et.
 Bygg en docker-image:
 
     $ docker build -t sokannonser:latest .
-    $ docker run -d -p 80:80 sokannonser
+    $ docker run -d -p 80:8081 sokannonser
 
 Gå till http://localhost:80 för att testa med Swagger-API:et.
 

@@ -2,6 +2,7 @@ from sokannonser.rest import api
 from flask import request
 from flask_restplus import Resource, abort
 from sokannonser.repository import platsannonser
+from sokannonser.repository import auranest
 from sokannonser.repository import taxonomy
 from sokannonser import settings
 from sokannonser.settings import taxonomy_type
@@ -50,7 +51,15 @@ class Search(Resource):
     @api.expect(sok_platsannons_query)
     def get(self):
         args = sok_platsannons_query.parse_args()
-        result = platsannonser.find_platsannonser(args)
+        dataset = args.get(settings.DATASET)
+        if dataset not in settings.AVAILABLE_DATASETS:
+            abort(400, 'Dataset %s is not available' % dataset)
+
+        if args.get(settings.DATASET) == settings.DATASET_AF:
+            result = platsannonser.find_platsannonser(args)
+        else:
+            result = auranest.find_annonser(args)
+
         if args.get(settings.RESULT_MODEL, '') == 'pbabi':
             return self.marshal_pbapi(result)
         elif args.get(settings.RESULT_MODEL, '') == 'simple':

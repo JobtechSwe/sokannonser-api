@@ -131,7 +131,8 @@ sok_platsannons_query.add_argument(settings.REGION, action='append')
 # sok_platsannons_query.add_argument(settings.PLACE_RADIUS, type=int)
 sok_platsannons_query.add_argument(settings.RESULT_MODEL, choices=settings.result_models)
 sok_platsannons_query.add_argument(settings.DATASET,
-                                   choices=['arbetsförmedlingen', 'auranest'])
+                                   choices=settings.AVAILABLE_DATASETS,
+                                   default=settings.DATASET_AF)
 
 taxonomy_query = reqparse.RequestParser()
 taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)

@@ -36,6 +36,11 @@ DATASET = 'dataset'
 MAX_OFFSET = 2000
 MAX_LIMIT = 1000
 
+DATASET_AF = 'arbetsförmedlingen'
+DATASET_AURA = 'auranest'
+AVAILABLE_DATASETS = [DATASET_AF, DATASET_AURA]
+
+
 # For taxonomy
 LANGUAGE = 'sprak'
 SHOW_COUNT = 'visa-antal'

@@ -2,3 +2,4 @@ elasticsearch
 flask
 flask-restplus
 flask-cors
+certifi

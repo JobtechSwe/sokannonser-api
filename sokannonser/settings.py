@@ -25,15 +25,7 @@ FREETEXT_QUERY = 'q'
 SORT = 'sortera'
 PUBLISHED_BEFORE = 'publicerad-innan'
 PUBLISHED_AFTER = 'publicerad-efter'
-OCCUPATION = 'yrkesroll'
-GROUP = 'yrkesgrupp'
-FIELD = 'yrkesomrade'
-SKILL = 'kompetens'
-PLACE = 'plats'
-MUNICIPALITY = 'kommun'
-REGION = 'lan'
 PLACE_RADIUS = 'plats.radie'
-WORKTIME_EXTENT = 'arbetstidsomfattning'
 DATASET = 'dataset'
 
 MAX_OFFSET = 2000
@@ -45,22 +37,8 @@ AVAILABLE_DATASETS = [DATASET_AF, DATASET_AURA]
 
 
 # For taxonomy
-LANGUAGE = 'sprak'
 SHOW_COUNT = 'visa-antal'
 
-taxonomy_type = {
-    OCCUPATION: 'jobterm',
-    GROUP: 'jobgroup',
-    FIELD: 'jobfield',
-    SKILL: 'skill',
-    MUNICIPALITY: 'municipality',
-    REGION: 'region',
-    WORKTIME_EXTENT: 'worktime_extent',
-    PLACE: 'place',
-    LANGUAGE: 'language',
-}
-
-reverse_taxonomy_type = {item[1]: item[0] for item in taxonomy_type.items()}
 
 RESULT_MODEL = 'resultatmodell'
 

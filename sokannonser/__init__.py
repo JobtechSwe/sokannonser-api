@@ -13,7 +13,7 @@ logging.basicConfig()
 # Set log level debug for module specific events
 # and level warning for all third party dependencies
 for key in logging.Logger.manager.loggerDict:
-    if key.startswith(__name__):
+    if key.startswith(__name__) or key.startswith('valuestore'):
         logging.getLogger(key).setLevel(logging.DEBUG)
     else:
         logging.getLogger(key).setLevel(logging.WARNING)

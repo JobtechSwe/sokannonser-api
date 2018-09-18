@@ -1,7 +1,8 @@
 from flask_restplus import fields, reqparse, inputs
+from datetime import datetime
+from valuestore import taxonomy
 from sokannonser.rest import api
 from sokannonser import settings
-from datetime import datetime
 
 
 # Resultatmodeller
@@ -120,14 +121,14 @@ sok_platsannons_query.add_argument(settings.PUBLISHED_AFTER,
                                    type=lambda x: datetime.strptime(x,
                                                                     '%Y-%m-%dT%H:%M:%S'))
 sok_platsannons_query.add_argument(settings.FREETEXT_QUERY)
-sok_platsannons_query.add_argument(settings.OCCUPATION, action='append')
-sok_platsannons_query.add_argument(settings.GROUP, action='append')
-sok_platsannons_query.add_argument(settings.FIELD, action='append')
-sok_platsannons_query.add_argument(settings.SKILL, action='append')
-sok_platsannons_query.add_argument(settings.WORKTIME_EXTENT, action='append')
+sok_platsannons_query.add_argument(taxonomy.OCCUPATION, action='append')
+sok_platsannons_query.add_argument(taxonomy.GROUP, action='append')
+sok_platsannons_query.add_argument(taxonomy.FIELD, action='append')
+sok_platsannons_query.add_argument(taxonomy.SKILL, action='append')
+sok_platsannons_query.add_argument(taxonomy.WORKTIME_EXTENT, action='append')
 # sok_platsannons_query.add_argument(settings.PLACE)
-sok_platsannons_query.add_argument(settings.MUNICIPALITY, action='append')
-sok_platsannons_query.add_argument(settings.REGION, action='append')
+sok_platsannons_query.add_argument(taxonomy.MUNICIPALITY, action='append')
+sok_platsannons_query.add_argument(taxonomy.REGION, action='append')
 # sok_platsannons_query.add_argument(settings.PLACE_RADIUS, type=int)
 sok_platsannons_query.add_argument(settings.RESULT_MODEL, choices=settings.result_models)
 sok_platsannons_query.add_argument(settings.DATASET,
@@ -140,8 +141,8 @@ taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)
 taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)
 taxonomy_query.add_argument('kod')
-taxonomy_query.add_argument('typ', choices=(settings.OCCUPATION, settings.GROUP,
-                                            settings.FIELD, settings.SKILL,
-                                            settings.LANGUAGE, settings.MUNICIPALITY,
-                                            settings.REGION, settings.WORKTIME_EXTENT))
+taxonomy_query.add_argument('typ', choices=(taxonomy.OCCUPATION, taxonomy.GROUP,
+                                            taxonomy.FIELD, taxonomy.SKILL,
+                                            taxonomy.LANGUAGE, taxonomy.MUNICIPALITY,
+                                            taxonomy.REGION, taxonomy.WORKTIME_EXTENT))
 taxonomy_query.add_argument(settings.SHOW_COUNT, type=bool, default=False)

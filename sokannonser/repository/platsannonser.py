@@ -2,6 +2,7 @@ import logging
 from flask_restplus import abort
 from elasticsearch import exceptions
 from valuestore import taxonomy
+from valuestore.taxonomy import tax_type
 from sokannonser import settings
 from . import elastic
 import json
@@ -13,11 +14,11 @@ log = logging.getLogger(__name__)
 def get_stats_for(taxonomy_type):
     log.info("Looking for %s" % taxonomy_type)
     value_path = {
-        settings.taxonomy_type[settings.OCCUPATION]: "yrkesroll.kod.keyword",
-        settings.taxonomy_type[settings.GROUP]: "yrkesgrupp.kod.keyword",
-        settings.taxonomy_type[settings.FIELD]: "yrkesomrade.kod.keyword",
-        settings.taxonomy_type[settings.SKILL]: "krav.kompetenser.kod.keyword",
-        settings.taxonomy_type[settings.WORKTIME_EXTENT]: "arbetstidstyp.kod.keyword",
+        tax_type[taxonomy.OCCUPATION]: "yrkesroll.kod.keyword",
+        tax_type[taxonomy.GROUP]: "yrkesgrupp.kod.keyword",
+        tax_type[taxonomy.FIELD]: "yrkesomrade.kod.keyword",
+        tax_type[taxonomy.SKILL]: "krav.kompetenser.kod.keyword",
+        tax_type[taxonomy.WORKTIME_EXTENT]: "arbetstidstyp.kod.keyword",
     }
     aggs_query = {
         "from": 0, "size": 0,
@@ -65,18 +66,18 @@ def _parse_args(args):
         return query_dsl
 
     freetext_query = _build_freetext_query(args.get(settings.FREETEXT_QUERY))
-    yrke_bool_query = _build_yrkes_query(args.get(settings.OCCUPATION),
-                                         args.get(settings.GROUP),
-                                         args.get(settings.FIELD))
+    yrke_bool_query = _build_yrkes_query(args.get(taxonomy.OCCUPATION),
+                                         args.get(taxonomy.GROUP),
+                                         args.get(taxonomy.FIELD))
     kompetens_bool_query = _build_bool_should_query("krav.kompetenser.kod",
-                                                    args.get(settings.SKILL))
-    plats_bool_query = _build_plats_query(args.get(settings.MUNICIPALITY),
-                                          args.get(settings.REGION))
+                                                    args.get(taxonomy.SKILL))
+    plats_bool_query = _build_plats_query(args.get(taxonomy.MUNICIPALITY),
+                                          args.get(taxonomy.REGION))
     # sprak_bool_query =  _build_bool_should_query("erfarenhet.sprak.kod",
-    #                                              args.get(settings.LANGUAGE))
+    #                                              args.get(taxonomy.LANGUAGE))
     sprak_bool_query = None
     worktime_bool_query = _build_worktimeextent_should_query(
-        args.get(settings.WORKTIME_EXTENT))
+        args.get(taxonomy.WORKTIME_EXTENT))
     timeframe_query = _build_timeframe_query(args.get(settings.PUBLISHED_AFTER),
                                              args.get(settings.PUBLISHED_BEFORE))
 
@@ -141,8 +142,8 @@ def _build_plats_query(kommunkoder, lanskoder):
     kommunlanskoder = []
     for lanskod in lanskoder if lanskoder is not None else []:
         kommun_results = taxonomy.find_concepts(None, lanskod,
-                                                settings.taxonomy_type.get(
-                                                    settings.MUNICIPALITY)).get(
+                                                tax_type.get(
+                                                    taxonomy.MUNICIPALITY)).get(
                                                         'hits', [])
         kommunlanskoder += [entitet['_source']['id'] for entitet in kommun_results]
 

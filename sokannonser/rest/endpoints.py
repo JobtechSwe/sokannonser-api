@@ -3,7 +3,7 @@ from flask import request
 from flask_restplus import Resource, abort
 from sokannonser.repository import platsannonser
 from sokannonser.repository import auranest
-from sokannonser.repository import taxonomy
+from valuestore import taxonomy
 from sokannonser import settings
 from sokannonser.settings import taxonomy_type
 from sokannonser.rest.decorators import check_api_key
@@ -116,7 +116,7 @@ class Valuestore(Resource):
 
     def _build_response(self, response, statistics):
         results = []
-        for hit in response['hits']:
+        for hit in response.get('hits', []):
             entity = {"kod": hit['_source']['id'], "term": hit['_source']['label'],
                       "typ": settings.reverse_taxonomy_type[hit['_source']['type']]}
             if statistics:

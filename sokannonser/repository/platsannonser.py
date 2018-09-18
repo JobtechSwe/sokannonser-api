@@ -1,7 +1,7 @@
 import logging
 from flask_restplus import abort
 from elasticsearch import exceptions
-from sokannonser.repository import taxonomy
+from valuestore import taxonomy
 from sokannonser import settings
 from . import elastic
 import json

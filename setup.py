@@ -5,6 +5,6 @@ setup(
     packages=['sokannonser'],
     include_package_data=True,
     install_requires=[
-        'flask', 'flask-restplus', 'flask-cors', 'elasticsearch', 'certifi'
+        'valuestore', 'flask', 'flask-restplus', 'flask-cors', 'elasticsearch', 'certifi'
     ],
 )

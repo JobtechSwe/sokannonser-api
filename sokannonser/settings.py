@@ -3,6 +3,8 @@ import os
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "localhost")
 ES_PORT = os.getenv("ES_PORT", 9200)
+ES_USER = os.getenv("ES_USER")
+ES_PWD = os.getenv("ES_PWD")
 ES_INDEX = os.getenv("ES_INDEX", "platsannons")
 ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy")
 
@@ -15,6 +17,7 @@ RESTPLUS_ERROR_404_HELP = False
 # Header parameters
 APIKEY = 'api-key'
 APIKEY_BACKDOOR = 'apa'  # TODO: Remove before production
+
 # Query parameters
 OFFSET = 'offset'
 LIMIT = 'limit'

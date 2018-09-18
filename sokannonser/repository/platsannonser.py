@@ -1,4 +1,6 @@
 import logging
+from flask_restplus import abort
+from elasticsearch import exceptions
 from sokannonser.repository import taxonomy
 from sokannonser import settings
 from . import elastic
@@ -39,7 +41,11 @@ def get_stats_for(taxonomy_type):
 def find_platsannonser(args):
     query_dsl = _parse_args(args)
     log.debug(json.dumps(query_dsl, indent=2))
-    query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+    try:
+        query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+    except exceptions.ConnectionError as e:
+        log.error('Failed to connect to elasticsearch: %s' % str(e), e)
+        abort(500, 'Failed to establish connection to database')
     return query_result.get('hits', {})
 
 

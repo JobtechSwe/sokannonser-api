@@ -55,10 +55,10 @@ class Search(Resource):
         if dataset not in settings.AVAILABLE_DATASETS:
             abort(400, 'Dataset %s is not available' % dataset)
 
-        if args.get(settings.DATASET) == settings.DATASET_AF:
-            result = platsannonser.find_platsannonser(args)
-        else:
+        if dataset == settings.DATASET_AURA:
             result = auranest.find_annonser(args)
+        else:
+            result = platsannonser.find_platsannonser(args)
 
         if args.get(settings.RESULT_MODEL, '') == 'pbabi':
             return self.marshal_pbapi(result)

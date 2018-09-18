@@ -7,7 +7,8 @@ log = logging.getLogger(__name__)
 log.info("Using Elasticsearch node at %s:%s" % (settings.ES_HOST, settings.ES_PORT))
 if settings.ES_USER and settings.ES_PWD:
     elastic = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT,
-                              'use_ssl': True,
+                              'use_ssl': True, 'sniff_on_start': True,
+                              'sniff_on_connection_fail': True, 'sniffer_timeout': 60,
                               'http_auth': "%s:%s" % (settings.ES_USER,
                                                       settings.ES_PWD)}])
 else:

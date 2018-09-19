@@ -7,7 +7,8 @@ RUN apk add --no-cache \
         supervisor \
         uwsgi-python3 \
         python3 \
-        nginx
+        nginx \
+        git
 
 COPY nginx.conf /etc/nginx/nginx.conf
 RUN rm /etc/nginx/conf.d/default.conf

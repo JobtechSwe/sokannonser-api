@@ -3,8 +3,7 @@ from flask import request
 from flask_restplus import Resource, abort
 from valuestore import taxonomy
 from valuestore.taxonomy import tax_type
-from sokannonser.repository import platsannonser
-from sokannonser.repository import auranest
+from sokannonser.repository import platsannonser, auranest, elastic
 from sokannonser import settings
 from sokannonser.rest.decorators import check_api_key
 from sokannonser.rest.models import pbapi_lista, simple_lista, \
@@ -107,7 +106,7 @@ class Valuestore(Resource):
         typ = tax_type.get(request.args.get('typ', None), None)
         offset = request.args.get(settings.OFFSET, 0)
         limit = request.args.get(settings.LIMIT, 10)
-        response = taxonomy.find_concepts(q, kod, typ, offset, limit)
+        response = taxonomy.find_concepts(elastic, q, kod, typ, offset, limit)
         statistics = platsannonser.get_stats_for(typ) if typ \
             and request.args.get(settings.SHOW_COUNT, False) else {}
         if not response:

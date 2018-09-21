@@ -141,7 +141,7 @@ def _build_plats_query(kommunkoder, lanskoder):
     kommuner = [] if not kommunkoder else kommunkoder
     kommunlanskoder = []
     for lanskod in lanskoder if lanskoder is not None else []:
-        kommun_results = taxonomy.find_concepts(None, lanskod,
+        kommun_results = taxonomy.find_concepts(elastic, None, lanskod,
                                                 tax_type.get(
                                                     taxonomy.MUNICIPALITY)).get(
                                                         'hits', [])

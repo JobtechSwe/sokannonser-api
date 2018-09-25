@@ -47,6 +47,8 @@ result_models = [
 ]
 sort_options = {
     'relevance': "_score",
-    'date-desc': {"publiceringsdatum": "desc"},
-    'date-asc':  {"publiceringsdatum": "asc"},
+    'pubdate-desc': {"publiceringsdatum": "desc"},
+    'pubdate-asc':  {"publiceringsdatum": "asc"},
+    'applydate-desc':  {"sista_ansokningsdatum": "desc"},
+    'applydate-asc':  {"sista_ansokningsdatum": "asc"},
 }

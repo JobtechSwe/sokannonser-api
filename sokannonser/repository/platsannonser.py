@@ -103,9 +103,34 @@ def _parse_args(args):
 
 def _build_freetext_query(querystring):
     return {
-        "multi_match": {
-            "query": querystring,
-            "fields": ["beskrivning.information", "beskrivning.behov", "beskrivning.krav"]
+        "bool": {
+            "should": [
+                {
+                    "match": {
+                        "rubrik": {
+                            "query": querystring,
+                            "boost": 3
+                        }
+                    }
+                },
+                {
+                    "match": {
+                        "arbetsgivare.namn": {
+                            "query": querystring,
+                            "boost": 2
+                        }
+                    }
+                },
+                {
+                    "multi_match": {
+                        "query": querystring,
+                        "fields": ["beskrivning.information",
+                                   "beskrivning.behov",
+                                   "beskrivning.krav",
+                                   "beskrivning.annonstext"]
+                    }
+                }
+            ]
         }
     } if querystring else None
 

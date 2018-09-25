@@ -14,4 +14,12 @@ def find_annonser(args):
 
 
 def _parse_args(args):
-    return {}
+    return {
+        "bool": {
+            "must_not": {
+                "exists": {
+                    "field": "source.removedAt"
+                }
+            }
+        }
+    }

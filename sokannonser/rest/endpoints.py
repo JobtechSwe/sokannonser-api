@@ -91,8 +91,8 @@ class Valuestore(Resource):
             settings.LIMIT: "Antal resultat att visa",
             settings.FREETEXT_QUERY: "Fritextfråga mot taxonomin. "
             "(Kan t.ex. användas för autocomplete / type ahead)",
-            "kod": "Begränsa sökning till taxonomier som har överliggande kod (förälder) "
-            "(används med fördel tillsammans med typ)",
+            "kod": "Begränsa sökning till taxonomivärden som har angiven kod som "
+            "förälder (endast tillsammans med typ)",
             "typ": "Visa enbart taxonomivärden av typ "
             "(giltiga värden: %s)" % list(tax_type.keys()),
             settings.SHOW_COUNT: "Visa antal annonser som matchar taxonomivärde "

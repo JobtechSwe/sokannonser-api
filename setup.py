@@ -7,4 +7,6 @@ setup(
     install_requires=[
         'valuestore', 'flask', 'flask-restplus', 'flask-cors', 'elasticsearch', 'certifi'
     ],
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest"]
 )

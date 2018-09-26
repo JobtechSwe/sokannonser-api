@@ -20,8 +20,11 @@ class Search(Resource):
             settings.OFFSET: "Börja lista resultat från denna position "
             "(0-%d)" % settings.MAX_OFFSET,
             settings.LIMIT: "Antal resultat att visa (0-%d)" % settings.MAX_LIMIT,
-            settings.SORT: "Sortering.\ndate-desc: publiceringsdatum, nyast först\n"
-            "date-asc: publiceringsdatum, äldst först\nrelevance: Relevans (poäng)",
+            settings.SORT: "Sortering.\npubdate-desc: publiceringsdatum, nyast först\n"
+            "pubdate-asc: publiceringsdatum, äldst först\n"
+            "applydate-desc: sista ansökningsdatum, nyast först\n"
+            "applydate-asc: sista ansökningsdatum, äldst först\n"
+            "relevance: Relevans (poäng)",
             settings.PUBLISHED_AFTER: "Visa annonser publicerade efter angivet datum "
             "(på formen YYYY-mm-ddTHH:MM:SS)",
             settings.PUBLISHED_BEFORE: "Visa annonser publicerade innan angivet datum "
@@ -108,7 +111,7 @@ class Valuestore(Resource):
         limit = request.args.get(settings.LIMIT, 10)
         response = taxonomy.find_concepts(elastic, q, kod, typ, offset, limit)
         statistics = platsannonser.get_stats_for(typ) if typ \
-            and request.args.get(settings.SHOW_COUNT, False) else {}
+            and request.args.get(settings.SHOW_COUNT) == "true" else {}
         if not response:
             abort(500, custom="The server failed to respond properly")
         query_dict = {}

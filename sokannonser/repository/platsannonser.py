@@ -20,6 +20,11 @@ def get_stats_for(taxonomy_type):
         tax_type[taxonomy.SKILL]: "krav.kompetenser.kod.keyword",
         tax_type[taxonomy.WORKTIME_EXTENT]: "arbetstidstyp.kod.keyword",
     }
+    # Make sure we don't crash if we want to stat on missing type
+    if taxonomy_type not in value_path:
+        log.warn("Taxonomy type %s not configured for aggs." % taxonomy_type)
+        return {}
+
     aggs_query = {
         "from": 0, "size": 0,
         "query": {
@@ -55,6 +60,16 @@ def _parse_args(args):
     query_dsl = dict()
     query_dsl['from'] = args.pop(settings.OFFSET, 0)
     query_dsl['size'] = args.pop(settings.LIMIT, 10)
+    # Remove api-key from args to make sure an empty query can occur
+    args.pop(settings.APIKEY)
+
+    # Make sure to only serve published ads
+    query_dsl['query'] = {
+        'bool': {
+            'must': [],
+            'filter': [{'term': {'status.publicerad': True}}]
+        },
+    }
 
     if args.get(settings.SORT):
         query_dsl['sort'] = [settings.sort_options.get(args.pop(settings.SORT))]
@@ -62,7 +77,7 @@ def _parse_args(args):
     # Check for empty query
     if not any(v is not None for v in args.values()):
         log.debug("Constructing match-all query")
-        query_dsl['query'] = {"match_all": {}}
+        query_dsl['query']['bool']['must'].append({'match_all': {}})
         return query_dsl
 
     freetext_query = _build_freetext_query(args.get(settings.FREETEXT_QUERY))
@@ -80,8 +95,6 @@ def _parse_args(args):
         args.get(taxonomy.WORKTIME_EXTENT))
     timeframe_query = _build_timeframe_query(args.get(settings.PUBLISHED_AFTER),
                                              args.get(settings.PUBLISHED_BEFORE))
-
-    query_dsl['query'] = {"bool": {"must": []}}
 
     if freetext_query:
         query_dsl['query']['bool']['must'].append(freetext_query)

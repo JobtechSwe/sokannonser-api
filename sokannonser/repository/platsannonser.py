@@ -19,6 +19,8 @@ def get_stats_for(taxonomy_type):
         tax_type[taxonomy.FIELD]: "yrkesomrade.kod.keyword",
         tax_type[taxonomy.SKILL]: "krav.kompetenser.kod.keyword",
         tax_type[taxonomy.WORKTIME_EXTENT]: "arbetstidstyp.kod.keyword",
+        tax_type[taxonomy.MUNICIPALITY]: "kommun.kod.keyword",
+        tax_type[taxonomy.REGION]: "lan.kod.keyword"
     }
     # Make sure we don't crash if we want to stat on missing type
     if taxonomy_type not in value_path:

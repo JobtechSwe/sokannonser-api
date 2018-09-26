@@ -2,7 +2,7 @@ from sokannonser.rest import api
 from flask import request
 from flask_restplus import Resource, abort
 from valuestore import taxonomy
-from valuestore.taxonomy import tax_type
+from valuestore.taxonomy import tax_type, reverse_tax_type
 from sokannonser.repository import platsannonser, auranest, elastic
 from sokannonser import settings
 from sokannonser.rest.decorators import check_api_key
@@ -50,7 +50,7 @@ class Search(Resource):
     @api.expect(sok_platsannons_query)
     def get(self):
         args = sok_platsannons_query.parse_args()
-        dataset = args.get(settings.DATASET)
+        dataset = args.pop(settings.DATASET)
         if dataset not in settings.AVAILABLE_DATASETS:
             abort(400, 'Dataset %s is not available' % dataset)
 
@@ -92,7 +92,7 @@ class Valuestore(Resource):
             settings.FREETEXT_QUERY: "Fritextfråga mot taxonomin. "
             "(Kan t.ex. användas för autocomplete / type ahead)",
             "kod": "Begränsa sökning till taxonomivärden som har angiven kod som "
-            "förälder (endast tillsammans med typ)",
+            "förälder (användbart tillsammans med typ)",
             "typ": "Visa enbart taxonomivärden av typ "
             "(giltiga värden: %s)" % list(tax_type.keys()),
             settings.SHOW_COUNT: "Visa antal annonser som matchar taxonomivärde "
@@ -111,9 +111,16 @@ class Valuestore(Resource):
             and request.args.get(settings.SHOW_COUNT, False) else {}
         if not response:
             abort(500, custom="The server failed to respond properly")
-        return self._build_response(response, statistics)
+        query_dict = {}
+        if q:
+            query_dict['filter'] = q
+        if kod:
+            query_dict['foralder'] = kod
+        if typ:
+            query_dict['typ'] = reverse_tax_type.get(typ)
+        return self._build_response(query_dict, response, statistics)
 
-    def _build_response(self, response, statistics):
+    def _build_response(self, query, response, statistics):
         results = []
         for hit in response.get('hits', {}).get('hits', []):
             type_label = taxonomy.reverse_tax_type.get(hit['_source']['type'],
@@ -124,4 +131,4 @@ class Valuestore(Resource):
             if statistics:
                 entity['antal'] = statistics.get(hit['_source']['id'], 0)
             results.append(entity)
-        return results
+        return {'sokning': query, 'resultat': results}

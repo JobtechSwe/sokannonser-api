@@ -67,7 +67,23 @@ def _parse_args(args):
     query_dsl['query'] = {
         'bool': {
             'must': [],
-            'filter': [{'term': {'status.publicerad': True}}]
+            'filter': [
+                # {'term': {'status.publicerad': True}},
+                {
+                    'range': {
+                        'publiceringsdatum': {
+                            'lte': datetime.isoformat(datetime.now())
+                        }
+                    }
+                },
+                {
+                    'range': {
+                        'status.sista_publiceringsdatum': {
+                            'gte': datetime.isoformat(datetime.now())
+                        }
+                    }
+                },
+            ]
         },
     }
 

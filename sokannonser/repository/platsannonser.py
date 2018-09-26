@@ -74,14 +74,14 @@ def _parse_args(args):
                 {
                     'range': {
                         'publiceringsdatum': {
-                            'lte': datetime.isoformat(datetime.now())
+                            'lte': 'now'
                         }
                     }
                 },
                 {
                     'range': {
                         'status.sista_publiceringsdatum': {
-                            'gte': datetime.isoformat(datetime.now())
+                            'gte': 'now'
                         }
                     }
                 },
@@ -218,12 +218,13 @@ def _build_timeframe_query(from_datetime, to_datetime):
         return None
     range_query = {"range": {"publiceringsdatum": {}}}
     if from_datetime:
-        range_query['range']['publiceringsdatum']['gte'] = _datetime2millis(from_datetime)
+        range_query['range']['publiceringsdatum']['gte'] = from_datetime.isoformat()
     if to_datetime:
-        range_query['range']['publiceringsdatum']['lte'] = _datetime2millis(to_datetime)
+        range_query['range']['publiceringsdatum']['lte'] = to_datetime.isoformat()
     return range_query
 
 
+# Deprecated. Previously used to build timeframe queries
 def _datetime2millis(utc_time):
     millis = (utc_time - datetime(1970, 1, 1)).total_seconds() * 1000  # We want millis
     return int(millis)

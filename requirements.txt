@@ -1,3 +1,4 @@
+pytest
 elasticsearch
 flask
 flask-restplus

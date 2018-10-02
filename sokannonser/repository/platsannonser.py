@@ -198,9 +198,8 @@ def _build_plats_query(kommunkoder, lanskoder):
     kommunlanskoder = []
     for lanskod in lanskoder if lanskoder is not None else []:
         kommun_results = taxonomy.find_concepts(elastic, None, lanskod,
-                                                tax_type.get(
-                                                    taxonomy.MUNICIPALITY)).get(
-                                                        'hits', [])
+                                                tax_type.get(taxonomy.MUNICIPALITY)
+                                                ).get('hits', {}).get('hits', [])
         kommunlanskoder += [entitet['_source']['id'] for entitet in kommun_results]
 
     # OBS: Casting kommunkod values to ints the way currently stored in elastic

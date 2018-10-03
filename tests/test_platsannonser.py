@@ -52,7 +52,6 @@ def safe_execute(default, exception, function, *args): # safe_execute("Felkod", 
 @pytest.mark.parametrize("lanskoder", [ ["25"], ["01", "03"], ["ejLanKod"], None, [] ])
 def test_build_plats_query(kommunkoder, lanskoder):
     print('============================', sys._getframe().f_code.co_name, '============================ ')
-    print(kommunkoder, lanskoder)
     d = platsannonser._build_plats_query(kommunkoder, lanskoder)
     print(d)
     kommunlanskoder = []
@@ -61,13 +60,11 @@ def test_build_plats_query(kommunkoder, lanskoder):
         kommunlanskoder += [entitet['_source']['id'] for entitet in kommun_results]
     # OBS: Casting kommunkod values to ints the way currently stored in elastic
     if kommunkoder:
-       int_kommunkoder = [ int(kommunkod) for kommunkod in kommunkoder] # if safe_execute("Fel", ValueError, int, kommunkod) != "Fel"]
-       print("KOMkoder",int_kommunkoder)
-       assert set(int_kommunkoder).issubset(set(find("value", d)))
+       # int_kommunkoder = [ int(kommunkod) for kommunkod in kommunkoder] # if safe_execute("Fel", ValueError, int, kommunkod) != "Fel"]
+       assert set(kommunkoder).issubset(set(find("value", d)))
     if kommunlanskoder:
-       int_kommunlanskoder = [ int(kommunlanskod) for kommunlanskod in kommunlanskoder]
-       print("KOM_LANSkoder",int_kommunlanskoder)
-       assert set(int_kommunlanskoder).issubset(set(find("value", d)))
+       # int_kommunlanskoder = [ int(kommunlanskod) for kommunlanskod in kommunlanskoder]
+       assert set(kommunlanskoder).issubset(set(find("value", d)))
     if kommunkoder is None and kommunlanskoder is None:
         assert d is None
 
@@ -92,4 +89,3 @@ def test_build_timeframe_query(from_datetime, to_datetime):
     if to_datetime:
         d = platsannonser._build_timeframe_query(from_datetime, parser.parse(to_datetime))
         assert d['range']['publiceringsdatum']['lte'] == parser.parse(to_datetime).isoformat()
-

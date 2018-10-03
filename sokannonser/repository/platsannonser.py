@@ -158,7 +158,11 @@ def _build_freetext_query(querystring):
                         "fields": ["beskrivning.information",
                                    "beskrivning.behov",
                                    "beskrivning.krav",
-                                   "beskrivning.annonstext"]
+                                   "beskrivning.annonstext",
+                                   "yrkesroll.term",
+                                   "yrkesgrupp.term",
+                                   "yrkesomrade.term",
+                                   "krav.kompetenser.term"]
                     }
                 }
             ]
@@ -205,10 +209,10 @@ def _build_plats_query(kommunkoder, lanskoder):
     # OBS: Casting kommunkod values to ints the way currently stored in elastic
     plats_term_query = [{"term": {
         "arbetsplatsadress.kommunkod": {
-            "value": int(kkod), "boost": 2.0}}} for kkod in kommuner]
+            "value": kkod, "boost": 2.0}}} for kkod in kommuner]
     plats_term_query += [{"term": {
         "arbetsplatsadress.kommunkod": {
-            "value": int(lkod), "boost": 1.0}}} for lkod in kommunlanskoder]
+            "value": lkod, "boost": 1.0}}} for lkod in kommunlanskoder]
     return {"bool": {"should": plats_term_query}} if plats_term_query else None
 
 

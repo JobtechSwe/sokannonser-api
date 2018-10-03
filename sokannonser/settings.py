@@ -23,6 +23,7 @@ APIKEY_BACKDOOR = 'apa'  # TODO: Remove before production
 OFFSET = 'offset'
 LIMIT = 'limit'
 FREETEXT_QUERY = 'q'
+TYPEAHEAD_QUERY = 'complete'
 SORT = 'sortera'
 PUBLISHED_BEFORE = 'publicerad-innan'
 PUBLISHED_AFTER = 'publicerad-efter'

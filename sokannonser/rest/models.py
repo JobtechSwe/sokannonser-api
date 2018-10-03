@@ -121,6 +121,7 @@ sok_platsannons_query.add_argument(settings.PUBLISHED_AFTER,
                                    type=lambda x: datetime.strptime(x,
                                                                     '%Y-%m-%dT%H:%M:%S'))
 sok_platsannons_query.add_argument(settings.FREETEXT_QUERY)
+sok_platsannons_query.add_argument(settings.TYPEAHEAD_QUERY)
 sok_platsannons_query.add_argument(taxonomy.OCCUPATION, action='append')
 sok_platsannons_query.add_argument(taxonomy.GROUP, action='append')
 sok_platsannons_query.add_argument(taxonomy.FIELD, action='append')

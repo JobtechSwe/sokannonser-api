@@ -115,7 +115,7 @@ def _parse_args(args):
     driv_lic_query = _build_drivers_licens_query(args.get(taxonomy.DRIVING_LICENCE))
 
     # TODO: Maybe check if NO skills are listed in ad instead?
-    unqualified_query = {"term": {"erfarenhet_kravs": False}} \
+    no_experience_query = {"term": {"erfarenhet_kravs": False}} \
         if args.get(settings.NO_EXPERIENCE) else None
 
     if freetext_query:
@@ -134,8 +134,8 @@ def _parse_args(args):
         query_dsl['query']['bool']['must'].append(timeframe_query)
     if driv_lic_query:
         query_dsl['query']['bool']['must'].append(driv_lic_query)
-    if unqualified_query:
-        query_dsl['query']['bool']['must'].append(unqualified_query)
+    if no_experience_query:
+        query_dsl['query']['bool']['must'].append(no_experience_query)
 
     return query_dsl
 

@@ -57,7 +57,6 @@ def find_platsannonser(args):
     return query_result.get('hits', {})
 
 
-# Todo: Refactor
 def _parse_args(args):
     query_dsl = dict()
     query_dsl['from'] = args.pop(settings.OFFSET, 0)
@@ -113,6 +112,7 @@ def _parse_args(args):
         args.get(taxonomy.WORKTIME_EXTENT))
     timeframe_query = _build_timeframe_query(args.get(settings.PUBLISHED_AFTER),
                                              args.get(settings.PUBLISHED_BEFORE))
+    driv_lic_query = _build_drivers_licens_query(args.get(taxonomy.DRIVING_LICENCE))
 
     if freetext_query:
         query_dsl['query']['bool']['must'].append(freetext_query)
@@ -128,6 +128,8 @@ def _parse_args(args):
         query_dsl['query']['bool']['must'].append(worktime_bool_query)
     if timeframe_query:
         query_dsl['query']['bool']['must'].append(timeframe_query)
+    if driv_lic_query:
+        query_dsl['query']['bool']['must'].append(driv_lic_query)
 
     return query_dsl
 
@@ -206,7 +208,7 @@ def _build_plats_query(kommunkoder, lanskoder):
                                                 ).get('hits', {}).get('hits', [])
         kommunlanskoder += [entitet['_source']['id'] for entitet in kommun_results]
 
-    # OBS: Casting kommunkod values to ints the way currently stored in elastic
+    # Verify kommunkod is string
     plats_term_query = [{"term": {
         "arbetsplatsadress.kommunkod": {
             "value": kkod, "boost": 2.0}}} for kkod in kommuner]
@@ -214,6 +216,18 @@ def _build_plats_query(kommunkoder, lanskoder):
         "arbetsplatsadress.kommunkod": {
             "value": lkod, "boost": 1.0}}} for lkod in kommunlanskoder]
     return {"bool": {"should": plats_term_query}} if plats_term_query else None
+
+
+def _build_drivers_licens_query(license_types):
+    dlic_query = []
+    if license_types:
+        for license_type in license_types:
+            dlic_query.append({
+                "term": {
+                    "korkort.kod": {"value": license_type}
+                }
+            })
+    return {"bool": {"should": dlic_query}} if dlic_query else None
 
 
 def _build_timeframe_query(from_datetime, to_datetime):

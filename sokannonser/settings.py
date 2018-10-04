@@ -27,6 +27,7 @@ TYPEAHEAD_QUERY = 'complete'
 SORT = 'sortera'
 PUBLISHED_BEFORE = 'publicerad-innan'
 PUBLISHED_AFTER = 'publicerad-efter'
+NO_EXPERIENCE = 'utan-erfarenhet'
 PLACE_RADIUS = 'plats.radie'
 DATASET = 'dataset'
 

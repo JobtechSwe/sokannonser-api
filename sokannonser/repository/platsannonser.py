@@ -58,6 +58,42 @@ def find_platsannonser(args):
 
 
 def _parse_args(args):
+    query_dsl = _bootstrap_query(args)
+
+    # Check for empty query
+    if not any(v is not None for v in args.values()):
+        log.debug("Constructing match-all query")
+        query_dsl['query']['bool']['must'].append({'match_all': {}})
+        return query_dsl
+
+    must_queries = []
+
+    must_queries.append(_build_freetext_query(args.get(settings.FREETEXT_QUERY)))
+    must_queries.append(_build_yrkes_query(args.get(taxonomy.OCCUPATION),
+                                           args.get(taxonomy.GROUP),
+                                           args.get(taxonomy.FIELD)))
+    must_queries.append(_build_bool_should_query("krav.kompetenser.kod",
+                                                 args.get(taxonomy.SKILL)))
+    must_queries.append(_build_plats_query(args.get(taxonomy.MUNICIPALITY),
+                                           args.get(taxonomy.REGION)))
+    must_queries.append(_build_worktime_query(args.get(taxonomy.WORKTIME_EXTENT)))
+    must_queries.append(_build_timeframe_query(args.get(settings.PUBLISHED_AFTER),
+                                               args.get(settings.PUBLISHED_BEFORE)))
+    must_queries.append(_build_drivers_licens_query(args.get(taxonomy.DRIVING_LICENCE)))
+    must_queries.append(_build_employment_type_query(args.get(taxonomy.EMPLOYMENT_TYPE)))
+    # sprak_bool_query =  _build_bool_should_query("erfarenhet.sprak.kod",
+    #                                              args.get(taxonomy.LANGUAGE))
+
+    # TODO: Maybe check if NO skills are listed in ad instead?
+    if args.get(settings.NO_EXPERIENCE):
+        must_queries.append({"term": {"erfarenhet_kravs": False}})
+
+    query_dsl = _assemble_queries(query_dsl, must_queries)
+
+    return query_dsl
+
+
+def _bootstrap_query(args):
     query_dsl = dict()
     query_dsl['from'] = args.pop(settings.OFFSET, 0)
     query_dsl['size'] = args.pop(settings.LIMIT, 10)
@@ -90,37 +126,6 @@ def _parse_args(args):
 
     if args.get(settings.SORT):
         query_dsl['sort'] = [settings.sort_options.get(args.pop(settings.SORT))]
-
-    # Check for empty query
-    if not any(v is not None for v in args.values()):
-        log.debug("Constructing match-all query")
-        query_dsl['query']['bool']['must'].append({'match_all': {}})
-        return query_dsl
-
-    must_queries = []
-
-    must_queries.append(_build_freetext_query(args.get(settings.FREETEXT_QUERY)))
-    must_queries.append(_build_yrkes_query(args.get(taxonomy.OCCUPATION),
-                                           args.get(taxonomy.GROUP),
-                                           args.get(taxonomy.FIELD)))
-    must_queries.append(_build_bool_should_query("krav.kompetenser.kod",
-                                                 args.get(taxonomy.SKILL)))
-    must_queries.append(_build_plats_query(args.get(taxonomy.MUNICIPALITY),
-                                           args.get(taxonomy.REGION)))
-    must_queries.append(_build_worktime_query(args.get(taxonomy.WORKTIME_EXTENT)))
-    must_queries.append(_build_timeframe_query(args.get(settings.PUBLISHED_AFTER),
-                                               args.get(settings.PUBLISHED_BEFORE)))
-    must_queries.append(_build_drivers_licens_query(args.get(taxonomy.DRIVING_LICENCE)))
-    must_queries.append(_build_employment_type_query(args.get(taxonomy.EMPLOYMENT_TYPE)))
-    # sprak_bool_query =  _build_bool_should_query("erfarenhet.sprak.kod",
-    #                                              args.get(taxonomy.LANGUAGE))
-
-    # TODO: Maybe check if NO skills are listed in ad instead?
-    if args.get(settings.NO_EXPERIENCE):
-        must_queries.append({"term": {"erfarenhet_kravs": False}})
-
-    query_dsl = _assemble_queries(query_dsl, must_queries)
-
     return query_dsl
 
 

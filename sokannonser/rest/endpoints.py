@@ -35,6 +35,7 @@ class Search(Resource):
             taxonomy.FIELD: "En eller flera yrkesområdeskoder enligt taxonomi",
             taxonomy.SKILL: "En eller flera kompetenskoder enligt taxonomi",
             taxonomy.DRIVING_LICENCE: "Typ av körkort som efterfrågas (taxonomikod)",
+            taxonomy.EMPLOYMENT_TYPE: "Anställningstyp enligt taxonomi",
             settings.NO_EXPERIENCE: "Visa enbart jobb som inte kräver erfarenhet",
             # settings.PLACE: "Generellt platsnamn",
             taxonomy.WORKTIME_EXTENT: "En eller flera arbetstidsomfattningskoder enligt "

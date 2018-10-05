@@ -81,7 +81,7 @@ class Search(Resource):
         result = {
             "total": esresult['total'],
             "hits": [hit['_source'] for hit in esresult['hits']],
-            "stats": esresult['aggs']
+            "stats": esresult.get('aggs')
         }
         return result
 

@@ -54,7 +54,11 @@ def find_platsannonser(args):
     except exceptions.ConnectionError as e:
         log.error('Failed to connect to elasticsearch: %s' % str(e), e)
         abort(500, 'Failed to establish connection to database')
-    return query_result.get('hits', {})
+    results = query_result.get('hits', {})
+    if 'aggregations' in query_result:
+        results['aggs'] = query_result.get('aggregations', {}) \
+                            .get('complete', {}).get('buckets', [])
+    return results
 
 
 def _parse_args(args):
@@ -123,6 +127,17 @@ def _bootstrap_query(args):
             ]
         },
     }
+    complete = args.pop(settings.TYPEAHEAD_QUERY)
+    if complete:
+        query_dsl['aggs'] = {
+            "complete": {
+                "terms": {
+                    "field": "keywords.raw",
+                    "size": 20,
+                    "include": "%s.*" % complete
+                }
+            }
+        }
 
     if args.get(settings.SORT):
         query_dsl['sort'] = [settings.sort_options.get(args.pop(settings.SORT))]
@@ -157,16 +172,20 @@ def _build_freetext_query(querystring):
                     }
                 },
                 {
+                    "match": {
+                        "keywords": {
+                            "query": querystring,
+                            "boost": 2
+                        }
+                    }
+                },
+                {
                     "multi_match": {
                         "query": querystring,
                         "fields": ["beskrivning.information",
                                    "beskrivning.behov",
                                    "beskrivning.krav",
-                                   "beskrivning.annonstext",
-                                   "yrkesroll.term",
-                                   "yrkesgrupp.term",
-                                   "yrkesomrade.term",
-                                   "krav.kompetenser.term"]
+                                   "beskrivning.annonstext"]
                     }
                 }
             ]

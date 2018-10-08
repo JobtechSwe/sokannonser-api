@@ -30,6 +30,7 @@ class Search(Resource):
             settings.PUBLISHED_BEFORE: "Visa annonser publicerade innan angivet datum "
             "(på formen YYYY-mm-ddTHH:MM:SS)",
             settings.FREETEXT_QUERY: "Fritextfråga",
+            settings.TYPEAHEAD_QUERY: "För att ge förslag på ytterligare sökord (type ahead)",
             taxonomy.OCCUPATION: "En eller flera yrkesbenämningskoder enligt taxonomi",
             taxonomy.GROUP: "En eller flera yrkesgruppskoder enligt taxonomi",
             taxonomy.FIELD: "En eller flera yrkesområdeskoder enligt taxonomi",

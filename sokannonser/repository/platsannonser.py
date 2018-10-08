@@ -85,8 +85,6 @@ def _parse_args(args):
                                                args.get(settings.PUBLISHED_BEFORE)))
     must_queries.append(_build_drivers_licens_query(args.get(taxonomy.DRIVING_LICENCE)))
     must_queries.append(_build_employment_type_query(args.get(taxonomy.EMPLOYMENT_TYPE)))
-    # sprak_bool_query =  _build_bool_should_query("erfarenhet.sprak.kod",
-    #                                              args.get(taxonomy.LANGUAGE))
 
     # TODO: Maybe check if NO skills are listed in ad instead?
     if args.get(settings.NO_EXPERIENCE):
@@ -153,47 +151,58 @@ def _assemble_queries(query_dsl, additional_queries):
 
 
 def _build_freetext_query(querystring):
-    query_words = ' '.join(querystring.split(' ')[:-1]) \
-        if ' ' in querystring else querystring
-    return {
-        "bool": {
-            "should": [
-                {
-                    "match": {
-                        "rubrik": {
-                            "query": query_words,
-                            "boost": 3
-                        }
-                    }
-                },
-                {
-                    "match": {
-                        "arbetsgivare.namn": {
-                            "query": query_words,
-                            "boost": 2
-                        }
-                    }
-                },
-                {
-                    "match": {
-                        "keywords": {
-                            "query": query_words,
-                            "boost": 2
-                        }
-                    }
-                },
-                {
-                    "multi_match": {
-                        "query": query_words,
-                        "fields": ["beskrivning.information",
-                                   "beskrivning.behov",
-                                   "beskrivning.krav",
-                                   "beskrivning.annonstext"]
-                    }
+    if not querystring:
+        return None
+    inc_words = ' '.join([w for w in querystring.split(' ') if not w.startswith('-')])
+    exc_words = ' '.join([w[1:] for w in querystring.split(' ') if w.startswith('-')])
+    shoulds = __freetext_fields(inc_words) if inc_words else None
+    mustnts = __freetext_fields(exc_words) if exc_words else None
+    ft_query = {"bool": {}}
+    if shoulds:
+        ft_query['bool']['should'] = shoulds
+    if mustnts:
+        ft_query['bool']['must_not'] = mustnts
+
+    return ft_query
+
+
+# Conveniance method to create list of queries for freetext (either should or must_not)
+def __freetext_fields(searchword):
+    return [
+        {
+            "match": {
+                "rubrik": {
+                    "query": searchword,
+                    "boost": 3
                 }
-            ]
+            }
+        },
+        {
+            "match": {
+                "arbetsgivare.namn": {
+                    "query": searchword,
+                    "boost": 2
+                }
+            }
+        },
+        {
+            "match": {
+                "keywords": {
+                    "query": searchword,
+                    "boost": 2
+                }
+            }
+        },
+        {
+            "multi_match": {
+                "query": searchword,
+                "fields": ["beskrivning.information",
+                           "beskrivning.behov",
+                           "beskrivning.krav",
+                           "beskrivning.annonstext"]
+            }
         }
-    } if querystring else None
+    ]
 
 
 def _build_yrkes_query(yrkesroller, yrkesgrupper, yrkesomraden):

@@ -127,8 +127,9 @@ def _bootstrap_query(args):
             ]
         },
     }
-    complete = args.pop(settings.TYPEAHEAD_QUERY)
-    if complete:
+    complete_string = args.get(settings.TYPEAHEAD_QUERY)
+    if complete_string:
+        complete = complete_string.split(' ')[-1]
         query_dsl['aggs'] = {
             "complete": {
                 "terms": {
@@ -152,13 +153,15 @@ def _assemble_queries(query_dsl, additional_queries):
 
 
 def _build_freetext_query(querystring):
+    query_words = ' '.join(querystring.split(' ')[:-1]) \
+        if ' ' in querystring else querystring
     return {
         "bool": {
             "should": [
                 {
                     "match": {
                         "rubrik": {
-                            "query": querystring,
+                            "query": query_words,
                             "boost": 3
                         }
                     }
@@ -166,7 +169,7 @@ def _build_freetext_query(querystring):
                 {
                     "match": {
                         "arbetsgivare.namn": {
-                            "query": querystring,
+                            "query": query_words,
                             "boost": 2
                         }
                     }
@@ -174,14 +177,14 @@ def _build_freetext_query(querystring):
                 {
                     "match": {
                         "keywords": {
-                            "query": querystring,
+                            "query": query_words,
                             "boost": 2
                         }
                     }
                 },
                 {
                     "multi_match": {
-                        "query": querystring,
+                        "query": query_words,
                         "fields": ["beskrivning.information",
                                    "beskrivning.behov",
                                    "beskrivning.krav",

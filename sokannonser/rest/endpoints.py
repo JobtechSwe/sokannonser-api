@@ -30,7 +30,7 @@ class Search(Resource):
             settings.PUBLISHED_BEFORE: "Visa annonser publicerade innan angivet datum "
             "(på formen YYYY-mm-ddTHH:MM:SS)",
             settings.FREETEXT_QUERY: "Fritextfråga",
-            settings.TYPEAHEAD_QUERY: "För att ge förslag på ytterligare sökord (type ahead)",
+            settings.TYPEAHEAD_QUERY: "Ge förslag på sökord utifrån nuvarande sökning (type head)",
             taxonomy.OCCUPATION: "En eller flera yrkesbenämningskoder enligt taxonomi",
             taxonomy.GROUP: "En eller flera yrkesgruppskoder enligt taxonomi",
             taxonomy.FIELD: "En eller flera yrkesområdeskoder enligt taxonomi",
@@ -81,8 +81,8 @@ class Search(Resource):
     def marshal_full(self, esresult):
         result = {
             "total": esresult['total'],
+            "stats": esresult.get('aggs', []),
             "hits": [hit['_source'] for hit in esresult['hits']],
-            "stats": esresult.get('aggs')
         }
         return result
 

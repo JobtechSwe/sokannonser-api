@@ -81,7 +81,7 @@ class Search(Resource):
     def marshal_full(self, esresult):
         result = {
             "total": esresult['total'],
-            "stats": esresult.get('aggs', []),
+            "typeahead": esresult.get('aggs', []),
             "hits": [hit['_source'] for hit in esresult['hits']],
         }
         return result

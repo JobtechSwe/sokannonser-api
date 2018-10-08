@@ -233,22 +233,42 @@ def _build_yrkes_query(yrkesroller, yrkesgrupper, yrkesomraden):
 
 
 def _build_plats_query(kommunkoder, lanskoder):
-    kommuner = [] if not kommunkoder else kommunkoder
+    kommuner = []
+    neg_komm = []
+    for kkod in kommunkoder if kommunkoder else []:
+        if kkod.startswith('-'):
+            neg_komm.append(kkod[1:])
+        else:
+            kommuner.append(kkod)
+
     kommunlanskoder = []
     for lanskod in lanskoder if lanskoder is not None else []:
-        kommun_results = taxonomy.find_concepts(elastic, None, lanskod,
-                                                tax_type.get(taxonomy.MUNICIPALITY)
-                                                ).get('hits', {}).get('hits', [])
-        kommunlanskoder += [entitet['_source']['id'] for entitet in kommun_results]
+        if lanskod.startswith('-'):
+            kommun_results = taxonomy.find_concepts(elastic, None, lanskod[1:],
+                                                    tax_type.get(taxonomy.MUNICIPALITY)
+                                                    ).get('hits', {}).get('hits', [])
+            neg_komm += [entitet['_source']['id'] for entitet in kommun_results]
+        else:
+            kommun_results = taxonomy.find_concepts(elastic, None, lanskod,
+                                                    tax_type.get(taxonomy.MUNICIPALITY)
+                                                    ).get('hits', {}).get('hits', [])
+            kommunlanskoder += [entitet['_source']['id'] for entitet in kommun_results]
 
-    # Verify kommunkod is string
     plats_term_query = [{"term": {
         "arbetsplatsadress.kommunkod": {
             "value": kkod, "boost": 2.0}}} for kkod in kommuner]
     plats_term_query += [{"term": {
         "arbetsplatsadress.kommunkod": {
             "value": lkod, "boost": 1.0}}} for lkod in kommunlanskoder]
-    return {"bool": {"should": plats_term_query}} if plats_term_query else None
+    plats_bool_query = {"bool": {"should": plats_term_query}} if plats_term_query else {}
+    if neg_komm:
+        neg_plats_term_query = [{"term": {
+            "arbetsplatsadress.kommunkod": {
+                "value": kkod}}} for kkod in neg_komm]
+        if 'bool' not in plats_bool_query:
+            plats_bool_query['bool'] = {}
+        plats_bool_query['bool']['must_not'] = neg_plats_term_query
+    return plats_bool_query
 
 
 def _build_drivers_licens_query(license_types):

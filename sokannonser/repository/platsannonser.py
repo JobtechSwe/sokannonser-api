@@ -76,8 +76,8 @@ def _parse_args(args):
     must_queries.append(_build_yrkes_query(args.get(taxonomy.OCCUPATION),
                                            args.get(taxonomy.GROUP),
                                            args.get(taxonomy.FIELD)))
-    must_queries.append(_build_bool_should_query("krav.kompetenser.kod",
-                                                 args.get(taxonomy.SKILL)))
+    must_queries.append(_build_generic_query("krav.kompetenser.kod",
+                                             args.get(taxonomy.SKILL)))
     must_queries.append(_build_plats_query(args.get(taxonomy.MUNICIPALITY),
                                            args.get(taxonomy.REGION)))
     must_queries.append(_build_worktime_query(args.get(taxonomy.WORKTIME_EXTENT)))
@@ -339,9 +339,21 @@ def _build_worktime_query(lista):
     return {"bool": {"should": term_query}} if term_query else None
 
 
-def _build_bool_should_query(key, itemlist):
+def _build_generic_query(key, itemlist):
     items = [] if not itemlist else itemlist
 
-    term_query = [{"term": {key: {"value": item}}} for item in items]
+    term_query = [{"term": {key: {"value": item}}}
+                  for item in items if not item.startswith('-')]
 
-    return {"bool": {"should": term_query}} if term_query else None
+    neg_term_query = [{"term": {key: {"value": item[1:]}}}
+                      for item in items if item.startswith('-')]
+
+    if term_query or neg_term_query:
+        query = {'bool': {}}
+        if term_query:
+            query['bool']['should'] = term_query
+        if neg_term_query:
+            query['bool']['must_not'] = neg_term_query
+        return query
+
+    return None

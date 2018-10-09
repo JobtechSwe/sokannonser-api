@@ -56,6 +56,8 @@ def find_platsannonser(args):
         abort(500, 'Failed to establish connection to database')
     results = query_result.get('hits', {})
     if 'aggregations' in query_result:
+        results['positions'] = query_result.get('aggregations', {}) \
+                                .get('positions', {}).get('value', 0)
         results['aggs'] = _filter_aggs(query_result.get('aggregations', {})
                                        .get('complete', {}).get('buckets', []),
                                        args.get(settings.FREETEXT_QUERY))
@@ -140,15 +142,18 @@ def _bootstrap_query(args):
         },
     }
     complete_string = args.get(settings.TYPEAHEAD_QUERY)
+    query_dsl['aggs'] = {
+        "positions": {
+            "sum": {"field": "antal_platser"}
+        }
+    }
     if complete_string:
         complete = complete_string.split(' ')[-1]
-        query_dsl['aggs'] = {
-            "complete": {
-                "terms": {
-                    "field": "keywords.raw",
-                    "size": 20,
-                    "include": "%s.*" % complete
-                }
+        query_dsl['aggs']['complete'] = {
+            "terms": {
+                "field": "keywords.raw",
+                "size": 20,
+                "include": "%s.*" % complete
             }
         }
 

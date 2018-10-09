@@ -214,20 +214,38 @@ def _build_yrkes_query(yrkesroller, yrkesgrupper, yrkesomraden):
         "term": {
             "yrkesroll.kod": {
                 "value": y,
-                "boost": 1.0}}} for y in yrken if y]
+                "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
     yrke_term_query += [{
         "term": {
             "yrkesgrupp.kod": {
                 "value": y,
-                "boost": 1.0}}} for y in yrkesgrupper if y]
+                "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
     yrke_term_query += [{
         "term": {
             "yrkesomrade.kod": {
                 "value": y,
-                "boost": 1.0}}} for y in yrkesomraden if y]
+                "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
 
-    if yrke_term_query:
-        return {"bool": {"should": yrke_term_query}}
+    neg_yrke_term_query = [{
+        "term": {
+            "yrkesroll.kod": {
+                "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
+    neg_yrke_term_query += [{
+        "term": {
+            "yrkesgrupp.kod": {
+                "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
+    neg_yrke_term_query += [{
+        "term": {
+            "yrkesomrade.kod": {
+                "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
+
+    if yrke_term_query or neg_yrke_term_query:
+        query = {'bool': {}}
+        if yrke_term_query:
+            query['bool']['should'] = yrke_term_query
+        if neg_yrke_term_query:
+            query['bool']['must_not'] = neg_yrke_term_query
+        return query
     else:
         return None
 

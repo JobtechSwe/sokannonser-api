@@ -56,9 +56,20 @@ def find_platsannonser(args):
         abort(500, 'Failed to establish connection to database')
     results = query_result.get('hits', {})
     if 'aggregations' in query_result:
-        results['aggs'] = query_result.get('aggregations', {}) \
-                            .get('complete', {}).get('buckets', [])
+        results['aggs'] = _filter_aggs(query_result.get('aggregations', {})
+                                       .get('complete', {}).get('buckets', []),
+                                       args.get(settings.FREETEXT_QUERY))
     return results
+
+
+def _filter_aggs(aggs, freetext):
+    fwords = freetext.split(' ') if freetext else []
+    filtered_aggs = []
+    for agg in aggs:
+        if not agg.get('key') in fwords:
+            filtered_aggs.append(agg)
+
+    return filtered_aggs
 
 
 def _parse_args(args):

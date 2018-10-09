@@ -76,15 +76,18 @@ def _parse_args(args):
     must_queries.append(_build_yrkes_query(args.get(taxonomy.OCCUPATION),
                                            args.get(taxonomy.GROUP),
                                            args.get(taxonomy.FIELD)))
-    must_queries.append(_build_generic_query("krav.kompetenser.kod",
-                                             args.get(taxonomy.SKILL)))
-    must_queries.append(_build_plats_query(args.get(taxonomy.MUNICIPALITY),
-                                           args.get(taxonomy.REGION)))
-    must_queries.append(_build_worktime_query(args.get(taxonomy.WORKTIME_EXTENT)))
     must_queries.append(_build_timeframe_query(args.get(settings.PUBLISHED_AFTER),
                                                args.get(settings.PUBLISHED_BEFORE)))
-    must_queries.append(_build_drivers_licens_query(args.get(taxonomy.DRIVING_LICENCE)))
-    must_queries.append(_build_employment_type_query(args.get(taxonomy.EMPLOYMENT_TYPE)))
+    must_queries.append(_build_plats_query(args.get(taxonomy.MUNICIPALITY),
+                                           args.get(taxonomy.REGION)))
+    must_queries.append(_build_generic_query("krav.kompetenser.kod",
+                                             args.get(taxonomy.SKILL)))
+    must_queries.append(_build_generic_query("arbetstidstyp.kod",
+                                             args.get(taxonomy.WORKTIME_EXTENT)))
+    must_queries.append(_build_generic_query("korkort.kod",
+                                             args.get(taxonomy.DRIVING_LICENCE)))
+    must_queries.append(_build_generic_query("anstallningstyp.kod",
+                                             args.get(taxonomy.EMPLOYMENT_TYPE)))
 
     # TODO: Maybe check if NO skills are listed in ad instead?
     if args.get(settings.NO_EXPERIENCE):
@@ -289,30 +292,6 @@ def _build_plats_query(kommunkoder, lanskoder):
     return plats_bool_query
 
 
-def _build_drivers_licens_query(license_types):
-    dlic_query = []
-    if license_types:
-        for license_type in license_types:
-            dlic_query.append({
-                "term": {
-                    "korkort.kod": {"value": license_type}
-                }
-            })
-    return {"bool": {"should": dlic_query}} if dlic_query else None
-
-
-def _build_employment_type_query(emp_types):
-    emp_query = []
-    if emp_types:
-        for emp_type in emp_types:
-            emp_query.append({
-                "term": {
-                    "anstallningstyp.kod": {"value": emp_type}
-                }
-            })
-    return {"bool": {"should": emp_query}} if emp_query else None
-
-
 def _build_timeframe_query(from_datetime, to_datetime):
     if not from_datetime and not to_datetime:
         return None
@@ -328,15 +307,6 @@ def _build_timeframe_query(from_datetime, to_datetime):
 def _datetime2millis(utc_time):
     millis = (utc_time - datetime(1970, 1, 1)).total_seconds() * 1000  # We want millis
     return int(millis)
-
-
-def _build_worktime_query(lista):
-    arbetstidskoder = [] if not lista else lista
-
-    term_query = [{"term": {
-        "arbetstidstyp.kod": {"value": kod}}} for kod in arbetstidskoder]
-
-    return {"bool": {"should": term_query}} if term_query else None
 
 
 def _build_generic_query(key, itemlist):

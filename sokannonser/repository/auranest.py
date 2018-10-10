@@ -44,41 +44,58 @@ def _parse_args(args):
     return query_dsl
 
 
+def __freetext_fields(searchword):
+    return [
+        {
+            "match": {
+                "header": {
+                    "query": searchword,
+                    "boost": 3
+                }
+            }
+        },
+        {
+            "match": {
+                "title.freetext": {
+                    "query": searchword,
+                    "boost": 3
+                }
+            }
+        },
+        {
+            "match": {
+                "employer.name": {
+                    "query": searchword,
+                    "boost": 2
+                }
+            }
+        },
+        {
+            "match": {
+                "content.text": {
+                    "query": searchword,
+                }
+            }
+        }
+    ]
+
+
 def _build_freetext_query(freetext):
+    if not freetext:
+        return None
+    inc_words = ' '.join([w for w in freetext.split(' ') if not w.startswith('-')])
+    exc_words = ' '.join([w[1:] for w in freetext.split(' ') if w.startswith('-')])
+    shoulds = __freetext_fields(inc_words) if inc_words else None
+    mustnts = __freetext_fields(exc_words) if exc_words else None
+    ft_query = {"bool": {}}
+    if shoulds:
+        ft_query['bool']['should'] = shoulds
+    if mustnts:
+        ft_query['bool']['must_not'] = mustnts
+
+    return ft_query
     return {
         "bool": {
-            "should": [
-                {
-                    "match": {
-                        "header": {
-                            "query": freetext,
-                            "boost": 3
-                        }
-                    }
-                },
-                {
-                    "match": {
-                        "title.freetext": {
-                            "query": freetext,
-                            "boost": 3
-                        }
-                    }
-                },
-                {
-                    "match": {
-                        "employer.name": {
-                            "query": freetext,
-                            "boost": 2
-                        }
-                    }
-                },
-                {
-                    "match": {
-                        "content.text": {
-                            "query": freetext,
-                        }
-                    }
-                }
-            ]
+            "should": __freetext_fields(freetext)
         }
     } if freetext else None

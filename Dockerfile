@@ -13,12 +13,12 @@ RUN apk add --no-cache \
 COPY nginx.conf /etc/nginx/nginx.conf
 RUN rm /etc/nginx/conf.d/default.conf
 
-RUN chmod -R 777 /var/lib/nginx && \
+RUN chmod -R 775 /var/lib/nginx && \
     chmod -R 777 /var/log/* && \
-    chmod -R 777 /var/tmp/nginx && \
+    chmod -R 775 /var/tmp/nginx && \
     mkdir -p /var/run/nginx && \
-    chmod -R 777 /var/run/nginx && \
-    chmod -R 777 /app
+    chmod -R 775 /var/run/nginx && \
+    chmod -R 775 /app
 
 
 WORKDIR /app

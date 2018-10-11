@@ -18,7 +18,8 @@ RUN chmod -R 775 /var/lib/nginx && \
     chmod -R 777 /var/tmp/nginx && \
     mkdir -p /var/run/nginx && \
     chmod -R 777 /var/run/nginx && \
-    chmod -R 775 /app
+    chmod -R 775 /app && \
+    chmod -R 777 /usr/sbin
 
 
 WORKDIR /app

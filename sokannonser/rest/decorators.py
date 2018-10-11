@@ -37,7 +37,7 @@ def _decode_key(apikey):
             except binascii.Error as e:
                 log.debug("Failed to decode api key: %s: %s" % (apikey, e))
             except UnicodeDecodeError as u:
-                log.debug("Failed to decode utf-8 key: %s: %s" % apikey, u)
+                log.debug("Failed to decode utf-8 key: %s: %s" % (apikey, u))
             # Reappend trailing '=' to find correct padding
             apikey = "%s=" % apikey
     return decoded

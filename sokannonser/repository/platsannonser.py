@@ -56,8 +56,8 @@ def find_platsannonser(args):
         abort(500, 'Failed to establish connection to database')
     results = query_result.get('hits', {})
     if 'aggregations' in query_result:
-        results['positions'] = query_result.get('aggregations', {}) \
-                                .get('positions', {}).get('value', 0)
+        results['positions'] = int(query_result.get('aggregations', {})
+                                   .get('positions', {}).get('value', 0))
         results['aggs'] = _filter_aggs(query_result.get('aggregations', {})
                                        .get('complete', {}).get('buckets', []),
                                        args.get(settings.FREETEXT_QUERY))

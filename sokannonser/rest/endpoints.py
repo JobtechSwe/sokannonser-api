@@ -30,7 +30,8 @@ class Search(Resource):
             settings.PUBLISHED_BEFORE: "Visa annonser publicerade innan angivet datum "
             "(på formen YYYY-mm-ddTHH:MM:SS)",
             settings.FREETEXT_QUERY: "Fritextfråga",
-            settings.TYPEAHEAD_QUERY: "Ge förslag på sökord utifrån nuvarande sökning (type head)",
+            settings.TYPEAHEAD_QUERY: "Ge förslag på sökord utifrån nuvarande sökning "
+            "(type head)",
             taxonomy.OCCUPATION: "En eller flera yrkesbenämningskoder enligt taxonomi",
             taxonomy.GROUP: "En eller flera yrkesgruppskoder enligt taxonomi",
             taxonomy.FIELD: "En eller flera yrkesområdeskoder enligt taxonomi",
@@ -45,6 +46,10 @@ class Search(Resource):
             taxonomy.REGION: "En eller flera länskoder",
             # settings.PLACE_RADIUS: "Inom vilken ungefärlig radie i kilometer från "
             # "valda platser som annonser ska hittas",
+            settings.STATISTICS: "Visa sökstatistik för angivna fält "
+            "(tillgängliga fält: %s, %s och %s)" % (
+                taxonomy.OCCUPATION, taxonomy.GROUP, taxonomy.FIELD
+            ),
             settings.RESULT_MODEL: "Resultatmodell",
             settings.DATASET: "Sök bland AF:s annonser eller alla på marknaden (auranest)"
         },
@@ -83,6 +88,7 @@ class Search(Resource):
             "total": esresult.get('total', 0),
             "positions": esresult.get('positions', 0),
             "typeahead": esresult.get('aggs', []),
+            "stats": esresult.get('stats', {}),
             "hits": [hit['_source'] for hit in esresult['hits']],
         }
         return result
@@ -137,6 +143,9 @@ class Valuestore(Resource):
                                                        hit['_source']['type'])
             entity = {"kod": hit['_source']['id'], "term": hit['_source']['label'],
                       "typ": type_label}
+            foralder = hit['_source'].get('parent', {}).get('id')
+            if foralder:
+                entity['foralder'] = foralder
             if statistics:
                 entity['antal'] = statistics.get(hit['_source']['id'], 0)
             results.append(entity)

@@ -61,6 +61,21 @@ def find_platsannonser(args):
         results['aggs'] = _filter_aggs(query_result.get('aggregations', {})
                                        .get('complete', {}).get('buckets', []),
                                        args.get(settings.FREETEXT_QUERY))
+        for stat in args.get(settings.STATISTICS):
+            if 'stats' not in results:
+                results['stats'] = []
+            results['stats'].append({
+                "type": stat,
+                "values": [
+                    {
+                        "term": taxonomy.get_term(elastic, stat, b['key']),
+                        "kod": b['key'],
+                        "count": b['doc_count']}
+                    for b in query_result.get('aggregations',
+                                              {}).get(stat, {}).get('buckets', [])
+                ]
+
+            })
     return results
 
 
@@ -107,6 +122,14 @@ def _parse_args(args):
         must_queries.append({"term": {"erfarenhet_kravs": False}})
 
     query_dsl = _assemble_queries(query_dsl, must_queries)
+
+    for stat in args.get(settings.STATISTICS):
+        query_dsl['aggs'][stat] = {
+            "terms": {
+                "field": settings.stats_options[stat],
+                "size": args.get(settings.STAT_LMT) if args.get(settings.STAT_LMT) else 5
+            }
+        }
 
     return query_dsl
 

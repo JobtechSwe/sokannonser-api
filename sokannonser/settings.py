@@ -1,4 +1,5 @@
 import os
+from valuestore import taxonomy
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "localhost")
@@ -29,6 +30,8 @@ PUBLISHED_BEFORE = 'publicerad-innan'
 PUBLISHED_AFTER = 'publicerad-efter'
 NO_EXPERIENCE = 'utan-erfarenhet'
 PLACE_RADIUS = 'plats.radie'
+STATISTICS = 'stats'
+STAT_LMT = 'stats.limit'
 DATASET = 'dataset'
 
 MAX_OFFSET = 2000
@@ -54,6 +57,11 @@ sort_options = {
     'pubdate-asc':  {"publiceringsdatum": "asc"},
     'applydate-desc':  {"sista_ansokningsdatum": "desc"},
     'applydate-asc':  {"sista_ansokningsdatum": "asc"},
+}
+stats_options = {
+    taxonomy.OCCUPATION: "yrkesroll.kod.keyword",
+    taxonomy.GROUP: "yrkesgrupp.kod.keyword",
+    taxonomy.FIELD: "yrkesomrade.kod.keyword",
 }
 auranest_sort_options = {
     'relevance': "_score",

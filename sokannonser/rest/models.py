@@ -134,6 +134,10 @@ sok_platsannons_query.add_argument(settings.NO_EXPERIENCE, type=bool, default=Fa
 sok_platsannons_query.add_argument(taxonomy.MUNICIPALITY, action='append')
 sok_platsannons_query.add_argument(taxonomy.REGION, action='append')
 # sok_platsannons_query.add_argument(settings.PLACE_RADIUS, type=int)
+sok_platsannons_query.add_argument(settings.STATISTICS, action='append',
+                                   choices=[taxonomy.OCCUPATION, taxonomy.GROUP,
+                                            taxonomy.FIELD])
+sok_platsannons_query.add_argument(settings.STAT_LMT, type=int, required=False)
 sok_platsannons_query.add_argument(settings.RESULT_MODEL, choices=settings.result_models)
 sok_platsannons_query.add_argument(settings.DATASET,
                                    choices=settings.AVAILABLE_DATASETS,

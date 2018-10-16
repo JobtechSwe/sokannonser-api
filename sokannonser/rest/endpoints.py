@@ -117,7 +117,7 @@ class Valuestore(Resource):
     @api.expect(taxonomy_query)
     def get(self):
         q = request.args.get('q', None)
-        kod = request.args.get('kod', None)
+        kod = request.args.get('kod', [])
         typ = tax_type.get(request.args.get('typ', None), None)
         offset = request.args.get(settings.OFFSET, 0)
         limit = request.args.get(settings.LIMIT, 10)

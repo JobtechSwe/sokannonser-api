@@ -1,7 +1,8 @@
-pytest
 elasticsearch
 flask
 flask-restplus
 flask-cors
 certifi
 git+https://github.com/JobtechSwe/valuestore-module.git
+python-dateutil
+pytest

@@ -23,6 +23,7 @@ def find(key, dictionary):  # about yield: https://stackoverflow.com/questions/2
 tax_stat = [tax_type[t.OCCUPATION], tax_type[t.GROUP], tax_type[t.FIELD], tax_type[t.SKILL],tax_type[t.WORKTIME_EXTENT]]
 tax_other = [tax_type[t.MUNICIPALITY], tax_type[t.REGION], tax_type[t.PLACE], tax_type[t.LANGUAGE]]
 tax_noexist = ['', 'blabla', ' ']
+@pytest.mark.integration
 @pytest.mark.parametrize("taxonomy_type", tax_stat + tax_other + tax_noexist)
 def test_get_stats_for(taxonomy_type):
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -47,7 +48,7 @@ def safe_execute(default, exception, function, *args): # safe_execute("Felkod", 
         log.error(default, exception)
         return default
 
-
+@pytest.mark.integration
 @pytest.mark.parametrize("kommunkoder", [ ["2510", "0118"], ["0118"], None , [] ] )
 @pytest.mark.parametrize("lanskoder", [ ["25"], ["01", "03"], ["ejLanKod"], None, [] ])
 def test_build_plats_query(kommunkoder, lanskoder):
@@ -68,6 +69,7 @@ def test_build_plats_query(kommunkoder, lanskoder):
     if kommunkoder is None and kommunlanskoder is None:
         assert d is None
 
+@pytest.mark.unit
 @pytest.mark.parametrize("from_datetime", [  "2018-09-28T00:00:00", '2018-09-28', '', None, [] ] )
 @pytest.mark.parametrize("to_datetime", [  "2018-09-28T00:01", '2018-09-27', '', None, [] ])
 def test_build_timeframe_query(from_datetime, to_datetime):

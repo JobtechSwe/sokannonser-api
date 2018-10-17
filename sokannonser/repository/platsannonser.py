@@ -4,7 +4,7 @@ from elasticsearch import exceptions
 from valuestore import taxonomy
 from valuestore.taxonomy import tax_type
 from sokannonser import settings
-from . import elastic
+from sokannonser.repository import elastic
 import json
 from datetime import datetime
 

@@ -366,3 +366,21 @@ def _build_generic_query(key, itemlist):
         return query
 
     return None
+
+
+def _build_geopoint_distance_filter(longitude, latitude, coordinate_range):
+    geo_filter = {}
+    if ((longitude is None)
+        or (latitude is None)
+        or (coordinate_range is None)):
+        return geo_filter
+    elif ((-180 <= longitude <= 180)
+          or (-90 <= latitude <= 90)
+          or (coordinate_range > 0)):
+        geo_filter["geo_filter"] = {
+            "distance": coordinate_range,
+            "arbetsplatsadress.coordinates": [longitude, latitude]
+        }
+    return geo_filter
+        
+        

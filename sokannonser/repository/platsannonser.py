@@ -54,6 +54,7 @@ def find_platsannonser(args):
     except exceptions.ConnectionError as e:
         log.error('Failed to connect to elasticsearch: %s' % str(e), e)
         abort(500, 'Failed to establish connection to database')
+        return
     results = query_result.get('hits', {})
     if 'aggregations' in query_result:
         results['positions'] = int(query_result.get('aggregations', {})
@@ -98,7 +99,7 @@ def _parse_args(args):
         query_dsl['query']['bool']['must'].append({'match_all': {}})
         return query_dsl
 
-    must_queries = []
+    must_queries = list()
 
     must_queries.append(_build_freetext_query(args.get(settings.FREETEXT_QUERY)))
     must_queries.append(_build_yrkes_query(args.get(taxonomy.OCCUPATION),
@@ -382,5 +383,3 @@ def _build_geopoint_distance_filter(longitude, latitude, coordinate_range):
             "arbetsplatsadress.coordinates": [longitude, latitude]
         }
     return geo_filter
-        
-        

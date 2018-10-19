@@ -24,7 +24,7 @@ def get_stats_for(taxonomy_type):
     }
     # Make sure we don't crash if we want to stat on missing type
     if taxonomy_type not in value_path:
-        log.warn("Taxonomy type %s not configured for aggs." % taxonomy_type)
+        log.warning("Taxonomy type %s not configured for aggs." % taxonomy_type)
         return {}
 
     aggs_query = {
@@ -61,7 +61,7 @@ def find_platsannonser(args):
         results['aggs'] = _filter_aggs(query_result.get('aggregations', {})
                                        .get('complete', {}).get('buckets', []),
                                        args.get(settings.FREETEXT_QUERY))
-        for stat in args.get(settings.STATISTICS):
+        for stat in args.get(settings.STATISTICS) if args.get(settings.STATISTICS) else []:
             if 'stats' not in results:
                 results['stats'] = []
             results['stats'].append({
@@ -123,7 +123,7 @@ def _parse_args(args):
 
     query_dsl = _assemble_queries(query_dsl, must_queries)
 
-    for stat in args.get(settings.STATISTICS):
+    for stat in args.get(settings.STATISTICS) if args.get(settings.STATISTICS) else []:
         query_dsl['aggs'][stat] = {
             "terms": {
                 "field": settings.stats_options[stat],

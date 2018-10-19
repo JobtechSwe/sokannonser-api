@@ -13,6 +13,10 @@ def find_annonser(args):
     return query_result.get('hits', {})
 
 
+def autocomplete(querystring):
+    return []
+
+
 def _parse_args(args):
     query_dsl = dict()
     query_dsl['from'] = args.pop(settings.OFFSET, 0)

@@ -149,6 +149,11 @@ auranest_query.add_argument(settings.APIKEY, location='headers', required=True,
 auranest_query.add_argument(settings.FREETEXT_QUERY)
 auranest_query.add_argument('group_id')
 
+auranest_typeahead = reqparse.RequestParser()
+auranest_typeahead.add_argument(settings.APIKEY, location='headers', required=True,
+                            default=settings.APIKEY_BACKDOOR)
+auranest_typeahead.add_argument(settings.FREETEXT_QUERY)
+
 taxonomy_query = reqparse.RequestParser()
 taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True,
                             default=settings.APIKEY_BACKDOOR)

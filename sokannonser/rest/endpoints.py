@@ -7,7 +7,8 @@ from sokannonser.repository import platsannonser, auranest, elastic
 from sokannonser import settings
 from sokannonser.rest.decorators import check_api_key
 from sokannonser.rest.models import pbapi_lista, simple_lista, \
-                                    sok_platsannons_query, taxonomy_query
+                                    sok_platsannons_query, taxonomy_query, \
+                                    auranest_query
 
 
 @api.route('/sok')
@@ -96,6 +97,16 @@ class Search(Resource):
     @api.marshal_with(simple_lista)
     def marshal_simple(self, result):
         return result
+
+
+@api.route('/alla')
+class AuranestSearch(Resource):
+    method_decorators = [check_api_key]
+
+    @api.expect(auranest_query)
+    def get(self):
+        args = auranest_query.parse_args()
+        return auranest.find_annonser(args)
 
 
 @api.route('/vardeforrad')

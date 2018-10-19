@@ -143,8 +143,15 @@ sok_platsannons_query.add_argument(settings.DATASET,
                                    choices=settings.AVAILABLE_DATASETS,
                                    default=settings.DATASET_AF)
 
+auranest_query = reqparse.RequestParser()
+auranest_query.add_argument(settings.APIKEY, location='headers', required=True,
+                            default=settings.APIKEY_BACKDOOR)
+auranest_query.add_argument(settings.FREETEXT_QUERY)
+auranest_query.add_argument('group_id')
+
 taxonomy_query = reqparse.RequestParser()
-taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)
+taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True,
+                            default=settings.APIKEY_BACKDOOR)
 taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)
 taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)

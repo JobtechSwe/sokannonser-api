@@ -36,7 +36,6 @@ def _parse_args(args):
         query_dsl['sort'] = [settings.auranest_sort_options.get(args.pop(settings.SORT))]
 
     # Check for empty query
-    print(args.values())
     if not any(v is not None for v in args.values()):
         log.debug("Constructing match-all query")
         query_dsl['query']['bool']['must'].append({'match_all': {}})

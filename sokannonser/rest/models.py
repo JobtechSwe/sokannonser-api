@@ -135,6 +135,10 @@ sok_platsannons_query.add_argument(settings.NO_EXPERIENCE, type=bool, default=Fa
 # sok_platsannons_query.add_argument(settings.PLACE)
 sok_platsannons_query.add_argument(taxonomy.MUNICIPALITY, action='append')
 sok_platsannons_query.add_argument(taxonomy.REGION, action='append')
+
+sok_platsannons_query.add_argument(settings.LONGITUDE, type=float)
+sok_platsannons_query.add_argument(settings.LATITUDE, type=float)
+sok_platsannons_query.add_argument(settings.POSITION_RADIUS, type=int)
 # sok_platsannons_query.add_argument(settings.PLACE_RADIUS, type=int)
 sok_platsannons_query.add_argument(settings.STATISTICS, action='append',
                                    choices=[taxonomy.OCCUPATION, taxonomy.GROUP,

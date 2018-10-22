@@ -44,6 +44,9 @@ class Search(Resource):
             settings.PARTTIME_MAX: "För deltidsjobb, maximal omfattning",
             taxonomy.MUNICIPALITY: "En eller flera kommunkoder",
             taxonomy.REGION: "En eller flera länskoder",
+            settings.LONGITUDE: "Longitud för punkt",
+            settings.LATITUDE: "Latitud för punkt",
+            settings.POSITION_RADIUS: "Radie från punkt i km",
             # settings.PLACE_RADIUS: "Inom vilken ungefärlig radie i kilometer från "
             # "valda platser som annonser ska hittas",
             settings.STATISTICS: "Visa sökstatistik för angivna fält "

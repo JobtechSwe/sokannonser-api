@@ -124,7 +124,12 @@ def _parse_args(args):
     if args.get(settings.NO_EXPERIENCE):
         must_queries.append({"term": {"erfarenhet_kravs": False}})
 
-    query_dsl = _assemble_queries(query_dsl, must_queries)
+    filter_queries = list()
+    filter_queries.append(_build_geopoint_distance_filter(args.get(settings.LONGITUDE),
+                                                          args.get(settings.LATITUDE),
+                                                          args.get(settings.POSITION_RADIUS)))
+        
+    query_dsl = _assemble_queries(query_dsl, must_queries, filter_queries)
 
     for stat in args.get(settings.STATISTICS) if args.get(settings.STATISTICS) else []:
         query_dsl['aggs'][stat] = {
@@ -188,10 +193,13 @@ def _bootstrap_query(args):
     return query_dsl
 
 
-def _assemble_queries(query_dsl, additional_queries):
+def _assemble_queries(query_dsl, additional_queries, additional_filters):
     for query in additional_queries:
         if query:
             query_dsl['query']['bool']['must'].append(query)
+    for f in additional_filters:
+        if f:
+            query_dsl['query']['bool']['filter'].append(f)
     return query_dsl
 
 
@@ -405,15 +413,15 @@ def _build_generic_query(key, itemlist):
 
 def _build_geopoint_distance_filter(longitude, latitude, coordinate_range):
     geo_filter = {}
-    if ((longitude is None)
-        or (latitude is None)
-        or (coordinate_range is None)):
+    if (not longitude
+        or not latitude
+        or not coordinate_range):
         return geo_filter
     elif ((-180 <= longitude <= 180)
-          or (-90 <= latitude <= 90)
-          or (coordinate_range > 0)):
-        geo_filter["geo_filter"] = {
-            "distance": coordinate_range,
+          and (-90 <= latitude <= 90)
+          and (coordinate_range > 0)):
+        geo_filter["geo_distance"] = {
+            "distance": str(coordinate_range) + "km",
             "arbetsplatsadress.coordinates": [longitude, latitude]
         }
     return geo_filter

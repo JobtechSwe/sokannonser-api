@@ -121,8 +121,10 @@ def _parse_args(args):
                                              args.get(taxonomy.EMPLOYMENT_TYPE)))
 
     # TODO: Maybe check if NO skills are listed in ad instead?
-    if args.get(settings.NO_EXPERIENCE):
+    if args.get(settings.EXPERIENCE_REQUIRED) == 'false':
         must_queries.append({"term": {"erfarenhet_kravs": False}})
+    if args.get(settings.EXPERIENCE_REQUIRED) == 'true':
+        must_queries.append({"term": {"erfarenhet_kravs": True}})
 
     filter_queries = list()
     filter_queries.append(_build_geopoint_distance_filter(args.get(settings.LONGITUDE),

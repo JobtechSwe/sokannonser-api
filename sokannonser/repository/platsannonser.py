@@ -70,7 +70,7 @@ def find_platsannonser(args):
                 "values": [
                     {
                         "term": taxonomy.get_term(elastic, stat, b['key']),
-                        "kod": b['key'],
+                        "code": b['key'],
                         "count": b['doc_count']}
                     for b in query_result.get('aggregations',
                                               {}).get(stat, {}).get('buckets', [])

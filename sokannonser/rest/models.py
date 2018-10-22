@@ -2,27 +2,27 @@ from datetime import datetime
 from flask_restplus import fields, reqparse, inputs
 from valuestore import taxonomy
 from sokannonser import settings
-from sokannonser.rest import ns_afannons
+from sokannonser.rest import ns_platsannons
 
 # Models
 # Resultatmodeller
-resultat_plats = ns_afannons.model('Plats', {
+resultat_plats = ns_platsannons.model('Plats', {
     'id': fields.String(attribute='id'),
     'namn': fields.String(attribute='label')
 })
 
-resultat_geoposition = ns_afannons.inherit('GeoPosition', resultat_plats, {
+resultat_geoposition = ns_platsannons.inherit('GeoPosition', resultat_plats, {
     'longitud': fields.Float(attribute='longitude'),
     'latitud': fields.Float(attribute='latitude')
 })
 
-resultat_taxonomi = ns_afannons.model('TaxonomiEntitet', {
+resultat_taxonomi = ns_platsannons.model('TaxonomiEntitet', {
     'kod': fields.String(),
     'term': fields.String()
 })
 
 
-matchande_annons = ns_afannons.model('MatchandeAnnons', {
+matchande_annons = ns_platsannons.model('MatchandeAnnons', {
     'arbetssokandeprofilId': fields.String(attribute='_source.id'),
     'rubrik': fields.String(attribute='_source.rubrik'),
     'senastModifierad': fields.DateTime(attribute='_source.timestamp'),
@@ -46,7 +46,7 @@ matchande_annons = ns_afannons.model('MatchandeAnnons', {
     }, attribute='_source')
 })
 
-matchande_annons_simple = ns_afannons.model('MatchandeAnnons', {
+matchande_annons_simple = ns_platsannons.model('MatchandeAnnons', {
     'annons': fields.Nested({
         'annonsid': fields.String(attribute='id'),
         'platsannons_url': fields.String(attribute='url'),
@@ -90,12 +90,12 @@ matchande_annons_simple = ns_afannons.model('MatchandeAnnons', {
 }, skip_none=True)
 
 
-pbapi_lista = ns_afannons.model('Platsannonser', {
+pbapi_lista = ns_platsannons.model('Platsannonser', {
     'antal': fields.Integer(attribute='total'),
     'annonser': fields.List(fields.Nested(matchande_annons), attribute='hits')
 })
 
-simple_lista = ns_afannons.model('Platsannonser', {
+simple_lista = ns_platsannons.model('Platsannonser', {
     'antal_platsannonser': fields.Integer(attribute='total'),
     'platsannonser': fields.List(fields.Nested(matchande_annons_simple), attribute='hits')
 })

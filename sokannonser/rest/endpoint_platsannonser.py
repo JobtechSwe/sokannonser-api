@@ -2,17 +2,17 @@ from datetime import datetime
 from flask_restplus import Resource, abort
 from valuestore import taxonomy
 from sokannonser import settings
-from sokannonser.rest import ns_afannons
+from sokannonser.rest import ns_platsannons
 from sokannonser.rest.decorators import check_api_key
 from sokannonser.rest.models import pbapi_lista, sok_platsannons_query, simple_lista
 from sokannonser.repository import auranest, platsannonser
 
 
-@ns_afannons.route('/search')
+@ns_platsannons.route('/search')
 class Search(Resource):
     method_decorators = [check_api_key]
 
-    @ns_afannons.doc(
+    @ns_platsannons.doc(
         params={
             settings.APIKEY: "Nyckel som krävs för att använda API:et",
             settings.OFFSET: "Börja lista resultat från denna position "
@@ -57,7 +57,7 @@ class Search(Resource):
             500: 'Bad'
         }
     )
-    @ns_afannons.expect(sok_platsannons_query)
+    @ns_platsannons.expect(sok_platsannons_query)
     def get(self):
         args = sok_platsannons_query.parse_args()
         result = platsannonser.find_platsannonser(args)
@@ -70,7 +70,7 @@ class Search(Resource):
             return self.marshal_full(result)
 
     # Marshal with pbapi model
-    @ns_afannons.marshal_with(pbapi_lista)
+    @ns_platsannons.marshal_with(pbapi_lista)
     def marshal_pbapi(self, result):
         return result
 
@@ -84,7 +84,7 @@ class Search(Resource):
         }
         return result
 
-    @ns_afannons.marshal_with(simple_lista)
+    @ns_platsannons.marshal_with(simple_lista)
     def marshal_simple(self, result):
         return result
 

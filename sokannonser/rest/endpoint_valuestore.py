@@ -8,7 +8,7 @@ from sokannonser.rest import ns_valuestore
 from sokannonser.rest.models import taxonomy_query
 
 
-@ns_valuestore.route('/sok')
+@ns_valuestore.route('/search')
 class Valuestore(Resource):
     @ns_valuestore.doc(
         params={

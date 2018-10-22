@@ -6,7 +6,7 @@ from sokannonser.rest.models import auranest_query, auranest_typeahead
 from sokannonser.repository import auranest
 
 
-@ns_auranest.route('/sok')
+@ns_auranest.route('search')
 class AuranestSearch(Resource):
     method_decorators = [check_api_key]
 
@@ -17,7 +17,7 @@ class AuranestSearch(Resource):
         return auranest.find_annonser(args)
 
 
-@ns_auranest.route('/complete')
+@ns_auranest.route('complete')
 class AuranestSearch(Resource):
     method_decorators = [check_api_key]
 

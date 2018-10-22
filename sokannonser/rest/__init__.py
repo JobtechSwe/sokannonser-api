@@ -13,5 +13,5 @@ ns_valuestore = Namespace('Värdeförråd',
                           description='Sök i taxonomi och ontologi')
 
 api.add_namespace(ns_afannons, '/af')
-api.add_namespace(ns_auranest, '/alla')
+api.add_namespace(ns_auranest, '/')
 api.add_namespace(ns_valuestore, '/vf')

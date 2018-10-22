@@ -19,8 +19,8 @@ Gå till http://localhost:5000 för att testa med Swagger-API:et.
 
 Bygg en docker-image:
 
-    ~/sokannonser-api$ sudo docker build -t sokannonser:latest .
-    ~/sokannonser-api$ sudo docker run -d -p 80:8081 sokannonser
+    $ sudo docker build -t sokannonser:latest .
+    $ sudo docker run -d -p 80:8081 sokannonser
 
 Gå till http://localhost:80 för att testa med Swagger-API:et.
 
@@ -64,9 +64,9 @@ Kan med fördel sättas till development under utveckling. Ändrar defaultvärde
    
 Ger debugmeddelanden vid fel.
 
-### Tetst
+### Test
 
 att köra unit/integration tester: 
 
-    ~/sokannonser-api$ python3 -m pytest -svv -m unit tests/
-    ~/sokannonser-api$ python3 -m pytest -svv -m integration tests/
+    $ python3 -m pytest -svv -m unit tests/
+    $ python3 -m pytest -svv -m integration tests/

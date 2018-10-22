@@ -139,9 +139,9 @@ sok_platsannons_query.add_argument(settings.STATISTICS, action='append',
                                             taxonomy.FIELD])
 sok_platsannons_query.add_argument(settings.STAT_LMT, type=int, required=False)
 sok_platsannons_query.add_argument(settings.RESULT_MODEL, choices=settings.result_models)
-sok_platsannons_query.add_argument(settings.DATASET,
-                                   choices=settings.AVAILABLE_DATASETS,
-                                   default=settings.DATASET_AF)
+# sok_platsannons_query.add_argument(settings.DATASET,
+#                                    choices=settings.AVAILABLE_DATASETS,
+#                                    default=settings.DATASET_AF)
 
 auranest_query = reqparse.RequestParser()
 auranest_query.add_argument(settings.APIKEY, location='headers', required=True,

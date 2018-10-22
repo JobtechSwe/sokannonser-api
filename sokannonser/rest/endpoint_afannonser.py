@@ -8,7 +8,7 @@ from sokannonser.rest.models import pbapi_lista, sok_platsannons_query, simple_l
 from sokannonser.repository import auranest, platsannonser
 
 
-@ns_afannons.route('/sok')
+@ns_afannons.route('/search')
 class Search(Resource):
     method_decorators = [check_api_key]
 
@@ -49,7 +49,7 @@ class Search(Resource):
                                          taxonomy.OCCUPATION, taxonomy.GROUP, taxonomy.FIELD
                                  ),
             settings.RESULT_MODEL: "Resultatmodell",
-            settings.DATASET: "Sök bland AF:s annonser eller alla på marknaden (auranest)"
+            # settings.DATASET: "Sök bland AF:s annonser eller alla på marknaden (auranest)"
         },
         responses={
             200: 'OK',
@@ -60,14 +60,7 @@ class Search(Resource):
     @ns_afannons.expect(sok_platsannons_query)
     def get(self):
         args = sok_platsannons_query.parse_args()
-        dataset = args.pop(settings.DATASET)
-        if dataset not in settings.AVAILABLE_DATASETS:
-            abort(400, 'Dataset %s is not available' % dataset)
-
-        if dataset == settings.DATASET_AURA:
-            result = auranest.find_annonser(args)
-        else:
-            result = platsannonser.find_platsannonser(args)
+        result = platsannonser.find_platsannonser(args)
 
         if args.get(settings.RESULT_MODEL, '') == 'pbabi':
             return self.marshal_pbapi(result)

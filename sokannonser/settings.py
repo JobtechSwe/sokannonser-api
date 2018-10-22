@@ -25,11 +25,11 @@ OFFSET = 'offset'
 LIMIT = 'limit'
 FREETEXT_QUERY = 'q'
 TYPEAHEAD_QUERY = 'typehead'
-SORT = 'sortera'
-PUBLISHED_BEFORE = 'publicerad-innan'
-PUBLISHED_AFTER = 'publicerad-efter'
-NO_EXPERIENCE = 'utan-erfarenhet'
-PLACE_RADIUS = 'plats.radie'
+SORT = 'sort'
+PUBLISHED_BEFORE = 'published-before'
+PUBLISHED_AFTER = 'published-after'
+NO_EXPERIENCE = 'no-experience'
+PLACE_RADIUS = 'place.radie'
 STATISTICS = 'stats'
 STAT_LMT = 'stats.limit'
 DATASET = 'dataset'
@@ -46,7 +46,7 @@ AVAILABLE_DATASETS = [DATASET_AF, DATASET_AURA]
 SHOW_COUNT = 'visa-antal'
 
 
-RESULT_MODEL = 'resultatmodell'
+RESULT_MODEL = 'resultmodel'
 
 result_models = [
     'pbapi', 'simple'

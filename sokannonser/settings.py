@@ -34,9 +34,9 @@ STATISTICS = 'stats'
 STAT_LMT = 'stats.limit'
 PARTTIME_MIN = 'parttime.min'
 PARTTIME_MAX = 'parttime.max'
-LONGITUDE = 'longitud'
-LATITUDE = 'latitud'
-POSITION_RADIUS = 'position.radie'
+LONGITUDE = 'longitude'
+LATITUDE = 'latitude'
+POSITION_RADIUS = 'position.radius'
 
 MAX_OFFSET = 2000
 MAX_LIMIT = 1000

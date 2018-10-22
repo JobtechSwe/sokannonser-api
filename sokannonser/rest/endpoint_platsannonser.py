@@ -40,6 +40,8 @@ class Search(Resource):
             # settings.PLACE: "Generellt platsnamn",
             taxonomy.WORKTIME_EXTENT: "En eller flera arbetstidsomfattningskoder enligt "
                                       "taxonomi",
+            settings.PARTTIME_MIN: "För deltidsjobb, minsta omfattning",
+            settings.PARTTIME_MAX: "För deltidsjobb, maximal omfattning",
             taxonomy.MUNICIPALITY: "En eller flera kommunkoder",
             taxonomy.REGION: "En eller flera länskoder",
             # settings.PLACE_RADIUS: "Inom vilken ungefärlig radie i kilometer från "

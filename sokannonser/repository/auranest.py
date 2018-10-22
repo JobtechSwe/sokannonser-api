@@ -97,9 +97,4 @@ def _build_freetext_query(freetext):
     if mustnts:
         ft_query['bool']['must_not'] = mustnts
 
-    return ft_query
-    return {
-        "bool": {
-            "should": __freetext_fields(freetext)
-        }
-    } if freetext else None
+    return ft_query if shoulds or mustnts else None

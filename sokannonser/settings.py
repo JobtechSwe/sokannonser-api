@@ -32,7 +32,8 @@ NO_EXPERIENCE = 'no-experience'
 PLACE_RADIUS = 'place.radie'
 STATISTICS = 'stats'
 STAT_LMT = 'stats.limit'
-DATASET = 'dataset'
+PARTTIME_MIN = 'parttime.min'
+PARTTIME_MAX = 'parttime.max'
 
 MAX_OFFSET = 2000
 MAX_LIMIT = 1000

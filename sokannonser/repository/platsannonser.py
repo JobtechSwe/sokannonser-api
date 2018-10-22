@@ -107,6 +107,8 @@ def _parse_args(args):
                                            args.get(taxonomy.FIELD)))
     must_queries.append(_build_timeframe_query(args.get(settings.PUBLISHED_AFTER),
                                                args.get(settings.PUBLISHED_BEFORE)))
+    must_queries.append(_build_parttime_range_query(args.get(settings.PARTTIME_MIN),
+                                                    args.get(settings.PARTTIME_MAX)))
     must_queries.append(_build_plats_query(args.get(taxonomy.MUNICIPALITY),
                                            args.get(taxonomy.REGION)))
     must_queries.append(_build_generic_query("krav.kompetenser.kod",
@@ -341,6 +343,38 @@ def _build_timeframe_query(from_datetime, to_datetime):
     if to_datetime:
         range_query['range']['publiceringsdatum']['lte'] = to_datetime.isoformat()
     return range_query
+
+
+def _build_parttime_range_query(parttime_min, parttime_max):
+    if not parttime_min and not parttime_max:
+        return None
+    if not parttime_min:
+        parttime_min = 0.0
+    if not parttime_max:
+        parttime_max = 100.0
+    parttime_query = {
+        "bool": {
+            "must": [
+                {
+                    "range": {
+                        "arbetsomfattning.min": {
+                            "lte": parttime_max,
+                            "gte": parttime_min
+                        },
+                    }
+                },
+                {
+                    "range": {
+                        "arbetsomfattning.max": {
+                            "lte": parttime_max,
+                            "gte": parttime_min
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    return parttime_query
 
 
 # Deprecated. Previously used to build timeframe queries

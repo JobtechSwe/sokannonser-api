@@ -2,7 +2,7 @@ import logging
 from flask import Flask
 from flask_cors import CORS
 from sokannonser.rest import api
-from sokannonser.rest.endpoint_afannonser import Search
+from sokannonser.rest.endpoint_platsannonser import Search
 from sokannonser.rest.endpoint_valuestore import Valuestore
 from sokannonser.rest.endpoint_auranest import AuranestSearch
 from sokannonser import settings

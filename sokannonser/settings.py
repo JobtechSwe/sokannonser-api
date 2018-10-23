@@ -28,7 +28,7 @@ TYPEAHEAD_QUERY = 'typehead'
 SORT = 'sort'
 PUBLISHED_BEFORE = 'published-before'
 PUBLISHED_AFTER = 'published-after'
-NO_EXPERIENCE = 'no-experience'
+EXPERIENCE_REQUIRED = 'experience'
 PLACE_RADIUS = 'place.radie'
 STATISTICS = 'stats'
 STAT_LMT = 'stats.limit'
@@ -41,16 +41,10 @@ POSITION_RADIUS = 'position.radius'
 MAX_OFFSET = 2000
 MAX_LIMIT = 1000
 
-DATASET_AF = 'arbetsförmedlingen'
-DATASET_AURA = 'auranest'
-AVAILABLE_DATASETS = [DATASET_AF, DATASET_AURA]
-
+RESULT_MODEL = 'resultmodel'
 
 # For taxonomy
 SHOW_COUNT = 'visa-antal'
-
-
-RESULT_MODEL = 'resultmodel'
 
 result_models = [
     'pbapi', 'simple'

@@ -7,30 +7,70 @@ log = logging.getLogger(__name__)
 
 
 def find_annonser(args):
+    aggregates = _statistics(args.pop(settings.STATISTICS),
+                             args.pop(settings.STAT_LMT))
     query_dsl = _parse_args(args)
+    if aggregates:
+        query_dsl['aggs'] = aggregates
+
     log.debug(json.dumps(query_dsl, indent=2))
     query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
-    return query_result.get('hits', {})
+    return query_result
 
 
 def autocomplete(querystring):
+    without_last = ' '.join(querystring.split(' ')[:-1])
+    query_dsl = _parse_args({
+        settings.FREETEXT_QUERY: without_last,
+        settings.LIMIT: 0,
+        settings.SHOW_EXPIRED: 'false'
+    })
+    complete = querystring.split(' ')[-1]
+    query_dsl['aggs'] = {'complete': {
+        "terms": {
+            "field": "keywords.raw",
+            "size": 20,
+            "include": "%s.*" % complete
+        }
+    }}
+    query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
+    if 'aggregations' in query_result:
+        return [c['key'] for c in query_result.get('aggregations', {})
+                                              .get('complete', {})
+                                              .get('buckets', [])]
     return []
 
 
+def _statistics(agg_fields, agg_size):
+    aggs = dict()
+    size = agg_size if agg_size else 10
+
+    for agg in agg_fields if agg_fields else []:
+        aggs[agg] = {
+            "terms": {
+                "field": settings.auranest_stats_options[agg],
+                "size": size
+            }
+        }
+    return aggs
+
+
 def _parse_args(args):
+    args = dict(args)
     query_dsl = dict()
     query_dsl['from'] = args.pop(settings.OFFSET, 0)
     query_dsl['size'] = args.pop(settings.LIMIT, 10)
     # Remove api-key from args to make sure an empty query can occur
-    args.pop(settings.APIKEY)
+    args.pop(settings.APIKEY, None)
 
     # Make sure to only serve published ads
     query_dsl['query'] = {
         'bool': {
             'must': [],
-            'filter': [{'bool': {'must_not': {'exists': {'field': 'source.removedAt'}}}}]
         },
     }
+    if args.pop(settings.SHOW_EXPIRED) != 'true':
+        query_dsl['query']['bool']['filter'] = [{'bool': {'must_not': {'exists': {'field': 'source.removedAt'}}}}]
 
     if args.get(settings.SORT):
         query_dsl['sort'] = [settings.auranest_sort_options.get(args.pop(settings.SORT))]
@@ -62,6 +102,14 @@ def __freetext_fields(searchword):
                 "title.freetext": {
                     "query": searchword,
                     "boost": 3
+                }
+            }
+        },
+        {
+            "match": {
+                "keywords": {
+                    "query": searchword,
+                    "boost": 1
                 }
             }
         },

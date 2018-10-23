@@ -1,5 +1,6 @@
 import logging
-import json
+from flask_restplus import abort
+from elasticsearch import exceptions
 from sokannonser import settings
 from sokannonser.repository import elastic
 
@@ -12,9 +13,13 @@ def find_annonser(args):
     query_dsl = _parse_args(args)
     if aggregates:
         query_dsl['aggs'] = aggregates
+    try:
+        query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
+    except exceptions.ConnectionError as e:
+        log.error('Failed to connect to elasticsearch: %s' % str(e), e)
+        abort(500, 'Failed to establish connection to database')
+        return
 
-    log.debug(json.dumps(query_dsl, indent=2))
-    query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
     return query_result
 
 

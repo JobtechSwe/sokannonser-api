@@ -46,6 +46,9 @@ RESULT_MODEL = 'resultmodel'
 # For taxonomy
 SHOW_COUNT = 'visa-antal'
 
+# For all ads
+SHOW_EXPIRED = 'show-expired'
+
 result_models = [
     'pbapi', 'simple'
 ]
@@ -67,4 +70,10 @@ auranest_sort_options = {
     'pubdate-asc':  {"source.firstSeenAt": "asc"},
     'applydate-desc':  {"application.deadline": "desc"},
     'applydate-asc':  {"application.deadline": "asc"},
+}
+
+auranest_stats_options = {
+    'employers': 'employer.name.keyword',
+    'sites': 'source.site.name.keyword',
+    'locations': 'location.translations.sv-SE.keyword'
 }

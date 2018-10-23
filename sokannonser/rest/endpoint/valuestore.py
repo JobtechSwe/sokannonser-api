@@ -5,7 +5,7 @@ from valuestore import taxonomy
 from sokannonser import settings
 from sokannonser.repository import elastic, platsannonser
 from sokannonser.rest import ns_valuestore
-from sokannonser.rest.models import taxonomy_query
+from sokannonser.rest.model.queries import taxonomy_query
 
 
 @ns_valuestore.route('/search')

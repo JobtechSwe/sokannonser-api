@@ -16,8 +16,7 @@ class AuranestSearch(Resource):
     @ns_auranest.marshal_with(auranest_lista)
     def get(self):
         args = auranest_query.parse_args()
-        results = auranest.find_annonser(args)
-        return results
+        return auranest.find_annonser(args)
 
 
 @ns_auranest.route('complete')

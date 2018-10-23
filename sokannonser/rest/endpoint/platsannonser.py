@@ -1,11 +1,11 @@
-from datetime import datetime
-from flask_restplus import Resource, abort
+from flask_restplus import Resource
 from valuestore import taxonomy
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons
 from sokannonser.rest.decorators import check_api_key
-from sokannonser.rest.models import pbapi_lista, sok_platsannons_query, simple_lista
-from sokannonser.repository import auranest, platsannonser
+from sokannonser.rest.model.platsannons_results import pbapi_lista, simple_lista
+from sokannonser.rest.model.queries import sok_platsannons_query
+from sokannonser.repository import platsannonser
 
 
 @ns_platsannons.route('/search')
@@ -65,11 +65,12 @@ class Search(Resource):
     @ns_platsannons.expect(sok_platsannons_query)
     def get(self):
         args = sok_platsannons_query.parse_args()
+        resultmodel = args.get(settings.RESULT_MODEL)
         result = platsannonser.find_platsannonser(args)
 
-        if args.get(settings.RESULT_MODEL, '') == 'pbabi':
+        if resultmodel == 'pbapi':
             return self.marshal_pbapi(result)
-        elif args.get(settings.RESULT_MODEL, '') == 'simple':
+        elif resultmodel == 'simple':
             return self.marshal_simple(result)
         else:
             return self.marshal_full(result)

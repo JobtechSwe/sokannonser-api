@@ -77,6 +77,7 @@ def find_platsannonser(args):
                 ]
 
             })
+    log.debug(json.dumps(results, indent=2))
     return results
 
 

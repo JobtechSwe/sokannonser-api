@@ -12,6 +12,7 @@ def find_annonser(args):
     aggregates = _statistics(args.pop(settings.STATISTICS),
                              args.pop(settings.STAT_LMT))
     query_dsl = _parse_args(args)
+    log.debug(json.dumps(query_dsl, indent=2))
     if aggregates:
         query_dsl['aggs'] = aggregates
     try:

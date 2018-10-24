@@ -13,10 +13,13 @@ class AuranestSearch(Resource):
 
     @ns_auranest.doc(description='Sök med fritextfråga')
     @ns_auranest.expect(auranest_query)
-    @ns_auranest.marshal_with(auranest_lista)
     def get(self):
         args = auranest_query.parse_args()
-        return auranest.find_annonser(args)
+        return self.marshal_default(auranest.find_annonser(args))
+
+    @ns_auranest.marshal_with(auranest_lista)
+    def marshal_default(self, results):
+        return results
 
 
 @ns_auranest.route('complete')

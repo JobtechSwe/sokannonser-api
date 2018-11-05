@@ -74,7 +74,7 @@ def _parse_args(args):
     query_dsl['query'] = {
         'bool': {
             'must': [],
-        },
+        }
     }
     if args.pop(settings.SHOW_EXPIRED) != 'true':
         query_dsl['query']['bool']['filter'] = [{'bool': {'must_not': {'exists': {'field': 'source.removedAt'}}}}]

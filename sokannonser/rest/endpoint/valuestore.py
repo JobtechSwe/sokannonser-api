@@ -51,7 +51,7 @@ class Valuestore(Resource):
             type_label = taxonomy.reverse_tax_type.get(hit['_source']['type'],
                                                        "UNKNOWN: %s" %
                                                        hit['_source']['type'])
-            entity = {"kod": hit['_source']['id'], "term": hit['_source']['label'],
+            entity = {"kod": hit['_source']['concept_id'], "term": hit['_source']['label'],
                       "typ": type_label}
             foralder = hit['_source'].get('parent', {}).get('id')
             if foralder:

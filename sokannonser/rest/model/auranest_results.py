@@ -31,9 +31,12 @@ stat_value = api.model('StatValue', {
 auranest_lista = api.model('Ads', {
     'total': fields.Integer(attribute='hits.total'),
     'stats': fields.Nested({
-        'employers': fields.List(fields.Nested(stat_value), attribute='employers.buckets'),
-        'sites': fields.List(fields.Nested(stat_value), attribute='sites.buckets'),
-        'locations': fields.List(fields.Nested(stat_value), attribute='locations.buckets'),
+        'employers': fields.List(fields.Nested(stat_value),
+                                 attribute='employers.buckets'),
+        'sites': fields.List(fields.Nested(stat_value),
+                             attribute='sites.buckets'),
+        'locations': fields.List(fields.Nested(stat_value),
+                                 attribute='locations.buckets'),
     }, attribute='aggregations', skip_none=True),
     'hits': fields.List(fields.Nested(annons), attribute='hits.hits')
 })

@@ -26,6 +26,8 @@ def find_annonser(args):
 
 
 def autocomplete(querystring):
+    if not querystring:
+        querystring = ''
     without_last = ' '.join(querystring.split(' ')[:-1])
     query_dsl = _parse_args({
         settings.FREETEXT_QUERY: without_last,

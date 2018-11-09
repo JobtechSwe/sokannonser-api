@@ -26,6 +26,8 @@ def find_annonser(args):
 
 
 def autocomplete(querystring):
+    if not querystring:
+        querystring = ''
     without_last = ' '.join(querystring.split(' ')[:-1])
     query_dsl = _parse_args({
         settings.FREETEXT_QUERY: without_last,
@@ -74,7 +76,7 @@ def _parse_args(args):
     query_dsl['query'] = {
         'bool': {
             'must': [],
-        },
+        }
     }
     if args.pop(settings.SHOW_EXPIRED) != 'true':
         query_dsl['query']['bool']['filter'] = [{'bool': {'must_not': {'exists': {'field': 'source.removedAt'}}}}]

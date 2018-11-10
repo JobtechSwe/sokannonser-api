@@ -52,7 +52,7 @@ def find_platsannonser(args):
     try:
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
     except exceptions.ConnectionError as e:
-        log.error('Failed to connect to elasticsearch: %s' % str(e), e)
+        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
     results = query_result.get('hits', {})

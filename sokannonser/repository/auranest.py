@@ -18,7 +18,7 @@ def find_annonser(args):
     try:
         query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
     except exceptions.ConnectionError as e:
-        log.error('Failed to connect to elasticsearch: %s' % str(e), e)
+        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
     log.debug(json.dumps(query_result, indent=2))

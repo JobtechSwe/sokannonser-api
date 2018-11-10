@@ -51,7 +51,7 @@ def safe_execute(default, exception, function, *args):
     try:
         return function(*args)
     except exception:
-        log.error(default, exception)
+        logging.exception(default)
         return default
 
     

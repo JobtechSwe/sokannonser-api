@@ -7,7 +7,7 @@ from sokannonser.rest.endpoint.auranest import AuranestSearch
 from sokannonser.rest.endpoint.platsannonser import Search
 from sokannonser.rest.endpoint.valuestore import Valuestore
 from sokannonser import settings
-
+import os
 
 
 app = Flask(__name__)
@@ -28,21 +28,20 @@ class NarvalLogFormatter(logging.Formatter):
                 pass
 
         if is_json_str and json_obj is not None:
-            # print('json.dumping')
             message = json.dumps(json_obj)
             record.msg = message
 
         result = super(NarvalLogFormatter, self).format(record)
-        return result.replace('\n', '')
+        return result.replace('\n', os.linesep)
 
 
     def formatException(self, exc_info):
         result = super(NarvalLogFormatter, self).formatException(exc_info)
-        return result.replace('\n', '')
+        return result.replace('\n', os.linesep)
 
     def formatMessage(self, record):
         result = super(NarvalLogFormatter, self).formatMessage(record)
-        return result.replace('\n', '')
+        return result.replace('\n', os.linesep)
 
 
 def configure_logging():
@@ -54,7 +53,7 @@ def configure_logging():
     f = NarvalLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s')
     fh.setFormatter(f)
     root = logging.getLogger()
-    root.setLevel(logging.INFO)
+    # root.setLevel(logging.INFO)
     root.addHandler(fh)
 
     # Set log level debug for module specific events
@@ -92,6 +91,13 @@ def test_logging():
     }'''
 
     log.debug(test_json)
+
+    # try:
+    #     json_obj = json.loads('not a json-string')
+    # except ValueError as e:
+    #     logging.exception('Testmessage for exception')
+
+
     log.info('Testing log levels - END')
 
 

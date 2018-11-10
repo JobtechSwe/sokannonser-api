@@ -68,12 +68,10 @@ def configure_logging():
             logging.getLogger(key).setLevel(logging.WARNING)
 
 
+
+
 def test_logging():
     log.info('Testing log levels - BEGIN')
-    log.debug('DEBUG log level activated')
-    log.info('INFO log level activated')
-    log.warning('WARNING log level activated')
-    log.error('ERROR log level activated')
 
     test_dict = {
         "prop1":"dict_val1",
@@ -104,10 +102,8 @@ def test_logging():
 
 configure_logging()
 
-
-
 log = logging.getLogger(__name__)
-
+log.debug(logging.getLevelName(log.getEffectiveLevel()) + ' log level activated')
 log.info("Starting %s" % __name__)
 
 test_logging()

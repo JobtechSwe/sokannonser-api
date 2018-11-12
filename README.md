@@ -1,5 +1,5 @@
 # Sök Annonser API
-
+Skapa separat virtual environment för projektet (Virtualenv, Conda)
 
 ## Installation och körning (rekommenderar starkt att skapa en virtualenv eller anaconda-env innan).
 
@@ -11,6 +11,7 @@ När du står i projektets rot-katalog:
     $ pip install -r requirements.txt
     $ python setup.py develop
     $ export FLASK_APP=sokannonser
+    $ export FLASK_ENV=development
     $ flask run
 
 Gå till http://localhost:5000 för att testa med Swagger-API:et.

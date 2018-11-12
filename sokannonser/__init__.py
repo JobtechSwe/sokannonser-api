@@ -1,5 +1,6 @@
 import logging
 import json
+from sokannonser.customlogging import NarvalLogFormatter
 from flask import Flask
 from flask_cors import CORS
 from sokannonser.rest import api
@@ -10,38 +11,10 @@ from sokannonser import settings
 import os
 
 
+
 app = Flask(__name__)
 CORS(app)
 
-#TODO: Move to separate file/class.
-class NarvalLogFormatter(logging.Formatter):
-    def format(self, record):
-        is_json_str = False
-        json_obj = None
-        # print(type(record.msg))
-        if type(record.msg) == str and '{' in record.msg:
-            try:
-                json_obj = json.loads(record.msg)
-                is_json_str = True
-            except ValueError:
-                # print('Got ValueError when trying json.loads')
-                pass
-
-        if is_json_str and json_obj is not None:
-            message = json.dumps(json_obj)
-            record.msg = message
-
-        result = super(NarvalLogFormatter, self).format(record)
-        return result.replace('\n', os.linesep)
-
-
-    def formatException(self, exc_info):
-        result = super(NarvalLogFormatter, self).formatException(exc_info)
-        return result.replace('\n', os.linesep)
-
-    def formatMessage(self, record):
-        result = super(NarvalLogFormatter, self).formatMessage(record)
-        return result.replace('\n', os.linesep)
 
 
 def configure_logging():
@@ -50,7 +23,13 @@ def configure_logging():
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
     fh = logging.StreamHandler()
-    f = NarvalLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s')
+
+    if os.getenv('FLASK_ENV', '') == 'development':
+        is_develop_mode = True
+    else:
+        is_develop_mode = False
+
+    f = NarvalLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s', is_develop_mode=is_develop_mode)
     fh.setFormatter(f)
     root = logging.getLogger()
     # root.setLevel(logging.INFO)
@@ -68,45 +47,13 @@ def configure_logging():
             logging.getLogger(key).setLevel(logging.WARNING)
 
 
-
-
-def test_logging():
-    log.info('Testing log levels - BEGIN')
-
-    test_dict = {
-        "prop1":"dict_val1",
-        "prop2": "dict_val2",
-        "inner": {
-            "innerobjprop":"innerobjval"
-        }
-    }
-    log.debug(test_dict)
-
-    test_json = '''{
-        "jsontestprop1": "jsontestval1",
-        "jsontestprop2": "jsontestval2"
-        
-    }'''
-
-    log.debug(test_json)
-
-    # try:
-    #     json_obj = json.loads('not a json-string')
-    # except ValueError as e:
-    #     logging.exception('Testmessage for exception')
-
-
-    log.info('Testing log levels - END')
-
-
-
 configure_logging()
 
 log = logging.getLogger(__name__)
 log.debug(logging.getLevelName(log.getEffectiveLevel()) + ' log level activated')
 log.info("Starting %s" % __name__)
 
-test_logging()
+NarvalLogFormatter.printTestLogMessages(log)
 
 
 def configure_app(flask_app):

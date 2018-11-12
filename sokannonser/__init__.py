@@ -53,7 +53,7 @@ log = logging.getLogger(__name__)
 log.debug(logging.getLevelName(log.getEffectiveLevel()) + ' log level activated')
 log.info("Starting %s" % __name__)
 
-NarvalLogFormatter.printTestLogMessages(log)
+# NarvalLogFormatter.printTestLogMessages(log)
 
 
 def configure_app(flask_app):

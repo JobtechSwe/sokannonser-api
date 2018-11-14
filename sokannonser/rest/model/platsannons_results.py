@@ -21,8 +21,7 @@ resultat_taxonomi = ns_platsannons.model('TaxonomiEntitet', {
 matchande_annons = ns_platsannons.model('MatchandeAnnons', {
     'arbetssokandeprofilId': fields.String(attribute='_source.id'),
     'rubrik': fields.String(attribute='_source.rubrik'),
-    'senastModifierad': fields.DateTime(attribute='_source.timestamp',
-                                        dt_format='timestamp'),
+    'senastModifierad': fields.String(attribute='_source.timestamp'),
     'efterfragadArbetsplats': fields.Nested({
         'land': fields.List(fields.Nested(resultat_plats), attribute='krav.land'),
         'lan': fields.List(fields.Nested(resultat_plats), attribute='krav.lan'),

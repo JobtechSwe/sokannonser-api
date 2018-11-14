@@ -1,4 +1,5 @@
 from flask_restplus import Resource
+
 from valuestore import taxonomy
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons
@@ -6,6 +7,7 @@ from sokannonser.rest.decorators import check_api_key
 from sokannonser.rest.model.platsannons_results import pbapi_lista, simple_lista
 from sokannonser.rest.model.queries import sok_platsannons_query
 from sokannonser.repository import platsannonser
+from sokannonser.repository.querybuilder import PlatsbankenQuery
 
 
 @ns_platsannons.route('/search')
@@ -65,9 +67,10 @@ class Search(Resource):
     )
     @ns_platsannons.expect(sok_platsannons_query)
     def get(self):
+        querybuilder = PlatsbankenQuery()
         args = sok_platsannons_query.parse_args()
         resultmodel = args.get(settings.RESULT_MODEL)
-        result = platsannonser.find_platsannonser(args)
+        result = platsannonser.find_platsannonser(args, querybuilder)
 
         if resultmodel == 'pbapi':
             return self.marshal_pbapi(result)

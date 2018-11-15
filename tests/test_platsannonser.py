@@ -1,16 +1,13 @@
-import logging
-import pytest
-import sys
-import os
-
-from dateutil import parser
+from sokannonser.repository import elastic, platsannonser
+from sokannonser.repository.querybuilder import QueryBuilder
+from sokannonser import settings
 from valuestore import taxonomy as t
 from valuestore.taxonomy import tax_type
-
-from sokannonser import settings
-from sokannonser.repository import elastic, platsannonser
+from dateutil import parser
+import sys, pytest, logging
 
 log = logging.getLogger(__name__)
+pbquery = QueryBuilder()
 
 
 def find(key, dictionary): 
@@ -65,7 +62,7 @@ def safe_execute(default, exception, function, *args):
 @pytest.mark.parametrize("lanskoder", [["25"], ["01", "03"], ["ejLanKod"], None, []])
 def test_build_plats_query(kommunkoder, lanskoder):
     print('============================', sys._getframe().f_code.co_name, '============================ ')
-    d = platsannonser._build_plats_query(kommunkoder, lanskoder)
+    d = pbquery._build_plats_query(kommunkoder, lanskoder)
     print(d)
     kommunlanskoder = []
     for lanskod in lanskoder if lanskoder is not None else []:
@@ -85,24 +82,24 @@ def test_build_plats_query(kommunkoder, lanskoder):
 @pytest.mark.unit
 @pytest.mark.parametrize("from_datetime", ["2018-09-28T00:00:00", '2018-09-28', '', None, []])
 @pytest.mark.parametrize("to_datetime", ["2018-09-28T00:01", '2018-09-27', '', None, []])
-def test_build_timeframe_query(from_datetime, to_datetime):
+def test_filter_timeframe(from_datetime, to_datetime):
     print('============================', sys._getframe().f_code.co_name, '============================ ')
     print(from_datetime, to_datetime)
     if not from_datetime and not to_datetime:  # from and to date are empty
-        assert platsannonser._build_timeframe_query(from_datetime, to_datetime) is None
+        assert pbquery._filter_timeframe(from_datetime, to_datetime) is None
         return
     if from_datetime and to_datetime:
-        d = platsannonser._build_timeframe_query(parser.parse(from_datetime), parser.parse(to_datetime))
+        d = pbquery._filter_timeframe(parser.parse(from_datetime), parser.parse(to_datetime))
         print(d)
         assert d['range']['publiceringsdatum']['gte'] == parser.parse(from_datetime).isoformat()
         assert d['range']['publiceringsdatum']['lte'] == parser.parse(to_datetime).isoformat()
         return
     if from_datetime:
-        d = platsannonser._build_timeframe_query(parser.parse(from_datetime), to_datetime)
+        d = pbquery._filter_timeframe(parser.parse(from_datetime), to_datetime)
         assert d['range']['publiceringsdatum']['gte'] == parser.parse(from_datetime).isoformat()
         return
     if to_datetime:
-        d = platsannonser._build_timeframe_query(from_datetime, parser.parse(to_datetime))
+        d = pbquery._filter_timeframe(from_datetime, parser.parse(to_datetime))
         assert d['range']['publiceringsdatum']['lte'] == parser.parse(to_datetime).isoformat()
 
         
@@ -135,11 +132,6 @@ def test_build_timeframe_query(from_datetime, to_datetime):
                                                                           17.1, 60.5
                                                                       ]}})])
 def test_geo_distance_filter(args, exist, expected):
-    query_dsl = platsannonser._parse_args(args)
+    query_dsl = pbquery.parse_args(args)
     assert (expected in query_dsl["query"]["bool"]["filter"]) == exist
-
-
-if __name__ == '__main__':
-    # pytest.main([os.path.realpath(__file__), '-svv', '-ra','-m unit'])
-    # pytest.main([os.path.realpath(__file__), '-svv', '-ra','-m integration'])
-    pytest.main([os.path.realpath(__file__), '-svv', '-ra'])
+    

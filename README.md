@@ -69,5 +69,14 @@ Ger debugmeddelanden vid fel.
 
 att köra unit/integration tester: 
 
-    $ python3 -m pytest -svv -m unit tests/
-    $ python3 -m pytest -svv -m integration tests/
+    $ python3 -m pytest -svv -ra -m unit tests/
+    $ python3 -m pytest -svv -ra -m integration tests/
+    
+### Test coverage
+https://pytest-cov.readthedocs.io/en/latest/
+python3 -m pytest -svv -ra -m unit --cov=. tests/
+
+För att lägga till coverage i IntelliJ, gå till menyn IntelliJ IDEA/Preferences/
+Välj menyn Tools/Python Integrated Tools och för Default test runner, välj py.test.
+Högerklicka därefter på katalogen sokannonser-api/tests och välj "Run py.test with coverage"
+

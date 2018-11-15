@@ -1,9 +1,14 @@
-from sokannonser.repository import elastic, platsannonser
-from sokannonser import settings
+import logging
+import pytest
+import sys
+import os
+
+from dateutil import parser
 from valuestore import taxonomy as t
 from valuestore.taxonomy import tax_type
-from dateutil import parser
-import sys, pytest, logging
+
+from sokannonser import settings
+from sokannonser.repository import elastic, platsannonser
 
 log = logging.getLogger(__name__)
 
@@ -132,4 +137,9 @@ def test_build_timeframe_query(from_datetime, to_datetime):
 def test_geo_distance_filter(args, exist, expected):
     query_dsl = platsannonser._parse_args(args)
     assert (expected in query_dsl["query"]["bool"]["filter"]) == exist
-    
+
+
+if __name__ == '__main__':
+    # pytest.main([os.path.realpath(__file__), '-svv', '-ra','-m unit'])
+    # pytest.main([os.path.realpath(__file__), '-svv', '-ra','-m integration'])
+    pytest.main([os.path.realpath(__file__), '-svv', '-ra'])

@@ -1,5 +1,5 @@
 from sokannonser.repository import elastic, platsannonser
-from sokannonser.repository.querybuilder import PlatsbankenQuery
+from sokannonser.repository.querybuilder import QueryBuilder
 from sokannonser import settings
 from valuestore import taxonomy as t
 from valuestore.taxonomy import tax_type
@@ -7,7 +7,7 @@ from dateutil import parser
 import sys, pytest, logging
 
 log = logging.getLogger(__name__)
-pbquery = PlatsbankenQuery()
+pbquery = QueryBuilder()
 
 
 def find(key, dictionary): 

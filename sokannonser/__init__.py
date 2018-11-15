@@ -22,19 +22,28 @@ def configure_logging():
     # Remove basicConfig-handlers and replace with custom formatter.
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
-    fh = logging.StreamHandler()
+    stream_handler = logging.StreamHandler()
 
+    f = create_log_formatter()
+    stream_handler.setFormatter(f)
+    root = logging.getLogger()
+    # root.setLevel(logging.INFO)
+    root.addHandler(stream_handler)
+
+
+    set_custom_log_level()
+
+
+def create_log_formatter():
     if os.getenv('FLASK_ENV', '') == 'development':
         is_develop_mode = True
     else:
         is_develop_mode = False
-
     f = NarvalLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s', is_develop_mode=is_develop_mode)
-    fh.setFormatter(f)
-    root = logging.getLogger()
-    # root.setLevel(logging.INFO)
-    root.addHandler(fh)
+    return f
 
+
+def set_custom_log_level():
     # Set log level debug for module specific events
     # and level warning for all third party dependencies
     for key in logging.Logger.manager.loggerDict:
@@ -53,7 +62,7 @@ log = logging.getLogger(__name__)
 log.debug(logging.getLevelName(log.getEffectiveLevel()) + ' log level activated')
 log.info("Starting %s" % __name__)
 
-# NarvalLogFormatter.printTestLogMessages(log)
+NarvalLogFormatter.printTestLogMessages(log)
 
 
 def configure_app(flask_app):

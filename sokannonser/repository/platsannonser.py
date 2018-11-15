@@ -39,6 +39,7 @@ def get_stats_for(taxonomy_type):
             }
         }
     }
+    log.debug('aggs_query', aggs_query)
     aggs_result = elastic.search(index=settings.ES_INDEX, body=aggs_query)
     code_count = {
         item['key']: item['doc_count']

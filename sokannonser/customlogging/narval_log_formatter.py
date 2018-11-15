@@ -7,6 +7,8 @@ class NarvalLogFormatter(logging.Formatter):
     def __init__(self, fmt=None, datefmt=None, style='%', is_develop_mode=False):
         super().__init__(fmt, datefmt, style)
 
+        self.is_develop_mode = is_develop_mode
+
         if(is_develop_mode==True):
             self.linesep = os.linesep
             print('NarvalLogFormatter configured to development mode.')
@@ -41,7 +43,11 @@ class NarvalLogFormatter(logging.Formatter):
         result = result.replace('\n', self.linesep)
         # Replace last occurrence of lineseparator to '\n’ to
         # create separate log-row in openshift.
-        result = self.lastreplace(result, self.linesep, '\n')
+        if result.endswith(self.linesep):
+            result = self.lastreplace(result, self.linesep, '\n')
+
+        if not self.is_develop_mode and not result.endswith('\n'):
+            result = result + '\n'
 
         return result
 
@@ -75,11 +81,24 @@ class NarvalLogFormatter(logging.Formatter):
 
         log.debug(test_json)
 
+        test_non_json = '''function test{ 
+                                alert('just testing logging...'); 
+                            }'''
+        log.debug(test_non_json)
+
+
         try:
             json_obj = json.loads('not a json-string')
         except ValueError as e:
             logging.exception('Testmessage for exception')
 
 
+        test_newline = '''hello
+                    world
+                    test'''
+        log.debug(test_newline)
+
+
         log.info('Testing log levels - END')
+
 

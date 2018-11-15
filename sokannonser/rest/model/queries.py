@@ -4,6 +4,8 @@ from valuestore import taxonomy
 from sokannonser import settings
 
 # Frågemodeller
+QF_CHOICES = ['occupation', 'skill', 'location']
+
 sok_platsannons_query = reqparse.RequestParser()
 sok_platsannons_query.add_argument(settings.APIKEY, location='headers', required=True,
                                    default=settings.APIKEY_BACKDOOR)
@@ -24,6 +26,8 @@ sok_platsannons_query.add_argument(settings.PUBLISHED_AFTER,
                                                                     '%Y-%m-%dT%H:%M:%S'))
 sok_platsannons_query.add_argument(settings.FREETEXT_QUERY)
 sok_platsannons_query.add_argument(settings.TYPEAHEAD_QUERY)
+sok_platsannons_query.add_argument(settings.FREETEXT_FIELDS, action='append',
+                                   choices=QF_CHOICES)
 sok_platsannons_query.add_argument(taxonomy.OCCUPATION, action='append')
 sok_platsannons_query.add_argument(taxonomy.GROUP, action='append')
 sok_platsannons_query.add_argument(taxonomy.FIELD, action='append')

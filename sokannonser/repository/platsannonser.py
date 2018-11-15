@@ -1,6 +1,8 @@
 import logging
 from flask_restplus import abort
 from elasticsearch import exceptions
+
+from sokannonser.rest.model import queries
 from valuestore import taxonomy
 from valuestore.taxonomy import tax_type
 from sokannonser import settings
@@ -58,10 +60,10 @@ def find_platsannonser(args, querybuilder):
     if 'aggregations' in query_result:
         results['positions'] = int(query_result.get('aggregations', {})
                                    .get('positions', {}).get('value', 0))
-        results['aggs'] = querybuilder.filter_aggs(query_result.get('aggregations', {})
-                                                   .get('complete', {}).get('buckets', []),
+        results['aggs'] = querybuilder.filter_aggs(query_result.get('aggregations', {}),
                                                    args.get(settings.FREETEXT_QUERY))
-        for stat in args.get(settings.STATISTICS) if args.get(settings.STATISTICS) else []:
+
+        for stat in args.get(settings.STATISTICS) or []:
             if 'stats' not in results:
                 results['stats'] = []
             results['stats'].append({

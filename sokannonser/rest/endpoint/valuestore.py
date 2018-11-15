@@ -26,8 +26,9 @@ class Valuestore(Resource):
     )
     @ns_valuestore.expect(taxonomy_query)
     def get(self):
+        args = taxonomy_query.parse_args()
         q = request.args.get('q', None)
-        kod = request.args.get('kod', [])
+        kod = args.get('kod') if args.get('kod') else []
         typ = tax_type.get(request.args.get('typ', None), None)
         offset = request.args.get(settings.OFFSET, 0)
         limit = request.args.get(settings.LIMIT, 10)
@@ -51,8 +52,8 @@ class Valuestore(Resource):
             type_label = taxonomy.reverse_tax_type.get(hit['_source']['type'],
                                                        "UNKNOWN: %s" %
                                                        hit['_source']['type'])
-            entity = {"kod": hit['_source']['id'],
-                      "uuid": hit['_source']['concept_id'],
+            entity = {"kod": hit['_source'].get('id'),
+                      "uuid": hit['_source'].get('concept_id'),
                       "term": hit['_source']['label'],
                       "typ": type_label}
             foralder = hit['_source'].get('parent', {}).get('id')

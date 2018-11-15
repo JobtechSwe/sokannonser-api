@@ -1,5 +1,6 @@
 from flask_restplus import Resource
 
+from sokannonser.rest.model import queries
 from valuestore import taxonomy
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons
@@ -7,12 +8,13 @@ from sokannonser.rest.decorators import check_api_key
 from sokannonser.rest.model.platsannons_results import pbapi_lista, simple_lista
 from sokannonser.rest.model.queries import sok_platsannons_query
 from sokannonser.repository import platsannonser
-from sokannonser.repository.querybuilder import PlatsbankenQuery
+from sokannonser.repository.querybuilder import QueryBuilder
 
 
 @ns_platsannons.route('/search')
 class Search(Resource):
     method_decorators = [check_api_key]
+    querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
         params={
@@ -24,14 +26,21 @@ class Search(Resource):
                            "pubdate-asc: publiceringsdatum, äldst först\n"
                            "applydate-desc: sista ansökningsdatum, nyast först\n"
                            "applydate-asc: sista ansökningsdatum, äldst först\n"
-                           "relevance: Relevans (poäng)",
+                           "relevance: Relevans (poäng) (default)",
             settings.PUBLISHED_AFTER: "Visa annonser publicerade efter angivet datum "
                                       "(på formen YYYY-mm-ddTHH:MM:SS)",
             settings.PUBLISHED_BEFORE: "Visa annonser publicerade innan angivet datum "
                                        "(på formen YYYY-mm-ddTHH:MM:SS)",
             settings.FREETEXT_QUERY: "Fritextfråga",
             settings.TYPEAHEAD_QUERY: "Ge förslag på sökord utifrån nuvarande sökning "
-                                      "(type head)",
+                                      "(autocomplete)",
+            settings.FREETEXT_FIELDS: "Välj vilka fält utöver standardfälten (rubrik, "
+                                      "arbetsplatsnamn och annonstext) "
+                                      "som ska användas för fritextfråga "
+                                      "(" + settings.FREETEXT_QUERY + "). Påverkar också "
+                                      "autocomplete (" + settings.TYPEAHEAD_QUERY + ").\n"
+                                      "Alternativ: " + str(queries.QF_CHOICES) + "\n"
+                                      "Default: samtliga",
             taxonomy.OCCUPATION: "En eller flera yrkesbenämningskoder enligt taxonomi",
             taxonomy.GROUP: "En eller flera yrkesgruppskoder enligt taxonomi",
             taxonomy.FIELD: "En eller flera yrkesområdeskoder enligt taxonomi",
@@ -67,10 +76,9 @@ class Search(Resource):
     )
     @ns_platsannons.expect(sok_platsannons_query)
     def get(self):
-        querybuilder = PlatsbankenQuery()
         args = sok_platsannons_query.parse_args()
         resultmodel = args.get(settings.RESULT_MODEL)
-        result = platsannonser.find_platsannonser(args, querybuilder)
+        result = platsannonser.find_platsannonser(args, self.querybuilder)
 
         if resultmodel == 'pbapi':
             return self.marshal_pbapi(result)

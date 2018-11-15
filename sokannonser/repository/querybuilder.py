@@ -1,6 +1,7 @@
 import logging
 from sokannonser import settings
 from sokannonser.repository import elastic
+from sokannonser.rest.model import queries
 from valuestore import taxonomy
 from valuestore.taxonomy import tax_type
 
@@ -25,7 +26,8 @@ class QueryBuilder(object):
 
         must_queries = list()
 
-        must_queries.append(self._build_freetext_query(args.get(settings.FREETEXT_QUERY)))
+        must_queries.append(self._build_freetext_query(args.get(settings.FREETEXT_QUERY),
+                                                       args.get(settings.FREETEXT_FIELDS)))
         must_queries.append(self._build_yrkes_query(args.get(taxonomy.OCCUPATION),
                                                     args.get(taxonomy.GROUP),
                                                     args.get(taxonomy.FIELD)))
@@ -58,13 +60,11 @@ class QueryBuilder(object):
 
         query_dsl = self._assemble_queries(query_dsl, must_queries, filter_queries)
 
-        stats = args.get(settings.STATISTICS) if args.get(settings.STATISTICS) else []
-        for stat in stats:
-            size = args.get(settings.STAT_LMT) if args.get(settings.STAT_LMT) else 5
+        for stat in args.get(settings.STATISTICS) or []:
             query_dsl['aggs'][stat] = {
                 "terms": {
                     "field": settings.stats_options[stat],
-                    "size": size
+                    "size": args.get(settings.STAT_LMT) or 5
                 }
             }
 
@@ -72,11 +72,14 @@ class QueryBuilder(object):
 
     def filter_aggs(self, aggs, freetext):
         fwords = freetext.split(' ') if freetext else []
-        filtered_aggs = []
+        value_dicts = []
         for agg in aggs:
-            if not agg.get('key') in fwords:
-                filtered_aggs.append(agg)
-
+            if agg.startswith('complete_'):
+                value_dicts += aggs[agg]['buckets']
+        filtered_aggs = [kv['key'] for kv in sorted(value_dicts,
+                                                    key=lambda k: k['doc_count'],
+                                                    reverse=True)
+                         if kv['key'] not in fwords]
         return filtered_aggs
 
     def _bootstrap_query(self, args):
@@ -109,21 +112,24 @@ class QueryBuilder(object):
                 ]
             },
         }
-        complete_string = args.get(settings.TYPEAHEAD_QUERY)
         query_dsl['aggs'] = {
             "positions": {
                 "sum": {"field": "antal_platser"}
             }
         }
+        complete_string = args.get(settings.TYPEAHEAD_QUERY)
+        complete_fields = args.get(settings.FREETEXT_FIELDS) or queries.QF_CHOICES
         if complete_string:
             complete = complete_string.split(' ')[-1]
-            query_dsl['aggs']['complete'] = {
-                "terms": {
-                    "field": "keywords.raw",
-                    "size": 20,
-                    "include": "%s.*" % complete
+            for field in complete_fields:
+                dkey = "complete_%s" % field
+                query_dsl['aggs'][dkey] = {
+                    "terms": {
+                        "field": "keywords.%s.raw" % field,
+                        "size": 5,
+                        "include": "%s.*" % complete
+                    }
                 }
-            }
 
         if args.get(settings.SORT):
             query_dsl['sort'] = [settings.sort_options.get(args.pop(settings.SORT))]
@@ -138,13 +144,15 @@ class QueryBuilder(object):
                 query_dsl['query']['bool']['filter'].append(f)
         return query_dsl
 
-    def _build_freetext_query(self, querystring):
+    def _build_freetext_query(self, querystring, queryfields):
         if not querystring:
             return None
+        if not queryfields:
+            queryfields = queries.QF_CHOICES
         inc_words = ' '.join([w for w in querystring.split(' ') if not w.startswith('-')])
         exc_words = ' '.join([w[1:] for w in querystring.split(' ') if w.startswith('-')])
-        shoulds = self.freetext_fields(inc_words) if inc_words else None
-        mustnts = self.freetext_fields(exc_words) if exc_words else None
+        shoulds = self._freetext_fields(inc_words, queryfields) if inc_words else None
+        mustnts = self._freetext_fields(exc_words, queryfields) if exc_words else None
         ft_query = {"bool": {}}
         if shoulds:
             ft_query['bool']['should'] = shoulds
@@ -153,10 +161,47 @@ class QueryBuilder(object):
 
         return ft_query
 
+    def _freetext_fields(self, searchword, queryfields):
+        kw_fields = ["keywords.%s" % qf for qf in queryfields]
+        return [
+            {
+                "match": {
+                    "rubrik": {
+                        "query": searchword,
+                        "boost": 3
+                    }
+                }
+            },
+            {
+                "match": {
+                    "arbetsgivare.namn": {
+                        "query": searchword,
+                        "boost": 2
+                    }
+                }
+            },
+            {
+                "multi_match": {
+                    "query": searchword,
+                    "boost": 2,
+                    "fields": kw_fields,
+                }
+            },
+            {
+                "multi_match": {
+                    "query": searchword,
+                    "fields": ["beskrivning.information",
+                               "beskrivning.behov",
+                               "beskrivning.krav",
+                               "beskrivning.annonstext"]
+                }
+            }
+        ]
+
     def _build_yrkes_query(self, yrkesroller, yrkesgrupper, yrkesomraden):
-        yrken = [] if not yrkesroller else yrkesroller
-        yrkesgrupper = [] if not yrkesgrupper else yrkesgrupper
-        yrkesomraden = [] if not yrkesomraden else yrkesomraden
+        yrken = yrkesroller or []
+        yrkesgrupper = yrkesgrupper or []
+        yrkesomraden = yrkesomraden or []
 
         yrke_term_query = [{
             "term": {
@@ -312,73 +357,3 @@ class QueryBuilder(object):
                 "arbetsplatsadress.coordinates": [longitude, latitude]
             }
         return geo_filter
-
-
-class PlatsbankenQuery(QueryBuilder):
-    def freetext_fields(self, searchword):
-        return [
-            {
-                "match": {
-                    "rubrik": {
-                        "query": searchword,
-                        "boost": 3
-                    }
-                }
-            },
-            {
-                "match": {
-                    "arbetsgivare.namn": {
-                        "query": searchword,
-                        "boost": 2
-                    }
-                }
-            },
-            {
-                "multi_match": {
-                    "query": searchword,
-                    "fields": ["beskrivning.information",
-                               "beskrivning.behov",
-                               "beskrivning.krav",
-                               "beskrivning.annonstext"]
-                }
-            }
-        ]
-
-
-class DefaultQuery(QueryBuilder):
-    def freetext_fields(self, searchword):
-        return [
-            {
-                "match": {
-                    "rubrik": {
-                        "query": searchword,
-                        "boost": 3
-                    }
-                }
-            },
-            {
-                "match": {
-                    "arbetsgivare.namn": {
-                        "query": searchword,
-                        "boost": 2
-                    }
-                }
-            },
-            {
-                "match": {
-                    "keywords": {
-                        "query": searchword,
-                        "boost": 2
-                    }
-                }
-            },
-            {
-                "multi_match": {
-                    "query": searchword,
-                    "fields": ["beskrivning.information",
-                               "beskrivning.behov",
-                               "beskrivning.krav",
-                               "beskrivning.annonstext"]
-                }
-            }
-        ]

@@ -65,7 +65,6 @@ def test_check_api_key_not_valid():
         @check_api_key
         def non_valid_key_function_to_test():
             print('This line should not be printed since user doesnt have a valid API key')
-            return True
 
         with pytest.raises(Unauthorized):
             non_valid_key_function_to_test()
@@ -80,7 +79,6 @@ def test_check_api_key_not_valid_and_base64():
         @check_api_key
         def non_base64_key_function_to_test():
             print('This line should not be printed since user doesnt have a base64-encoded API key')
-            return True
 
         with pytest.raises(Unauthorized):
             non_base64_key_function_to_test()

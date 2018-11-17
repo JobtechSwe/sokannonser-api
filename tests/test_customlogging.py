@@ -37,9 +37,7 @@ def test_log_newlines_develop():
 
     sokannonserlog.debug('''hello\nworld''')
     logrow_val = log_stream.getvalue()
-    repr_logrow_val = repr(logrow_val)
-    # print('log_stream.getvalue()', repr_logrow_val)
-    assert ('\\r' not in repr_logrow_val)
+    assert ('\r' not in logrow_val)
 
 @pytest.mark.unit
 def test_log_newlines_production():

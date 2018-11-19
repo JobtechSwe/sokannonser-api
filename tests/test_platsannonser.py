@@ -132,6 +132,7 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                                           17.1, 60.5
                                                                       ]}})])
 def test_geo_distance_filter(args, exist, expected):
+    print('============================', sys._getframe().f_code.co_name, '============================ ')
     query_dsl = pbquery.parse_args(args)
     assert (expected in query_dsl["query"]["bool"]["filter"]) == exist
     

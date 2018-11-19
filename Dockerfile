@@ -1,13 +1,16 @@
-FROM alpine:3.8
+FROM alpine:latest
 
 EXPOSE 8081
 
-RUN apk add --no-cache \
+RUN apk update && apk upgrade
+
+RUN apk add --no-cache --update \
         supervisor \
         uwsgi-python3 \
         python3 \
         nginx \
-        git
+        git \
+        curl
 
 COPY . /app
 

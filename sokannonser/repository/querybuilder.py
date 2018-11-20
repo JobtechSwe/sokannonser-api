@@ -144,6 +144,7 @@ class QueryBuilder(object):
                 query_dsl['query']['bool']['filter'].append(f)
         return query_dsl
 
+    # Parses FREETEXT_QUERY and FREETEXT_FIELDS
     def _build_freetext_query(self, querystring, queryfields):
         if not querystring:
             return None
@@ -198,6 +199,7 @@ class QueryBuilder(object):
             }
         ]
 
+    # Parses OCCUPATION, FIELD and GROUP
     def _build_yrkes_query(self, yrkesroller, yrkesgrupper, yrkesomraden):
         yrken = yrkesroller or []
         yrkesgrupper = yrkesgrupper or []
@@ -242,6 +244,7 @@ class QueryBuilder(object):
         else:
             return None
 
+    # Parses MUNICIPALITY and REGION
     def _build_plats_query(self, kommunkoder, lanskoder):
         kommuner = []
         neg_komm = []
@@ -283,6 +286,7 @@ class QueryBuilder(object):
             plats_bool_query['bool']['must_not'] = neg_plats_term_query
         return plats_bool_query
 
+    # Parses PUBLISHED_AFTER and PUBLISHED_BEFORE
     def _filter_timeframe(self, from_datetime, to_datetime):
         if not from_datetime and not to_datetime:
             return None
@@ -293,6 +297,7 @@ class QueryBuilder(object):
             range_query['range']['publiceringsdatum']['lte'] = to_datetime.isoformat()
         return range_query
 
+    # Parses PARTTIME_MIN and PARTTIME_MAX
     def _build_parttime_query(self, parttime_min, parttime_max):
         if not parttime_min and not parttime_max:
             return None
@@ -343,6 +348,7 @@ class QueryBuilder(object):
 
         return None
 
+    # Parses LONGITUDE LATITUDE and POSITION_RADIUS
     def _build_geo_dist_filter(self, longitude, latitude, coordinate_range):
         geo_filter = {}
         if (not longitude

@@ -13,10 +13,9 @@ from sokannonser.repository.querybuilder import QueryBuilder
 
 @ns_platsannons.route('/ad/<id>')
 class Proxy(Resource):
-    AD_PROXY_URL = 'http://api.arbetsformedlingen.se/af/v0/platsannonser/'
 
     def get(self, id):
-        url = "%s%s" % (self.AD_PROXY_URL, id)
+        url = "%s%s" % (settings.AD_PROXY_URL, id)
         headers = {'Accept-Language': 'sv', 'Accept': 'application/json'}
         return get(url, headers=headers).json()
 

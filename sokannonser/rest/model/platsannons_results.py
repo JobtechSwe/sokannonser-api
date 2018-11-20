@@ -42,9 +42,16 @@ matchande_annons = ns_platsannons.model('MatchandeAnnons', {
     }, attribute='_source')
 })
 
+
+class FormattedUrl(fields.Raw):
+    def format(self, value):
+        return "/af/ad/%s" % value
+
+
 matchande_annons_simple = ns_platsannons.model('MatchandeAnnons', {
     'annons': fields.Nested({
         'annonsid': fields.String(attribute='id'),
+        'annons_url': FormattedUrl(attribute='id'),
         'platsannons_url': fields.String(attribute='url'),
         'annonsrubrik': fields.String(attribute='rubrik'),
         'annonstext': fields.String(attribute='beskrivning.annonstext'),

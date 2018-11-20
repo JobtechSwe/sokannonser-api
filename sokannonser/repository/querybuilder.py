@@ -26,8 +26,10 @@ class QueryBuilder(object):
 
         must_queries = list()
 
-        must_queries.append(self._build_freetext_query(args.get(settings.FREETEXT_QUERY),
-                                                       args.get(settings.FREETEXT_FIELDS)))
+        must_queries.append(
+            self._build_freetext_query(args.get(settings.FREETEXT_QUERY),
+                                       args.get(settings.FREETEXT_FIELDS))
+        )
         must_queries.append(self._build_yrkes_query(args.get(taxonomy.OCCUPATION),
                                                     args.get(taxonomy.GROUP),
                                                     args.get(taxonomy.FIELD)))

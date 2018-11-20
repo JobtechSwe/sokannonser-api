@@ -16,6 +16,9 @@ RESTPLUS_VALIDATE = True
 RESTPLUS_MASK_SWAGGER = False
 RESTPLUS_ERROR_404_HELP = False
 
+# Ad proxy URL
+AD_PROXY_URL = 'http://api.arbetsformedlingen.se/af/v0/platsannonser/'
+
 # Header parameters
 APIKEY = 'api-key'
 APIKEY_BACKDOOR = 'apa'  # TODO: Remove before production

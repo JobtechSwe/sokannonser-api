@@ -1,5 +1,6 @@
 from flask_restplus import fields
 from sokannonser.rest import ns_platsannons
+from sokannonser import settings
 
 # Platsannonser
 resultat_plats = ns_platsannons.model('Plats', {
@@ -45,7 +46,7 @@ matchande_annons = ns_platsannons.model('MatchandeAnnons', {
 
 class FormattedUrl(fields.Raw):
     def format(self, value):
-        return "/af/ad/%s" % value
+        return "%s/af/ad/%s" % (settings.API_URL, value)
 
 
 matchande_annons_simple = ns_platsannons.model('MatchandeAnnons', {

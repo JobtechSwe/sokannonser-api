@@ -1,5 +1,5 @@
 from flask_restplus import Resource
-
+from requests import get
 from sokannonser.rest.model import queries
 from valuestore import taxonomy
 from sokannonser import settings
@@ -9,6 +9,16 @@ from sokannonser.rest.model.platsannons_results import pbapi_lista, simple_lista
 from sokannonser.rest.model.queries import sok_platsannons_query
 from sokannonser.repository import platsannonser
 from sokannonser.repository.querybuilder import QueryBuilder
+
+
+@ns_platsannons.route('/ad/<id>')
+class Proxy(Resource):
+    AD_PROXY_URL = 'http://api.arbetsformedlingen.se/af/v0/platsannonser/'
+
+    def get(self, id):
+        url = "%s%s" % (self.AD_PROXY_URL, id)
+        headers = {'Accept-Language': 'sv', 'Accept': 'application/json'}
+        return get(url, headers=headers).json()
 
 
 @ns_platsannons.route('/search')
@@ -63,10 +73,10 @@ class Search(Resource):
             # "valda platser som annonser ska hittas",
             settings.STATISTICS: "Visa sökstatistik för angivna fält "
                                  "(tillgängliga fält: %s, %s och %s)" % (
-                                         taxonomy.OCCUPATION, taxonomy.GROUP, taxonomy.FIELD
-                                 ),
+                                     taxonomy.OCCUPATION,
+                                     taxonomy.GROUP,
+                                     taxonomy.FIELD),
             settings.RESULT_MODEL: "Resultatmodell",
-            # settings.DATASET: "Sök bland AF:s annonser eller alla på marknaden (auranest)"
         },
         responses={
             200: 'OK',
@@ -105,5 +115,3 @@ class Search(Resource):
     @ns_platsannons.marshal_with(simple_lista)
     def marshal_simple(self, result):
         return result
-
-

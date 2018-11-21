@@ -29,7 +29,7 @@ class Proxy(Resource):
         url = "%s%s" % (settings.AD_PROXY_URL, id)
         headers = {'Accept-Language': 'sv', 'Accept': 'application/json'}
         try:
-            response = get(url, headers=headers)
+            response = get(url, headers=headers, timeout=10)
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 404:
@@ -110,9 +110,7 @@ class Search(Resource):
         resultmodel = args.get(settings.RESULT_MODEL)
         result = platsannonser.find_platsannonser(args, self.querybuilder)
 
-        if resultmodel == 'pbapi':
-            return self.marshal_pbapi(result)
-        elif resultmodel == 'simple':
+        if resultmodel == 'simple':
             return self.marshal_simple(result)
         else:
             return self.marshal_full(result)

@@ -1,5 +1,6 @@
-from flask_restplus import Resource
-from requests import get
+import logging
+from flask_restplus import Resource, abort
+from requests import get, exceptions
 from sokannonser.rest.model import queries
 from valuestore import taxonomy
 from sokannonser import settings
@@ -10,14 +11,34 @@ from sokannonser.rest.model.queries import sok_platsannons_query
 from sokannonser.repository import platsannonser
 from sokannonser.repository.querybuilder import QueryBuilder
 
+log = logging.getLogger(__name__)
+
 
 @ns_platsannons.route('/ad/<id>')
 class Proxy(Resource):
 
+    @ns_platsannons.doc(
+        responses={
+            200: 'OK',
+            401: 'Felaktig API-nyckel',
+            404: 'Annonsen saknas',
+            500: 'Serverfel'
+        }
+    )
     def get(self, id):
         url = "%s%s" % (settings.AD_PROXY_URL, id)
         headers = {'Accept-Language': 'sv', 'Accept': 'application/json'}
-        return get(url, headers=headers).json()
+        try:
+            response = get(url, headers=headers)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 404:
+                abort(404)
+            else:
+                abort(500)
+        except exceptions.ConnectionError as e:
+            log.error('Connection error', e)
+            abort(500)
 
 
 @ns_platsannons.route('/search')

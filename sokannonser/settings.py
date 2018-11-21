@@ -19,7 +19,7 @@ RESTPLUS_ERROR_404_HELP = False
 # Ad proxy URL
 AD_PROXY_URL = 'http://api.arbetsformedlingen.se/af/v0/platsannonser/'
 # Base API URL
-API_URL = os.getenv('API_URL', 'https://base.url')
+BASE_URL = os.getenv('BASE_URL', 'https://base.url')
 
 # Header parameters
 APIKEY = 'api-key'

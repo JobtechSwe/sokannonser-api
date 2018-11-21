@@ -49,7 +49,7 @@ MAX_LIMIT = 1000
 RESULT_MODEL = 'resultmodel'
 
 # For taxonomy
-SHOW_COUNT = 'visa-antal'
+SHOW_COUNT = 'show-count'
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'

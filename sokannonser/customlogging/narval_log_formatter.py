@@ -81,8 +81,8 @@ class NarvalLogFormatter(logging.Formatter):
 
         log.debug(test_json)
 
-        test_non_json = '''function test{ 
-                                alert('just testing logging...'); 
+        test_non_json = '''function test{
+                                alert('just testing logging...');
                             }'''
         log.debug(test_non_json)
 

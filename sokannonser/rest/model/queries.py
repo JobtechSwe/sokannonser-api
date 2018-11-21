@@ -83,8 +83,8 @@ taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True,
 taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)
 taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)
-taxonomy_query.add_argument('kod', action='append')
-taxonomy_query.add_argument('typ', choices=(taxonomy.OCCUPATION, taxonomy.GROUP,
+taxonomy_query.add_argument('parent-id', action='append')
+taxonomy_query.add_argument('type', choices=(taxonomy.OCCUPATION, taxonomy.GROUP,
                                             taxonomy.FIELD, taxonomy.SKILL,
                                             taxonomy.LANGUAGE, taxonomy.MUNICIPALITY,
                                             taxonomy.REGION, taxonomy.WORKTIME_EXTENT))

@@ -35,7 +35,7 @@ class Proxy(Resource):
             elif response.status_code == 404:
                 abort(404)
             else:
-                abort(500)
+                abort(response.status_code)
         except exceptions.RequestException as e:
             log.error('Failed to connect', e)
             abort(500)

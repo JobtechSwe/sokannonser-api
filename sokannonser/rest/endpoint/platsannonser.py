@@ -36,8 +36,8 @@ class Proxy(Resource):
                 abort(404)
             else:
                 abort(500)
-        except exceptions.ConnectionError as e:
-            log.error('Connection error', e)
+        except exceptions.RequestException as e:
+            log.error('Failed to connect', e)
             abort(500)
 
 

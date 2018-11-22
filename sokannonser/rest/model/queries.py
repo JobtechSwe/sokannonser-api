@@ -8,21 +8,11 @@ QF_CHOICES = ['occupation', 'skill', 'location']
 
 swagger_doc_params = {
     settings.APIKEY: "Nyckel som krävs för att använda API:et",
-    settings.OFFSET: "Börja lista resultat från denna position "
-    "(0-%d)" % settings.MAX_OFFSET,
-    settings.LIMIT: "Antal resultat att visa (0-%d)" % settings.MAX_LIMIT,
-    settings.SORT: "Sortering.\npubdate-desc: publiceringsdatum, nyast först\n"
-    "pubdate-asc: publiceringsdatum, äldst först\n"
-    "applydate-desc: sista ansökningsdatum, nyast först\n"
-    "applydate-asc: sista ansökningsdatum, äldst först\n"
-    "relevance: Relevans (poäng) (default)",
     settings.PUBLISHED_AFTER: "Visa annonser publicerade efter angivet datum "
     "(på formen YYYY-mm-ddTHH:MM:SS)",
     settings.PUBLISHED_BEFORE: "Visa annonser publicerade innan angivet datum "
     "(på formen YYYY-mm-ddTHH:MM:SS)",
     settings.FREETEXT_QUERY: "Fritextfråga",
-    settings.TYPEAHEAD_QUERY: "Ge förslag på sökord utifrån nuvarande sökning "
-    "(autocomplete)",
     settings.FREETEXT_FIELDS: "Välj vilka fält utöver standardfälten (rubrik, "
     "arbetsplatsnamn och annonstext) "
     "som ska användas för fritextfråga "
@@ -38,7 +28,6 @@ swagger_doc_params = {
     taxonomy.EMPLOYMENT_TYPE: "Anställningstyp enligt taxonomi",
     settings.EXPERIENCE_REQUIRED: "Sätt till 'false' för att visa enbart jobb "
     "som inte kräver erfarenhet",
-    # settings.PLACE: "Generellt platsnamn",
     taxonomy.WORKTIME_EXTENT: "En eller flera arbetstidsomfattningskoder enligt "
     "taxonomi",
     settings.PARTTIME_MIN: "För deltidsjobb, minsta omfattning",
@@ -48,8 +37,16 @@ swagger_doc_params = {
     settings.LONGITUDE: "Longitud för punkt",
     settings.LATITUDE: "Latitud för punkt",
     settings.POSITION_RADIUS: "Radie från punkt i km",
-    # settings.PLACE_RADIUS: "Inom vilken ungefärlig radie i kilometer från "
-    # "valda platser som annonser ska hittas",
+}
+swagger_filter_doc_params = {
+    settings.OFFSET: "Börja lista resultat från denna position "
+    "(0-%d)" % settings.MAX_OFFSET,
+    settings.LIMIT: "Antal resultat att visa (0-%d)" % settings.MAX_LIMIT,
+    settings.SORT: "Sortering.\npubdate-desc: publiceringsdatum, nyast först\n"
+    "pubdate-asc: publiceringsdatum, äldst först\n"
+    "applydate-desc: sista ansökningsdatum, nyast först\n"
+    "applydate-asc: sista ansökningsdatum, äldst först\n"
+    "relevance: Relevans (poäng) (default)",
     settings.STATISTICS: "Visa sökstatistik för angivna fält "
     "(tillgängliga fält: %s, %s och %s)" % (
         taxonomy.OCCUPATION,
@@ -62,25 +59,12 @@ swagger_doc_params = {
 sok_platsannons_query = reqparse.RequestParser()
 sok_platsannons_query.add_argument(settings.APIKEY, location='headers', required=True,
                                    default=settings.APIKEY_BACKDOOR)
-
-sok_platsannons_query.add_argument(settings.OFFSET,
-                                   type=inputs.int_range(0, settings.MAX_OFFSET),
-                                   default=0)
-sok_platsannons_query.add_argument(settings.LIMIT,
-                                   type=inputs.int_range(0, settings.MAX_LIMIT),
-                                   default=10)
-sok_platsannons_query.add_argument(settings.SORT,
-                                   choices=list(settings.sort_options.keys()))
 sok_platsannons_query.add_argument(settings.PUBLISHED_BEFORE,
                                    type=lambda x: datetime.strptime(x,
                                                                     '%Y-%m-%dT%H:%M:%S'))
 sok_platsannons_query.add_argument(settings.PUBLISHED_AFTER,
                                    type=lambda x: datetime.strptime(x,
                                                                     '%Y-%m-%dT%H:%M:%S'))
-sok_platsannons_query.add_argument(settings.FREETEXT_QUERY)
-sok_platsannons_query.add_argument(settings.TYPEAHEAD_QUERY)
-sok_platsannons_query.add_argument(settings.FREETEXT_FIELDS, action='append',
-                                   choices=QF_CHOICES)
 sok_platsannons_query.add_argument(taxonomy.OCCUPATION, action='append')
 sok_platsannons_query.add_argument(taxonomy.GROUP, action='append')
 sok_platsannons_query.add_argument(taxonomy.FIELD, action='append')
@@ -92,20 +76,25 @@ sok_platsannons_query.add_argument(taxonomy.DRIVING_LICENCE, action='append')
 sok_platsannons_query.add_argument(taxonomy.EMPLOYMENT_TYPE, action='append')
 sok_platsannons_query.add_argument(settings.EXPERIENCE_REQUIRED,
                                    choices=['true', 'false'])
-# sok_platsannons_query.add_argument(settings.PLACE)
 sok_platsannons_query.add_argument(taxonomy.MUNICIPALITY, action='append')
 sok_platsannons_query.add_argument(taxonomy.REGION, action='append')
 
 sok_platsannons_query.add_argument(settings.LONGITUDE, type=float)
 sok_platsannons_query.add_argument(settings.LATITUDE, type=float)
 sok_platsannons_query.add_argument(settings.POSITION_RADIUS, type=int)
-# sok_platsannons_query.add_argument(settings.PLACE_RADIUS, type=int)
-sok_platsannons_query.add_argument(settings.STATISTICS, action='append',
-                                   choices=[taxonomy.OCCUPATION, taxonomy.GROUP,
-                                            taxonomy.FIELD])
-sok_platsannons_query.add_argument(settings.STAT_LMT,
-                                   type=int_range(0, 20),
-                                   required=False)
+sok_platsannons_query.add_argument(settings.FREETEXT_QUERY)
+sok_platsannons_query.add_argument(settings.FREETEXT_FIELDS, action='append',
+                                   choices=QF_CHOICES)
+pb_query = sok_platsannons_query.copy()
+pb_query.add_argument(settings.OFFSET, type=inputs.int_range(0, settings.MAX_OFFSET),
+                      default=0)
+pb_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_LIMIT),
+                      default=10)
+pb_query.add_argument(settings.SORT, choices=list(settings.sort_options.keys()))
+pb_query.add_argument(settings.STATISTICS, action='append',
+                      choices=[taxonomy.OCCUPATION, taxonomy.GROUP,
+                               taxonomy.FIELD])
+pb_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 20), required=False)
 
 auranest_query = reqparse.RequestParser()
 auranest_query.add_argument(settings.APIKEY, location='headers', required=True,

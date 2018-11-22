@@ -1,20 +1,16 @@
 import logging
-import json
 from sokannonser.customlogging import NarvalLogFormatter
 from flask import Flask
 from flask_cors import CORS
 from sokannonser.rest import api
 from sokannonser.rest.endpoint.auranest import AuranestSearch
-from sokannonser.rest.endpoint.platsannonser import Search
+from sokannonser.rest.endpoint.platsannonser import PBSearch, OpenSearch, Proxy
 from sokannonser.rest.endpoint.valuestore import Valuestore
 from sokannonser import settings
 import os
 
-
-
 app = Flask(__name__)
 CORS(app)
-
 
 
 def configure_logging():
@@ -30,7 +26,6 @@ def configure_logging():
     # root.setLevel(logging.INFO)
     root.addHandler(stream_handler)
 
-
     set_custom_log_level()
 
 
@@ -39,7 +34,8 @@ def create_log_formatter():
         is_develop_mode = True
     else:
         is_develop_mode = False
-    f = NarvalLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s', is_develop_mode=is_develop_mode)
+    f = NarvalLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s',
+                           is_develop_mode=is_develop_mode)
     return f
 
 
@@ -75,10 +71,6 @@ def configure_app(flask_app):
 def initialize_app(flask_app):
     configure_app(flask_app)
     api.init_app(flask_app)
-
-
-
-
 
 
 if __name__ == '__main__':

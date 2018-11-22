@@ -60,6 +60,7 @@ class PBComplete(Resource):
     @ns_platsannons.expect(sok_platsannons_query)
     def get(self):
         args = sok_platsannons_query.parse_args()
+        # This could be prettier
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         args[settings.TYPEAHEAD_QUERY] = args.get(settings.FREETEXT_QUERY)
 

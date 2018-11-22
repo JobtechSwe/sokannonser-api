@@ -32,8 +32,6 @@ class Proxy(Resource):
             response = get(url, headers=headers, timeout=10)
             if response.status_code == 200:
                 return response.json()
-            elif response.status_code == 404:
-                abort(404)
             else:
                 abort(response.status_code)
         except exceptions.RequestException as e:

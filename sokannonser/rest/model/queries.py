@@ -55,6 +55,7 @@ swagger_doc_params = {
         taxonomy.OCCUPATION,
         taxonomy.GROUP,
         taxonomy.FIELD),
+    settings.STAT_LMT: "Antal statistikrader per typ",
 }
 
 
@@ -102,10 +103,9 @@ sok_platsannons_query.add_argument(settings.POSITION_RADIUS, type=int)
 sok_platsannons_query.add_argument(settings.STATISTICS, action='append',
                                    choices=[taxonomy.OCCUPATION, taxonomy.GROUP,
                                             taxonomy.FIELD])
-sok_platsannons_query.add_argument(settings.STAT_LMT, type=int, required=False)
-# sok_platsannons_query.add_argument(settings.DATASET,
-#                                    choices=settings.AVAILABLE_DATASETS,
-#                                    default=settings.DATASET_AF)
+sok_platsannons_query.add_argument(settings.STAT_LMT,
+                                   type=int_range(0, 20),
+                                   required=False)
 
 auranest_query = reqparse.RequestParser()
 auranest_query.add_argument(settings.APIKEY, location='headers', required=True,

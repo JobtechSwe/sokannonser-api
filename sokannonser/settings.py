@@ -6,8 +6,8 @@ ES_HOST = os.getenv("ES_HOST", "localhost")
 ES_PORT = os.getenv("ES_PORT", 9200)
 ES_USER = os.getenv("ES_USER")
 ES_PWD = os.getenv("ES_PWD")
-ES_INDEX = os.getenv("ES_INDEX", "platsannons")
-ES_AURANEST = os.getenv("ES_AURANEST", "auranest")
+ES_INDEX = os.getenv("ES_INDEX", "platsannons-read")
+ES_AURANEST = os.getenv("ES_AURANEST", "auranest-read")
 ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy")
 
 # Flask-Restplus settings

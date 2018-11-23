@@ -59,6 +59,6 @@ class Valuestore(Resource):
             if foralder:
                 entity['parentId'] = foralder
             if statistics:
-                entity['antal'] = statistics.get(hit['_source']['id'], 0)
+                entity['count'] = statistics.get(hit['_source']['legacy_ams_taxonomy_id'], 0)
             results.append(entity)
         return {'search': query, 'result': results}

@@ -24,7 +24,6 @@ RUN mkdir -p /var/run/nginx && \
     chmod -R 777 /var/run/nginx
 RUN mkdir -p /var/run/supervisord /var/log/supervisord && \
     chmod -R 777 /var/run/supervisord
-RUN mkdir -p /var/log/supervisord
 RUN chmod -R 775 /app && \
     chmod -R 777 /usr/sbin && \
     chmod -R 775 /usr/lib/python*

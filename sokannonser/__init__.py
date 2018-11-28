@@ -34,7 +34,7 @@ def create_log_formatter():
         is_develop_mode = True
     else:
         is_develop_mode = False
-    f = NarvalLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s',
+    f = NarvalLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s', '%Y-%m-%d %H:%M:%S%z',
                            is_develop_mode=is_develop_mode)
     return f
 

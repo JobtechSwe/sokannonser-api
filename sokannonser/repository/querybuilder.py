@@ -39,13 +39,13 @@ class QueryBuilder(object):
                                                        args.get(settings.PARTTIME_MAX)))
         must_queries.append(self._build_plats_query(args.get(taxonomy.MUNICIPALITY),
                                                     args.get(taxonomy.REGION)))
-        must_queries.append(self._build_generic_query("krav.kompetenser.kod",
+        must_queries.append(self._build_generic_query(["krav.kompetenser.kod.keyword", "krav.kompetenser.taxonomi-kod"],
                                                       args.get(taxonomy.SKILL)))
-        must_queries.append(self._build_generic_query("arbetstidstyp.kod",
+        must_queries.append(self._build_generic_query(["arbetstidstyp.kod.keyword", "arbetstidstyp.taxonomi-kod"],
                                                       args.get(taxonomy.WORKTIME_EXTENT)))
-        must_queries.append(self._build_generic_query("korkort.kod",
+        must_queries.append(self._build_generic_query(["korkort.kod.keyword", "korkort.taxonomi-kod"],
                                                       args.get(taxonomy.DRIVING_LICENCE)))
-        must_queries.append(self._build_generic_query("anstallningstyp.kod",
+        must_queries.append(self._build_generic_query(["anstallningstyp.kod.keyword", "anstallningstyp.taxonomi-kod"],
                                                       args.get(taxonomy.EMPLOYMENT_TYPE)))
 
         # TODO: Maybe check if NO skills are listed in ad instead?
@@ -209,31 +209,57 @@ class QueryBuilder(object):
 
         yrke_term_query = [{
             "term": {
-                "yrkesroll.kod": {
+                "yrkesroll.kod.keyword": {
                     "value": y,
                     "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                "yrkesgrupp.kod": {
+                "yrkesroll.taxonomi-kod": {
+                    "value": y,
+                    "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
+        yrke_term_query += [{
+            "term": {
+                "yrkesgrupp.kod.keyword": {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                "yrkesomrade.kod": {
+                "yrkesgrupp.taxonomi-kod": {
+                    "value": y,
+                    "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
+        yrke_term_query += [{
+            "term": {
+                "yrkesomrade.kod.keyword": {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
-
+        yrke_term_query += [{
+            "term": {
+                "yrkesomrade.taxonomi-kod": {
+                    "value": y,
+                    "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
         neg_yrke_term_query = [{
             "term": {
-                "yrkesroll.kod": {
+                "yrkesroll.kod.keyword": {
+                    "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
+        neg_yrke_term_query = [{
+            "term": {
+                "yrkesroll.taxonomi-kod": {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                "yrkesgrupp.kod": {
+                "yrkesgrupp.kod.keyword": {
                     "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                "yrkesomrade.kod": {
+                "yrkesgrupp.taxonomi-kod": {
+                    "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
+        neg_yrke_term_query += [{
+            "term": {
+                "yrkesomrade.kod.keyword": {
+                    "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
+        neg_yrke_term_query += [{
+            "term": {
+                "yrkesomrade.taxonomi-kod": {
                     "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
 
         if yrke_term_query or neg_yrke_term_query:
@@ -259,10 +285,10 @@ class QueryBuilder(object):
         for lanskod in lanskoder if lanskoder is not None else []:
             ttype = tax_type.get(taxonomy.MUNICIPALITY)
             if lanskod.startswith('-'):
-                kommun_results = taxonomy.find_concepts(elastic, None, lanskod[1:],
+                kommun_results = taxonomy.find_concepts(elastic, None, [lanskod[1:]],
                                                         ttype
                                                         ).get('hits', {}).get('hits', [])
-                neg_komm += [entitet['_source']['id'] for entitet in kommun_results]
+                neg_komm += [entitet['_source']['legacy_ams_taxonomy_id'] for entitet in kommun_results]
             else:
                 kommun_results = taxonomy.find_concepts(elastic, None, [lanskod],
                                                         ttype
@@ -329,14 +355,18 @@ class QueryBuilder(object):
         }
         return parttime_query
 
-    def _build_generic_query(self, key, itemlist):
+    def _build_generic_query(self, keys, itemlist):
         items = [] if not itemlist else itemlist
+        term_query = []
+        neg_term_query = []
+        if isinstance(keys, str):
+            keys = [keys]
+        for key in keys:
+            term_query += [{"term": {key: {"value": item}}}
+                           for item in items if not item.startswith('-')]
 
-        term_query = [{"term": {key: {"value": item}}}
-                      for item in items if not item.startswith('-')]
-
-        neg_term_query = [{"term": {key: {"value": item[1:]}}}
-                          for item in items if item.startswith('-')]
+            neg_term_query += [{"term": {key: {"value": item[1:]}}}
+                               for item in items if item.startswith('-')]
 
         if term_query or neg_term_query:
             query = {'bool': {}}

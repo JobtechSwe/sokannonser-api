@@ -10,7 +10,12 @@ RUN apk add --no-cache --update \
         python3 \
         nginx \
         git \
-        curl
+        curl \
+        tzdata
+RUN rm -rf /var/cache/apk/*
+
+ENV TZ=Europe/Paris
+RUN date +"%Y-%m-%dT%H:%M:%S %Z"
 
 COPY . /app
 

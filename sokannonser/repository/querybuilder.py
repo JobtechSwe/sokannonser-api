@@ -255,7 +255,6 @@ class QueryBuilder(object):
                 neg_komm.append(kkod[1:])
             else:
                 kommuner.append(kkod)
-
         kommunlanskoder = []
         for lanskod in lanskoder if lanskoder is not None else []:
             ttype = tax_type.get(taxonomy.MUNICIPALITY)
@@ -265,11 +264,10 @@ class QueryBuilder(object):
                                                         ).get('hits', {}).get('hits', [])
                 neg_komm += [entitet['_source']['id'] for entitet in kommun_results]
             else:
-                kommun_results = taxonomy.find_concepts(elastic, None, lanskod,
+                kommun_results = taxonomy.find_concepts(elastic, None, [lanskod],
                                                         ttype
                                                         ).get('hits', {}).get('hits', [])
-                kommunlanskoder += [e['_source']['id'] for e in kommun_results]
-
+                kommunlanskoder += [e['_source']['legacy_ams_taxonomy_id'] for e in kommun_results]
         plats_term_query = [{"term": {
             "arbetsplatsadress.kommunkod": {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]

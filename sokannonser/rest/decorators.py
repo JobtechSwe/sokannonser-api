@@ -28,14 +28,13 @@ def check_api_key(func):
 
 def check_api_key_auranest(func):
     def wrapper(*args, **kwargs):
-        abort(401, message="Access denied!")
         apikey = request.headers.get(settings.APIKEY)
-        decoded_key = _decode_key(apikey) \
-            if apikey != settings.APIKEY_BACKDOOR else settings.APIKEY_BACKDOOR
-        if decoded_key == settings.APIKEY_BACKDOOR or EMAIL_REGEX.match(decoded_key):
+        decoded_key = _decode_key(apikey)
+        if EMAIL_REGEX.match(decoded_key):
             log.info("API key %s is valid." % decoded_key)
             return func(*args, **kwargs)
         log.info("Failed validation for key '%s'" % decoded_key)
+        abort(401, message="You're no monkey!")
 
     return wrapper
 

@@ -78,6 +78,13 @@ def _parse_args(args):
             'must': [],
         }
     }
+    query_dsl['collapse'] = {
+        "field": "group.id",
+        "inner_hits": {
+            "name": "other",
+            "size": 20
+        }
+    }
     if args.pop(settings.SHOW_EXPIRED) != 'true':
         query_dsl['query']['bool']['filter'] = [{'bool': {'must_not': {'exists': {'field': 'source.removedAt'}}}}]
 

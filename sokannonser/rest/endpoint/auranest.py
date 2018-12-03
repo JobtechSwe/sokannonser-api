@@ -1,6 +1,6 @@
 from flask_restplus import Resource
 from sokannonser import settings
-from sokannonser.rest.decorators import check_api_key_auranest
+from sokannonser.rest.decorators import check_api_key, check_api_key_auranest
 from sokannonser.rest import ns_auranest
 from sokannonser.rest.model.queries import auranest_query, auranest_typeahead
 from sokannonser.rest.model.auranest_results import auranest_lista

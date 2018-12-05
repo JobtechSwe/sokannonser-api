@@ -86,7 +86,8 @@ def _parse_args(args):
         }
     }
     if args.pop(settings.SHOW_EXPIRED) != 'true':
-        query_dsl['query']['bool']['filter'] = [{'bool': {'must_not': {'exists': {'field': 'source.removedAt'}}}}]
+        query_dsl['query']['bool']['filter'] = \
+            [{'bool': {'must_not': {'exists': {'field': 'source.removedAt'}}}}]
 
     if args.get(settings.SORT):
         query_dsl['sort'] = [settings.auranest_sort_options.get(args.pop(settings.SORT))]

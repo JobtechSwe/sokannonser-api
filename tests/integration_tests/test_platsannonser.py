@@ -5,9 +5,10 @@ import sys
 
 from valuestore import taxonomy as t
 from valuestore.taxonomy import tax_type
-
 from sokannonser.repository import elastic, platsannonser
 from sokannonser.repository.querybuilder import QueryBuilder
+from dateutil import parser
+import re
 
 log = logging.getLogger(__name__)
 pbquery = QueryBuilder()
@@ -47,10 +48,10 @@ def test_get_stats_for(taxonomy_type):
             pytest.fail('ERROR: This is not a KeyError exception: %s' % str(ex), pytrace=False)
     else:  # taxonomy_type is in 5 mentioned in platsannonser.py::get_stats_for()
         for k, v in platsannonser.get_stats_for(taxonomy_type).items():
-            assert isinstance(int(k), int)  # check k is string of int
+            assert (re.match(r'^[\w\d_-]*$', k) is not None)  # check k is string of int
             assert isinstance(v, int)  # check v is int
 
-            
+
 def safe_execute(default, exception, function, *args):
     # safe_execute("Felkod", ValueError, int, kkod) != "Felkod"
     try:
@@ -59,7 +60,7 @@ def safe_execute(default, exception, function, *args):
         logging.exception(default)
         return default
 
-    
+
 @pytest.mark.integration
 @pytest.mark.parametrize("kommunkoder", [["2510", "0118"], ["0118"], None, []])
 @pytest.mark.parametrize("lanskoder", [["25"], ["01", "03"], ["ejLanKod"], None, []])
@@ -80,5 +81,3 @@ def test_build_plats_query(kommunkoder, lanskoder):
         assert set(kommunlanskoder).issubset(set(find("value", d)))
     if kommunkoder is None and kommunlanskoder is None:
         assert d is None
-
-        

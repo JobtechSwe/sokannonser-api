@@ -1,10 +1,12 @@
-from sokannonser.repository import elastic, platsannonser
-from sokannonser.repository.querybuilder import QueryBuilder
-from sokannonser import settings
-from valuestore import taxonomy as t
-from valuestore.taxonomy import tax_type
+#-*- coding: utf-8 -*-
+import logging
+import pytest
+import sys
+
 from dateutil import parser
-import sys, pytest, logging
+
+from sokannonser import settings
+from sokannonser.repository.querybuilder import QueryBuilder
 
 log = logging.getLogger(__name__)
 pbquery = QueryBuilder()

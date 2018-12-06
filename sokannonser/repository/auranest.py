@@ -105,44 +105,15 @@ def _parse_args(args):
 
 
 def __freetext_fields(searchword):
+    search_fields = ["header^3", "title.freetext^3", "keywords",
+                     "employer.name^2", "content.text"]
     return [
         {
-            "match": {
-                "header": {
-                    "query": searchword,
-                    "boost": 3
-                }
-            }
-        },
-        {
-            "match": {
-                "title.freetext": {
-                    "query": searchword,
-                    "boost": 3
-                }
-            }
-        },
-        {
-            "match": {
-                "keywords": {
-                    "query": searchword,
-                    "boost": 1
-                }
-            }
-        },
-        {
-            "match": {
-                "employer.name": {
-                    "query": searchword,
-                    "boost": 2
-                }
-            }
-        },
-        {
-            "match": {
-                "content.text": {
-                    "query": searchword,
-                }
+            "multi_match": {
+                "query": searchword,
+                "type": "cross_fields",
+                "operator": "and",
+                "fields": search_fields
             }
         }
     ]

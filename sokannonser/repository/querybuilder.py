@@ -165,38 +165,19 @@ class QueryBuilder(object):
         return ft_query
 
     def _freetext_fields(self, searchword, queryfields):
-        kw_fields = ["keywords.%s" % qf for qf in queryfields]
+        search_fields = ["rubrik^3", "arbetsgivare.namn^2",
+                         "beskrivning.information",
+                         "beskrivning.behov",
+                         "beskriving.krav",
+                         "beskrivning.annonstext"]
+        search_fields += ["keywords.%s" % qf for qf in queryfields]
         return [
             {
-                "match": {
-                    "rubrik": {
-                        "query": searchword,
-                        "boost": 3
-                    }
-                }
-            },
-            {
-                "match": {
-                    "arbetsgivare.namn": {
-                        "query": searchword,
-                        "boost": 2
-                    }
-                }
-            },
-            {
                 "multi_match": {
                     "query": searchword,
-                    "boost": 2,
-                    "fields": kw_fields,
-                }
-            },
-            {
-                "multi_match": {
-                    "query": searchword,
-                    "fields": ["beskrivning.information",
-                               "beskrivning.behov",
-                               "beskrivning.krav",
-                               "beskrivning.annonstext"]
+                    "type": "cross_fields",
+                    "operator": "and",
+                    "fields": search_fields
                 }
             }
         ]

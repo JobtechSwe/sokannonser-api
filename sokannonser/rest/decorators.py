@@ -12,10 +12,8 @@ from sokannonser.repository import elastic
 log = logging.getLogger(__name__)
 
 EMAIL_REGEX = re.compile(r"\"?([-a-zA-Z0-9.`?{}]+@\w+\.\w+)\"?")
-valid_api_keys = elastic.get_source(index=settings.ES_SYSTEM_INDEX,
-                                    doc_type='_all',
-                                    id=settings.ES_APIKEYS_DOC_ID)
-last_check_ts = int(time.time())
+valid_api_keys = dict()
+last_check_ts = 0
 
 
 def check_api_key(func):
@@ -42,10 +40,11 @@ def check_api_key_auranest(func):
                                                 id=settings.ES_APIKEYS_DOC_ID)
             last_check_ts = time.time()
         apikey = request.headers.get(settings.APIKEY)
+        decoded_key = _decode_key(apikey)
         if valid_api_keys and apikey in valid_api_keys.get('validkeys', []):
-            log.info("API key \"%s\" is valid." % _decode_key(apikey))
+            log.info("API key \"%s\" is valid." % decoded_key)
             return func(*args, **kwargs)
-        log.info("Failed validation for key '%s'" % apikey)
+        log.info("Failed validation for key '%s'" % decoded_key)
         abort(401, message="You're no monkey!")
 
     return wrapper
@@ -53,7 +52,7 @@ def check_api_key_auranest(func):
 
 # Decodes the API which is in base64 format
 def _decode_key(apikey):
-    decoded = apikey
+    decoded = apikey or 'Invalid Key: None'
     if apikey:
         for i in range(3):
             try:
@@ -64,6 +63,7 @@ def _decode_key(apikey):
                 pass
             except UnicodeDecodeError as u:
                 log.debug("Failed to decode utf-8 key: %s: %s" % (apikey, u))
+                decoded = 'Invalid Key'  # Prevents users from sending plain email adress
             # Reappend trailing '=' to find correct padding
             apikey = "%s=" % apikey
     return decoded

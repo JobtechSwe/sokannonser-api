@@ -1,6 +1,6 @@
 from flask_restplus import Resource
 from sokannonser import settings
-from sokannonser.rest.decorators import check_api_key, check_api_key_auranest
+from sokannonser.rest.decorators import check_api_key_auranest
 from sokannonser.rest import ns_auranest
 from sokannonser.rest.model.queries import auranest_query, auranest_typeahead
 from sokannonser.rest.model.auranest_results import auranest_lista
@@ -23,7 +23,7 @@ class AuranestSearch(Resource):
 
 
 @ns_auranest.route('complete')
-class AuranestSearch(Resource):
+class AuranestComplete(Resource):
     method_decorators = [check_api_key_auranest]
 
     @ns_auranest.doc(description='Ge förslag på nästa sökord')

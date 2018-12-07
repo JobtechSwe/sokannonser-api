@@ -124,8 +124,20 @@ taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)
 taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)
 taxonomy_query.add_argument('parent-id', action='append')
-taxonomy_query.add_argument('type', choices=(taxonomy.OCCUPATION, taxonomy.GROUP,
-                                             taxonomy.FIELD, taxonomy.SKILL,
-                                             taxonomy.LANGUAGE, taxonomy.MUNICIPALITY,
-                                             taxonomy.REGION, taxonomy.WORKTIME_EXTENT))
+taxonomy_query.add_argument('type', choices=(
+                                             taxonomy.JobtechTaxonomy.OCCUPATION_NAME,
+                                             taxonomy.JobtechTaxonomy.OCCUPATION_GROUP,
+                                             taxonomy.JobtechTaxonomy.OCCUPATION_FIELD,
+                                             taxonomy.JobtechTaxonomy.SKILL,
+                                             taxonomy.JobtechTaxonomy.LANGUAGE,
+                                             taxonomy.JobtechTaxonomy.MUNICIPALITY,
+                                             taxonomy.JobtechTaxonomy.COUNTY,
+                                             taxonomy.JobtechTaxonomy.WORKTIME_EXTENT,
+                                             taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_1,
+                                             taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_2,
+                                             taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_3,
+                                             taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_1,
+                                             taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_2,
+                                             taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_3,
+                                             ))
 taxonomy_query.add_argument(settings.SHOW_COUNT, type=bool, default=False)

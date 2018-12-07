@@ -28,7 +28,7 @@ class Valuestore(Resource):
         args = taxonomy_query.parse_args()
         q = request.args.get('q', None)
         parent_id = args.get('parent-id') if args.get('parent-id') else []
-        concept_type = tax_type.get(request.args.get('type', None), None)
+        concept_type = request.args.get('type', None)
         offset = request.args.get(settings.OFFSET, 0)
         limit = request.args.get(settings.LIMIT, 10)
         response = taxonomy.find_concepts(elastic, q, parent_id, concept_type, offset, limit)
@@ -48,9 +48,7 @@ class Valuestore(Resource):
     def _build_response(self, query, response, statistics):
         results = []
         for hit in response.get('hits', {}).get('hits', []):
-            type_label = taxonomy.reverse_tax_type.get(hit['_source']['type'],
-                                                       "UNKNOWN: %s" %
-                                                       hit['_source']['type'])
+            type_label = hit['_source']['type']
             entity = {"conceptId": hit['_source'].get('concept_id'),
                       "legacyAmsTaxonomyId": hit['_source'].get('legacy_ams_taxonomy_id'),
                       "term": hit['_source']['label'],

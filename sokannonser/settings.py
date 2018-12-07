@@ -10,6 +10,10 @@ ES_INDEX = os.getenv("ES_INDEX", "platsannons-read")
 ES_AURANEST = os.getenv("ES_AURANEST", "auranest-read")
 ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy")
 
+# API keys settings
+ES_SYSTEM_INDEX = os.getenv("ES_SYSTEM_INDEX", "system")
+ES_APIKEYS_DOC_ID = os.getenv("ES_APIKEYS_DOC_ID", "apikeys")
+
 # Flask-Restplus settings
 RESTPLUS_SWAGGER_UI_DOC_EXPANSION = 'list'
 RESTPLUS_VALIDATE = True

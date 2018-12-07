@@ -11,8 +11,8 @@ ns_platsannons = Namespace('AF-Annonser',
                            description='Sök bland AF:s annonser')
 ns_auranest = Namespace('Alla Annonser',
                         description='Sök bland alla annonser på marknaden')
-ns_valuestore = Namespace('Värdeförråd',
-                          description='Sök i taxonomi och ontologi')
+ns_valuestore = Namespace('Jobtech Taxonomy',
+                          description='Find concepts in the Jobtech Taxonomy')
 
 api.add_namespace(ns_open, '/open')
 api.add_namespace(ns_platsannons, '/af')

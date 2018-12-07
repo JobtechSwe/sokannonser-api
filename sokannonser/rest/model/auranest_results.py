@@ -20,7 +20,11 @@ annons = api.model('Ad', {
             'url': fields.String(),
             'name': fields.String()
         }, attribute='site')
-    }, attribute='_source.application', skip_none=True)
+    }, attribute='_source.application', skip_none=True),
+    'sources': fields.List(fields.Nested({
+        'name': fields.String(attribute='_source.source.site.name'),
+        'url': fields.String(attribute='_source.source.url')
+    }), attribute='inner_hits.other.hits.hits')
 })
 
 stat_value = api.model('StatValue', {

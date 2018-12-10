@@ -6,6 +6,7 @@ annons = api.model('Ad', {
     'id': fields.String(attribute='_source.id'),
     'header': fields.String(attribute='_source.header'),
     'content': fields.String(attribute='_source.content.text'),
+    'markup': fields.String(attribute='_source.content.xml'),
     'employer': fields.Nested({
         'name': fields.String(),
         'logoUrl': fields.String()

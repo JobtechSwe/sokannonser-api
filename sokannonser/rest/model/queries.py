@@ -79,6 +79,7 @@ sok_platsannons_query.add_argument(settings.EXPERIENCE_REQUIRED,
                                    choices=['true', 'false'])
 sok_platsannons_query.add_argument(taxonomy.MUNICIPALITY, action='append')
 sok_platsannons_query.add_argument(taxonomy.REGION, action='append')
+sok_platsannons_query.add_argument(taxonomy.COUNTRY, action='append')
 
 sok_platsannons_query.add_argument(settings.LONGITUDE, type=float)
 sok_platsannons_query.add_argument(settings.LATITUDE, type=float)

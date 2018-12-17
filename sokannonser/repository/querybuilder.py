@@ -39,13 +39,18 @@ class QueryBuilder(object):
                                                        args.get(settings.PARTTIME_MAX)))
         must_queries.append(self._build_plats_query(args.get(taxonomy.MUNICIPALITY),
                                                     args.get(taxonomy.REGION)))
-        must_queries.append(self._build_generic_query(["krav.kompetenser.kod.keyword", "krav.kompetenser.taxonomi-kod"],
+        must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
+        must_queries.append(self._build_generic_query(["krav.kompetenser.kod.keyword",
+                                                       "krav.kompetenser.taxonomi-kod"],
                                                       args.get(taxonomy.SKILL)))
-        must_queries.append(self._build_generic_query(["arbetstidstyp.kod.keyword", "arbetstidstyp.taxonomi-kod"],
+        must_queries.append(self._build_generic_query(["arbetstidstyp.kod.keyword",
+                                                       "arbetstidstyp.taxonomi-kod"],
                                                       args.get(taxonomy.WORKTIME_EXTENT)))
-        must_queries.append(self._build_generic_query(["korkort.kod.keyword", "korkort.taxonomi-kod"],
+        must_queries.append(self._build_generic_query(["korkort.kod.keyword",
+                                                       "korkort.taxonomi-kod"],
                                                       args.get(taxonomy.DRIVING_LICENCE)))
-        must_queries.append(self._build_generic_query(["anstallningstyp.kod.keyword", "anstallningstyp.taxonomi-kod"],
+        must_queries.append(self._build_generic_query(["anstallningstyp.kod.keyword",
+                                                       "anstallningstyp.taxonomi-kod"],
                                                       args.get(taxonomy.EMPLOYMENT_TYPE)))
 
         # TODO: Maybe check if NO skills are listed in ad instead?
@@ -269,12 +274,14 @@ class QueryBuilder(object):
                 kommun_results = taxonomy.find_concepts(elastic, None, [lanskod[1:]],
                                                         ttype
                                                         ).get('hits', {}).get('hits', [])
-                neg_komm += [entitet['_source']['legacy_ams_taxonomy_id'] for entitet in kommun_results]
+                neg_komm += [entitet['_source']['legacy_ams_taxonomy_id']
+                             for entitet in kommun_results]
             else:
                 kommun_results = taxonomy.find_concepts(elastic, None, [lanskod],
                                                         ttype
                                                         ).get('hits', {}).get('hits', [])
-                kommunlanskoder += [e['_source']['legacy_ams_taxonomy_id'] for e in kommun_results]
+                kommunlanskoder += [e['_source']['legacy_ams_taxonomy_id']
+                                    for e in kommun_results]
         plats_term_query = [{"term": {
             "arbetsplatsadress.kommunkod": {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
@@ -292,6 +299,30 @@ class QueryBuilder(object):
                 plats_bool_query['bool'] = {}
             plats_bool_query['bool']['must_not'] = neg_plats_term_query
         return plats_bool_query
+
+    # Parses COUNTRY
+    def _build_country_query(self, landskoder):
+        lander = []
+        neg_land = []
+        for lkod in landskoder if landskoder else []:
+            if lkod.startswith('-'):
+                neg_land.append(lkod[1:])
+            else:
+                lander.append(lkod)
+        county_term_query = [{"term": {
+            "arbetsplatsadress.landskod": {
+                "value": lkod, "boost": 1.0}}} for lkod in lander]
+        country_bool_query = {"bool": {
+            "should": county_term_query}
+        } if county_term_query else {}
+        if neg_land:
+            neg_country_term_query = [{"term": {
+                "arbetsplatsadress.landskod": {
+                    "value": lkod}}} for lkod in neg_land]
+            if 'bool' not in country_bool_query:
+                country_bool_query['bool'] = {}
+            country_bool_query['bool']['must_not'] = neg_country_term_query
+        return country_bool_query
 
     # Parses PUBLISHED_AFTER and PUBLISHED_BEFORE
     def _filter_timeframe(self, from_datetime, to_datetime):

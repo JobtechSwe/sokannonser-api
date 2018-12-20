@@ -72,6 +72,7 @@ stats_options = {
     taxonomy.OCCUPATION: "yrkesroll.kod.keyword",
     taxonomy.GROUP: "yrkesgrupp.kod.keyword",
     taxonomy.FIELD: "yrkesomrade.kod.keyword",
+    taxonomy.SKILL: "krav.kompetenser.kod.keyword",
 }
 auranest_sort_options = {
     'relevance': "_score",

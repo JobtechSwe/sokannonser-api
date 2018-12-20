@@ -69,10 +69,10 @@ sort_options = {
     'applydate-asc':  {"sista_ansokningsdatum": "asc"},
 }
 stats_options = {
-    taxonomy.OCCUPATION: "yrkesroll.kod.keyword",
-    taxonomy.GROUP: "yrkesgrupp.kod.keyword",
-    taxonomy.FIELD: "yrkesomrade.kod.keyword",
-    taxonomy.SKILL: "krav.kompetenser.kod.keyword",
+    taxonomy.OCCUPATION: "yrkesroll.taxonomi-kod.keyword",
+    taxonomy.GROUP: "yrkesgrupp.taxonomi-kod.keyword",
+    taxonomy.FIELD: "yrkesomrade.taxonomi-kod.keyword",
+    taxonomy.SKILL: "krav.kompetenser.taxonomi-kod.keyword",
 }
 auranest_sort_options = {
     'relevance': "_score",

@@ -3,3 +3,4 @@ build
 *.egg-info
 *.eggs
 .pytest_cache/
+.coverage

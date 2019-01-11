@@ -35,8 +35,7 @@ swagger_doc_params = {
     taxonomy.MUNICIPALITY: "En eller flera kommunkoder",
     taxonomy.REGION: "En eller flera länskoder",
     taxonomy.COUNTRY: "Ett eller flera länder enligt taxonomikod.",
-    settings.LONGITUDE: "Longitud för punkt",
-    settings.LATITUDE: "Latitud för punkt",
+    settings.POSITION: "Latitud och longitud på formen \"59.329, 18.068\" (latitud, longitud).",
     settings.POSITION_RADIUS: "Radie från punkt i km",
 }
 swagger_filter_doc_params = {
@@ -80,9 +79,9 @@ sok_platsannons_query.add_argument(settings.EXPERIENCE_REQUIRED,
 sok_platsannons_query.add_argument(taxonomy.MUNICIPALITY, action='append')
 sok_platsannons_query.add_argument(taxonomy.REGION, action='append')
 sok_platsannons_query.add_argument(taxonomy.COUNTRY, action='append')
-
-sok_platsannons_query.add_argument(settings.LONGITUDE, type=float)
-sok_platsannons_query.add_argument(settings.LATITUDE, type=float)
+sok_platsannons_query.add_argument(settings.POSITION,
+                                   type=inputs.regex('^[\\d\\.]+, ?[\\d\\.]+$'),
+                                   action='append')
 sok_platsannons_query.add_argument(settings.POSITION_RADIUS, type=int)
 sok_platsannons_query.add_argument(settings.FREETEXT_QUERY)
 sok_platsannons_query.add_argument(settings.FREETEXT_FIELDS, action='append',

@@ -16,7 +16,7 @@ ES_APIKEYS_DOC_ID = os.getenv("ES_APIKEYS_DOC_ID", "apikeys")
 
 # Flask-Restplus settings
 RESTPLUS_SWAGGER_UI_DOC_EXPANSION = 'list'
-RESTPLUS_VALIDATE = True
+RESTPLUS_VALIDATE = False
 RESTPLUS_MASK_SWAGGER = False
 RESTPLUS_ERROR_404_HELP = False
 
@@ -45,6 +45,7 @@ PARTTIME_MIN = 'parttime.min'
 PARTTIME_MAX = 'parttime.max'
 LONGITUDE = 'longitude'
 LATITUDE = 'latitude'
+POSITION = 'position'
 POSITION_RADIUS = 'position.radius'
 
 MAX_OFFSET = 2000

@@ -1,4 +1,5 @@
 import logging
+import re
 from sokannonser import settings
 from sokannonser.repository import elastic
 from sokannonser.rest.model import queries
@@ -60,8 +61,7 @@ class QueryBuilder(object):
             must_queries.append({"term": {"erfarenhet_kravs": True}})
 
         filter_queries = list()
-        geo_filter = self._build_geo_dist_filter(args.get(settings.LONGITUDE),
-                                                 args.get(settings.LATITUDE),
+        geo_filter = self._build_geo_dist_filter(args.get(settings.POSITION),
                                                  args.get(settings.POSITION_RADIUS))
         filter_queries.append(geo_filter)
 
@@ -390,8 +390,14 @@ class QueryBuilder(object):
 
         return None
 
-    # Parses LONGITUDE LATITUDE and POSITION_RADIUS
-    def _build_geo_dist_filter(self, longitude, latitude, coordinate_range):
+    # Parses POSITION and POSITION_RADIUS
+    def _build_geo_dist_filter(self, position, coordinate_range):
+        longitude = None
+        latitude = None
+        if position:
+            latitude = float(re.split(', ?', position)[0])
+            longitude = float(re.split(', ?', position)[1])
+
         geo_filter = {}
         if (not longitude
                 or not latitude

@@ -35,7 +35,8 @@ swagger_doc_params = {
     taxonomy.MUNICIPALITY: "En eller flera kommunkoder",
     taxonomy.REGION: "En eller flera länskoder",
     taxonomy.COUNTRY: "Ett eller flera länder enligt taxonomikod.",
-    settings.POSITION: "Latitud och longitud på formen \"59.329, 18.068\" (latitud, longitud).",
+    settings.POSITION: "Latitud och longitud på formen \"59.329, 18.068\" "
+                       "(latitud, longitud).",
     settings.POSITION_RADIUS: "Radie från punkt i km",
 }
 swagger_filter_doc_params = {

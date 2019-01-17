@@ -35,11 +35,10 @@ def test_filter_timeframe(from_datetime, to_datetime):
         d = pbquery._filter_timeframe(from_datetime, parser.parse(to_datetime))
         assert d['range']['publiceringsdatum']['lte'] == parser.parse(to_datetime).isoformat()
 
-        
+
 @pytest.mark.unit
 @pytest.mark.parametrize("args, exist, expected", [({settings.APIKEY: "",
-                                                     settings.LONGITUDE: 17.1,
-                                                     settings.LATITUDE: 60.5,
+                                                     settings.POSITION: "60.5, 17.1",
                                                      settings.POSITION_RADIUS: 5},
                                                     True,
                                                     {"geo_distance": {"distance": "5km",
@@ -47,8 +46,7 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                                           17.1, 60.5
                                                                       ]}}),
                                                    ({settings.APIKEY: "",
-                                                     settings.LONGITUDE: 399.1,
-                                                     settings.LATITUDE: 60.5,
+                                                     settings.POSITION: "60.5, 399.1",
                                                      settings.POSITION_RADIUS: 5},
                                                     False,
                                                     {"geo_distance": {"distance": "5km",
@@ -56,8 +54,7 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                                           399.1, 60.5
                                                                       ]}}),
                                                    ({settings.APIKEY: "",
-                                                     settings.LONGITUDE: 17.1,
-                                                     settings.LATITUDE: 60.5,
+                                                     settings.POSITION: "60.5, 17.1",
                                                      settings.POSITION_RADIUS: -5},
                                                     False,
                                                     {"geo_distance": {"distance": "-5km",
@@ -68,4 +65,4 @@ def test_geo_distance_filter(args, exist, expected):
     print('============================', sys._getframe().f_code.co_name, '============================ ')
     query_dsl = pbquery.parse_args(args)
     assert (expected in query_dsl["query"]["bool"]["filter"]) == exist
-    
+

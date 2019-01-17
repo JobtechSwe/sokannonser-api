@@ -1,31 +1,28 @@
-from flask_restplus import fields, reqparse, inputs
-from datetime import datetime
-from valuestore import taxonomy
-from sokannonser.rest import api
+from flask_restplus import fields
+from sokannonser.rest import ns_platsannons
 from sokannonser import settings
 
-
-# Resultatmodeller
-resultat_plats = api.model('Plats', {
+# Platsannonser
+resultat_plats = ns_platsannons.model('Plats', {
     'id': fields.String(attribute='id'),
     'namn': fields.String(attribute='label')
 })
 
-resultat_geoposition = api.inherit('GeoPosition', resultat_plats, {
+resultat_geoposition = ns_platsannons.inherit('GeoPosition', resultat_plats, {
     'longitud': fields.Float(attribute='longitude'),
     'latitud': fields.Float(attribute='latitude')
 })
 
-resultat_taxonomi = api.model('TaxonomiEntitet', {
+resultat_taxonomi = ns_platsannons.model('TaxonomiEntitet', {
     'kod': fields.String(),
     'term': fields.String()
 })
 
 
-matchande_annons = api.model('MatchandeAnnons', {
+matchande_annons = ns_platsannons.model('MatchandeAnnons', {
     'arbetssokandeprofilId': fields.String(attribute='_source.id'),
     'rubrik': fields.String(attribute='_source.rubrik'),
-    'senastModifierad': fields.DateTime(attribute='_source.timestamp'),
+    'senastModifierad': fields.String(attribute='_source.timestamp'),
     'efterfragadArbetsplats': fields.Nested({
         'land': fields.List(fields.Nested(resultat_plats), attribute='krav.land'),
         'lan': fields.List(fields.Nested(resultat_plats), attribute='krav.lan'),
@@ -46,9 +43,16 @@ matchande_annons = api.model('MatchandeAnnons', {
     }, attribute='_source')
 })
 
-matchande_annons_simple = api.model('MatchandeAnnons', {
+
+class FormattedUrl(fields.Raw):
+    def format(self, value):
+        return "%s/af/ad/%s" % (settings.BASE_URL, value)
+
+
+matchande_annons_simple = ns_platsannons.model('MatchandeAnnons', {
     'annons': fields.Nested({
         'annonsid': fields.String(attribute='id'),
+        'annons_url': FormattedUrl(attribute='id'),
         'platsannons_url': fields.String(attribute='url'),
         'annonsrubrik': fields.String(attribute='rubrik'),
         'annonstext': fields.String(attribute='beskrivning.annonstext'),
@@ -90,63 +94,12 @@ matchande_annons_simple = api.model('MatchandeAnnons', {
 }, skip_none=True)
 
 
-pbapi_lista = api.model('Platsannonser', {
+pbapi_lista = ns_platsannons.model('Platsannonser', {
     'antal': fields.Integer(attribute='total'),
     'annonser': fields.List(fields.Nested(matchande_annons), attribute='hits')
 })
 
-simple_lista = api.model('Platsannonser', {
+simple_lista = ns_platsannons.model('Platsannonser', {
     'antal_platsannonser': fields.Integer(attribute='total'),
     'platsannonser': fields.List(fields.Nested(matchande_annons_simple), attribute='hits')
 })
-
-
-# Frågemodeller
-sok_platsannons_query = reqparse.RequestParser()
-sok_platsannons_query.add_argument(settings.APIKEY, location='headers', required=True,
-                                   default=settings.APIKEY_BACKDOOR)
-
-sok_platsannons_query.add_argument(settings.OFFSET,
-                                   type=inputs.int_range(0, settings.MAX_OFFSET),
-                                   default=0)
-sok_platsannons_query.add_argument(settings.LIMIT,
-                                   type=inputs.int_range(0, settings.MAX_LIMIT),
-                                   default=10)
-sok_platsannons_query.add_argument(settings.SORT,
-                                   choices=list(settings.sort_options.keys()))
-sok_platsannons_query.add_argument(settings.PUBLISHED_BEFORE,
-                                   type=lambda x: datetime.strptime(x,
-                                                                    '%Y-%m-%dT%H:%M:%S'))
-sok_platsannons_query.add_argument(settings.PUBLISHED_AFTER,
-                                   type=lambda x: datetime.strptime(x,
-                                                                    '%Y-%m-%dT%H:%M:%S'))
-sok_platsannons_query.add_argument(settings.FREETEXT_QUERY)
-sok_platsannons_query.add_argument(settings.TYPEAHEAD_QUERY)
-sok_platsannons_query.add_argument(taxonomy.OCCUPATION, action='append')
-sok_platsannons_query.add_argument(taxonomy.GROUP, action='append')
-sok_platsannons_query.add_argument(taxonomy.FIELD, action='append')
-sok_platsannons_query.add_argument(taxonomy.SKILL, action='append')
-sok_platsannons_query.add_argument(taxonomy.WORKTIME_EXTENT, action='append')
-sok_platsannons_query.add_argument(taxonomy.DRIVING_LICENCE, action='append')
-sok_platsannons_query.add_argument(taxonomy.EMPLOYMENT_TYPE, action='append')
-sok_platsannons_query.add_argument(settings.NO_EXPERIENCE, type=bool, default=False)
-# sok_platsannons_query.add_argument(settings.PLACE)
-sok_platsannons_query.add_argument(taxonomy.MUNICIPALITY, action='append')
-sok_platsannons_query.add_argument(taxonomy.REGION, action='append')
-# sok_platsannons_query.add_argument(settings.PLACE_RADIUS, type=int)
-sok_platsannons_query.add_argument(settings.RESULT_MODEL, choices=settings.result_models)
-sok_platsannons_query.add_argument(settings.DATASET,
-                                   choices=settings.AVAILABLE_DATASETS,
-                                   default=settings.DATASET_AF)
-
-taxonomy_query = reqparse.RequestParser()
-taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)
-taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)
-taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
-taxonomy_query.add_argument(settings.FREETEXT_QUERY)
-taxonomy_query.add_argument('kod')
-taxonomy_query.add_argument('typ', choices=(taxonomy.OCCUPATION, taxonomy.GROUP,
-                                            taxonomy.FIELD, taxonomy.SKILL,
-                                            taxonomy.LANGUAGE, taxonomy.MUNICIPALITY,
-                                            taxonomy.REGION, taxonomy.WORKTIME_EXTENT))
-taxonomy_query.add_argument(settings.SHOW_COUNT, type=bool, default=False)

@@ -1,5 +1,5 @@
 # Sök Annonser API
-
+Skapa separat virtual environment för projektet (Virtualenv, Conda)
 
 ## Installation och körning (rekommenderar starkt att skapa en virtualenv eller anaconda-env innan).
 
@@ -11,6 +11,7 @@ När du står i projektets rot-katalog:
     $ pip install -r requirements.txt
     $ python setup.py develop
     $ export FLASK_APP=sokannonser
+    $ export FLASK_ENV=development
     $ flask run
 
 Gå till http://localhost:5000 för att testa med Swagger-API:et.
@@ -19,8 +20,8 @@ Gå till http://localhost:5000 för att testa med Swagger-API:et.
 
 Bygg en docker-image:
 
-    $ docker build -t sokannonser:latest .
-    $ docker run -d -p 80:8081 sokannonser
+    $ sudo docker build -t sokannonser:latest .
+    $ sudo docker run -d -p 80:8081 sokannonser
 
 Gå till http://localhost:80 för att testa med Swagger-API:et.
 
@@ -63,4 +64,19 @@ Kan med fördel sättas till development under utveckling. Ändrar defaultvärde
     FLASK_DEBUG=False
    
 Ger debugmeddelanden vid fel.
+
+### Test
+
+att köra unit/integration tester: 
+
+    $ python3 -m pytest -svv -ra -m unit tests/
+    $ python3 -m pytest -svv -ra -m integration tests/
+    
+### Test coverage
+https://pytest-cov.readthedocs.io/en/latest/
+python3 -m pytest -svv -ra -m unit --cov=. tests/
+
+För att lägga till coverage i IntelliJ, gå till menyn IntelliJ IDEA/Preferences/
+Välj menyn Tools/Python Integrated Tools och för Default test runner, välj py.test.
+Högerklicka därefter på katalogen sokannonser-api/tests och välj "Run py.test with coverage"
 

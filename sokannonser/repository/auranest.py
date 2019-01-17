@@ -1,5 +1,7 @@
 import logging
 import json
+from flask_restplus import abort
+from elasticsearch import exceptions
 from sokannonser import settings
 from sokannonser.repository import elastic
 
@@ -7,32 +9,91 @@ log = logging.getLogger(__name__)
 
 
 def find_annonser(args):
+    aggregates = _statistics(args.pop(settings.STATISTICS),
+                             args.pop(settings.STAT_LMT))
     query_dsl = _parse_args(args)
     log.debug(json.dumps(query_dsl, indent=2))
+    if aggregates:
+        query_dsl['aggs'] = aggregates
+    try:
+        query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
+    except exceptions.ConnectionError as e:
+        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        abort(500, 'Failed to establish connection to database')
+        return
+    log.debug(json.dumps(query_result, indent=2))
+    return query_result
+
+
+def autocomplete(querystring):
+    if not querystring:
+        querystring = ''
+    without_last = ' '.join(querystring.split(' ')[:-1])
+    query_dsl = _parse_args({
+        settings.FREETEXT_QUERY: without_last,
+        settings.LIMIT: 0,
+        settings.SHOW_EXPIRED: 'false'
+    })
+    complete = querystring.split(' ')[-1]
+    query_dsl['aggs'] = {'complete': {
+        "terms": {
+            "field": "keywords.raw",
+            "size": 20,
+            "include": "%s.*" % complete
+        }
+    }}
     query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
-    return query_result.get('hits', {})
+    if 'aggregations' in query_result:
+        return [c['key'] for c in query_result.get('aggregations', {})
+                                              .get('complete', {})
+                                              .get('buckets', [])]
+    return []
+
+
+def _statistics(agg_fields, agg_size):
+    aggs = dict()
+    size = agg_size if agg_size else 10
+
+    for agg in agg_fields if agg_fields else []:
+        aggs[agg] = {
+            "terms": {
+                "field": settings.auranest_stats_options[agg],
+                "size": size
+            }
+        }
+    return aggs
 
 
 def _parse_args(args):
+    args = dict(args)
     query_dsl = dict()
     query_dsl['from'] = args.pop(settings.OFFSET, 0)
     query_dsl['size'] = args.pop(settings.LIMIT, 10)
     # Remove api-key from args to make sure an empty query can occur
-    args.pop(settings.APIKEY)
+    args.pop(settings.APIKEY, None)
 
     # Make sure to only serve published ads
     query_dsl['query'] = {
         'bool': {
             'must': [],
-            'filter': [{'bool': {'must_not': {'exists': {'field': 'source.removedAt'}}}}]
-        },
+        }
     }
+    query_dsl['collapse'] = {
+        "field": "group.id",
+        "inner_hits": {
+            "name": "other",
+            "_source": ["source.url", "source.site.name"],
+            "size": 20
+        }
+    }
+    if args.pop(settings.SHOW_EXPIRED) != 'true':
+        query_dsl['query']['bool']['filter'] = \
+            [{'bool': {'must_not': {'exists': {'field': 'source.removedAt'}}}}]
 
     if args.get(settings.SORT):
         query_dsl['sort'] = [settings.auranest_sort_options.get(args.pop(settings.SORT))]
 
     # Check for empty query
-    print(args.values())
     if not any(v is not None for v in args.values()):
         log.debug("Constructing match-all query")
         query_dsl['query']['bool']['must'].append({'match_all': {}})
@@ -45,36 +106,15 @@ def _parse_args(args):
 
 
 def __freetext_fields(searchword):
+    search_fields = ["header^3", "title.freetext^3", "keywords",
+                     "employer.name^2", "content.text"]
     return [
         {
-            "match": {
-                "header": {
-                    "query": searchword,
-                    "boost": 3
-                }
-            }
-        },
-        {
-            "match": {
-                "title.freetext": {
-                    "query": searchword,
-                    "boost": 3
-                }
-            }
-        },
-        {
-            "match": {
-                "employer.name": {
-                    "query": searchword,
-                    "boost": 2
-                }
-            }
-        },
-        {
-            "match": {
-                "content.text": {
-                    "query": searchword,
-                }
+            "multi_match": {
+                "query": searchword,
+                "type": "cross_fields",
+                "operator": "and",
+                "fields": search_fields
             }
         }
     ]
@@ -93,9 +133,4 @@ def _build_freetext_query(freetext):
     if mustnts:
         ft_query['bool']['must_not'] = mustnts
 
-    return ft_query
-    return {
-        "bool": {
-            "should": __freetext_fields(freetext)
-        }
-    } if freetext else None
+    return ft_query if shoulds or mustnts else None

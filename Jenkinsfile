@@ -131,11 +131,13 @@ node('jobtech-appdev'){
     //   }
 
     } catch (e) {
-        slackSend color: 'bad', message: 'Failed to build Sokannonser-api ${commitHash}, branch:${branch}'
+        //slackSend color: 'bad', message: 'Failed to build Sokannonser-api ${commitHash}, branch:${branch}'
+        echo "exception"
         throw e
     } finally {
         (currentBuild.result == "SUCCESS") {
-            slackSend color: 'good', message: 'Succesfully built Sokannonser-api ${commitHash}, branch:${branch}'
+            //slackSend color: 'good', message: 'Succesfully built Sokannonser-api ${commitHash}, branch:${branch}'
+            echo "success"
         }
     }
 }

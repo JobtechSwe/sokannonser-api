@@ -24,7 +24,7 @@ node('jobtech-appdev'){
     branch = "${scmVars.GIT_BRANCH}"
   }
   echo "Commithash: ${commitHash}"
-  def devTag = "${jenkinsTag}"
+    def devTag = "${jenkinsTag}"
   // Call SonarQube for Code Analysis
   stage('Code Analysis') {
     echo "Running Code Analysis"
@@ -127,5 +127,16 @@ node('jobtech-appdev'){
   //       openshiftDeploy depCfg: 'sokapi-a', namespace: 'jt-prod', verbose: 'false', waitTime: '', waitUnit: 'sec'
   //       openshiftVerifyDeployment depCfg: 'sokapi-a', namespace: 'jt-prod', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
 
-  //   }
+    //   }
+
+
+    post {
+        success {
+            slackSend color: 'good', message: 'Successfully built Sokannonser-api ${commitHash}, branch:${branch}'
+        }
+        failure {
+            slackSend color: 'bad', message: 'Failed to build Sokannonser-api ${commitHash}, branch:${branch}'
+
+        }
+    }
 }

@@ -24,7 +24,7 @@ node('jobtech-appdev'){
     branch = "${scmVars.GIT_BRANCH}"
   }
   echo "Commithash: ${commitHash}"
-  def devTag = "${jenkinsTag}
+  def devTag = "${jenkinsTag}"
   // Call SonarQube for Code Analysis
   stage('Code Analysis') {
     echo "Running Code Analysis"

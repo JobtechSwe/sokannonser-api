@@ -4,7 +4,6 @@
 // Jenkins Slaves have JDK and Maven already installed
 // 'jobtech-appdev' has skopeo installed as well.
 node('jobtech-appdev'){
-    try {
 
   // The following variables need to be defined at the top level and not inside the scope of a stage - otherwise they would not be accessible from other stages.
   def version    = "1"
@@ -130,14 +129,4 @@ node('jobtech-appdev'){
 
     //   }
 
-    } catch (e) {
-        //slackSend color: 'bad', message: 'Failed to build Sokannonser-api ${commitHash}, branch:${branch}'
-        echo "exception"
-        throw e
-    } finally {
-        (currentBuild.result == "SUCCESS") {
-            //slackSend color: 'good', message: 'Succesfully built Sokannonser-api ${commitHash}, branch:${branch}'
-            echo "success"
-        }
-    }
 }

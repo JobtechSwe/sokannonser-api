@@ -49,7 +49,7 @@ POSITION = 'position'
 POSITION_RADIUS = 'position.radius'
 
 MAX_OFFSET = 2000
-MAX_LIMIT = 1000
+MAX_LIMIT = 100
 
 RESULT_MODEL = 'resultmodel'
 

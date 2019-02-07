@@ -5,7 +5,7 @@ from sokannonser import settings
 from sokannonser.rest import ns_platsannons, ns_open
 from sokannonser.rest.decorators import check_api_key
 from sokannonser.rest.model.platsannons_results import simple_lista
-from sokannonser.rest.model.queries import sok_platsannons_query, pb_query
+from sokannonser.rest.model.queries import annons_complete_query, pb_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
 from sokannonser.repository import platsannonser
 from sokannonser.repository.querybuilder import QueryBuilder
@@ -57,9 +57,9 @@ class PBComplete(Resource):
             500: 'Bad'
         }
     )
-    @ns_platsannons.expect(sok_platsannons_query)
+    @ns_platsannons.expect(annons_complete_query)
     def get(self):
-        args = sok_platsannons_query.parse_args()
+        args = annons_complete_query.parse_args()
         # This could be prettier
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         args[settings.TYPEAHEAD_QUERY] = args.get(settings.FREETEXT_QUERY)
@@ -83,16 +83,16 @@ class OpenSearch(Resource):
     querybuilder = QueryBuilder()
 
     @ns_open.doc(
-        params=swagger_doc_params,
+        params={**swagger_doc_params, **swagger_filter_doc_params},
         responses={
             200: 'OK',
             401: 'Felaktig API-nyckel',
             500: 'Bad'
         }
     )
-    @ns_platsannons.expect(sok_platsannons_query)
+    @ns_platsannons.expect(pb_query)
     def get(self):
-        args = sok_platsannons_query.parse_args()
+        args = pb_query.parse_args()
         result = platsannonser.find_platsannonser(args, self.querybuilder)
 
         return self.marshal_results(result)

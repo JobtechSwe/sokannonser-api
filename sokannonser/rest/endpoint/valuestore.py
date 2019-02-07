@@ -16,8 +16,8 @@ class Valuestore(Resource):
             settings.LIMIT: "Antal resultat att visa",
             settings.FREETEXT_QUERY: "Fritextfråga mot taxonomin. "
                                      "(Kan t.ex. användas för autocomplete / type ahead)",
-            "parent-id": "Begränsa sökning till taxonomivärden som har angiven conceptId som "
-                   "förälder (användbart tillsammans med typ)",
+            "parent-id": "Begränsa sökning till taxonomivärden som har angiven conceptId"
+                         " som förälder (användbart tillsammans med typ)",
             "type": "Visa enbart taxonomivärden av typ ",
             settings.SHOW_COUNT: "Visa antal annonser som matchar taxonomivärde "
                                  "(endast i kombination med val av typ)"
@@ -43,6 +43,8 @@ class Valuestore(Resource):
             query_dict['parentId'] = parent_id
         if concept_type:
             query_dict['type'] = concept_type
+        query_dict['offset'] = offset
+        query_dict['limit'] = limit
         return self._build_response(query_dict, response, statistics)
 
     def _build_response(self, query, response, statistics):
@@ -50,13 +52,16 @@ class Valuestore(Resource):
         for hit in response.get('hits', {}).get('hits', []):
             type_label = hit['_source']['type']
             entity = {"conceptId": hit['_source'].get('concept_id'),
-                      "legacyAmsTaxonomyId": hit['_source'].get('legacy_ams_taxonomy_id'),
+                      "id": hit['_source'].get('legacy_ams_taxonomy_id'),
                       "term": hit['_source']['label'],
+                      "typ": taxonomy.reverse_tax_type.get(type_label, type_label),
                       "type": type_label}
             foralder = hit['_source'].get('parent', {}).get('concept_id')
             if foralder:
                 entity['parentId'] = foralder
             if statistics:
-                entity['count'] = statistics.get(hit['_source']['legacy_ams_taxonomy_id'], 0)
+                entity['antal'] = statistics.get(hit['_source']['legacy_ams_taxonomy_id'], 0)
             results.append(entity)
-        return {'search': query, 'result': results}
+        return {'search': query,
+                'total': response.get('hits', {}).get('total', 0),
+                'result': results}

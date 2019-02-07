@@ -13,13 +13,13 @@ log = logging.getLogger(__name__)
 def get_stats_for(taxonomy_type):
     log.info("Looking for %s" % taxonomy_type)
     value_path = {
-        tax_type[taxonomy.OCCUPATION]: "yrkesroll.kod.keyword",
-        tax_type[taxonomy.GROUP]: "yrkesgrupp.kod.keyword",
-        tax_type[taxonomy.FIELD]: "yrkesomrade.kod.keyword",
-        tax_type[taxonomy.SKILL]: "krav.kompetenser.kod.keyword",
-        tax_type[taxonomy.WORKTIME_EXTENT]: "arbetstidstyp.kod.keyword",
-        tax_type[taxonomy.MUNICIPALITY]: "arbetsplatsadress.kommun.keyword",
-        tax_type[taxonomy.REGION]: "arbetsplatsadress.lan.keyword"
+        taxonomy.JobtechTaxonomy.OCCUPATION_NAME: "yrkesroll.taxonomi-kod.keyword",
+        taxonomy.JobtechTaxonomy.OCCUPATION_GROUP: "yrkesgrupp.taxonomi-kod.keyword",
+        taxonomy.JobtechTaxonomy.OCCUPATION_FIELD: "yrkesomrade.taxonomi-kod.keyword",
+        taxonomy.JobtechTaxonomy.SKILL: "krav.kompetenser.taxonomi-kod.keyword",
+        taxonomy.JobtechTaxonomy.WORKTIME_EXTENT: "arbetstidstyp.taxonomi-kod.keyword",
+        taxonomy.JobtechTaxonomy.MUNICIPALITY: "arbetsplatsadress.taxonomi-kommun.keyword",
+        taxonomy.JobtechTaxonomy.COUNTY: "arbetsplatsadress.taxonomi-lan.keyword"
     }
     # Make sure we don't crash if we want to stat on missing type
     if taxonomy_type not in value_path:
@@ -29,7 +29,24 @@ def get_stats_for(taxonomy_type):
     aggs_query = {
         "from": 0, "size": 0,
         "query": {
-            "match_all": {
+            "bool": {
+                "must": [{ "match_all": {}}],
+                'filter': [
+                    {
+                        'range': {
+                            'publiceringsdatum': {
+                                'lte': 'now'
+                            }
+                        }
+                    },
+                    {
+                        'range': {
+                            'status.sista_publiceringsdatum': {
+                                'gte': 'now'
+                            }
+                        }
+                    },
+                ]
             }
         },
         "aggs": {

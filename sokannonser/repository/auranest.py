@@ -22,6 +22,10 @@ def find_annonser(args):
         abort(500, 'Failed to establish connection to database')
         return
     # log.debug(json.dumps(query_result, indent=2))
+    rAts = [item['_source']['source']['removedAt'] for item in query_result['hits']['hits']]
+    lsAts = [item['_source']['source']['lastSeenAt'] for item in query_result['hits']['hits']]
+    print("rAts", rAts)
+    print("lsAts", json.dumps(lsAts, indent=2))
     return query_result
 
 

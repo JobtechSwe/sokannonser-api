@@ -100,7 +100,6 @@ pb_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 20), required=
 
 auranest_query = reqparse.RequestParser()
 auranest_query.add_argument(settings.APIKEY, location='headers', required=True)
-auranest_query.add_argument('group_id')
 auranest_query.add_argument(settings.OFFSET,
                             type=inputs.int_range(0, settings.MAX_OFFSET),
                             default=0)

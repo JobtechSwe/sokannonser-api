@@ -24,7 +24,7 @@ annons = api.model('Ad', {
     }, attribute='_source.application', skip_none=True),
     'sources': fields.List(fields.Nested({
         'name': fields.String(attribute='_source.source.site.name'),
-        'url': fields.String(attribute='_source.source.url')
+        'url': fields.String(attribute='_source.source.url'),
     }), attribute='inner_hits.other.hits.hits')
 })
 
@@ -45,4 +45,3 @@ auranest_lista = api.model('Ads', {
     }, attribute='aggregations', skip_none=True),
     'hits': fields.List(fields.Nested(annons), attribute='hits.hits')
 })
-

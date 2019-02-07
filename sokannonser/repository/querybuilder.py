@@ -101,7 +101,6 @@ class QueryBuilder(object):
             'bool': {
                 'must': [],
                 'filter': [
-                    # {'term': {'status.publicerad': True}},
                     {
                         'range': {
                             'publiceringsdatum': {

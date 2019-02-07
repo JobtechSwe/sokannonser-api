@@ -1,8 +1,6 @@
 import logging
 from flask_restplus import abort
 from elasticsearch import exceptions
-
-from sokannonser.rest.model import queries
 from valuestore import taxonomy
 from valuestore.taxonomy import tax_type
 from sokannonser import settings
@@ -79,5 +77,5 @@ def find_platsannonser(args, querybuilder):
                 ]
 
             })
-    log.debug(json.dumps(results, indent=2))
+    # log.debug(json.dumps(results, indent=2))
     return results

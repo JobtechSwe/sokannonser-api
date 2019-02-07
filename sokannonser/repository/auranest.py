@@ -21,7 +21,7 @@ def find_annonser(args):
         logging.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
-    log.debug(json.dumps(query_result, indent=2))
+    # log.debug(json.dumps(query_result, indent=2))
     return query_result
 
 

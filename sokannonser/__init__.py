@@ -4,7 +4,8 @@ from flask import Flask
 from flask_cors import CORS
 from sokannonser.rest import api
 from sokannonser.rest.endpoint.auranest import AuranestSearch
-from sokannonser.rest.endpoint.platsannonser import PBSearch, OpenSearch, Proxy
+from sokannonser.rest.endpoint.platsannonser import PBSearch
+from sokannonser.rest.endpoint.openapi import OpenSearch, Proxy
 from sokannonser.rest.endpoint.valuestore import Valuestore
 from sokannonser import settings
 import os

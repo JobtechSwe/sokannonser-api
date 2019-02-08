@@ -28,7 +28,7 @@ pipeline {
         }
         stage('Deploy to Dev environment'){
             steps{
-                sh "oc set image dc/sokapi sokapi=docker-registry.default.svc:5000/${openshiftProject}/sokapi:${devTag} -n ${openshiftProject}"
+                sh "oc set image dc/sokapi sokapi=docker-registry.default.svc:5000/${openshiftProject}/sokapi:${buildTag} -n ${openshiftProject}"
                 openshiftDeploy(depCfg: 'sokapi', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
                 openshiftVerifyDeployment(depCfg: 'sokapi', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
             }
@@ -46,6 +46,8 @@ pipeline {
         }
     }
 }
+
+// The rest is preserved for future use
 
   // // Run Unit Tests on Development Environment.
   // //stage('Dev Env Unit Tests') {

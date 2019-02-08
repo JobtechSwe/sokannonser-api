@@ -16,7 +16,7 @@ pipeline {
         stage('Code analysis'){
             steps {
                 withSonarQubeEnv('Jobtech_SonarQube_Server'){
-                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=job_ad_loader -Dsonar.sources=."
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sokapi -Dsonar.sources=."
                 }
             }
         }
@@ -28,6 +28,7 @@ pipeline {
         }
         stage('Deploy to Dev environment'){
             steps{
+                sh "oc set image dc/sokapi sokapi=docker-registry.default.svc:5000/${openshiftProject}/sokapi:${devTag} -n ${openshiftProject}"
                 openshiftDeploy(depCfg: 'sokapi', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
                 openshiftVerifyDeployment(depCfg: 'sokapi', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
             }

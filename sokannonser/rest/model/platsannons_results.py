@@ -94,12 +94,12 @@ matchande_annons_simple = ns_platsannons.model('MatchandeAnnons', {
 }, skip_none=True)
 
 statistics = ns_platsannons.model('Statistik', {
-    'type': fields.String,
-    'values': fields.List(fields.Nested({
+    'typ': fields.String(attribute='type'),
+    'poster': fields.List(fields.Nested({
         'term': fields.String(),
-        'code': fields.String(),
-        'count': fields.Integer()
-    }))
+        'kod': fields.String(attribute='code'),
+        'antal': fields.Integer(attribute='count')
+    }), attribute='values')
 })
 
 pbapi_lista = ns_platsannons.model('Platsannonser', {
@@ -109,6 +109,6 @@ pbapi_lista = ns_platsannons.model('Platsannonser', {
 
 simple_lista = ns_platsannons.model('Platsannonser', {
     'antal_platsannonser': fields.Integer(attribute='total'),
-    'stats': fields.Nested(statistics, attribute='stats'),
+    'statistik': fields.Nested(statistics, attribute='stats'),
     'platsannonser': fields.List(fields.Nested(matchande_annons_simple), attribute='hits')
 })

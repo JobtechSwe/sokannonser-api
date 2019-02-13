@@ -35,7 +35,6 @@ class PBSearch(Resource):
         result = {
             "total": esresult.get('total', 0),
             "positions": esresult.get('positions', 0),
-            "typeahead": esresult.get('aggs', []),
             "stats": esresult.get('stats', {}),
             "hits": [hit['_source'] for hit in esresult['hits']],
         }

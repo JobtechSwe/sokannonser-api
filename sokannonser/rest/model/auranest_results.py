@@ -10,7 +10,7 @@ annons = api.model('Ad', {
     'employer': fields.Nested({
         'name': fields.String(),
         'logoUrl': fields.String()
-    }, attribute='employer', skip_none=True),
+    }, attribute='_source.employer', skip_none=True),
     'location': fields.String(attribute='_source.location.translations.sv-SE'),
     'application': fields.Nested({
         'url': fields.String(),

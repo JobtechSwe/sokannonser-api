@@ -29,9 +29,12 @@ class PBSearch(Resource):
     def get(self):
         start_time = int(time.time()*1000)
         args = pb_query.parse_args()
-        log.debug("Query parsed after %d milliseconds." % (int(time.time()*1000)-start_time))
+        log.debug("Query parsed after %d milliseconds." %
+                  (int(time.time()*1000)-start_time))
         result = platsannonser.find_platsannonser(args, self.querybuilder, start_time)
-        log.debug("Query results after %d milliseconds." % (int(time.time()*1000)-start_time))
+        log.debug("Query results after %d milliseconds." %
+                  (int(time.time()*1000)-start_time))
+        log.debug("Elastic took: %d" % result.get('took', 0))
 
         hits = [hit['_source'] for hit in result['hits']],
 
@@ -47,7 +50,7 @@ class PBSearch(Resource):
             "hits": hits
         }
         log.debug("Sending results after %d milliseconds."
-                 % (int(time.time()*1000) - start_time))
+                  (int(time.time()*1000) - start_time))
         return result
 
 

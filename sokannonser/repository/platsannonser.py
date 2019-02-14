@@ -73,6 +73,7 @@ def find_platsannonser(args, querybuilder):
         abort(500, 'Failed to establish connection to database')
         return
     results = query_result.get('hits', {})
+    results['took'] = query_result.get('took', 0)
     if 'aggregations' in query_result:
         results['positions'] = int(query_result.get('aggregations', {})
                                    .get('positions', {}).get('value', 0))
@@ -94,5 +95,6 @@ def find_platsannonser(args, querybuilder):
                 ]
 
             })
+
     # log.debug(json.dumps(results, indent=2))
     return results

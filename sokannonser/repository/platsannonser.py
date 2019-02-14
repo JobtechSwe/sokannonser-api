@@ -1,11 +1,11 @@
 import logging
+import json
+import time
 from flask_restplus import abort
 from elasticsearch import exceptions
 from valuestore import taxonomy
-from valuestore.taxonomy import tax_type
 from sokannonser import settings
 from sokannonser.repository import elastic
-import json
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +18,8 @@ def get_stats_for(taxonomy_type):
         taxonomy.JobtechTaxonomy.OCCUPATION_FIELD: "yrkesomrade.taxonomi-kod.keyword",
         taxonomy.JobtechTaxonomy.SKILL: "krav.kompetenser.taxonomi-kod.keyword",
         taxonomy.JobtechTaxonomy.WORKTIME_EXTENT: "arbetstidstyp.taxonomi-kod.keyword",
-        taxonomy.JobtechTaxonomy.MUNICIPALITY: "arbetsplatsadress.taxonomi-kommun.keyword",
+        taxonomy.JobtechTaxonomy.MUNICIPALITY:
+        "arbetsplatsadress.taxonomi-kommun.keyword",
         taxonomy.JobtechTaxonomy.COUNTY: "arbetsplatsadress.taxonomi-lan.keyword"
     }
     # Make sure we don't crash if we want to stat on missing type
@@ -30,7 +31,7 @@ def get_stats_for(taxonomy_type):
         "from": 0, "size": 0,
         "query": {
             "bool": {
-                "must": [{ "match_all": {}}],
+                "must": [{"match_all": {}}],
                 'filter': [
                     {
                         'range': {
@@ -63,16 +64,24 @@ def get_stats_for(taxonomy_type):
     return code_count
 
 
-def find_platsannonser(args, querybuilder):
+def find_platsannonser(args, querybuilder, start_time=0):
     query_dsl = querybuilder.parse_args(args)
     log.debug(json.dumps(query_dsl, indent=2))
+    log.debug("Query constructed after %d milliseconds."
+              % (int(time.time()*1000)-start_time))
+
     try:
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+        log.debug("Elastic results after %d milliseconds."
+                  % (int(time.time()*1000)-start_time))
     except exceptions.ConnectionError as e:
         logging.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
+    log.debug("Elasticsearch: took=%d, timed_out=%s"
+              % (query_result.get('took', 0), query_result.get('timed_out', '')))
     results = query_result.get('hits', {})
+    results['took'] = query_result.get('took', 0)
     if 'aggregations' in query_result:
         results['positions'] = int(query_result.get('aggregations', {})
                                    .get('positions', {}).get('value', 0))
@@ -94,5 +103,6 @@ def find_platsannonser(args, querybuilder):
                 ]
 
             })
+
     # log.debug(json.dumps(results, indent=2))
     return results

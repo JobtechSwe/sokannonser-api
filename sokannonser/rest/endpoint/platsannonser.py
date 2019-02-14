@@ -48,8 +48,8 @@ class PBSearch(Resource):
             "stats": esresult.get('stats', {}),
             "hits": hits
         }
-        log.debug("Sending results after %d milliseconds."
-                  (int(time.time()*1000) - start_time))
+        log.debug("Sending results after %s milliseconds." %
+                  (int(time.time()*1000)-start_time))
         return result
 
 

@@ -1,4 +1,5 @@
 import logging
+import time
 from flask_restplus import Resource
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons
@@ -26,18 +27,30 @@ class PBSearch(Resource):
     )
     @ns_platsannons.expect(pb_query)
     def get(self):
+        start_time = int(time.time()*1000)
         args = pb_query.parse_args()
-        result = platsannonser.find_platsannonser(args, self.querybuilder)
+        log.debug("Query parsed after %d milliseconds." %
+                  (int(time.time()*1000)-start_time))
+        result = platsannonser.find_platsannonser(args, self.querybuilder, start_time)
+        log.debug("Query results after %d milliseconds." %
+                  (int(time.time()*1000)-start_time))
+        log.debug("Elastic took: %d" % result.get('took', 0))
 
-        return self.marshal_results(result)
+        hits = [hit['_source'] for hit in result['hits']],
 
-    def marshal_results(self, esresult):
+        return self.marshal_results(result, hits, start_time)
+
+    def marshal_results(self, esresult, hits, start_time):
         result = {
             "total": esresult.get('total', 0),
             "positions": esresult.get('positions', 0),
+            "query_time_in:_millis": esresult.get('took', 0),
+            "result_time_in_millis": int(time.time()*1000) - start_time,
             "stats": esresult.get('stats', {}),
-            "hits": [hit['_source'] for hit in esresult['hits']],
+            "hits": hits
         }
+        log.debug("Sending results after %d milliseconds."
+                  (int(time.time()*1000) - start_time))
         return result
 
 
@@ -59,7 +72,7 @@ class PBComplete(Resource):
         args = annons_complete_query.parse_args()
         # This could be prettier
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
-        args[settings.TYPEAHEAD_QUERY] = args.get(settings.FREETEXT_QUERY)
+        args[settings.TYPEAHEAD_QUERY] = args.pop(settings.FREETEXT_QUERY)
 
         result = platsannonser.find_platsannonser(args, self.querybuilder)
 
@@ -67,8 +80,7 @@ class PBComplete(Resource):
 
     def marshal_results(self, esresult):
         result = {
-            "total": esresult.get('total', 0),
-            "positions": esresult.get('positions', 0),
+            "time_in_millis": esresult.get('took', 0),
             "typeahead": esresult.get('aggs', []),
         }
         return result

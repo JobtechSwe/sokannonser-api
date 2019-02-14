@@ -34,7 +34,6 @@ class PBSearch(Resource):
         result = platsannonser.find_platsannonser(args, self.querybuilder, start_time)
         log.debug("Query results after %d milliseconds." %
                   (int(time.time()*1000)-start_time))
-        log.debug("Elastic took: %d" % result.get('took', 0))
 
         hits = [hit['_source'] for hit in result['hits']],
 
@@ -49,8 +48,8 @@ class PBSearch(Resource):
             "stats": esresult.get('stats', {}),
             "hits": hits
         }
-        log.debug("Sending results after %d milliseconds."
-                  (int(time.time()*1000) - start_time))
+        log.debug("Sending results after %s milliseconds." %
+                  (int(time.time()*1000)-start_time))
         return result
 
 

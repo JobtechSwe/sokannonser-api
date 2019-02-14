@@ -1,11 +1,11 @@
 import logging
+import json
+import time
 from flask_restplus import abort
 from elasticsearch import exceptions
 from valuestore import taxonomy
-from valuestore.taxonomy import tax_type
 from sokannonser import settings
 from sokannonser.repository import elastic
-import json
 
 log = logging.getLogger(__name__)
 
@@ -63,11 +63,14 @@ def get_stats_for(taxonomy_type):
     return code_count
 
 
-def find_platsannonser(args, querybuilder):
+def find_platsannonser(args, querybuilder, start_time=0):
     query_dsl = querybuilder.parse_args(args)
     log.debug(json.dumps(query_dsl, indent=2))
+    log.debug("Query constructed after %d milliseconds." % (int(time.time()*1000)-start_time))
+
     try:
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+        log.debug("Elastic results after %d milliseconds." % (int(time.time()*1000)-start_time))
     except exceptions.ConnectionError as e:
         logging.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')

@@ -78,7 +78,7 @@ def find_platsannonser(args, querybuilder, start_time=0):
         logging.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
-    log.debug("Elasticsearch: took=%d, timed_out=%s"
+    log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
     results = query_result.get('hits', {})
     results['took'] = query_result.get('took', 0)

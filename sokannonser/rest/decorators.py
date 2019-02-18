@@ -42,6 +42,8 @@ def check_api_key_auranest(func):
         apikey = request.headers.get(settings.APIKEY)
         decoded_key = _decode_key(apikey)
         if valid_api_keys and apikey in valid_api_keys.get('validkeys', []):
+            if decoded_key == 'Invalid Key':
+                decoded_key = apikey
             log.info("API key \"%s\" is valid." % decoded_key)
             return func(*args, **kwargs)
         log.info("Failed validation for key '%s'" % decoded_key)
@@ -59,7 +61,7 @@ def _decode_key(apikey):
                 decoded = base64.urlsafe_b64decode(apikey).decode('utf-8').strip()
                 break
             except binascii.Error as e:
-                # log.debug("Failed to decode api key: %s: %s" % (apikey, e))
+                log.debug("Failed to decode api key: %s: %s" % (apikey, e))
                 pass
             except UnicodeDecodeError as u:
                 log.debug("Failed to decode utf-8 key: %s: %s" % (apikey, u))

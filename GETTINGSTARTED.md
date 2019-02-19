@@ -1,6 +1,3 @@
-#TODO 
-beskriv off set
-
 #Search API for job adds - getting started
 
 The aim of this text is to walk you through what you're seeing in the Swagger UI so you can get a bit of orientation on what can be done with the SOKANNONSER API. 
@@ -127,6 +124,10 @@ Request URL
 
 	https://develop-sokannonser.dev.services.jtech.se/open/search?published-after=2019-02-14T13%3A13%3A13&offset=100&limit=100
 
+
+#TODO 
+Good example of how to use position
+Good example of what to use qfields for	
 
 	
 	

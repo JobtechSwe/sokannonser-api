@@ -59,7 +59,7 @@ Namnet på applikationen. Bör sättas till "sokannonser". (Se ovan)
 
     FLASK_ENV=production
     
-Kan med fördel sättas till development under utveckling. Ändrar defaultvärdet för nästa parameter (FLASK_DEBUG) till True
+Kan med fördel sättas till development under utveckling. Ändrar defaultvärdet för nästa parameter (FLASK_DEBUG) till True.
 
     FLASK_DEBUG=False
    

@@ -32,7 +32,6 @@ class PBSearch(Resource):
         log.debug("Query parsed after %d milliseconds." % (int(time.time()*1000)-start_time))
         result = platsannonser.find_platsannonser(args, self.querybuilder, start_time)
         log.debug("Query results after %d milliseconds." % (int(time.time()*1000)-start_time))
-        print(result)
 
         hits = [hit['_source'] for hit in result.get('hits', [])]
 

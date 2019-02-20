@@ -81,7 +81,7 @@ def _parse_args(args):
         "field": "group.id",
         "inner_hits": {
             "name": "other",
-            "_source": ["source.url", "source.site.name"],
+            "_source": ["id", "source.url", "source.site.name"],
             "size": 20
         }
     }

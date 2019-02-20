@@ -59,16 +59,20 @@ def check_api_key(api_identifier):
 def _decode_key(apikey):
     decoded = apikey or 'Invalid Key: None'
     if apikey:
+        error = 0
         for i in range(3):
             try:
                 decoded = base64.urlsafe_b64decode(apikey).decode('utf-8').strip()
+                error = 0
                 break
             except binascii.Error as e:
-                log.debug("Failed to decode api key: %s: %s" % (apikey, e))
+                error = 1
                 pass
             except UnicodeDecodeError as u:
-                log.debug("Failed to decode utf-8 key: %s: %s" % (apikey, u))
-                decoded = 'Invalid Key'  # Prevents users from sending plain email adress
+                error = 2
+                decoded = 'Invalid Key'
             # Reappend trailing '=' to find correct padding
             apikey = "%s=" % apikey
+        if error > 0:
+            log.debug("Failed to decode utf-8 key: %s: errorcode: %d" % (apikey, error))
     return decoded

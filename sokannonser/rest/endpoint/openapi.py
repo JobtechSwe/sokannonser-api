@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 
 @ns_open.route('/search')
 class OpenSearch(Resource):
-    method_decorators = [check_api_key]
+    method_decorators = [check_api_key('open')]
     querybuilder = QueryBuilder()
 
     @ns_open.doc(

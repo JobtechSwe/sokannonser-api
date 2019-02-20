@@ -1,6 +1,6 @@
 from flask_restplus import Resource
 from sokannonser import settings
-from sokannonser.rest.decorators import check_api_key_auranest
+from sokannonser.rest.decorators import check_api_key
 from sokannonser.rest import ns_auranest
 from sokannonser.rest.model.queries import auranest_query, auranest_typeahead
 from sokannonser.rest.model.auranest_results import auranest_lista
@@ -9,7 +9,7 @@ from sokannonser.repository import auranest
 
 @ns_auranest.route('search')
 class AuranestSearch(Resource):
-    method_decorators = [check_api_key_auranest]
+    method_decorators = [check_api_key('all')]
 
     @ns_auranest.doc(description='Sök med fritextfråga')
     @ns_auranest.expect(auranest_query)
@@ -24,7 +24,7 @@ class AuranestSearch(Resource):
 
 @ns_auranest.route('complete')
 class AuranestComplete(Resource):
-    method_decorators = [check_api_key_auranest]
+    method_decorators = [check_api_key('all')]
 
     @ns_auranest.doc(description='Ge förslag på nästa sökord')
     @ns_auranest.expect(auranest_typeahead)

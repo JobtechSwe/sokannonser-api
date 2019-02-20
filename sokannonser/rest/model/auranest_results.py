@@ -23,6 +23,7 @@ annons = api.model('Ad', {
         }, attribute='site')
     }, attribute='_source.application', skip_none=True),
     'sources': fields.List(fields.Nested({
+        'id': fields.String(attribute='_source.id'),
         'name': fields.String(attribute='_source.source.site.name'),
         'url': fields.String(attribute='_source.source.url'),
     }), attribute='inner_hits.other.hits.hits')

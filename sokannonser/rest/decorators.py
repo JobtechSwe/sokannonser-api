@@ -16,7 +16,7 @@ valid_api_keys = dict()
 last_check_ts = 0
 
 
-def check_api_key(func):
+def check_api_key_simple(func):
     def wrapper(*args, **kwargs):
         apikey = request.headers.get(settings.APIKEY)
         decoded_key = _decode_key(apikey) \
@@ -30,42 +30,49 @@ def check_api_key(func):
     return wrapper
 
 
-def check_api_key_auranest(func):
-    def wrapper(*args, **kwargs):
-        global last_check_ts, valid_api_keys
-        if int(time.time()) > last_check_ts + 60:  # Refresh keys every 60 secs
-            log.debug("Reloading API keys")
-            valid_api_keys = elastic.get_source(index=settings.ES_SYSTEM_INDEX,
-                                                doc_type='_all',
-                                                id=settings.ES_APIKEYS_DOC_ID)
-            last_check_ts = time.time()
-        apikey = request.headers.get(settings.APIKEY)
-        decoded_key = _decode_key(apikey)
-        if valid_api_keys and apikey in valid_api_keys.get('validkeys', []):
-            if decoded_key == 'Invalid Key':
-                decoded_key = apikey
-            log.info("API key \"%s\" is valid." % decoded_key)
-            return func(*args, **kwargs)
-        log.info("Failed validation for key '%s'" % decoded_key)
-        abort(401, message="You're no monkey!")
+def check_api_key(api_identifier):
+    def real_check_api_key_decorator(func):
+        def wrapper(*args, **kwargs):
+            global last_check_ts, valid_api_keys
+            if int(time.time()) > last_check_ts + 60:  # Refresh keys every 60 secs
+                apikeys_id = "%s_%s" % (settings.ES_APIKEYS_DOC_ID, api_identifier)
+                log.debug("Reloading API keys for id %s" % apikeys_id)
+                valid_api_keys = elastic.get_source(index=settings.ES_SYSTEM_INDEX,
+                                                    doc_type='_all',
+                                                    id=apikeys_id, ignore=404)
+                last_check_ts = time.time()
+            apikey = request.headers.get(settings.APIKEY)
+            if valid_api_keys and apikey in valid_api_keys.get('validkeys', []):
+                decoded_key = _decode_key(apikey)
+                if decoded_key == 'Invalid Key':
+                    decoded_key = apikey
+                log.info("API key \"%s\" is valid." % decoded_key)
+                return func(*args, **kwargs)
+            log.info("Failed validation for key '%s'" % apikey)
+            abort(401, message="Missing or invalid API key")
 
-    return wrapper
+        return wrapper
+    return real_check_api_key_decorator
 
 
 # Decodes the API which is in base64 format
 def _decode_key(apikey):
     decoded = apikey or 'Invalid Key: None'
     if apikey:
+        error = 0
         for i in range(3):
             try:
                 decoded = base64.urlsafe_b64decode(apikey).decode('utf-8').strip()
+                error = 0
                 break
             except binascii.Error as e:
-                log.debug("Failed to decode api key: %s: %s" % (apikey, e))
+                error = 1
                 pass
             except UnicodeDecodeError as u:
-                log.debug("Failed to decode utf-8 key: %s: %s" % (apikey, u))
-                decoded = 'Invalid Key'  # Prevents users from sending plain email adress
+                error = 2
+                decoded = 'Invalid Key'
             # Reappend trailing '=' to find correct padding
             apikey = "%s=" % apikey
+        if error > 0:
+            log.debug("Failed to decode utf-8 key: %s: errorcode: %d" % (apikey, error))
     return decoded

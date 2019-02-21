@@ -40,7 +40,7 @@ Request URL
 
 	https://sokannonser.dev.services.jtech.se/open/search?q=souschef&offset=0&limit=10
 
-You can also use the field occupation with the conceptId for the term souschef. Firstly look up the ID for souschef.  
+You can also use the field occupation with the conceptId for the term souschef. First look up the ID for souschef.  
 
 Request URL
 

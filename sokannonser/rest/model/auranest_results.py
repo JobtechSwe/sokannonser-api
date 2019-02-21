@@ -22,6 +22,11 @@ annons = api.model('Ad', {
             'name': fields.String()
         }, attribute='site')
     }, attribute='_source.application', skip_none=True),
+    'detected_keywords': fields.Nested({
+        'occupations': fields.List(fields.String),
+        'skills': fields.List(fields.String),
+        'traits': fields.List(fields.String)
+    }, attribute='_source'),
     'sources': fields.List(fields.Nested({
         'id': fields.String(attribute='_source.id'),
         'name': fields.String(attribute='_source.source.site.name'),

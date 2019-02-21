@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 @ns_platsannons.route('/search')
 class PBSearch(Resource):
-    method_decorators = [check_api_key('pb')]
+    method_decorators = [check_api_key]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
@@ -53,7 +53,7 @@ class PBSearch(Resource):
 
 @ns_platsannons.route('/complete')
 class PBComplete(Resource):
-    method_decorators = [check_api_key('pb')]
+    method_decorators = [check_api_key]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(

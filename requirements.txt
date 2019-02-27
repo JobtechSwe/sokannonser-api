@@ -8,3 +8,4 @@ git+https://github.com/JobtechSwe/valuestore-module.git
 python-dateutil
 pytest
 pytest-cov
+elastic-apm[flask]

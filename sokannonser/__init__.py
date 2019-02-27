@@ -9,6 +9,7 @@ from sokannonser.rest.endpoint.openapi import OpenSearch, Proxy
 from sokannonser.rest.endpoint.valuestore import Valuestore
 from sokannonser import settings
 import os
+from elasticapm.contrib.flask import ElasticAPM
 
 app = Flask(__name__)
 CORS(app)
@@ -67,6 +68,16 @@ def configure_app(flask_app):
     flask_app.config.RESTPLUS_VALIDATE = settings.RESTPLUS_VALIDATE
     flask_app.config.RESTPLUS_MASK_SWAGGER = settings.RESTPLUS_MASK_SWAGGER
     flask_app.config.ERROR_404_HELP = settings.RESTPLUS_ERROR_404_HELP
+    if settings.APM_SERVICE_NAME and settings.APM_SERVICE_URL and settings.APM_SECRET:
+        flask_app.config['ELASTIC_APM'] = {
+            'SERVICE_NAME': settings.APM_SERVICE_NAME,
+            'SERVER_URL': settings.APM_SERVICE_URL,
+            'SECRET_TOKEN': settings.APM_SECRET
+        }
+        apm = ElasticAPM(flask_app, logging=logging.INFO)
+        log.info("ElasticAPM enabled")
+    else:
+        log.info("ElasticAPM is disabled")
 
 
 def initialize_app(flask_app):

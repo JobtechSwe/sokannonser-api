@@ -41,7 +41,7 @@ class PBSearch(Resource):
         result = {
             "total": esresult.get('total', 0),
             "positions": esresult.get('positions', 0),
-            "query_time_in:_millis": esresult.get('took', 0),
+            "query_time_in_millis": esresult.get('took', 0),
             "result_time_in_millis": int(time.time()*1000) - start_time,
             "stats": esresult.get('stats', {}),
             "hits": hits

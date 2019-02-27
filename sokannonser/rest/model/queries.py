@@ -5,6 +5,8 @@ from sokannonser import settings
 
 # Frågemodeller
 QF_CHOICES = ['occupation', 'skill', 'location']
+OPTIONS_BRIEF = 'brief'
+OPTIONS_FULL = 'full'
 
 swagger_doc_params = {
     settings.APIKEY: "Nyckel som krävs för att använda API:et",
@@ -40,6 +42,7 @@ swagger_doc_params = {
     settings.POSITION_RADIUS: "Radie från punkt i km",
 }
 swagger_filter_doc_params = {
+    settings.DETAILS: "Show 'brief' or 'full' (default) results",
     settings.OFFSET: "Börja lista resultat från denna position "
     "(0-%d)" % settings.MAX_OFFSET,
     settings.LIMIT: "Antal resultat att visa (0-%d)" % settings.MAX_LIMIT,

@@ -93,6 +93,10 @@ class QueryBuilder(object):
         query_dsl = dict()
         query_dsl['from'] = args.pop(settings.OFFSET, 0)
         query_dsl['size'] = args.pop(settings.LIMIT, 10)
+        if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
+            query_dsl['_source'] = ["id", "rubrik", "sista_ansokningsdatum",
+                                    "anstallningstyp.term", "arbetstidstyp.term",
+                                    "arbetsgivare.name", "publiceringsdatum"]
         # Remove api-key from args to make sure an empty query can occur
         args.pop(settings.APIKEY)
 
@@ -390,23 +394,24 @@ class QueryBuilder(object):
         return None
 
     # Parses POSITION and POSITION_RADIUS
-    def _build_geo_dist_filter(self, position, coordinate_range):
-        longitude = None
-        latitude = None
-        if position:
-            latitude = float(re.split(', ?', position)[0])
-            longitude = float(re.split(', ?', position)[1])
+    def _build_geo_dist_filter(self, positions, coordinate_range):
+        geo_bool = {"bool": {"should": []}}
+        for position in positions:
+            longitude = None
+            latitude = None
+            print("POSITION", position)
+            if position:
+                latitude = float(re.split(', ?', position)[0])
+                longitude = float(re.split(', ?', position)[1])
 
-        geo_filter = {}
-        if (not longitude
-                or not latitude
-                or not coordinate_range):
-            return geo_filter
-        elif ((-180 <= longitude <= 180)
-              and (-90 <= latitude <= 90)
-              and (coordinate_range > 0)):
-            geo_filter["geo_distance"] = {
-                "distance": str(coordinate_range) + "km",
-                "arbetsplatsadress.coordinates": [longitude, latitude]
-            }
-        return geo_filter
+            geo_filter = {}
+            if (not longitude or not latitude or not coordinate_range):
+                return geo_filter
+            elif ((-180 <= longitude <= 180)
+                  and (-90 <= latitude <= 90) and (coordinate_range > 0)):
+                geo_filter["geo_distance"] = {
+                    "distance": str(coordinate_range) + "km",
+                    "arbetsplatsadress.coordinates": [longitude, latitude]
+                }
+            geo_bool['bool']['should'].append(geo_filter)
+        return geo_bool

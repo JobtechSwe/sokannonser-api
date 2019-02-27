@@ -10,6 +10,12 @@ ES_INDEX = os.getenv("ES_INDEX", "platsannons-read")
 ES_AURANEST = os.getenv("ES_AURANEST", "auranest-read")
 ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy")
 
+# APM and Debug settings
+APM_SERVICE_NAME = os.getenv("APM_SERVICE_NAME")
+APM_SERVICE_URL = os.getenv("APM_SERVICE_URL")
+APM_SECRET = os.getenv("APM_SECRET")
+APM_LOG_LEVEL = os.getenv("LOG_LEVEL", "WARNING")
+
 # API keys settings
 ES_SYSTEM_INDEX = os.getenv("ES_SYSTEM_INDEX", "system")
 ES_APIKEYS_DOC_ID = os.getenv("ES_APIKEYS_DOC_ID", "apikeys")

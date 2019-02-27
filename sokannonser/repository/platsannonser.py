@@ -82,6 +82,10 @@ def find_platsannonser(args, querybuilder, start_time=0):
         return
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
+    return transform_platsannons_query_result(args, query_result, querybuilder)
+
+
+def transform_platsannons_query_result(args, query_result, querybuilder):
     results = query_result.get('hits', {})
     results['took'] = query_result.get('took', 0)
     if 'aggregations' in query_result:
@@ -105,6 +109,5 @@ def find_platsannonser(args, querybuilder, start_time=0):
                 ]
 
             })
-
     # log.debug(json.dumps(results, indent=2))
     return results

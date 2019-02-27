@@ -394,13 +394,15 @@ class QueryBuilder(object):
         return None
 
     # Parses POSITION and POSITION_RADIUS
-    def _build_geo_dist_filter(self, positions, coordinate_range):
+    def _build_geo_dist_filter(self, positions, coordinate_ranges):
         geo_bool = {"bool": {"should": []}} if positions else {}
-        for position in positions or []:
+        for index, position in enumerate(positions or []):
             longitude = None
             latitude = None
-            coordinate_range = coordinate_range or \
-                settings.DEFAUT_POSITION_RADIUS
+            print(coordinate_ranges)
+            print(index)
+            coordinate_range = coordinate_ranges[index] if coordinate_ranges is not None and index < len(coordinate_ranges) \
+                else settings.DEFAULT_POSITION_RADIUS
             if position and ',' in position:
                 try:
                     latitude = float(re.split(', ?', position)[0])

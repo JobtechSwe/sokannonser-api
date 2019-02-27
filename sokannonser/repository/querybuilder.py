@@ -395,23 +395,25 @@ class QueryBuilder(object):
 
     # Parses POSITION and POSITION_RADIUS
     def _build_geo_dist_filter(self, positions, coordinate_range):
-        geo_bool = {"bool": {"should": []}}
-        for position in positions:
+        geo_bool = {"bool": {"should": []}} if positions else {}
+        for position in positions or []:
             longitude = None
             latitude = None
-            print("POSITION", position)
+            coordinate_range = coordinate_range or \
+                settings.DEFAUT_POSITION_RADIUS
             if position:
                 latitude = float(re.split(', ?', position)[0])
                 longitude = float(re.split(', ?', position)[1])
 
             geo_filter = {}
             if (not longitude or not latitude or not coordinate_range):
-                return geo_filter
+                geo_bool['bool']['should'].append(geo_filter)
             elif ((-180 <= longitude <= 180)
                   and (-90 <= latitude <= 90) and (coordinate_range > 0)):
                 geo_filter["geo_distance"] = {
                     "distance": str(coordinate_range) + "km",
                     "arbetsplatsadress.coordinates": [longitude, latitude]
                 }
-            geo_bool['bool']['should'].append(geo_filter)
+            if geo_filter:
+                geo_bool['bool']['should'].append(geo_filter)
         return geo_bool

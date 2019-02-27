@@ -86,7 +86,7 @@ annons_complete_query.add_argument(taxonomy.COUNTRY, action='append')
 annons_complete_query.add_argument(settings.POSITION,
                                    type=inputs.regex('^[\\d\\.]+, ?[\\d\\.]+$'),
                                    action='append')
-annons_complete_query.add_argument(settings.POSITION_RADIUS, type=int)
+annons_complete_query.add_argument(settings.POSITION_RADIUS, type=int, action='append')
 annons_complete_query.add_argument(settings.FREETEXT_QUERY)
 annons_complete_query.add_argument(settings.FREETEXT_FIELDS, action='append',
                                    choices=QF_CHOICES)

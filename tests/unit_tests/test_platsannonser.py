@@ -43,15 +43,18 @@ def test_filter_timeframe(from_datetime, to_datetime):
             parser.parse(to_datetime).isoformat()
 
 
+#  @pytest.mark.unit
 @pytest.mark.parametrize("args, exist, expected", [({settings.APIKEY: "",
                                                      settings.POSITION: "60.5, 17.1",
                                                      settings.POSITION_RADIUS: 5},
                                                     True,
-                                                    [{"geo_distance": {
-                                                        "distance": "5km",
-                                                        "arbetsplatsadress.coordinates": [
-                                                            17.1, 60.5
-                                                        ]}}]),
+                                                    {"bool": {
+                                                        "should":
+                                                        [{"geo_distance": {
+                                                            "distance": "5km",
+                                                            "arbetsplatsadress.coordinates": [
+                                                                17.1, 60.5
+                                                            ]}}]}}),
                                                    ({settings.APIKEY: "",
                                                      settings.POSITION: "60.5, 399.1",
                                                      settings.POSITION_RADIUS: 5},

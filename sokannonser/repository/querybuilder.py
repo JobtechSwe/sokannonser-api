@@ -401,13 +401,16 @@ class QueryBuilder(object):
             latitude = None
             coordinate_range = coordinate_range or \
                 settings.DEFAUT_POSITION_RADIUS
-            if position:
-                latitude = float(re.split(', ?', position)[0])
-                longitude = float(re.split(', ?', position)[1])
+            if position and ',' in position:
+                try:
+                    latitude = float(re.split(', ?', position)[0])
+                    longitude = float(re.split(', ?', position)[1])
+                except ValueError as e:
+                    log.debug("Bad position-parameter: \"%s\" (%s)" % (position, str(e)))
 
             geo_filter = {}
             if (not longitude or not latitude or not coordinate_range):
-                geo_bool['bool']['should'].append(geo_filter)
+                return {}
             elif ((-180 <= longitude <= 180)
                   and (-90 <= latitude <= 90) and (coordinate_range > 0)):
                 geo_filter["geo_distance"] = {

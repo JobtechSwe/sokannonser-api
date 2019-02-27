@@ -2,7 +2,7 @@ import os
 import sys
 import time
 from operator import itemgetter
-from pprint import pprint
+# from pprint import pprint
 import json
 
 import pytest
@@ -13,6 +13,7 @@ from sokannonser.repository.platsannonser import transform_platsannons_query_res
 
 currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
+
 def get_static_ads_from_file():
     with open(currentdir + 'test_resources/platsannons_results.json') as f:
         result = json.load(f)
@@ -20,17 +21,15 @@ def get_static_ads_from_file():
 
         return result
 
+
 @pytest.mark.unit
 def test_properties_and_types_marshal_mocked_elastic_result():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
 
-
     esresult = get_static_ads_from_file()
     # pprint(esresult)
 
-    args = {}
-    args[settings.FREETEXT_QUERY] = False
-    args[settings.STATISTICS] = False
+    args = {settings.FREETEXT_QUERY: False, settings.STATISTICS: False}
 
     pbsearch = PBSearch()
     querybuilder = QueryBuilder()
@@ -45,7 +44,8 @@ def test_properties_and_types_marshal_mocked_elastic_result():
     assert_is_type(results, dict)
     # pprint(results)
 
-    assert_has_properties(results, ['hits', 'positions', 'query_time_in_millis', 'result_time_in_millis', 'stats', 'total'])
+    assert_has_properties(results,
+                          ['hits', 'positions', 'query_time_in_millis', 'result_time_in_millis', 'stats', 'total'])
 
     results_hits = results['hits']
     assert_is_type(results_hits, list)
@@ -75,7 +75,8 @@ def test_properties_and_types_marshal_mocked_elastic_result():
                                      'yrkesgrupp', 'yrkesomrade', 'yrkesroll'])
 
     assert_is_type(test_hit['ansokningsdetaljer'], dict)
-    assert_has_properties(test_hit['ansokningsdetaljer'], ['annat', 'epost', 'information', 'referens', 'via_af', 'webbadress'])
+    assert_has_properties(test_hit['ansokningsdetaljer'],
+                          ['annat', 'epost', 'information', 'referens', 'via_af', 'webbadress'])
 
     assert_is_type(test_hit['anstallningstyp'], dict)
     assert_has_properties(test_hit['anstallningstyp'], ['kod', 'taxonomi-kod', 'term'])
@@ -83,7 +84,8 @@ def test_properties_and_types_marshal_mocked_elastic_result():
     assert_is_type(test_hit['antal_platser'], int)
 
     assert_is_type(test_hit['arbetsgivare'], dict)
-    assert_has_properties(test_hit['arbetsgivare'], ['arbetsplats', 'epost', 'id', 'namn', 'organisationsnummer', 'telefonnummer', 'webbadress'])
+    assert_has_properties(test_hit['arbetsgivare'],
+                          ['arbetsplats', 'epost', 'id', 'namn', 'organisationsnummer', 'telefonnummer', 'webbadress'])
 
     assert_is_type(test_hit['arbetsomfattning'], dict)
     assert_has_properties(test_hit['arbetsomfattning'], ['min', 'max'])
@@ -93,13 +95,10 @@ def test_properties_and_types_marshal_mocked_elastic_result():
 def test_values_marshal_mocked_elastic_result():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
 
-
     esresult = get_static_ads_from_file()
     # pprint(esresult)
 
-    args = {}
-    args[settings.FREETEXT_QUERY] = False
-    args[settings.STATISTICS] = False
+    args = {settings.FREETEXT_QUERY: False, settings.STATISTICS: False}
 
     pbsearch = PBSearch()
     querybuilder = QueryBuilder()
@@ -136,7 +135,6 @@ def test_values_marshal_mocked_elastic_result():
 
     anstallningstyp = test_hit['anstallningstyp']
     assert_has_taxonomy_values(anstallningstyp)
-
 
     assert_has_int_value(test_hit['antal_platser'], 1)
 
@@ -256,31 +254,33 @@ def assert_is_type(value_to_check, wanted_type):
     # print('value: %s, type: %s, wanted_type: %s' % (value_to_check, type(value_to_check), wanted_type))
     assert wanted_type == type(value_to_check)
 
+
 def assert_has_properties(value_to_check, wanted_propertynames):
     for name in wanted_propertynames:
         assert name in value_to_check
+
 
 def assert_has_str_value(value_to_check):
     assert type(value_to_check) == str
     assert len(value_to_check) > 0
 
+
 def assert_has_bool_value(value_to_check, wanted_bool):
     assert type(value_to_check) == bool
     assert value_to_check == wanted_bool
+
 
 def assert_has_int_value(value_to_check, wanted_int):
     assert type(value_to_check) == int
     assert value_to_check == wanted_int
 
+
 def assert_has_list_values(value_to_check):
     assert type(value_to_check) == list
     assert len(value_to_check) > 0
+
 
 def assert_has_taxonomy_values(hit_attr):
     assert_has_str_value(hit_attr['kod'])
     assert_has_str_value(hit_attr['taxonomi-kod'])
     assert_has_str_value(hit_attr['term'])
-
-
-
-

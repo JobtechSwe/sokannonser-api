@@ -53,6 +53,7 @@ LONGITUDE = 'longitude'
 LATITUDE = 'latitude'
 POSITION = 'position'
 POSITION_RADIUS = 'position.radius'
+DEFAUT_POSITION_RADIUS = 5
 
 MAX_OFFSET = 2000
 MAX_LIMIT = 100

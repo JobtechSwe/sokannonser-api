@@ -77,15 +77,15 @@ def test_rewrite_uppercase_input():
 @pytest.mark.unit
 def test_rewrite_non_concept_words():
     concepts = text_to_concept.text_to_concepts(
-        'jättebra och flexibel Key Account Manager som vill jobba med försäljning på Spotify i Boston, Connecticut')
+        'jättebra och flexibel Key Account Manager som vill jobba med försäljning på Spotify i Hartford, Connecticut')
     assert len(concepts) > 0
-    # pprint(concepts)
+    print(concepts)
     assert 'försäljning' in concepts['competencies']
     assert 'key account manager' in concepts['occupations']
     assert 'flexibel' in concepts['traits']
 
     assert 'jättebra' in concepts['others']
-    assert 'boston,' in concepts['others']
+    assert 'hartford,' in concepts['others']
     assert 'connecticut' in concepts['others']
     assert 'spotify' in concepts['others']
 

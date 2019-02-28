@@ -24,7 +24,7 @@ text_to_concept = TextToConcept(ontologyhost=url,
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
-@pytest.mark.unit
+@pytest.mark.integration
 def test_rewrite_unigram_competence():
     print('\n============================', sys._getframe().f_code.co_name, '============================')
 
@@ -38,7 +38,7 @@ def test_rewrite_unigram_competence():
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
-@pytest.mark.unit
+@pytest.mark.integration
 def test_rewrite_unigram_multiple_competencies():
     print('\n============================', sys._getframe().f_code.co_name, '============================')
 
@@ -53,7 +53,7 @@ def test_rewrite_unigram_multiple_competencies():
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
-@pytest.mark.unit
+@pytest.mark.integration
 def test_rewrite_unigram_misspelled_input():
     print('\n============================', sys._getframe().f_code.co_name, '============================')
 
@@ -65,7 +65,7 @@ def test_rewrite_unigram_misspelled_input():
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
-@pytest.mark.unit
+@pytest.mark.integration
 def test_rewrite_bigrams():
     concepts = text_to_concept.text_to_concepts('inhouse key account manager säljare')
     assert len(concepts) > 0
@@ -76,7 +76,7 @@ def test_rewrite_bigrams():
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
-@pytest.mark.unit
+@pytest.mark.integration
 def test_rewrite_uppercase_input():
     concepts = text_to_concept.text_to_concepts('Key Account Manager SÄLJARE')
     assert len(concepts) > 0
@@ -86,7 +86,7 @@ def test_rewrite_uppercase_input():
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
-@pytest.mark.unit
+@pytest.mark.integration
 def test_rewrite_non_concept_words():
     concepts = text_to_concept.text_to_concepts(
         'jättebra och flexibel Key Account Manager som vill jobba med försäljning på Spotify i Hartford, Connecticut')
@@ -103,4 +103,4 @@ def test_rewrite_non_concept_words():
 
 
 if __name__ == '__main__':
-    pytest.main([os.path.realpath(__file__), '-svv', '-ra', '-m unit'])
+    pytest.main([os.path.realpath(__file__), '-svv', '-ra', '-m integration'])

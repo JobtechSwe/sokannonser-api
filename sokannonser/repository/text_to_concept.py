@@ -1,4 +1,3 @@
-from orderedset import OrderedSet
 from beaker.cache import CacheManager
 from beaker import util
 
@@ -47,7 +46,7 @@ class TextToConcept(object):
 
         # print(other_text)
 
-        others = list(OrderedSet([word for word in other_text.split(' ') if word != self.REMOVED_TAG]))
+        others = [word for word in other_text.split(' ') if word != self.REMOVED_TAG]
 
         # print(other_words)
 

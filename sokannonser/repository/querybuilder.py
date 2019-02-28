@@ -93,7 +93,7 @@ class QueryBuilder(object):
         query_dsl = dict()
         query_dsl['from'] = args.pop(settings.OFFSET, 0)
         query_dsl['size'] = args.pop(settings.LIMIT, 10)
-        if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
+        if args.pop(settings.DETAILS, '') == queries.OPTIONS_FULL:
             query_dsl['_source'] = ["id", "rubrik", "sista_ansokningsdatum",
                                     "anstallningstyp.term", "arbetstidstyp.term",
                                     "arbetsgivare.name", "publiceringsdatum"]
@@ -401,7 +401,8 @@ class QueryBuilder(object):
             latitude = None
             print(coordinate_ranges)
             print(index)
-            coordinate_range = coordinate_ranges[index] if coordinate_ranges is not None and index < len(coordinate_ranges) \
+            coordinate_range = coordinate_ranges[index] \
+                if coordinate_ranges is not None and index < len(coordinate_ranges) \
                 else settings.DEFAULT_POSITION_RADIUS
             if position and ',' in position:
                 try:

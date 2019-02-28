@@ -59,7 +59,7 @@ MAX_OFFSET = 2000
 MAX_LIMIT = 100
 
 RESULT_MODEL = 'resultmodel'
-DETAILS = 'details'
+DETAILS = 'resdet'
 
 # For taxonomy
 SHOW_COUNT = 'show-count'

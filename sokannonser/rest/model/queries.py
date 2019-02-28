@@ -91,6 +91,7 @@ annons_complete_query.add_argument(settings.FREETEXT_QUERY)
 annons_complete_query.add_argument(settings.FREETEXT_FIELDS, action='append',
                                    choices=QF_CHOICES)
 pb_query = annons_complete_query.copy()
+pb_query.add_argument(settings.DETAILS, choices=[OPTIONS_FULL, OPTIONS_BRIEF])
 pb_query.add_argument(settings.OFFSET, type=inputs.int_range(0, settings.MAX_OFFSET),
                       default=0)
 pb_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_LIMIT),

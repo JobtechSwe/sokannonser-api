@@ -1,14 +1,26 @@
 import sys
 import os
 import pytest
+from sokannonser import settings
 # from pprint import pprint
 
 from sokannonser.repository.text_to_concept import TextToConcept
 
-text_to_concept = TextToConcept(ontologyhost='http://localhost:9200',
+host = settings.ES_HOST
+index = 'narvalontology'
+user = settings.ES_USER
+pwd = settings.ES_PWD
+port = settings.ES_PORT
+
+protocol = 'http' if host == 'localhost' else 'https'
+url = protocol + '://' + host + ':' + str(port)
+
+print('Running unittests calling %s' % url)
+
+text_to_concept = TextToConcept(ontologyhost=url,
                                 ontologyindex='narvalontology',
-                                ontologyuser=None,
-                                ontologypwd=None)
+                                ontologyuser=user,
+                                ontologypwd=pwd)
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")

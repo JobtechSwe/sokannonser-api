@@ -42,7 +42,7 @@ swagger_doc_params = {
     settings.POSITION_RADIUS: "Radie från punkt i km",
 }
 swagger_filter_doc_params = {
-    settings.DETAILS: "Show 'brief' or 'full' (default) results",
+    settings.DETAILS: "Show 'brief' (default) or 'full' results details",
     settings.OFFSET: "Börja lista resultat från denna position "
     "(0-%d)" % settings.MAX_OFFSET,
     settings.LIMIT: "Antal resultat att visa (0-%d)" % settings.MAX_LIMIT,

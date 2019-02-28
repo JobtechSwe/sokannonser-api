@@ -9,3 +9,6 @@ python-dateutil
 pytest
 pytest-cov
 elastic-apm[flask]
+flashtext
+orderedset
+Beaker

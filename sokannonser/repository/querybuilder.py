@@ -93,7 +93,7 @@ class QueryBuilder(object):
         query_dsl = dict()
         query_dsl['from'] = args.pop(settings.OFFSET, 0)
         query_dsl['size'] = args.pop(settings.LIMIT, 10)
-        if args.pop(settings.DETAILS, '') == queries.OPTIONS_FULL:
+        if args.pop(settings.DETAILS, '') != queries.OPTIONS_FULL:
             query_dsl['_source'] = ["id", "rubrik", "sista_ansokningsdatum",
                                     "anstallningstyp.term", "arbetstidstyp.term",
                                     "arbetsgivare.name", "publiceringsdatum"]
@@ -179,6 +179,7 @@ class QueryBuilder(object):
                          "beskriving.krav",
                          "beskrivning.annonstext"]
         search_fields += ["keywords.%s" % qf for qf in queryfields]
+        search_fields += ["keywords_enriched_binary.%s" % qf for qf in queryfields]
         return [
             {
                 "multi_match": {

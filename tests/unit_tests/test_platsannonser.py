@@ -76,10 +76,79 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                             "distance": "-5km",
                                                             "arbetsplatsadress.coordinates": [
                                                                 17.1, 60.5
-                                                            ]}}]}})])
+                                                            ]}}]}}),
+                                                   ({settings.APIKEY: "",
+                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"],
+                                                     settings.POSITION_RADIUS: [5, 10]},
+                                                    True,
+                                                    {"bool": {
+                                                        "should":
+                                                        [{"geo_distance": {
+                                                            "distance": "5km",
+                                                            "arbetsplatsadress.coordinates": [
+                                                                17.1, 60.5
+                                                            ]}},
+                                                         {"geo_distance": {
+                                                            "distance": "10km",
+                                                            "arbetsplatsadress.coordinates": [
+                                                                18.1, 61.5
+                                                            ]
+                                                         }}]
+                                                    }}),
+                                                   ({settings.APIKEY: "",
+                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"],
+                                                     settings.POSITION_RADIUS: [5, 10, 15]},
+                                                    True,
+                                                    {"bool": {
+                                                        "should":
+                                                        [{"geo_distance": {
+                                                            "distance": "5km",
+                                                            "arbetsplatsadress.coordinates": [
+                                                                17.1, 60.5
+                                                            ]}},
+                                                         {"geo_distance": {
+                                                            "distance": "10km",
+                                                            "arbetsplatsadress.coordinates": [
+                                                                18.1, 61.5
+                                                            ]
+                                                         }}]
+                                                    }}),
+                                                   ({settings.APIKEY: "",
+                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"],
+                                                     settings.POSITION_RADIUS: [10]},
+                                                    True,
+                                                    {"bool": {
+                                                        "should":
+                                                        [{"geo_distance": {
+                                                            "distance": "10km",
+                                                            "arbetsplatsadress.coordinates": [
+                                                                17.1, 60.5
+                                                            ]}},
+                                                         {"geo_distance": {
+                                                            "distance": "5km",
+                                                            "arbetsplatsadress.coordinates": [
+                                                                18.1, 61.5
+                                                            ]
+                                                         }}]
+                                                    }}),
+                                                   ({settings.APIKEY: "",
+                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"]},
+                                                    True,
+                                                    {"bool": {
+                                                        "should":
+                                                        [{"geo_distance": {
+                                                            "distance": "5km",
+                                                            "arbetsplatsadress.coordinates": [
+                                                                17.1, 60.5
+                                                            ]}},
+                                                         {"geo_distance": {
+                                                            "distance": "5km",
+                                                            "arbetsplatsadress.coordinates": [
+                                                                18.1, 61.5
+                                                            ]
+                                                         }}]
+                                                    }})])
 def test_geo_distance_filter(args, exist, expected):
     print('====================', sys._getframe().f_code.co_name, '==================== ')
     query_dsl = pbquery.parse_args(args)
-    print("specdebug")
-    print(query_dsl["query"]["bool"]["filter"])
     assert (expected in query_dsl["query"]["bool"]["filter"]) == exist

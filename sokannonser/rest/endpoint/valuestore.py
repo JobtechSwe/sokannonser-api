@@ -12,15 +12,15 @@ from sokannonser.rest.model.queries import taxonomy_query
 class Valuestore(Resource):
     @ns_valuestore.doc(
         params={
-            settings.OFFSET: "Börja lista resultat från denna position",
-            settings.LIMIT: "Antal resultat att visa",
-            settings.FREETEXT_QUERY: "Fritextfråga mot taxonomin. "
-                                     "(Kan t.ex. användas för autocomplete / type ahead)",
-            "parent-id": "Begränsa sökning till taxonomivärden som har angiven conceptId"
-                         " som förälder (användbart tillsammans med typ)",
-            "type": "Visa enbart taxonomivärden av typ ",
-            settings.SHOW_COUNT: "Visa antal annonser som matchar taxonomivärde "
-                                 "(endast i kombination med val av typ)"
+            settings.OFFSET: "The offset parameter defines the offset from the first result you want to fetch",
+            settings.LIMIT: "Number of result rows to fetch",
+            settings.FREETEXT_QUERY: "Freetext query for fetching a filtered result. "
+                                     "(for example for autocomplete / type ahead)",
+            "parent-id": "filter search for taxonomy values by specific parent conceptId"
+                         " (useful in combination with the type parameter)",
+            "type": "filter by type ",
+            settings.SHOW_COUNT: "fetch the number of job ads that matches a taxonomy value "
+                                 "(only available when chosen type is provided)"
         }
     )
     @ns_valuestore.expect(taxonomy_query)

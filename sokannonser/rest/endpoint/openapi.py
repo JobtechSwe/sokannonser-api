@@ -22,8 +22,8 @@ class OpenSearch(Resource):
         params={**swagger_doc_params, **swagger_filter_doc_params},
         responses={
             200: 'OK',
-            401: 'Felaktig API-nyckel',
-            500: 'Bad'
+            401: 'Invalid API-key',
+            500: 'Technical exception'
         }
     )
     @ns_platsannons.expect(pb_query)
@@ -44,9 +44,9 @@ class Proxy(Resource):
     @ns_platsannons.doc(
         responses={
             200: 'OK',
-            401: 'Felaktig API-nyckel',
-            404: 'Annonsen saknas',
-            500: 'Serverfel'
+            401: 'Invalid API-key',
+            404: 'Job ad not found exception',
+            500: 'Technical exception'
         }
     )
     def get(self, id):

@@ -38,22 +38,37 @@ class TextToConcept(object):
 
         text_lower = text.lower()
 
-        other_text = text_lower
+        tmp_text = text_lower
 
         for concept in ontology_concepts:
             term = concept['term']
-            other_text = other_text.replace(term, self.REMOVED_TAG)
+            term_index = tmp_text.index(term) - 1
+            prev_char = tmp_text[term_index:term_index + 1]
+            # print('term: %s, prev_char: %s' % (term, prev_char))
+            tmp_text = tmp_text.replace(term, self.REMOVED_TAG)
+            concept['operator'] = prev_char if prev_char == '-' else ''
 
-        # print(other_text)
+        # print(tmp_text)
 
-        others = [word for word in other_text.split(' ') if word != self.REMOVED_TAG]
+        competencies = [c['concept'].lower() for c in ontology_concepts if self.filter_concepts(c, self.COMPETENCE_KEY, '')]
+        occupations = [c['concept'].lower() for c in ontology_concepts if self.filter_concepts(c, self.OCCUPATION_KEY, '')]
+        traits = [c['concept'].lower() for c in ontology_concepts if self.filter_concepts(c, self.TRAIT_KEY, '')]
 
-        # print(other_words)
+        competencies_must_not = [c['concept'].lower() for c in ontology_concepts if self.filter_concepts(c, self.COMPETENCE_KEY, '-')]
+        occupations_must_not = [c['concept'].lower() for c in ontology_concepts if self.filter_concepts(c, self.OCCUPATION_KEY, '-')]
+        traits_must_not = [c['concept'].lower() for c in ontology_concepts if self.filter_concepts(c, self.TRAIT_KEY, '-')]
 
-        competencies = [c['concept'].lower() for c in ontology_concepts if c['type'] == self.COMPETENCE_KEY]
-        occupations = [c['concept'].lower() for c in ontology_concepts if c['type'] == self.OCCUPATION_KEY]
-        traits = [c['concept'].lower() for c in ontology_concepts if c['type'] == self.TRAIT_KEY]
-
-        result = {'competencies': competencies, 'occupations': occupations, 'traits': traits, 'others': others}
+        result = {'competencies': competencies,
+                  'occupations': occupations,
+                  'traits': traits,
+                  'competencies_must_not': competencies_must_not,
+                  'occupations_must_not': occupations_must_not,
+                  'traits_must_not': traits_must_not}
 
         return result
+
+    def filter_concepts(self, concept, concept_type, operator):
+        if concept['type'] == concept_type and concept['operator'] == operator:
+            return True
+        else:
+            return False

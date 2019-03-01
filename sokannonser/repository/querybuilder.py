@@ -266,42 +266,41 @@ class QueryBuilder(object):
     def _build_plats_query(self, kommunkoder, lanskoder):
         kommuner = []
         neg_komm = []
+        lan = []
+        neg_lan = []
         for kkod in kommunkoder if kommunkoder else []:
             if kkod.startswith('-'):
                 neg_komm.append(kkod[1:])
             else:
                 kommuner.append(kkod)
-        kommunlanskoder = []
-        for lanskod in lanskoder if lanskoder is not None else []:
-            ttype = tax_type.get(taxonomy.MUNICIPALITY)
-            if lanskod.startswith('-'):
-                kommun_results = taxonomy.find_concepts(elastic, None, [lanskod[1:]],
-                                                        ttype
-                                                        ).get('hits', {}).get('hits', [])
-                neg_komm += [entitet['_source']['legacy_ams_taxonomy_id']
-                             for entitet in kommun_results]
+        for lkod in lanskoder if lanskoder else []:
+            if lkod.startswith('-'):
+                neg_lan.append(lkod[1:])
             else:
-                kommun_results = taxonomy.find_concepts(elastic, None, [lanskod],
-                                                        ttype
-                                                        ).get('hits', {}).get('hits', [])
-                kommunlanskoder += [e['_source']['legacy_ams_taxonomy_id']
-                                    for e in kommun_results]
+                lan.append(lkod)
         plats_term_query = [{"term": {
             "arbetsplatsadress.kommunkod": {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
         plats_term_query += [{"term": {
-            "arbetsplatsadress.kommunkod": {
-                "value": lkod, "boost": 1.0}}} for lkod in kommunlanskoder]
+            "arbetsplatsadress.lanskod": {
+                "value": lkod, "boost": 1.0}}} for lkod in lan]
         plats_bool_query = {"bool": {
             "should": plats_term_query}
         } if plats_term_query else {}
         if neg_komm:
-            neg_plats_term_query = [{"term": {
+            neg_komm_term_query = [{"term": {
                 "arbetsplatsadress.kommunkod": {
                     "value": kkod}}} for kkod in neg_komm]
             if 'bool' not in plats_bool_query:
                 plats_bool_query['bool'] = {}
-            plats_bool_query['bool']['must_not'] = neg_plats_term_query
+            plats_bool_query['bool']['must_not'] = neg_komm_term_query
+        if neg_lan:
+            neg_lan_term_query = [{"term": {
+                "arbetsplatsadress.lanskod": {
+                    "value": lkod}}} for lkod in neg_lan]
+            if 'bool' not in plats_bool_query:
+                plats_bool_query['bool'] = {}
+            plats_bool_query['bool']['must_not'] = neg_lan_term_query
         return plats_bool_query
 
     # Parses COUNTRY

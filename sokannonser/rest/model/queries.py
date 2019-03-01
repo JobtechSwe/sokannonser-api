@@ -47,7 +47,7 @@ swagger_filter_doc_params = {
     "applydate-asc: last apply date, descending (oldest apply date first, few days left for application)\n"
     "relevance: Relevance (points) (default sorting)",
     settings.STATISTICS: "Show statistics for specified fields "
-    "(available fields: %s, %s och %s)" % (
+    "(available fields: %s, %s and %s)" % (
         taxonomy.OCCUPATION,
         taxonomy.GROUP,
         taxonomy.FIELD),

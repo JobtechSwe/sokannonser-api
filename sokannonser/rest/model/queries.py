@@ -9,54 +9,49 @@ OPTIONS_BRIEF = 'brief'
 OPTIONS_FULL = 'full'
 
 swagger_doc_params = {
-    settings.APIKEY: "Nyckel som krävs för att använda API:et",
-    settings.PUBLISHED_AFTER: "Visa annonser publicerade efter angivet datum "
-    "(på formen YYYY-mm-ddTHH:MM:SS)",
-    settings.PUBLISHED_BEFORE: "Visa annonser publicerade innan angivet datum "
-    "(på formen YYYY-mm-ddTHH:MM:SS)",
-    settings.FREETEXT_QUERY: "Fritextfråga",
-    settings.FREETEXT_FIELDS: "Välj vilka fält utöver standardfälten (rubrik, "
-    "arbetsplatsnamn och annonstext) "
-    "som ska användas för fritextfråga "
-    "(" + settings.FREETEXT_QUERY + "). Påverkar också "
-    "autocomplete (" + settings.TYPEAHEAD_QUERY + ").\n"
-    "Alternativ: " + str(QF_CHOICES) + "\n"
-    "Default: samtliga",
-    taxonomy.OCCUPATION: "En eller flera yrkesbenämningskoder enligt taxonomi",
-    taxonomy.GROUP: "En eller flera yrkesgruppskoder enligt taxonomi",
-    taxonomy.FIELD: "En eller flera yrkesområdeskoder enligt taxonomi",
-    taxonomy.SKILL: "En eller flera kompetenskoder enligt taxonomi",
-    taxonomy.DRIVING_LICENCE: "Typ av körkort som efterfrågas (taxonomikod)",
-    taxonomy.EMPLOYMENT_TYPE: "Anställningstyp enligt taxonomi",
-    settings.EXPERIENCE_REQUIRED: "Sätt till 'false' för att visa enbart jobb "
-    "som inte kräver erfarenhet",
-    taxonomy.WORKTIME_EXTENT: "En eller flera arbetstidsomfattningskoder enligt "
-    "taxonomi",
-    settings.PARTTIME_MIN: "För deltidsjobb, minsta omfattning",
-    settings.PARTTIME_MAX: "För deltidsjobb, maximal omfattning",
-    taxonomy.MUNICIPALITY: "En eller flera kommunkoder",
-    taxonomy.REGION: "En eller flera länskoder",
-    taxonomy.COUNTRY: "Ett eller flera länder enligt taxonomikod.",
-    settings.POSITION: "Latitud och longitud på formen \"59.329, 18.068\" "
-                       "(latitud, longitud).",
-    settings.POSITION_RADIUS: "Radie från punkt i km",
+    settings.APIKEY: "Required API key",
+    settings.PUBLISHED_AFTER: "Fetch job ads published after specified date and time "
+    "(format YYYY-mm-ddTHH:MM:SS)",
+    settings.PUBLISHED_BEFORE: "Fetch job ads published before specified date and time "
+                               "(format YYYY-mm-ddTHH:MM:SS)",
+    settings.FREETEXT_QUERY: "Freetext query. Search in ad headline, ad description and place of work.",
+    settings.FREETEXT_FIELDS: "Fields to freetext search in, in addition to default freetext search "
+                              "(parameter " + settings.FREETEXT_QUERY + ").\n"
+                              "Valid input values: " + str(QF_CHOICES) + "\n"
+                              "Default (no input): Search in ad headline, ad description and place of work",
+    taxonomy.OCCUPATION: "One or more occupational codes according to the taxonomy",
+    taxonomy.GROUP: "One or more occupational group codes according to the taxonomy",
+    taxonomy.FIELD: "One or more occupational area codes according to the taxonomy",
+    taxonomy.SKILL: "One or more competency codes according to the taxonomy",
+    taxonomy.DRIVING_LICENCE: "One or more types of demanded driving licenses, code according to the taxonomy",
+    taxonomy.EMPLOYMENT_TYPE: "Employment type, code according to the taxonomy",
+    settings.EXPERIENCE_REQUIRED: "Input 'false' to filter jobs that don't require experience",
+    taxonomy.WORKTIME_EXTENT: "One or more codes for worktime extent, code according to the taxonomy",
+    settings.PARTTIME_MIN: "For part-time jobs, minimum extent in percent (for example 50 for 50%)",
+    settings.PARTTIME_MAX: "For part-time jobs, maximum extent in percent (for example 100 for 100%)",
+    taxonomy.MUNICIPALITY: "One or more municipality codes, code according to the taxonomy",
+    taxonomy.REGION: "One or more region codes, code according to the taxonomy",
+    taxonomy.COUNTRY: "One or more country codes, code according to the taxonomy",
+    settings.POSITION: "Latitude and longitude in the format \"59.329, 18.068\" "
+                       "(latitude, longitude).",
+    settings.POSITION_RADIUS: "Radius from the specified " + settings.POSITION + " (latitude, longitude) in kilometers (km)",
 }
 swagger_filter_doc_params = {
     settings.DETAILS: "Show 'brief' (default) or 'full' results details",
-    settings.OFFSET: "Börja lista resultat från denna position "
-    "(0-%d)" % settings.MAX_OFFSET,
-    settings.LIMIT: "Antal resultat att visa (0-%d)" % settings.MAX_LIMIT,
-    settings.SORT: "Sortering.\npubdate-desc: publiceringsdatum, nyast först\n"
-    "pubdate-asc: publiceringsdatum, äldst först\n"
-    "applydate-desc: sista ansökningsdatum, nyast först\n"
-    "applydate-asc: sista ansökningsdatum, äldst först\n"
-    "relevance: Relevans (poäng) (default)",
-    settings.STATISTICS: "Visa sökstatistik för angivna fält "
-    "(tillgängliga fält: %s, %s och %s)" % (
+    settings.OFFSET: "The offset parameter defines the offset from the first result you want to fetch. "
+                     "Valid range is (0-%d)" % settings.MAX_OFFSET,
+    settings.LIMIT: "Number of results to fetch (0-%d)" % settings.MAX_LIMIT,
+    settings.SORT: "Sorting.\npubdate-desc: published date, descending (newest job ad first)\n"
+    "pubdate-asc: published date, ascending (oldest job ad first)\n"
+    "applydate-desc: last apply date, descending (newest apply date first)\n"
+    "applydate-asc: last apply date, descending (oldest apply date first, few days left for application)\n"
+    "relevance: Relevance (points) (default sorting)",
+    settings.STATISTICS: "Show statistics for specified fields "
+    "(available fields: %s, %s och %s)" % (
         taxonomy.OCCUPATION,
         taxonomy.GROUP,
         taxonomy.FIELD),
-    settings.STAT_LMT: "Antal statistikrader per typ",
+    settings.STAT_LMT: "Maximum number of statistical rows per field",
 }
 
 

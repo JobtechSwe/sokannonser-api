@@ -21,8 +21,8 @@ class PBSearch(Resource):
         params={**swagger_doc_params, **swagger_filter_doc_params},
         responses={
             200: 'OK',
-            401: 'Felaktig API-nyckel',
-            500: 'Bad'
+            401: 'Invalid API-key',
+            500: 'Technical exception'
         }
     )
     @ns_platsannons.expect(pb_query)
@@ -60,8 +60,8 @@ class PBComplete(Resource):
         params=swagger_doc_params,
         responses={
             200: 'OK',
-            401: 'Felaktig API-nyckel',
-            500: 'Bad'
+            401: 'Invalid API-key',
+            500: 'Technical exception'
         }
     )
     @ns_platsannons.expect(annons_complete_query)

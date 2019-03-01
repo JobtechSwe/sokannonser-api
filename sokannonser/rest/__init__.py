@@ -1,18 +1,22 @@
 from flask_restplus import Api, Namespace
 
-api = Api(version='1.0', title='Sök Annonser',
-          description='Hitta platsannonser.',
+api = Api(version='1.0', title='Search job ads',
+          description='An API for searching and retrieving job ads and for finding concepts in the Jobtech Taxonomy.',
           default='sokannonser',
-          default_label="Verktyg för att hitta platsannoner")
+          default_label="An API for searching and retrieving job ads.")
+
+ns_platsannons = Namespace('AF-job ads',
+                           description='Search and retrieve Arbetsförmedlingens (AF) job ads. '
+                                       'Used for online operations.')
+ns_auranest = Namespace('All job ads',
+                        description='Search and retrieve ~97% of all job ads.')
 
 ns_open = Namespace('Open-API',
-                    description='Sök bland AF:s annonser i öppet API')
-ns_platsannons = Namespace('AF-Annonser',
-                           description='Sök bland AF:s annonser')
-ns_auranest = Namespace('Alla Annonser',
-                        description='Sök bland alla annonser på marknaden')
+                    description='Search and retrieve Arbetsförmedlingens (AF) job ads. '
+                                'Used for bulk operations.')
+
 ns_valuestore = Namespace('Jobtech Taxonomy',
-                          description='Find concepts in the Jobtech Taxonomy')
+                          description='Find concepts in the Jobtech Taxonomy.')
 
 api.add_namespace(ns_open, '/open')
 api.add_namespace(ns_platsannons, '/af')

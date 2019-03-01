@@ -11,7 +11,7 @@ from sokannonser.repository import auranest
 class AuranestSearch(Resource):
     method_decorators = [check_api_key('all')]
 
-    @ns_auranest.doc(description='Sök med fritextfråga')
+    @ns_auranest.doc(description='Search with freetext query')
     @ns_auranest.expect(auranest_query)
     def get(self):
         args = auranest_query.parse_args()
@@ -26,7 +26,7 @@ class AuranestSearch(Resource):
 class AuranestComplete(Resource):
     method_decorators = [check_api_key('all')]
 
-    @ns_auranest.doc(description='Ge förslag på nästa sökord')
+    @ns_auranest.doc(description='Typeahead / Suggest the next search term')
     @ns_auranest.expect(auranest_typeahead)
     def get(self):
         args = auranest_typeahead.parse_args()

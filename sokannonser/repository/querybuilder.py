@@ -400,8 +400,6 @@ class QueryBuilder(object):
         for index, position in enumerate(positions or []):
             longitude = None
             latitude = None
-            print(coordinate_ranges)
-            print(index)
             coordinate_range = coordinate_ranges[index] \
                 if coordinate_ranges is not None and index < len(coordinate_ranges) \
                 else settings.DEFAULT_POSITION_RADIUS

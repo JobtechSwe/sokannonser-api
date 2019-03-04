@@ -19,15 +19,12 @@ pbquery = QueryBuilder()
 @pytest.mark.parametrize("to_datetime", ["2018-09-28T00:01",
                                          '2018-09-27', '', None, []])
 def test_filter_timeframe(from_datetime, to_datetime):
-    print('===========', sys._getframe().f_code.co_name, '============================ ')
-    print(from_datetime, to_datetime)
     if not from_datetime and not to_datetime:  # from and to date are empty
         assert pbquery._filter_timeframe(from_datetime, to_datetime) is None
         return
     if from_datetime and to_datetime:
         d = pbquery._filter_timeframe(parser.parse(from_datetime),
                                       parser.parse(to_datetime))
-        print(d)
         assert d['range']['publiceringsdatum']['gte'] == \
             parser.parse(from_datetime).isoformat()
         assert d['range']['publiceringsdatum']['lte'] == \

@@ -234,7 +234,6 @@ class QueryBuilder(object):
         search_fields = ["rubrik^3", "arbetsgivare.namn^2",
                          "beskrivning.annonstext"]
         search_fields += ["keywords.%s" % qf for qf in queryfields]
-        # search_fields += ["keywords_enriched_binary.%s" % qf for qf in queryfields]
         return [
             {
                 "multi_match": {

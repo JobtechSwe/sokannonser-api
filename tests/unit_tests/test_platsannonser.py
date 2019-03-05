@@ -232,3 +232,4 @@ def test_region_municipality_query(args, expected_pos, expected_neg):
         assert(len(neg_query) == len(expected_neg))
         for e in expected_neg:
             assert (e in neg_query)
+    print('====================', sys._getframe().f_code.co_name, '==================== ')

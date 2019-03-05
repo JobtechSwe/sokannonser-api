@@ -175,19 +175,6 @@ class QueryBuilder(object):
             ft_query['bool']['must_not'] = mustnts
         concepts = ttc.text_to_concepts(querystring)
         print("concepts", concepts)
-        # for field in ['occupations', 'skills', 'traits']:
-        #     key = "keywords_enriched_binary.%s.raw" % field[:-1]
-        #     for value in concepts.get(field, []):
-        #         if 'must' not in ft_query['bool']:
-        #             ft_query['bool']['must'] = []  # Adds a must segment
-        #         ft_query['bool']['must'].append(
-        #             {"term": {
-        #                 key: {
-        #                     "value": value,
-        #                     "boost": 10.0
-        #                 }}}
-        #         )
-        #         print("%s" % concepts.get(field, None))
         ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
                                                         ['occupations', 'skills',
                                                          'traits'], 1, 'must', 10)
@@ -196,18 +183,6 @@ class QueryBuilder(object):
                                                          'skills_must_not',
                                                          'traits_must_not'],
                                                         10, 'must_not')
-        # for field in ['occupations_must_not', 'skills_must_not', 'traits_must_not']:
-        #     key = "keywords_enriched_binary.%s.raw" % field[:-10]
-        #     for value in concepts.get(field, []):
-        #         if 'must_not' not in ft_query['bool']:
-        #             ft_query['bool']['must_not'] = []  # Adds a must segment
-        #         ft_query['bool']['must_not'].append(
-        #             {"term": {
-        #                 key: {
-        #                     "value": value
-        #                 }}}
-        #         )
-
         return ft_query
 
     def _freetext_enriched_fields_query(self, ft_query, concepts, fields,

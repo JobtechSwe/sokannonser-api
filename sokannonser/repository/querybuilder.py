@@ -1,11 +1,9 @@
 import logging
 import re
 from sokannonser import settings
-from sokannonser.repository import elastic
 from sokannonser.repository.text_to_concept import TextToConcept
 from sokannonser.rest.model import queries
 from valuestore import taxonomy
-from valuestore.taxonomy import tax_type
 
 log = logging.getLogger(__name__)
 ttc = TextToConcept(ontologyhost="https://%s:%s" % (settings.ES_HOST,
@@ -99,7 +97,7 @@ class QueryBuilder(object):
         query_dsl = dict()
         query_dsl['from'] = args.pop(settings.OFFSET, 0)
         query_dsl['size'] = args.pop(settings.LIMIT, 10)
-        if args.pop(settings.DETAILS, '') != queries.OPTIONS_FULL:
+        if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
             query_dsl['_source'] = ["id", "rubrik", "sista_ansokningsdatum",
                                     "anstallningstyp.term", "arbetstidstyp.term",
                                     "arbetsgivare.name", "publiceringsdatum"]
@@ -357,7 +355,8 @@ class QueryBuilder(object):
         if neg_komm_term_query or neg_lan_term_query:
             if 'bool' not in plats_bool_query:
                 plats_bool_query['bool'] = {}
-            plats_bool_query['bool']['must_not'] = neg_komm_term_query + neg_lan_term_query
+            plats_bool_query['bool']['must_not'] = neg_komm_term_query + \
+                neg_lan_term_query
         return plats_bool_query
 
     # Parses COUNTRY

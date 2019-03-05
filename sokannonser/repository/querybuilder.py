@@ -2,11 +2,16 @@ import logging
 import re
 from sokannonser import settings
 from sokannonser.repository import elastic
+from sokannonser.repository.text_to_concept import TextToConcept
 from sokannonser.rest.model import queries
 from valuestore import taxonomy
 from valuestore.taxonomy import tax_type
 
 log = logging.getLogger(__name__)
+ttc = TextToConcept(ontologyhost="https://%s:%s" % (settings.ES_HOST,
+                                                    settings.ES_PORT),
+                    ontologyuser=settings.ES_USER,
+                    ontologypwd=settings.ES_PWD)
 
 
 class QueryBuilder(object):
@@ -17,6 +22,7 @@ class QueryBuilder(object):
         Keyword arguments:
         args -- dictionary containing parameters from query
         """
+        ttc.text_to_concepts("foo")
         query_dsl = self._bootstrap_query(args)
 
         # Check for empty query
@@ -169,17 +175,68 @@ class QueryBuilder(object):
             ft_query['bool']['should'] = shoulds
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
+        concepts = ttc.text_to_concepts(querystring)
+        print("concepts", concepts)
+        # for field in ['occupations', 'skills', 'traits']:
+        #     key = "keywords_enriched_binary.%s.raw" % field[:-1]
+        #     for value in concepts.get(field, []):
+        #         if 'must' not in ft_query['bool']:
+        #             ft_query['bool']['must'] = []  # Adds a must segment
+        #         ft_query['bool']['must'].append(
+        #             {"term": {
+        #                 key: {
+        #                     "value": value,
+        #                     "boost": 10.0
+        #                 }}}
+        #         )
+        #         print("%s" % concepts.get(field, None))
+        ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
+                                                        ['occupations', 'skills',
+                                                         'traits'], 1, 'must', 10)
+        ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
+                                                        ['occupations_must_not',
+                                                         'skills_must_not',
+                                                         'traits_must_not'],
+                                                        10, 'must_not')
+        # for field in ['occupations_must_not', 'skills_must_not', 'traits_must_not']:
+        #     key = "keywords_enriched_binary.%s.raw" % field[:-10]
+        #     for value in concepts.get(field, []):
+        #         if 'must_not' not in ft_query['bool']:
+        #             ft_query['bool']['must_not'] = []  # Adds a must segment
+        #         ft_query['bool']['must_not'].append(
+        #             {"term": {
+        #                 key: {
+        #                     "value": value
+        #                 }}}
+        #         )
 
+        return ft_query
+
+    def _freetext_enriched_fields_query(self, ft_query, concepts, fields,
+                                        rev_cut, bool_type, boost=None):
+        for field in fields:
+            key = "keywords_enriched_binary.%s.raw" % field[:-rev_cut]
+            for value in concepts.get(field, []):
+                if bool_type not in ft_query['bool']:
+                    ft_query['bool'][bool_type] = []
+
+                query = {
+                    "term": {
+                        key: {
+                            "value": value
+                        }
+                    }
+                }
+                if boost:
+                    query['term'][key]['boost'] = boost
+                ft_query['bool'][bool_type].append(query)
         return ft_query
 
     def _freetext_fields(self, searchword, queryfields):
         search_fields = ["rubrik^3", "arbetsgivare.namn^2",
-                         "beskrivning.information",
-                         "beskrivning.behov",
-                         "beskriving.krav",
                          "beskrivning.annonstext"]
         search_fields += ["keywords.%s" % qf for qf in queryfields]
-        search_fields += ["keywords_enriched_binary.%s" % qf for qf in queryfields]
+        # search_fields += ["keywords_enriched_binary.%s" % qf for qf in queryfields]
         return [
             {
                 "multi_match": {

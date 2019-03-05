@@ -22,14 +22,11 @@ class TextToConcept(object):
 
     def __init__(self, ontologyhost='http://localhost:9200',
                  ontologyindex='narvalontology', ontologyuser=None, ontologypwd=None):
-
         self.ontologyhost = ontologyhost
         self.ontologyindex = ontologyindex
         self.ontologyuser = ontologyuser
         self.ontologypwd = ontologypwd
-        print("Caching Ontology")
         self.get_ontology()
-        print("Initiated TextToConcept")
 
     @cache.cache('get_ontology')
     def get_ontology(self):

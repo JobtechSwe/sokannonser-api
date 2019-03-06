@@ -6,7 +6,6 @@ log = logging.getLogger(__name__)
 
 
 class TextToConcept(object):
-
     COMPETENCE_KEY = 'KOMPETENS'
     OCCUPATION_KEY = 'YRKE'
     TRAIT_KEY = 'FORMAGA'
@@ -24,17 +23,18 @@ class TextToConcept(object):
         self.ontology = self.get_ontology()
 
     def get_ontology(self):
+        log.info('Creating ontology, host: %s, index: %s, user: %s' % (
+        self.ontologyhost, self.ontologyindex, self.ontologyuser))
         return Ontology(url=self.ontologyhost,
-                             index=self.ontologyindex,
-                             user=self.ontologyuser,
-                             pwd=self.ontologypwd,
-                             concept_type=None,
-                             include_misspelled=True)
-
+                        index=self.ontologyindex,
+                        user=self.ontologyuser,
+                        pwd=self.ontologypwd,
+                        concept_type=None,
+                        include_misspelled=True)
 
     def text_to_concepts(self, text):
         ontology_concepts = self.ontology.get_concepts(text, concept_type=None,
-                                                             span_info=False)
+                                                       span_info=False)
         text_lower = text.lower()
 
         tmp_text = text_lower

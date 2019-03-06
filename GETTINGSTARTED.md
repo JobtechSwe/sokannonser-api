@@ -1,6 +1,6 @@
 #Search API for job adds - getting started
 
-The aim of this text is to walk you through what you're seeing in the Swagger UI so you can get a bit of orientation on what can be done with the SOKANNONSER API. 
+The aim of this text is to walk you through what you're seeing in the Swagger UI so you can get a bit of orientation on what can be done with the Job Search API. 
 
 This service for open job adds consists of three endpoints. One meant for searching for job adds and one meant for fetching job adds by ID. The third endpoint provides labour market terms and their corresponding unique ID’s. For some fields these keys are required and the endpoint JOBTECH TAXONOMY API is an easy way to look them up.
 
@@ -20,7 +20,7 @@ Request URL
 
 	https://jobs.dev.services.jtech.se/vf/search?offset=0&limit=10&type=county&show-count=false
 
-The result set will contain the concepId for Dalarnas län, 2Hi6JUUemM, which you can now use for the region field in a request with the search endpoint. The result set also contains "id": "20", which is the BLABLABLA id for Dalarnas län. For geographical terms these work as well as the conceptId's if you are one of those people who have them memorized :)
+The result set will contain the concepId for Dalarnas län, 2Hi6JUUemM, which you can now use for the region field in a request with the search endpoint. The result set also contains "id": "20", which is the region id for Dalarnas län. For geographical terms these work as well as the conceptId's if you are one of those people who have them memorized :)
 
 Request URL 	
 

@@ -40,7 +40,6 @@ class TextToConcept(object):
     def text_to_concepts(self, text):
         ontology_concepts = self.get_ontology().get_concepts(text, concept_type=None,
                                                              span_info=False)
-
         text_lower = text.lower()
 
         tmp_text = text_lower

@@ -20,7 +20,6 @@ class QueryBuilder(object):
         Keyword arguments:
         args -- dictionary containing parameters from query
         """
-        ttc.text_to_concepts("foo")
         query_dsl = self._bootstrap_query(args)
 
         # Check for empty query

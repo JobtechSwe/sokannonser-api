@@ -1,12 +1,15 @@
 import logging
 import re
 from sokannonser import settings
-from sokannonser.repository import elastic
+from sokannonser.repository.text_to_concept import TextToConcept
 from sokannonser.rest.model import queries
 from valuestore import taxonomy
-from valuestore.taxonomy import tax_type
 
 log = logging.getLogger(__name__)
+ttc = TextToConcept(ontologyhost="https://%s:%s" % (settings.ES_HOST,
+                                                    settings.ES_PORT),
+                    ontologyuser=settings.ES_USER,
+                    ontologypwd=settings.ES_PWD)
 
 
 class QueryBuilder(object):
@@ -93,7 +96,7 @@ class QueryBuilder(object):
         query_dsl = dict()
         query_dsl['from'] = args.pop(settings.OFFSET, 0)
         query_dsl['size'] = args.pop(settings.LIMIT, 10)
-        if args.pop(settings.DETAILS, '') != queries.OPTIONS_FULL:
+        if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
             query_dsl['_source'] = ["id", "rubrik", "sista_ansokningsdatum",
                                     "anstallningstyp.term", "arbetstidstyp.term",
                                     "arbetsgivare.name", "publiceringsdatum"]
@@ -169,17 +172,42 @@ class QueryBuilder(object):
             ft_query['bool']['should'] = shoulds
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
+        concepts = ttc.text_to_concepts(querystring)
+        print("concepts", concepts)
+        ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
+                                                        ['occupations', 'skills',
+                                                         'traits'], 1, 'must', 10)
+        ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
+                                                        ['occupations_must_not',
+                                                         'skills_must_not',
+                                                         'traits_must_not'],
+                                                        10, 'must_not')
+        return ft_query
 
+    def _freetext_enriched_fields_query(self, ft_query, concepts, fields,
+                                        rev_cut, bool_type, boost=None):
+        for field in fields:
+            key = "keywords_enriched_binary.%s.raw" % field[:-rev_cut]
+            for value in concepts.get(field, []):
+                if bool_type not in ft_query['bool']:
+                    ft_query['bool'][bool_type] = []
+
+                query = {
+                    "term": {
+                        key: {
+                            "value": value
+                        }
+                    }
+                }
+                if boost:
+                    query['term'][key]['boost'] = boost
+                ft_query['bool'][bool_type].append(query)
         return ft_query
 
     def _freetext_fields(self, searchword, queryfields):
         search_fields = ["rubrik^3", "arbetsgivare.namn^2",
-                         "beskrivning.information",
-                         "beskrivning.behov",
-                         "beskriving.krav",
                          "beskrivning.annonstext"]
         search_fields += ["keywords.%s" % qf for qf in queryfields]
-        search_fields += ["keywords_enriched_binary.%s" % qf for qf in queryfields]
         return [
             {
                 "multi_match": {
@@ -266,42 +294,42 @@ class QueryBuilder(object):
     def _build_plats_query(self, kommunkoder, lanskoder):
         kommuner = []
         neg_komm = []
+        lan = []
+        neg_lan = []
         for kkod in kommunkoder if kommunkoder else []:
             if kkod.startswith('-'):
                 neg_komm.append(kkod[1:])
             else:
                 kommuner.append(kkod)
-        kommunlanskoder = []
-        for lanskod in lanskoder if lanskoder is not None else []:
-            ttype = tax_type.get(taxonomy.MUNICIPALITY)
-            if lanskod.startswith('-'):
-                kommun_results = taxonomy.find_concepts(elastic, None, [lanskod[1:]],
-                                                        ttype
-                                                        ).get('hits', {}).get('hits', [])
-                neg_komm += [entitet['_source']['legacy_ams_taxonomy_id']
-                             for entitet in kommun_results]
+        for lkod in lanskoder if lanskoder else []:
+            if lkod.startswith('-'):
+                neg_lan.append(lkod[1:])
             else:
-                kommun_results = taxonomy.find_concepts(elastic, None, [lanskod],
-                                                        ttype
-                                                        ).get('hits', {}).get('hits', [])
-                kommunlanskoder += [e['_source']['legacy_ams_taxonomy_id']
-                                    for e in kommun_results]
+                lan.append(lkod)
         plats_term_query = [{"term": {
             "arbetsplatsadress.kommunkod": {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
         plats_term_query += [{"term": {
-            "arbetsplatsadress.kommunkod": {
-                "value": lkod, "boost": 1.0}}} for lkod in kommunlanskoder]
+            "arbetsplatsadress.lanskod": {
+                "value": lkod, "boost": 1.0}}} for lkod in lan]
         plats_bool_query = {"bool": {
             "should": plats_term_query}
         } if plats_term_query else {}
+        neg_komm_term_query = []
+        neg_lan_term_query = []
         if neg_komm:
-            neg_plats_term_query = [{"term": {
+            neg_komm_term_query = [{"term": {
                 "arbetsplatsadress.kommunkod": {
                     "value": kkod}}} for kkod in neg_komm]
+        if neg_lan:
+            neg_lan_term_query = [{"term": {
+                "arbetsplatsadress.lanskod": {
+                    "value": lkod}}} for lkod in neg_lan]
+        if neg_komm_term_query or neg_lan_term_query:
             if 'bool' not in plats_bool_query:
                 plats_bool_query['bool'] = {}
-            plats_bool_query['bool']['must_not'] = neg_plats_term_query
+            plats_bool_query['bool']['must_not'] = neg_komm_term_query + \
+                neg_lan_term_query
         return plats_bool_query
 
     # Parses COUNTRY

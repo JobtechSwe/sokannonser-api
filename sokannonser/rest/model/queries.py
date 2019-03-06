@@ -37,7 +37,7 @@ swagger_doc_params = {
     settings.POSITION_RADIUS: "Radius from the specified " + settings.POSITION + " (latitude, longitude) in kilometers (km)",
 }
 swagger_filter_doc_params = {
-    settings.DETAILS: "Show 'brief' (default) or 'full' results details",
+    settings.DETAILS: "Show 'full' (default) or 'brief' results details",
     settings.OFFSET: "The offset parameter defines the offset from the first result you want to fetch. "
                      "Valid range is (0-%d)" % settings.MAX_OFFSET,
     settings.LIMIT: "Number of results to fetch (0-%d)" % settings.MAX_LIMIT,

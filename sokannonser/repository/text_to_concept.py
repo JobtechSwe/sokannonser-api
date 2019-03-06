@@ -22,20 +22,29 @@ class TextToConcept(object):
 
     def __init__(self, ontologyhost='http://localhost:9200',
                  ontologyindex='narvalontology', ontologyuser=None, ontologypwd=None):
+
         self.ontologyhost = ontologyhost
         self.ontologyindex = ontologyindex
         self.ontologyuser = ontologyuser
         self.ontologypwd = ontologypwd
         self.get_ontology()
 
-    @cache.cache('get_ontology')
     def get_ontology(self):
-        return Ontology(url=self.ontologyhost,
-                        index=self.ontologyindex,
-                        user=self.ontologyuser,
-                        pwd=self.ontologypwd,
-                        concept_type=None,
-                        include_misspelled=True)
+        return self._get_cached_ontology(self.ontologyhost,
+                                         self.ontologyindex,
+                                         self.ontologyuser,
+                                         self.ontologypwd)
+
+
+    @cache.cache('_get_cached_ontology')
+    def _get_cached_ontology(self, ontologyhost, ontologyindex, ontologyuser, ontologypwd):
+        return Ontology(url=ontologyhost,
+                 index=ontologyindex,
+                 user=ontologyuser,
+                 pwd=ontologypwd,
+                 concept_type=None,
+                 include_misspelled=True)
+
 
     def text_to_concepts(self, text):
         ontology_concepts = self.get_ontology().get_concepts(text, concept_type=None,

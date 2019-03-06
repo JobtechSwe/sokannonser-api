@@ -32,22 +32,22 @@ def test_rewrite_unigram_competence():
     assert concepts is not None
     assert len(concepts) > 0
     # pprint(concepts)
-    assert 'java' in concepts['competencies']
+    assert 'java' in concepts['skills']
     assert 'systemutvecklare' in concepts['occupations']
     assert 'noggrann' in concepts['traits']
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
-def test_rewrite_unigram_multiple_competencies():
+def test_rewrite_unigram_multiple_skills():
     print('\n============================', sys._getframe().f_code.co_name, '============================')
 
     concepts = text_to_concept.text_to_concepts('noggrann systemutvecklare java python cobol')
     assert len(concepts) > 0
     # pprint(concepts)
-    assert 'java' in concepts['competencies']
-    assert 'python' in concepts['competencies']
-    assert 'cobol' in concepts['competencies']
+    assert 'java' in concepts['skills']
+    assert 'python' in concepts['skills']
+    assert 'cobol' in concepts['skills']
     assert 'systemutvecklare' in concepts['occupations']
     assert 'noggrann' in concepts['traits']
 
@@ -92,10 +92,9 @@ def test_rewrite_non_concept_words():
         'jättebra och flexibel Key Account Manager som vill jobba med försäljning på Spotify i Hartford, Connecticut')
     assert len(concepts) > 0
     # print(concepts)
-    assert 'försäljning' in concepts['competencies']
+    assert 'försäljning' in concepts['skills']
     assert 'key account manager' in concepts['occupations']
     assert 'flexibel' in concepts['traits']
-
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -104,8 +103,8 @@ def test_rewrite_must_not_words():
     concepts = text_to_concept.text_to_concepts('mållare -målare säljare -key account manager python -java -noggrann flexibel')
     assert len(concepts) > 0
     # print(concepts)
-    assert 'python' in concepts['competencies']
-    assert 'java' in concepts['competencies_must_not']
+    assert 'python' in concepts['skills']
+    assert 'java' in concepts['skills_must_not']
     assert 'säljare' in concepts['occupations']
     assert 'målare' in concepts['occupations_must_not']
     assert 'key account manager' in concepts['occupations_must_not']

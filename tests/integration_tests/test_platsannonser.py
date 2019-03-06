@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import logging
 import pytest
 import sys
@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 pbquery = QueryBuilder()
 
 
-def find(key, dictionary): 
+def find(key, dictionary):
     for k, v in dictionary.items():
         if k == key:
             yield v

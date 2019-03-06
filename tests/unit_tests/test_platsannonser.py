@@ -7,6 +7,7 @@ from dateutil import parser
 
 from sokannonser import settings
 from sokannonser.repository.querybuilder import QueryBuilder
+from valuestore import taxonomy
 
 log = logging.getLogger(__name__)
 pbquery = QueryBuilder()
@@ -18,15 +19,12 @@ pbquery = QueryBuilder()
 @pytest.mark.parametrize("to_datetime", ["2018-09-28T00:01",
                                          '2018-09-27', '', None, []])
 def test_filter_timeframe(from_datetime, to_datetime):
-    print('===========', sys._getframe().f_code.co_name, '============================ ')
-    print(from_datetime, to_datetime)
     if not from_datetime and not to_datetime:  # from and to date are empty
         assert pbquery._filter_timeframe(from_datetime, to_datetime) is None
         return
     if from_datetime and to_datetime:
         d = pbquery._filter_timeframe(parser.parse(from_datetime),
                                       parser.parse(to_datetime))
-        print(d)
         assert d['range']['publiceringsdatum']['gte'] == \
             parser.parse(from_datetime).isoformat()
         assert d['range']['publiceringsdatum']['lte'] == \
@@ -149,6 +147,89 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                          }}]
                                                     }})])
 def test_geo_distance_filter(args, exist, expected):
-    print('====================', sys._getframe().f_code.co_name, '==================== ')
     query_dsl = pbquery.parse_args(args)
     assert (expected in query_dsl["query"]["bool"]["filter"]) == exist
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("args, expected_pos, expected_neg", [({settings.APIKEY: "",
+                                                                taxonomy.REGION: ["01", "02"]},
+                                                               [
+                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                           {"value": "01", "boost": 1.0}}},
+                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                           {"value": "02", "boost": 1.0}}}],
+                                                               []),
+                                            ({settings.APIKEY: "",
+                                              taxonomy.MUNICIPALITY: ["0111"]},
+                                             [
+                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                           {"value": "0111", "boost": 2.0}}}],
+                                             []),
+                                            ({settings.APIKEY: "",
+                                              taxonomy.REGION: ["01", "02"],
+                                              taxonomy.MUNICIPALITY: ["1111", "2222"]},
+                                             [
+                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                           {"value": "01", "boost": 1.0}}},
+                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                           {"value": "02", "boost": 1.0}}},
+                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                           {"value": "1111", "boost": 2.0}}},
+                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                           {"value": "2222", "boost": 2.0}}}],
+                                             []),
+                                            ({settings.APIKEY: "",
+                                              taxonomy.REGION: ["01", "-02"],
+                                              taxonomy.MUNICIPALITY: ["1111", "-2222"]},
+                                             [
+                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                           {"value": "01", "boost": 1.0}}},
+                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                           {"value": "1111", "boost": 2.0}}},
+                                             ],
+                                             [
+                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                           {"value": "02"}}},
+                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                           {"value": "2222"}}}
+                                             ]),
+                                            ({settings.APIKEY: "",
+                                              taxonomy.REGION: ["01", "-02"],
+                                              taxonomy.MUNICIPALITY: ["1111"]},
+                                             [
+                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                           {"value": "01", "boost": 1.0}}},
+                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                           {"value": "1111", "boost": 2.0}}},
+                                             ],
+                                             [
+                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                           {"value": "02"}}}
+                                             ]),
+                                            ({settings.APIKEY: "",
+                                              taxonomy.REGION: ["01"],
+                                              taxonomy.MUNICIPALITY: ["1111", "-2222"]},
+                                             [
+                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                           {"value": "01", "boost": 1.0}}},
+                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                           {"value": "1111", "boost": 2.0}}},
+                                             ],
+                                             [
+                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                           {"value": "2222"}}}
+                                             ])])
+def test_region_municipality_query(args, expected_pos, expected_neg):
+    query_dsl = pbquery.parse_args(args)
+    if expected_pos:
+        pos_query = query_dsl["query"]["bool"]["must"][0]["bool"]["should"]
+        assert(len(pos_query) == len(expected_pos))
+        for e in expected_pos:
+            assert (e in pos_query)
+    if expected_neg:
+        neg_query = query_dsl["query"]["bool"]['must'][0]["bool"]["must_not"]
+        assert(len(neg_query) == len(expected_neg))
+        for e in expected_neg:
+            assert (e in neg_query)
+    print('====================', sys._getframe().f_code.co_name, '==================== ')

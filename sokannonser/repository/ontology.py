@@ -1,8 +1,11 @@
+import logging
 from flashtext.keyword import KeywordProcessor
 import certifi
 from ssl import create_default_context
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, ElasticsearchException
 from elasticsearch.helpers import scan
+
+log = logging.getLogger(__name__)
 
 
 class Ontology(object):
@@ -94,14 +97,15 @@ class Ontology(object):
 
         # print(elastic_query)
 
-        if _source is None:
-            scan_result = scan(self.client, elastic_query, index=self.index, size=size, _source=None)
-        else:
-            scan_result = scan(self.client, elastic_query, index=self.index, size=size, _source=_source)
+        scan_result = scan(self.client, elastic_query, index=self.index, size=size, _source=_source)
 
         i = 0
-        for row in scan_result:
-            if i == maximum:
-                break
-            i = i + 1
-            yield row['_source']
+        try:
+            for row in scan_result:
+                if i == maximum:
+                    break
+                i = i + 1
+                yield row['_source']
+        except ElasticsearchException as e:
+            log.error("Failed to load ontology (%s)" % str(e))
+

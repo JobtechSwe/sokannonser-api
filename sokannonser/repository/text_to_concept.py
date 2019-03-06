@@ -1,6 +1,4 @@
 import logging
-from beaker.cache import CacheManager
-from beaker import util
 
 from sokannonser.repository.ontology import Ontology
 
@@ -8,17 +6,12 @@ log = logging.getLogger(__name__)
 
 
 class TextToConcept(object):
-    cache_opts = {
-        'cache.expire': 60 * 60 * 1,  # Expire time in seconds
-        'cache.type': 'memory'
-    }
 
     COMPETENCE_KEY = 'KOMPETENS'
     OCCUPATION_KEY = 'YRKE'
     TRAIT_KEY = 'FORMAGA'
     REMOVED_TAG = '<removed>'
-
-    cache = CacheManager(**util.parse_cache_config_options(cache_opts))
+    ontology = None
 
     def __init__(self, ontologyhost='http://localhost:9200',
                  ontologyindex='narvalontology', ontologyuser=None, ontologypwd=None):
@@ -27,27 +20,20 @@ class TextToConcept(object):
         self.ontologyindex = ontologyindex
         self.ontologyuser = ontologyuser
         self.ontologypwd = ontologypwd
-        self.get_ontology()
+
+        self.ontology = self.get_ontology()
 
     def get_ontology(self):
-        return self._get_cached_ontology(self.ontologyhost,
-                                         self.ontologyindex,
-                                         self.ontologyuser,
-                                         self.ontologypwd)
-
-
-    @cache.cache('_get_cached_ontology')
-    def _get_cached_ontology(self, ontologyhost, ontologyindex, ontologyuser, ontologypwd):
-        return Ontology(url=ontologyhost,
-                 index=ontologyindex,
-                 user=ontologyuser,
-                 pwd=ontologypwd,
-                 concept_type=None,
-                 include_misspelled=True)
+        return Ontology(url=self.ontologyhost,
+                             index=self.ontologyindex,
+                             user=self.ontologyuser,
+                             pwd=self.ontologypwd,
+                             concept_type=None,
+                             include_misspelled=True)
 
 
     def text_to_concepts(self, text):
-        ontology_concepts = self.get_ontology().get_concepts(text, concept_type=None,
+        ontology_concepts = self.ontology.get_concepts(text, concept_type=None,
                                                              span_info=False)
         text_lower = text.lower()
 

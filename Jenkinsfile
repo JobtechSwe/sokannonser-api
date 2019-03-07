@@ -33,7 +33,7 @@ pipeline {
         stage('Deploy to Staging'){
             agent any
             when{
-                environment name: 'GIT_BRANCH', value: 'jenkins'
+                environment name: 'GIT_BRANCH', value: 'origin/jenkins'
             }
             steps{
                 sh "oc set image dc/staging-sokapi staging-sokapi=docker-registry.default.svc:5000/${openshiftProject}/sokapi:${buildTag} -n ${openshiftProject}"
@@ -44,7 +44,7 @@ pipeline {
         stage('Deploy to Prod?'){
             agent none
             when{
-                environment name: 'GIT_BRANCH', value: 'jenkins'
+                environment name: 'GIT_BRANCH', value: 'origin/jenkins'
             }
             steps{
                 input "Deploy to prod"

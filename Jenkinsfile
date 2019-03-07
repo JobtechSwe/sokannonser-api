@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent none
     environment {
         scannerHome = tool 'Jobtech_Sokapi_SonarScanner'
         version = "1"
@@ -7,6 +7,7 @@ pipeline {
     }
     stages{
         stage('Checkout code'){
+            agent any
             steps{
                 checkout scm: [
                     $class: 'GitSCM'
@@ -14,6 +15,7 @@ pipeline {
             }
         }
         stage('Code analysis'){
+            agent any
             steps {
                 withSonarQubeEnv('Jobtech_SonarQube_Server'){
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sokapi -Dsonar.sources=."
@@ -21,12 +23,33 @@ pipeline {
             }
         }
         stage('Build and Tag Openshift Image'){
+            agent any
             steps{
                 openshiftBuild(namespace:'${openshiftProject}', bldCfg: 'sokapi', showBuildLogs: 'true')
                 openshiftTag(namespace:'${openshiftProject}', srcStream: 'sokapi', srcTag: 'latest', destStream: 'sokapi', destTag:'${buildTag}')
             }
         }
-        stage('Deploy to Dev environment'){
+        stage('Deploy to Staging'){
+            agent any
+            when{
+                environment name: 'GIT_BRANCH', value: 'jenkins'
+            }
+            steps{
+                sh "oc set image dc/staging-sokapi staging-sokapi=docker-registry.default.svc:5000/${openshiftProject}/sokapi:${buildTag} -n ${openshiftProject}"
+                openshiftDeploy(depCfg: 'staging-sokapi', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
+                openshiftVerifyDeployment(depCfg: 'staging-sokapi', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+            }
+        }
+        stage('Deploy to Prod?'){
+            agent none
+            when{
+                environment name: 'GIT_BRANCH', value: 'jenkins'
+            }
+            steps{
+                input "Deploy to prod"
+            }
+        }
+        stage('Final Deploy'){
             steps{
                 sh "oc set image dc/sokapi sokapi=docker-registry.default.svc:5000/${openshiftProject}/sokapi:${buildTag} -n ${openshiftProject}"
                 openshiftDeploy(depCfg: 'sokapi', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
@@ -36,13 +59,13 @@ pipeline {
     }
     post {
         success {
-            slackSend color: 'good', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} build: ${buildTag}."
+            //slackSend color: 'good', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} build: ${buildTag}."
         }
         failure {
-            slackSend color: 'bad', channel: '#narval-sokapi', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} failed to build to ${openshiftProject} build ${buildTag}."
+            //slackSend color: 'bad', channel: '#narval-sokapi', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} failed to build to ${openshiftProject} build ${buildTag}."
         }
         unstable {
-            slackSend color: 'bad', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} unstable build for ${openshiftProject} build ${buildTag}."
+            //slackSend color: 'bad', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} unstable build for ${openshiftProject} build ${buildTag}."
         }
     }
 }

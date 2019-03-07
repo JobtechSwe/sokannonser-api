@@ -25,6 +25,7 @@ pipeline {
         stage('Build and Tag Openshift Image'){
             agent any
             steps{
+                sh 'echo "${GIT_BRANCH}"'
                 openshiftBuild(namespace:'${openshiftProject}', bldCfg: 'sokapi', showBuildLogs: 'true')
                 openshiftTag(namespace:'${openshiftProject}', srcStream: 'sokapi', srcTag: 'latest', destStream: 'sokapi', destTag:'${buildTag}')
             }

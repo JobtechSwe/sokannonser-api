@@ -173,7 +173,6 @@ class QueryBuilder(object):
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
         concepts = ttc.text_to_concepts(querystring)
-        print("concepts", concepts)
         ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
                                                         ['occupations', 'skills',
                                                          'traits'], 1, 'must', 10)

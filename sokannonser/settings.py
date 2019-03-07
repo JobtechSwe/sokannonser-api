@@ -64,6 +64,9 @@ DETAILS = 'resdet'
 # For taxonomy
 SHOW_COUNT = 'show-count'
 
+# For auranest
+PLACE = 'place'
+
 # For all ads
 SHOW_EXPIRED = 'show-expired'
 

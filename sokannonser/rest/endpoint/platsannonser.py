@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 @ns_platsannons.route('/search')
 class PBSearch(Resource):
-    method_decorators = [check_api_key]
+    method_decorators = [check_api_key('pb')]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
@@ -29,9 +29,12 @@ class PBSearch(Resource):
     def get(self):
         start_time = int(time.time()*1000)
         args = pb_query.parse_args()
-        log.debug("Query parsed after %d milliseconds." % (int(time.time()*1000)-start_time))
-        result = platsannonser.find_platsannonser(args, self.querybuilder, start_time)
-        log.debug("Query results after %d milliseconds." % (int(time.time()*1000)-start_time))
+        log.debug("Query parsed after %d milliseconds."
+                  % (int(time.time()*1000)-start_time))
+        result = platsannonser.find_platsannonser(args,
+                                                  self.querybuilder, start_time)
+        log.debug("Query results after %d milliseconds."
+                  % (int(time.time()*1000)-start_time))
 
         hits = [hit['_source'] for hit in result.get('hits', [])]
 
@@ -47,13 +50,13 @@ class PBSearch(Resource):
             "hits": hits
         }
         log.debug("Sending results after %d milliseconds."
-                 % (int(time.time()*1000) - start_time))
+                  % (int(time.time()*1000) - start_time))
         return result
 
 
 @ns_platsannons.route('/complete')
 class PBComplete(Resource):
-    method_decorators = [check_api_key]
+    method_decorators = [check_api_key('pb')]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(

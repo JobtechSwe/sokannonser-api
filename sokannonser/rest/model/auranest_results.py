@@ -1,12 +1,37 @@
+import re
 from flask_restplus import fields
 from sokannonser.rest import ns_auranest as api
+
+
+class ShortString(fields.Raw):
+    element_pattern = re.compile('<([a-z]+) *[^/]*?>')
+
+    def _find_last_element(self, words):
+        for word in reversed(words):
+            match = self.element_pattern.findall(word)
+            if match:
+                return "</%s>" % match[-1]
+        return None
+
+    def format(self, value):
+        words = re.split(r'\s+', value)
+        if len(words) > 100:
+            valid_words = words[0:100]
+            last_element = self._find_last_element(valid_words)
+            new_value = " ".join(valid_words) + " ..."
+            if last_element:
+                new_value += last_element
+        else:
+            new_value = value
+
+        return new_value
 
 
 annons = api.model('Ad', {
     'id': fields.String(attribute='_source.id'),
     'header': fields.String(attribute='_source.header'),
-    'content': fields.String(attribute='_source.content.text'),
-    'markup': fields.String(attribute='_source.content.xml'),
+    'content': ShortString(attribute='_source.content.text'),
+    'markup': ShortString(attribute='_source.content.xml'),
     'employer': fields.Nested({
         'name': fields.String(),
         'logoUrl': fields.String()
@@ -22,11 +47,6 @@ annons = api.model('Ad', {
             'name': fields.String()
         }, attribute='site')
     }, attribute='_source.application', skip_none=True),
-    'detected_keywords': fields.Nested({
-        'occupations': fields.List(fields.String),
-        'skills': fields.List(fields.String),
-        'traits': fields.List(fields.String)
-    }, attribute='_source'),
     'sources': fields.List(fields.Nested({
         'id': fields.String(attribute='_source.id'),
         'name': fields.String(attribute='_source.source.site.name'),

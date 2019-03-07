@@ -42,6 +42,8 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # show commit info
 #RUN git log -1
 
+# delete all __pycache__-folders in tests-folder
+RUN find tests -type d -name __pycache__ -prune -exec rm -rf {} \;
 # runs unit tests with @pytest.mark.unit annotation only
 RUN python3 -m pytest -svv -m unit tests/
 RUN rm -rf ./pytest_cache sokannonser/__pycache__

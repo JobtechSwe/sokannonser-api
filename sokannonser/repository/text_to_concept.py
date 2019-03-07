@@ -2,6 +2,7 @@ import logging
 from beaker.cache import CacheManager
 from beaker import util
 
+from sokannonser import settings
 from sokannonser.repository.ontology import Ontology
 
 log = logging.getLogger(__name__)
@@ -9,7 +10,7 @@ log = logging.getLogger(__name__)
 
 class TextToConcept(object):
     cache_opts = {
-        'cache.expire': 60 * 60 * 1,  # Expire time in seconds
+        'cache.expire': 60 * 60 * 24,  # Expire time in seconds
         'cache.type': 'memory'
     }
 
@@ -27,7 +28,10 @@ class TextToConcept(object):
         self.ontologyindex = ontologyindex
         self.ontologyuser = ontologyuser
         self.ontologypwd = ontologypwd
-        self.get_ontology()
+
+        if settings.ES_HOST != 'localhost':
+            # Cache ontology directly unless it's a local call (tests or docker build)
+            self.get_ontology()
 
     def get_ontology(self):
         return self._get_cached_ontology(self.ontologyhost,

@@ -16,7 +16,7 @@ def test_check_api_key_no_key():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
 
     with app.test_request_context():
-        @check_api_key
+        @check_api_key_simple
         def function_to_test():
             print('This line should never be printed since user has no valid API key')
 
@@ -32,7 +32,7 @@ def test_check_api_key_backdoor():
     d = Headers()
     d.add(settings.APIKEY, settings.APIKEY_BACKDOOR)
     with app.test_request_context(headers=d):
-        @check_api_key
+        @check_api_key_simple
         def backdoor_function_to_test():
             print('This line should be printed since user has a backdoor key')
             return True
@@ -48,7 +48,7 @@ def test_check_api_key_valid():
     d = Headers()
     d.add(settings.APIKEY, encoded_key)
     with app.test_request_context(headers=d):
-        @check_api_key
+        @check_api_key_simple
         def valid_key_function_to_test():
             print('This line should be printed since user has a valid API key')
             return True
@@ -63,7 +63,7 @@ def test_check_api_key_not_valid():
     d = Headers()
     d.add(settings.APIKEY, encoded_key)
     with app.test_request_context(headers=d):
-        @check_api_key
+        @check_api_key_simple
         def non_valid_key_function_to_test():
             print('This line should not be printed since user doesnt have a valid API key')
 
@@ -77,7 +77,7 @@ def test_check_api_key_not_valid_and_base64():
     d = Headers()
     d.add(settings.APIKEY, 'test.testsson@test.se')
     with app.test_request_context(headers=d):
-        @check_api_key
+        @check_api_key_simple
         def non_base64_key_function_to_test():
             print('This line should not be printed since user doesnt have a base64-encoded API key')
 

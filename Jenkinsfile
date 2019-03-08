@@ -50,9 +50,16 @@ pipeline {
                 input "Deploy to prod"
             }
         }
-        stage('Final Deploy'){
+        stage('Final Deploy to api'){
             agent any
+            when{
+                anyOf{
+                environment name: 'GIT_BRANCH', value: 'origin/develop'
+                environment name: 'GIT_BRANCH', value: 'origin/jenkins'                   
+                }
+            }
             steps{
+                sh 'echo "Deploying from ${GIT_BRANCH}"'
                 sh "oc set image dc/sokapi sokapi=docker-registry.default.svc:5000/${openshiftProject}/sokapi:${buildTag} -n ${openshiftProject}"
                 openshiftDeploy(depCfg: 'sokapi', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
                 openshiftVerifyDeployment(depCfg: 'sokapi', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')

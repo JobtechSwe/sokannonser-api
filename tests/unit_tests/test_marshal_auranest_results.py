@@ -10,11 +10,13 @@ from sokannonser.rest.endpoint.auranest import AuranestSearch
 
 currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
+
 def get_static_ads_from_file():
     with open(currentdir + 'test_resources/auranest_results.json') as f:
         result = json.load(f)
         # pprint(result)
         return result
+
 
 @pytest.mark.unit
 def test_properties_and_types_marshal_mocked_elastic_result():
@@ -34,5 +36,3 @@ def test_properties_and_types_marshal_mocked_elastic_result():
         # print(len(words))
         # print(words[-1:])
         assert len(words) <= 101
-
-

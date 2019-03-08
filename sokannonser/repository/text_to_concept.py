@@ -7,10 +7,9 @@ from sokannonser.repository.ontology import Ontology
 
 log = logging.getLogger(__name__)
 
-
 class TextToConcept(object):
     cache_opts = {
-        'cache.expire': 60 * 60 * 24,  # Expire time in seconds
+        'cache.expire': 60, #60 * 60 * 24,  # Expire time in seconds
         'cache.type': 'memory'
     }
 
@@ -44,12 +43,14 @@ class TextToConcept(object):
     def _get_cached_ontology(self, ontologyhost, ontologyindex, ontologyuser, ontologypwd):
         log.info('Creating ontology, host: %s, index: %s, user: %s' % (
             self.ontologyhost, self.ontologyindex, self.ontologyuser))
-        return Ontology(url=ontologyhost,
+        ontology = Ontology(url=ontologyhost,
                  index=ontologyindex,
                  user=ontologyuser,
                  pwd=ontologypwd,
                  concept_type=None,
                  include_misspelled=True)
+        log.info('Created ontology')
+        return ontology
 
 
     def text_to_concepts(self, text):

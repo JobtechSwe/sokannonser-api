@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 class TextToConcept(object):
     cache_opts = {
-        'cache.expire': 60, #60 * 60 * 24,  # Expire time in seconds
+        'cache.expire': 60 * 60 * 24 * 7,  # Expire time in seconds
         'cache.type': 'memory'
     }
 

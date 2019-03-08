@@ -29,8 +29,7 @@ class Ontology(object):
 
         self.init_ontology()
 
-    @staticmethod
-    def create_elastic_client(pwd, url, user):
+    def create_elastic_client(self, pwd, url, user):
         context = create_default_context(cafile=certifi.where())
         if user and pwd:
             client = Elasticsearch([url],

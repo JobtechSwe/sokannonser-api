@@ -2,18 +2,22 @@ import logging
 from flashtext.keyword import KeywordProcessor
 from elasticsearch import ElasticsearchException
 from elasticsearch.helpers import scan
+from beaker.cache import CacheManager
+from beaker import util
 
 log = logging.getLogger(__name__)
 
 
 class Ontology(object):
+    cache_opts = {
+        'cache.expire': 60,  # 60 * 60 * 24,  # Expire time in seconds
+        'cache.type': 'memory',
+    }
 
-    # def __init__(self, host='localhost', port=9200, index='narvalontology', user=None, pwd=None, stoplist=None,
-    #              concept_type=None, include_misspelled=False):
+    cache = CacheManager(**util.parse_cache_config_options(cache_opts))
+
     def __init__(self, client=None, index='narvalontology', stoplist=None,
                  concept_type=None, include_misspelled=False):
-        self.keyword_processor = KeywordProcessor()
-        self.init_keyword_processor()
 
         self.client = client
 
@@ -26,10 +30,8 @@ class Ontology(object):
 
         self.concept_to_term = {}
 
-        self.init_ontology()
-
     def __len__(self):
-        return len(self.keyword_processor)
+        return len(self.get_keyword_processor())
 
     def misspelled_predicate(self, value):
         if not self.include_misspelled and value['term_misspelled']:
@@ -46,22 +48,29 @@ class Ontology(object):
                 if ontologi_concept['term'] not in self.stoplist
                 and self.misspelled_predicate(ontologi_concept))
 
-    def init_keyword_processor(self):
-        [self.keyword_processor.add_non_word_boundary(token) for token in list('åäöÅÄÖ()')]
-
-    def init_ontology(self):
+    def init_ontology(self, keyword_processor):
         for term_obj in self.get_ontologi_iterator():
-            self.keyword_processor.add_keyword(term_obj['term'], term_obj)
+            keyword_processor.add_keyword(term_obj['term'], term_obj)
             concept_preferred_label = term_obj['concept'].lower()
             if concept_preferred_label not in self.concept_to_term:
                 self.concept_to_term[concept_preferred_label] = []
             self.concept_to_term[concept_preferred_label].append(term_obj)
 
+    @staticmethod
+    def init_keyword_processor(keyword_processor):
+        [keyword_processor.add_non_word_boundary(token) for token in list('åäöÅÄÖ()')]
+
+    @cache.cache('get_keyword_processor')
     def get_keyword_processor(self):
-        return self.keyword_processor
+        log.info('get_keyword_processor, creating keyword_processor, index: %s' % self.index)
+        keyword_processor = KeywordProcessor()
+        self.init_keyword_processor(keyword_processor)
+        self.init_ontology(keyword_processor)
+        log.info('get_keyword_processor, created keyword_processor, index: %s' % self.index)
+        return keyword_processor
 
     def get_concepts(self, text, concept_type=None, span_info=False):
-        concepts = self.keyword_processor.extract_keywords(text, span_info=span_info)
+        concepts = self.get_keyword_processor().extract_keywords(text, span_info=span_info)
         if concept_type is not None:
             if span_info:
                 concepts = list(filter(lambda concept: concept[0]['type'] == concept_type, concepts))
@@ -70,6 +79,7 @@ class Ontology(object):
         # print('Returning concepts', concepts)
         return concepts
 
+    # @cache.cache('elastic_iterator')
     def elastic_iterator(self, maximum=None, query=None, _source=None, size=1000):
         if maximum:
             maximum = int(maximum)

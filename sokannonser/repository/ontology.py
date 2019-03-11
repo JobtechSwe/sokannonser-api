@@ -2,19 +2,11 @@ import logging
 from flashtext.keyword import KeywordProcessor
 from elasticsearch import ElasticsearchException
 from elasticsearch.helpers import scan
-from beaker.cache import CacheManager
-from beaker import util
 
 log = logging.getLogger(__name__)
 
 
 class Ontology(object):
-    cache_opts = {
-        'cache.expire': 60 * 60 * 24,  # Expire time in seconds
-        'cache.type': 'memory',
-    }
-
-    cache = CacheManager(**util.parse_cache_config_options(cache_opts))
 
     def __init__(self, client=None, index='narvalontology', stoplist=None,
                  concept_type=None, include_misspelled=False):
@@ -29,6 +21,10 @@ class Ontology(object):
         self.include_misspelled = include_misspelled
 
         self.concept_to_term = {}
+        self.keyword_processor = KeywordProcessor()
+        self.init_keyword_processor(self.keyword_processor)
+        self.init_ontology(self.keyword_processor)
+
 
     def __len__(self):
         return len(self.get_keyword_processor())
@@ -60,14 +56,8 @@ class Ontology(object):
     def init_keyword_processor(keyword_processor):
         [keyword_processor.add_non_word_boundary(token) for token in list('åäöÅÄÖ()')]
 
-    @cache.cache('get_keyword_processor')
     def get_keyword_processor(self):
-        log.info('get_keyword_processor, creating keyword_processor, index: %s' % self.index)
-        keyword_processor = KeywordProcessor()
-        self.init_keyword_processor(keyword_processor)
-        self.init_ontology(keyword_processor)
-        log.info('get_keyword_processor, created keyword_processor, index: %s' % self.index)
-        return keyword_processor
+        return self.keyword_processor
 
     def get_concepts(self, text, concept_type=None, span_info=False):
         concepts = self.get_keyword_processor().extract_keywords(text, span_info=span_info)
@@ -79,7 +69,6 @@ class Ontology(object):
         # print('Returning concepts', concepts)
         return concepts
 
-    # @cache.cache('elastic_iterator')
     def elastic_iterator(self, maximum=None, query=None, _source=None, size=1000):
         if maximum:
             maximum = int(maximum)

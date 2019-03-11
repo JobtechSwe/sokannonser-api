@@ -2,7 +2,7 @@ import sys
 import os
 import pytest
 from sokannonser import settings
-# from pprint import pprint
+from pprint import pprint
 
 from sokannonser.repository.text_to_concept import TextToConcept
 
@@ -12,12 +12,13 @@ user = settings.ES_USER
 pwd = settings.ES_PWD
 port = settings.ES_PORT
 
-protocol = 'http' if host == 'localhost' else 'https'
-url = protocol + '://' + host + ':' + str(port)
+# protocol = 'http' if host == 'localhost' else 'https'
+# url = protocol + '://' + host + ':' + str(port)
 
 # print('Running unittests calling %s' % url)
 
-text_to_concept = TextToConcept(ontologyhost=url,
+text_to_concept = TextToConcept(ontologyhost=host,
+                                ontologyport=port,
                               ontologyindex='narvalontology',
                               ontologyuser=user,
                               ontologypwd=pwd)
@@ -32,7 +33,7 @@ def test_rewrite_unigram_competence():
     assert_not_empty(concepts, 'skills')
     assert_not_empty(concepts, 'traits')
     assert len(concepts) > 0
-    # pprint(concepts)
+    pprint(concepts)
     assert 'systemutvecklare' in concepts['occupations']
     assert 'java' in concepts['skills']
     assert 'noggrann' in concepts['traits']
@@ -63,7 +64,7 @@ def test_rewrite_unigram_misspelled_input():
     concepts = text_to_concept.text_to_concepts('noggran sjukssköterska java')
     assert_not_empty(concepts, 'occupations')
     assert_not_empty(concepts, 'traits')
-    # pprint(concepts)
+    pprint(concepts)
     assert 'sjuksköterska' in concepts['occupations']
     assert 'noggrann' in concepts['traits']
 
@@ -75,7 +76,7 @@ def test_rewrite_unigram_misspelled_input():
 def test_rewrite_bigrams():
     concepts = text_to_concept.text_to_concepts('inhouse key account manager säljare')
     assert_not_empty(concepts, 'occupations')
-    # pprint(concepts)
+    pprint(concepts)
 
     assert 'key account manager' in concepts['occupations']
     assert 'säljare' in concepts['occupations']
@@ -132,7 +133,7 @@ def test_rewrite_non_concept_words():
     assert_not_empty(concepts, 'occupations')
     assert_not_empty(concepts, 'skills')
     assert_not_empty(concepts, 'traits')
-    # print(concepts)
+    print(concepts)
     assert 'key account manager' in concepts['occupations']
     assert 'försäljning' in concepts['skills']
     assert 'flexibel' in concepts['traits']
@@ -149,7 +150,7 @@ def test_rewrite_must_not_words():
     assert_not_empty(concepts, 'traits')
     assert_not_empty(concepts, 'traits_must_not')
 
-    # print(concepts)
+    print(concepts)
 
     assert 'säljare' in concepts['occupations']
     assert 'målare' in concepts['occupations_must_not']

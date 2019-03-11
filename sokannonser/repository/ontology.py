@@ -10,14 +10,13 @@ log = logging.getLogger(__name__)
 
 class Ontology(object):
 
-    def __init__(self, url='http://localhost:9200', index='narvalontology', user=None, pwd=None, stoplist=None,
+    def __init__(self, host='localhost', port=9200, index='narvalontology', user=None, pwd=None, stoplist=None,
                  concept_type=None, include_misspelled=False):
         self.keyword_processor = KeywordProcessor()
         self.init_keyword_processor()
 
-        self.client = self.create_elastic_client(pwd, url, user)
+        self.client = self.create_elastic_client(host, port, user, pwd)
 
-        self.url = url
         self.index = index
         if stoplist is None:
             stoplist = []
@@ -29,15 +28,16 @@ class Ontology(object):
 
         self.init_ontology()
 
-    def create_elastic_client(self, pwd, url, user):
-        context = create_default_context(cafile=certifi.where())
+    def create_elastic_client(self, host, port, user, pwd):
         if user and pwd:
-            client = Elasticsearch([url],
-                                   use_ssl=True, scheme='https',
-                                   ssl_context=context,
-                                   http_auth=(user, pwd))
+            context = create_default_context(cafile=certifi.where())
+            client = Elasticsearch([host], port=port,
+                            use_ssl=True, scheme='https',
+                            ssl_context=context,
+                            http_auth=(user, pwd))
         else:
-            client = Elasticsearch([url], ca_certs=certifi.where(), timeout=30)
+            client = Elasticsearch([{'host': host, 'port': port}])
+
         return client
 
     def __len__(self):

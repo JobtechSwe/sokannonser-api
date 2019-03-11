@@ -35,6 +35,10 @@ RUN chmod -R 775 /app && \
 RUN chmod -R 775 /var/lib/nginx && \
     chmod -R 777 /var/log/* && \
     chmod -R 777 /var/tmp/nginx
+RUN mkdir -p /tmp/cache/data && \
+    chmod -R 777 /tmp/cache/data
+RUN mkdir -p /tmp/cache/lock && \
+    chmod -R 777 /tmp/cache/lock
 
 WORKDIR /app
 

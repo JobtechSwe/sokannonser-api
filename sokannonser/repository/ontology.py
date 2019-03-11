@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 
 class Ontology(object):
     cache_opts = {
-        'cache.expire': 60,  # 60 * 60 * 24,  # Expire time in seconds
+        'cache.expire': 60 * 60 * 24,  # Expire time in seconds
         'cache.type': 'memory',
     }
 

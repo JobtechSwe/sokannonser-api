@@ -9,8 +9,10 @@ log = logging.getLogger(__name__)
 
 class TextToConcept(object):
     cache_opts = {
-        'cache.expire': 60 * 60 * 24 * 7,  # Expire time in seconds
-        'cache.type': 'memory'
+        'cache.expire': 60,# 60 * 60 * 24 * 7,  # Expire time in seconds
+        'cache.type': 'memory',
+        'cache.data_dir': '/tmp/cache/data',
+        'cache.lock_dir': '/tmp/cache/lock'
     }
 
     COMPETENCE_KEY = 'KOMPETENS'
@@ -20,10 +22,11 @@ class TextToConcept(object):
 
     cache = CacheManager(**util.parse_cache_config_options(cache_opts))
 
-    def __init__(self, ontologyhost='http://localhost:9200',
+    def __init__(self, ontologyhost='localhost', ontologyport=9200,
                  ontologyindex='narvalontology', ontologyuser=None, ontologypwd=None):
-
+        log.info('Creating TextToConcept')
         self.ontologyhost = ontologyhost
+        self.ontologyport = ontologyport
         self.ontologyindex = ontologyindex
         self.ontologyuser = ontologyuser
         self.ontologypwd = ontologypwd
@@ -32,18 +35,21 @@ class TextToConcept(object):
             # Cache ontology directly unless it's a local call (tests or docker build)
             self.get_ontology()
 
+
     def get_ontology(self):
         return self._get_cached_ontology(self.ontologyhost,
+                                         self.ontologyport,
                                          self.ontologyindex,
                                          self.ontologyuser,
                                          self.ontologypwd)
 
 
     @cache.cache('_get_cached_ontology')
-    def _get_cached_ontology(self, ontologyhost, ontologyindex, ontologyuser, ontologypwd):
+    def _get_cached_ontology(self, ontologyhost, ontologyport, ontologyindex, ontologyuser, ontologypwd):
         log.info('Creating ontology, host: %s, index: %s, user: %s' % (
             self.ontologyhost, self.ontologyindex, self.ontologyuser))
-        ontology = Ontology(url=ontologyhost,
+        ontology = Ontology(host=ontologyhost,
+                            port=ontologyport,
                  index=ontologyindex,
                  user=ontologyuser,
                  pwd=ontologypwd,

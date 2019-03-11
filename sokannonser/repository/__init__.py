@@ -18,8 +18,8 @@ else:
     elastic = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT}])
 
 
-ttc = TextToConcept(ontologyhost="https://%s:%s" % (settings.ES_HOST,
-                                                    settings.ES_PORT),
+ttc = TextToConcept(ontologyhost=settings.ES_HOST,
+                    ontologyport=settings.ES_PORT,
                     ontologyuser=settings.ES_USER,
                     ontologypwd=settings.ES_PWD)
 

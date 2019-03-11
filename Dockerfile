@@ -49,15 +49,6 @@ RUN python3 -m pytest -svv -m unit tests/
 RUN rm -rf ./pytest_cache sokannonser/__pycache__
 #RUN git log -1
 
-#USER 10000
-USER root
-RUN adduser -u 10000 -S appuser -G root
-RUN mkdir -p /tmp/cache/data && \
-    chmod -R 775 /tmp/cache/data
-RUN mkdir -p /tmp/cache/lock && \
-    chmod -R 775 /tmp/cache/lock
-
-USER appuser
-
+USER 10000
 CMD ["/usr/bin/supervisord", "-n"]
 #CMD ["/usr/bin/supervisord", "-n" "-c", "/app/supervisord.conf"]

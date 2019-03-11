@@ -92,28 +92,6 @@ def test_rewrite_diverse_occupationterms_to_concepts():
     #TODO: Lägg till även 'sous chef' när denna term finns i narvalontology i prod
     # assert_term_to_concept('sous chef', input_type, assert_concept_name)
 
-
-def assert_term_to_concept(input_term, input_type, assert_concept_name):
-    concepts = text_to_concept.text_to_concepts(input_term)
-    assert_not_empty(concepts, input_type)
-    assert assert_concept_name in concepts[input_type]
-
-def assert_result_has_keys(concepts):
-    for name in ['skills', 'occupations', 'traits', 'skills_must_not', 'occupations_must_not', 'traits_must_not']:
-        assert name in concepts
-
-
-def assert_not_empty(concepts, resulttype):
-    assert type(concepts) == dict
-    assert_result_has_keys(concepts)
-
-    assert len(concepts[resulttype]) > 0
-
-
-
-
-
-
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_rewrite_uppercase_input():
@@ -159,6 +137,24 @@ def test_rewrite_must_not_words():
     assert 'java' in concepts['skills_must_not']
     assert 'flexibel' in concepts['traits']
     assert 'noggrann' in concepts['traits_must_not']
+
+def assert_term_to_concept(input_term, input_type, assert_concept_name):
+    concepts = text_to_concept.text_to_concepts(input_term)
+    assert_not_empty(concepts, input_type)
+    assert assert_concept_name in concepts[input_type]
+
+def assert_result_has_keys(concepts):
+    for name in ['skills', 'occupations', 'traits', 'skills_must_not', 'occupations_must_not', 'traits_must_not']:
+        assert name in concepts
+
+
+def assert_not_empty(concepts, resulttype):
+    assert type(concepts) == dict
+    assert_result_has_keys(concepts)
+
+    assert len(concepts[resulttype]) > 0
+
+
 
 
 if __name__ == '__main__':

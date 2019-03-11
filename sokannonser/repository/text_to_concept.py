@@ -2,27 +2,16 @@ import logging
 import certifi
 from ssl import create_default_context
 from elasticsearch import Elasticsearch
-from beaker.cache import CacheManager
-from beaker import util
-
-from sokannonser import settings
 from sokannonser.repository.ontology import Ontology
 
 log = logging.getLogger(__name__)
 
 
 class TextToConcept(object):
-    cache_opts = {
-        'cache.expire': 60,#60 * 60 * 24 * 7,  # Expire time in seconds
-        'cache.type': 'memory',
-    }
-
     COMPETENCE_KEY = 'KOMPETENS'
     OCCUPATION_KEY = 'YRKE'
     TRAIT_KEY = 'FORMAGA'
     REMOVED_TAG = '<removed>'
-
-    cache = CacheManager(**util.parse_cache_config_options(cache_opts))
 
     def __init__(self, ontologyhost='localhost', ontologyport=9200,
                  ontologyindex='narvalontology', ontologyuser=None, ontologypwd=None):
@@ -32,21 +21,13 @@ class TextToConcept(object):
 
         self.client = self.create_elastic_client(ontologyhost, ontologyport, ontologyuser, ontologypwd)
 
-        if settings.ES_HOST != 'localhost':
-            # Cache ontology directly unless it's a local call (tests or docker build)
-            self.get_ontology()
+        self.ontology =Ontology(client=self.client,
+                                            concept_type=None,
+                                            include_misspelled=True)
+
 
     def get_ontology(self):
-        return self._get_cached_ontology(self.cachekey)
-
-    @cache.cache('_get_cached_ontology')
-    def _get_cached_ontology(self, cachekey):
-        log.info('Creating ontology, cachekey: %s' % cachekey)
-        ontology = Ontology(client=self.client,
-                            concept_type=None,
-                            include_misspelled=True)
-        log.info('Created ontology')
-        return ontology
+        return self.ontology
 
     @staticmethod
     def create_elastic_client(host, port, user, pwd):

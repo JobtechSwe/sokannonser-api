@@ -2,6 +2,7 @@ import logging
 import certifi
 from ssl import create_default_context
 from elasticsearch import Elasticsearch
+from sokannonser import settings
 from sokannonser.repository.ontology import Ontology
 
 log = logging.getLogger(__name__)
@@ -17,16 +18,25 @@ class TextToConcept(object):
                  ontologyindex='narvalontology', ontologyuser=None, ontologypwd=None):
         log.info('Creating TextToConcept')
 
-        self.cachekey = '%s-%s-%s-%s' % (ontologyhost, ontologyport, ontologyindex, ontologyuser)
-
         self.client = self.create_elastic_client(ontologyhost, ontologyport, ontologyuser, ontologypwd)
+        self.ontologyindex = ontologyindex
 
-        self.ontology =Ontology(client=self.client,
-                                            concept_type=None,
-                                            include_misspelled=True)
+        self.ontology = None
+
+        if settings.ES_HOST != 'localhost':
+            # Cache ontology directly unless it's a local call (tests or docker build)
+            self.get_ontology()
 
 
     def get_ontology(self):
+        if self.ontology is None:
+            log.info('Creating Ontology, ontologyindex: %s' % self.ontologyindex)
+            self.ontology = Ontology(client=self.client,
+                                     index=self.ontologyindex,
+                                     concept_type=None,
+                                     include_misspelled=True)
+            log.info('Done creating Ontology, ontologyindex: %s' % self.ontologyindex)
+
         return self.ontology
 
     @staticmethod

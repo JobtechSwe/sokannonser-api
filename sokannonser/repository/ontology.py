@@ -1,8 +1,6 @@
 import logging
 from flashtext.keyword import KeywordProcessor
-import certifi
-from ssl import create_default_context
-from elasticsearch import Elasticsearch, ElasticsearchException
+from elasticsearch import ElasticsearchException
 from elasticsearch.helpers import scan
 
 log = logging.getLogger(__name__)
@@ -10,12 +8,14 @@ log = logging.getLogger(__name__)
 
 class Ontology(object):
 
-    def __init__(self, host='localhost', port=9200, index='narvalontology', user=None, pwd=None, stoplist=None,
+    # def __init__(self, host='localhost', port=9200, index='narvalontology', user=None, pwd=None, stoplist=None,
+    #              concept_type=None, include_misspelled=False):
+    def __init__(self, client=None, index='narvalontology', stoplist=None,
                  concept_type=None, include_misspelled=False):
         self.keyword_processor = KeywordProcessor()
         self.init_keyword_processor()
 
-        self.client = self.create_elastic_client(host, port, user, pwd)
+        self.client = client
 
         self.index = index
         if stoplist is None:
@@ -27,18 +27,6 @@ class Ontology(object):
         self.concept_to_term = {}
 
         self.init_ontology()
-
-    def create_elastic_client(self, host, port, user, pwd):
-        if user and pwd:
-            context = create_default_context(cafile=certifi.where())
-            client = Elasticsearch([host], port=port,
-                            use_ssl=True, scheme='https',
-                            ssl_context=context,
-                            http_auth=(user, pwd))
-        else:
-            client = Elasticsearch([{'host': host, 'port': port}])
-
-        return client
 
     def __len__(self):
         return len(self.keyword_processor)
@@ -107,4 +95,3 @@ class Ontology(object):
                 yield row['_source']
         except ElasticsearchException as e:
             log.error("Failed to load ontology (%s)" % str(e))
-

@@ -35,10 +35,6 @@ RUN chmod -R 775 /app && \
 RUN chmod -R 775 /var/lib/nginx && \
     chmod -R 777 /var/log/* && \
     chmod -R 777 /var/tmp/nginx
-RUN mkdir -p /tmp/cache/data && \
-    chmod -R 777 /tmp/cache/data
-RUN mkdir -p /tmp/cache/lock && \
-    chmod -R 777 /tmp/cache/lock
 
 WORKDIR /app
 
@@ -53,6 +49,15 @@ RUN python3 -m pytest -svv -m unit tests/
 RUN rm -rf ./pytest_cache sokannonser/__pycache__
 #RUN git log -1
 
-USER 10000
+#USER 10000
+USER root
+RUN adduser -u 10000 -S appuser -G root
+RUN mkdir -p /tmp/cache/data && \
+    chmod -R 775 /tmp/cache/data
+RUN mkdir -p /tmp/cache/lock && \
+    chmod -R 775 /tmp/cache/lock
+
+USER appuser
+
 CMD ["/usr/bin/supervisord", "-n"]
 #CMD ["/usr/bin/supervisord", "-n" "-c", "/app/supervisord.conf"]

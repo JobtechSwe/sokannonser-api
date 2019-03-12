@@ -98,9 +98,14 @@ def _parse_args(args):
         query_dsl['query']['bool']['must'].append({'match_all': {}})
         return query_dsl
 
-    freetext_query = _build_freetext_query(args.get(settings.FREETEXT_QUERY))
+    freetext_query = _build_query(args.get(settings.FREETEXT_QUERY),
+                                  __freetext_fields)
     if freetext_query:
         query_dsl['query']['bool']['must'].append(freetext_query)
+    place_query = _build_query(args.get(settings.PLACE),
+                               __place_fields)
+    if place_query:
+        query_dsl['query']['bool']['must'].append(place_query)
     return query_dsl
 
 
@@ -119,13 +124,23 @@ def __freetext_fields(searchword):
     ]
 
 
-def _build_freetext_query(freetext):
-    if not freetext:
+def __place_fields(searchword):
+    return [
+        {
+            "match": {
+                "location.translations.sv-SE": searchword,
+            }
+        }
+    ]
+
+
+def _build_query(querystring, fields_method):
+    if not querystring:
         return None
-    inc_words = ' '.join([w for w in freetext.split(' ') if not w.startswith('-')])
-    exc_words = ' '.join([w[1:] for w in freetext.split(' ') if w.startswith('-')])
-    shoulds = __freetext_fields(inc_words) if inc_words else None
-    mustnts = __freetext_fields(exc_words) if exc_words else None
+    inc_words = ' '.join([w for w in querystring.split(' ') if not w.startswith('-')])
+    exc_words = ' '.join([w[1:] for w in querystring.split(' ') if w.startswith('-')])
+    shoulds = fields_method(inc_words) if inc_words else None
+    mustnts = fields_method(exc_words) if exc_words else None
     ft_query = {"bool": {}}
     if shoulds:
         ft_query['bool']['should'] = shoulds

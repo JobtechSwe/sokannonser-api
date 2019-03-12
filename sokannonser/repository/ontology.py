@@ -1,8 +1,6 @@
 import logging
 from flashtext.keyword import KeywordProcessor
-import certifi
-from ssl import create_default_context
-from elasticsearch import Elasticsearch, ElasticsearchException
+from elasticsearch import ElasticsearchException
 from elasticsearch.helpers import scan
 
 log = logging.getLogger(__name__)
@@ -10,14 +8,11 @@ log = logging.getLogger(__name__)
 
 class Ontology(object):
 
-    def __init__(self, url='http://localhost:9200', index='narvalontology', user=None, pwd=None, stoplist=None,
+    def __init__(self, client=None, index='narvalontology', stoplist=None,
                  concept_type=None, include_misspelled=False):
-        self.keyword_processor = KeywordProcessor()
-        self.init_keyword_processor()
 
-        self.client = self.create_elastic_client(pwd, url, user)
+        self.client = client
 
-        self.url = url
         self.index = index
         if stoplist is None:
             stoplist = []
@@ -26,23 +21,13 @@ class Ontology(object):
         self.include_misspelled = include_misspelled
 
         self.concept_to_term = {}
+        self.keyword_processor = KeywordProcessor()
+        self.init_keyword_processor(self.keyword_processor)
+        self.init_ontology(self.keyword_processor)
 
-        self.init_ontology()
-
-    @staticmethod
-    def create_elastic_client(pwd, url, user):
-        context = create_default_context(cafile=certifi.where())
-        if user and pwd:
-            client = Elasticsearch([url],
-                                   use_ssl=True, scheme='https',
-                                   ssl_context=context,
-                                   http_auth=(user, pwd))
-        else:
-            client = Elasticsearch([url], ca_certs=certifi.where(), timeout=30)
-        return client
 
     def __len__(self):
-        return len(self.keyword_processor)
+        return len(self.get_keyword_processor())
 
     def misspelled_predicate(self, value):
         if not self.include_misspelled and value['term_misspelled']:
@@ -59,22 +44,23 @@ class Ontology(object):
                 if ontologi_concept['term'] not in self.stoplist
                 and self.misspelled_predicate(ontologi_concept))
 
-    def init_keyword_processor(self):
-        [self.keyword_processor.add_non_word_boundary(token) for token in list('åäöÅÄÖ()')]
-
-    def init_ontology(self):
+    def init_ontology(self, keyword_processor):
         for term_obj in self.get_ontologi_iterator():
-            self.keyword_processor.add_keyword(term_obj['term'], term_obj)
+            keyword_processor.add_keyword(term_obj['term'], term_obj)
             concept_preferred_label = term_obj['concept'].lower()
             if concept_preferred_label not in self.concept_to_term:
                 self.concept_to_term[concept_preferred_label] = []
             self.concept_to_term[concept_preferred_label].append(term_obj)
 
+    @staticmethod
+    def init_keyword_processor(keyword_processor):
+        [keyword_processor.add_non_word_boundary(token) for token in list('åäöÅÄÖ()')]
+
     def get_keyword_processor(self):
         return self.keyword_processor
 
     def get_concepts(self, text, concept_type=None, span_info=False):
-        concepts = self.keyword_processor.extract_keywords(text, span_info=span_info)
+        concepts = self.get_keyword_processor().extract_keywords(text, span_info=span_info)
         if concept_type is not None:
             if span_info:
                 concepts = list(filter(lambda concept: concept[0]['type'] == concept_type, concepts))
@@ -108,4 +94,3 @@ class Ontology(object):
                 yield row['_source']
         except ElasticsearchException as e:
             log.error("Failed to load ontology (%s)" % str(e))
-

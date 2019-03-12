@@ -1,41 +1,58 @@
 import logging
-from beaker.cache import CacheManager
-from beaker import util
-
+import certifi
+from ssl import create_default_context
+from elasticsearch import Elasticsearch
+from sokannonser import settings
 from sokannonser.repository.ontology import Ontology
 
 log = logging.getLogger(__name__)
 
 
 class TextToConcept(object):
-    cache_opts = {
-        'cache.expire': 60 * 60 * 1,  # Expire time in seconds
-        'cache.type': 'memory'
-    }
-
     COMPETENCE_KEY = 'KOMPETENS'
     OCCUPATION_KEY = 'YRKE'
     TRAIT_KEY = 'FORMAGA'
     REMOVED_TAG = '<removed>'
 
-    cache = CacheManager(**util.parse_cache_config_options(cache_opts))
-
-    def __init__(self, ontologyhost='http://localhost:9200',
+    def __init__(self, ontologyhost='localhost', ontologyport=9200,
                  ontologyindex='narvalontology', ontologyuser=None, ontologypwd=None):
-        self.ontologyhost = ontologyhost
-        self.ontologyindex = ontologyindex
-        self.ontologyuser = ontologyuser
-        self.ontologypwd = ontologypwd
-        self.get_ontology()
+        log.info('Creating TextToConcept')
 
-    @cache.cache('get_ontology')
+        self.client = self.create_elastic_client(ontologyhost, ontologyport, ontologyuser, ontologypwd)
+        self.ontologyindex = ontologyindex
+
+        self.ontology = None
+
+        if settings.ES_HOST != 'localhost':
+            # Cache ontology directly unless it's a local call (tests or docker build)
+            self.get_ontology()
+
+
     def get_ontology(self):
-        return Ontology(url=self.ontologyhost,
-                        index=self.ontologyindex,
-                        user=self.ontologyuser,
-                        pwd=self.ontologypwd,
-                        concept_type=None,
-                        include_misspelled=True)
+        if self.ontology is None:
+            log.info('Creating Ontology, ontologyindex: %s' % self.ontologyindex)
+            self.ontology = Ontology(client=self.client,
+                                     index=self.ontologyindex,
+                                     concept_type=None,
+                                     include_misspelled=True)
+            log.info('Done creating Ontology, ontologyindex: %s' % self.ontologyindex)
+
+        return self.ontology
+
+    @staticmethod
+    def create_elastic_client(host, port, user, pwd):
+        log.info('Creating ontology elasticclient, host: %s, port: %s, user: %s' % (
+            host, port, user))
+        if user and pwd:
+            context = create_default_context(cafile=certifi.where())
+            client = Elasticsearch([host], port=port,
+                                   use_ssl=True, scheme='https',
+                                   ssl_context=context,
+                                   http_auth=(user, pwd))
+        else:
+            client = Elasticsearch([{'host': host, 'port': port}])
+
+        return client
 
     def text_to_concepts(self, text):
         ontology_concepts = self.get_ontology().get_concepts(text, concept_type=None,
@@ -77,7 +94,8 @@ class TextToConcept(object):
 
         return result
 
-    def filter_concepts(self, concept, concept_type, operator):
+    @staticmethod
+    def filter_concepts(concept, concept_type, operator):
         if concept['type'] == concept_type and concept['operator'] == operator:
             return True
         else:

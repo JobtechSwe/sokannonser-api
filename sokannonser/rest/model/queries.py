@@ -14,37 +14,50 @@ swagger_doc_params = {
     "(format YYYY-mm-ddTHH:MM:SS)",
     settings.PUBLISHED_BEFORE: "Fetch job ads published before specified date and time "
                                "(format YYYY-mm-ddTHH:MM:SS)",
-    settings.FREETEXT_QUERY: "Freetext query. Search in ad headline, ad description and place of work.",
-    settings.FREETEXT_FIELDS: "Fields to freetext search in, in addition to default freetext search "
+    settings.FREETEXT_QUERY: "Freetext query. Search in ad headline, ad description and "
+                             "place of work.",
+    settings.FREETEXT_FIELDS: "Fields to freetext search in, in addition to default "
+                              "freetext search "
                               "(parameter " + settings.FREETEXT_QUERY + ").\n"
                               "Valid input values: " + str(QF_CHOICES) + "\n"
-                              "Default (no input): Search in ad headline, ad description and place of work",
+                              "Default (no input): Search in ad headline, ad description "
+                              "and place of work",
     taxonomy.OCCUPATION: "One or more occupational codes according to the taxonomy",
     taxonomy.GROUP: "One or more occupational group codes according to the taxonomy",
     taxonomy.FIELD: "One or more occupational area codes according to the taxonomy",
     taxonomy.SKILL: "One or more competency codes according to the taxonomy",
-    taxonomy.DRIVING_LICENCE: "One or more types of demanded driving licenses, code according to the taxonomy",
+    taxonomy.DRIVING_LICENCE: "One or more types of demanded driving licenses, code "
+    "according to the taxonomy",
     taxonomy.EMPLOYMENT_TYPE: "Employment type, code according to the taxonomy",
-    settings.EXPERIENCE_REQUIRED: "Input 'false' to filter jobs that don't require experience",
-    taxonomy.WORKTIME_EXTENT: "One or more codes for worktime extent, code according to the taxonomy",
-    settings.PARTTIME_MIN: "For part-time jobs, minimum extent in percent (for example 50 for 50%)",
-    settings.PARTTIME_MAX: "For part-time jobs, maximum extent in percent (for example 100 for 100%)",
-    taxonomy.MUNICIPALITY: "One or more municipality codes, code according to the taxonomy",
+    settings.EXPERIENCE_REQUIRED: "Input 'false' to filter jobs that don't require "
+                                  "experience",
+    taxonomy.WORKTIME_EXTENT: "One or more codes for worktime extent, code according to "
+    "the taxonomy",
+    settings.PARTTIME_MIN: "For part-time jobs, minimum extent in percent "
+    "(for example 50 for 50%)",
+    settings.PARTTIME_MAX: "For part-time jobs, maximum extent in percent "
+    "(for example 100 for 100%)",
+    taxonomy.MUNICIPALITY: "One or more municipality codes, code according to "
+    "the taxonomy",
     taxonomy.REGION: "One or more region codes, code according to the taxonomy",
     taxonomy.COUNTRY: "One or more country codes, code according to the taxonomy",
     settings.POSITION: "Latitude and longitude in the format \"59.329, 18.068\" "
                        "(latitude, longitude).",
-    settings.POSITION_RADIUS: "Radius from the specified " + settings.POSITION + " (latitude, longitude) in kilometers (km)",
+    settings.POSITION_RADIUS: "Radius from the specified " + settings.POSITION +
+    " (latitude, longitude) in kilometers (km)",
 }
 swagger_filter_doc_params = {
     settings.DETAILS: "Show 'full' (default) or 'brief' results details",
-    settings.OFFSET: "The offset parameter defines the offset from the first result you want to fetch. "
+    settings.OFFSET: "The offset parameter defines the offset from the first result you "
+    "want to fetch. "
                      "Valid range is (0-%d)" % settings.MAX_OFFSET,
     settings.LIMIT: "Number of results to fetch (0-%d)" % settings.MAX_LIMIT,
-    settings.SORT: "Sorting.\npubdate-desc: published date, descending (newest job ad first)\n"
+    settings.SORT: "Sorting.\npubdate-desc: published date, descending (newest job ad "
+    "first)\n"
     "pubdate-asc: published date, ascending (oldest job ad first)\n"
     "applydate-desc: last apply date, descending (newest apply date first)\n"
-    "applydate-asc: last apply date, descending (oldest apply date first, few days left for application)\n"
+    "applydate-asc: last apply date, descending (oldest apply date first, few days left "
+    "for application)\n"
     "relevance: Relevance (points) (default sorting)",
     settings.STATISTICS: "Show statistics for specified fields "
     "(available fields: %s, %s and %s)" % (
@@ -107,6 +120,7 @@ auranest_query.add_argument(settings.LIMIT,
                             default=10)
 auranest_query.add_argument(settings.SHOW_EXPIRED, choices=['true', 'false'])
 auranest_query.add_argument(settings.FREETEXT_QUERY)
+auranest_query.add_argument(settings.PLACE)
 auranest_query.add_argument(settings.STATISTICS,
                             choices=list(settings.auranest_stats_options.keys()),
                             action='append')

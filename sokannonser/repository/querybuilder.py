@@ -1,16 +1,11 @@
 import logging
 import re
 from sokannonser import settings
-from sokannonser.repository.text_to_concept import TextToConcept
+from sokannonser.repository import ttc
 from sokannonser.rest.model import queries
 from valuestore import taxonomy
 
 log = logging.getLogger(__name__)
-ttc = TextToConcept(ontologyhost="https://%s:%s" % (settings.ES_HOST,
-                                                    settings.ES_PORT),
-                    ontologyuser=settings.ES_USER,
-                    ontologypwd=settings.ES_PWD)
-
 
 class QueryBuilder(object):
     def parse_args(self, args):
@@ -173,7 +168,6 @@ class QueryBuilder(object):
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
         concepts = ttc.text_to_concepts(querystring)
-        print("concepts", concepts)
         ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
                                                         ['occupations', 'skills',
                                                          'traits'], 1, 'must', 10)

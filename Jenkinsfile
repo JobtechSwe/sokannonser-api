@@ -7,7 +7,6 @@ pipeline {
     }
     stages{
         stage('Checkout code'){
-            agent any
             steps{
                 checkout scm: [
                     $class: 'GitSCM'
@@ -15,7 +14,6 @@ pipeline {
             }
         }
         stage('Code analysis'){
-            agent any
             steps {
                 withSonarQubeEnv('Jobtech_SonarQube_Server'){
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sokapi -Dsonar.sources=."
@@ -23,7 +21,6 @@ pipeline {
             }
         }
         stage('Build and Tag Openshift Image'){
-            agent any
             steps{
                 sh 'echo "${GIT_BRANCH}"'
                 openshiftBuild(namespace:'${openshiftProject}', bldCfg: 'sokapi', showBuildLogs: 'true')
@@ -31,31 +28,29 @@ pipeline {
             }
         }
         stage('Deploy to Staging'){
-            agent any
             when{
-                environment name: 'GIT_BRANCH', value: 'origin/jenkins'
+                environment name: 'GIT_BRANCH', value: 'origin/master'
             }
             steps{
                 sh "oc set image dc/staging-sokapi staging-sokapi=docker-registry.default.svc:5000/${openshiftProject}/sokapi:${buildTag} -n ${openshiftProject}"
                 openshiftDeploy(depCfg: 'staging-sokapi', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
                 openshiftVerifyDeployment(depCfg: 'staging-sokapi', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+                slackSend color: 'good', channel: '#narval-sokapi', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} Staging build: ${buildTag}. You cannot build again from ${GIT_BRANCH} until build has been promoted or aborted. ${BUILD_URL}"
             }
         }
         stage('Deploy to Prod?'){
-            agent none
             when{
-                environment name: 'GIT_BRANCH', value: 'origin/jenkins'
+                environment name: 'GIT_BRANCH', value: 'origin/master'
             }
             steps{
-                input "Deploy to prod"
+                input "Deploy to prod (You cannot build again until build has been promoted or aborted)?"
             }
         }
         stage('Final Deploy to api'){
-            agent any
             when{
                 anyOf{
                 environment name: 'GIT_BRANCH', value: 'origin/develop'
-                environment name: 'GIT_BRANCH', value: 'origin/jenkins'                   
+                environment name: 'GIT_BRANCH', value: 'origin/master'                   
                 }
             }
             steps{
@@ -68,16 +63,13 @@ pipeline {
     }
     post {
         success {
-            sh 'echo "success"'
-            //slackSend color: 'good', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} build: ${buildTag}."
+            slackSend color: 'good', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} build: ${buildTag}."
         }
         failure {
-            sh 'echo "fail"'
-            //slackSend color: 'bad', channel: '#narval-sokapi', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} failed to build to ${openshiftProject} build ${buildTag}."
+            slackSend color: 'bad', channel: '#narval-sokapi', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} failed to build to ${openshiftProject} build ${buildTag}. ${BUILD_URL}console"
         }
         unstable {
-            sh 'echo "unstable"'
-            //slackSend color: 'bad', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} unstable build for ${openshiftProject} build ${buildTag}."
+            slackSend color: 'bad', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} unstable build for ${openshiftProject} build ${buildTag}. ${BUILD_URL}console"
         }
     }
 }

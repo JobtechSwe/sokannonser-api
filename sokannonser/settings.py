@@ -54,6 +54,7 @@ LATITUDE = 'latitude'
 POSITION = 'position'
 POSITION_RADIUS = 'position.radius'
 DEFAULT_POSITION_RADIUS = 5
+EMPLOYER = 'employer'
 
 MAX_OFFSET = 2000
 MAX_LIMIT = 100

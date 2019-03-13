@@ -7,7 +7,7 @@ from sokannonser.rest.decorators import check_api_key
 from sokannonser.rest.model.queries import annons_complete_query, pb_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
 from sokannonser.repository import platsannonser
-from sokannonser.repository.querybuilder import QueryBuilder
+from sokannonser.repository.querybuilder import QueryBuilder, ttc
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +33,8 @@ class PBSearch(Resource):
                   % (int(time.time()*1000)-start_time))
         result = platsannonser.find_platsannonser(args,
                                                   self.querybuilder, start_time)
+        if args.get(settings.FREETEXT_QUERY):
+            result['concepts'] = ttc.text_to_concepts(args.get(settings.FREETEXT_QUERY))
         log.debug("Query results after %d milliseconds."
                   % (int(time.time()*1000)-start_time))
 
@@ -47,6 +49,7 @@ class PBSearch(Resource):
             "query_time_in_millis": esresult.get('took', 0),
             "result_time_in_millis": int(time.time()*1000) - start_time,
             "stats": esresult.get('stats', {}),
+            "freetext_concepts": esresult.get('concepts', {}),
             "hits": hits
         }
         log.debug("Sending results after %d milliseconds."

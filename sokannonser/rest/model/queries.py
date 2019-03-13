@@ -22,6 +22,7 @@ swagger_doc_params = {
                               "Valid input values: " + str(QF_CHOICES) + "\n"
                               "Default (no input): Search in ad headline, ad description "
                               "and place of work",
+    settings.EMPLOYER: "Name or organisation number of employer",
     taxonomy.OCCUPATION: "One or more occupational codes according to the taxonomy",
     taxonomy.GROUP: "One or more occupational group codes according to the taxonomy",
     taxonomy.FIELD: "One or more occupational area codes according to the taxonomy",
@@ -95,6 +96,7 @@ annons_complete_query.add_argument(settings.POSITION,
                                    type=inputs.regex('^[\\d\\.]+, ?[\\d\\.]+$'),
                                    action='append')
 annons_complete_query.add_argument(settings.POSITION_RADIUS, type=int, action='append')
+annons_complete_query.add_argument(settings.EMPLOYER, action='append')
 annons_complete_query.add_argument(settings.FREETEXT_QUERY)
 annons_complete_query.add_argument(settings.FREETEXT_FIELDS, action='append',
                                    choices=QF_CHOICES)
@@ -120,7 +122,8 @@ auranest_query.add_argument(settings.LIMIT,
                             default=10)
 auranest_query.add_argument(settings.SHOW_EXPIRED, choices=['true', 'false'])
 auranest_query.add_argument(settings.FREETEXT_QUERY)
-auranest_query.add_argument(settings.PLACE)
+auranest_query.add_argument(settings.PLACE, action='append')
+auranest_query.add_argument(settings.EMPLOYER, action='append')
 auranest_query.add_argument(settings.STATISTICS,
                             choices=list(settings.auranest_stats_options.keys()),
                             action='append')

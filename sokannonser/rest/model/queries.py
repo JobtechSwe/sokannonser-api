@@ -22,7 +22,8 @@ swagger_doc_params = {
                               "Valid input values: " + str(QF_CHOICES) + "\n"
                               "Default (no input): Search in ad headline, ad description "
                               "and place of work",
-    settings.EMPLOYER: "Name or organisation number of employer",
+    settings.EMPLOYER: "Name or organisation number (numbers only, no dashes or spaces) "
+    "of employer",
     taxonomy.OCCUPATION: "One or more occupational codes according to the taxonomy",
     taxonomy.GROUP: "One or more occupational group codes according to the taxonomy",
     taxonomy.FIELD: "One or more occupational area codes according to the taxonomy",

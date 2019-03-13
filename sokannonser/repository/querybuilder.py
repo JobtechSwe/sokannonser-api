@@ -21,6 +21,8 @@ class QueryBuilder(object):
         if not any(v is not None for v in args.values()):
             log.debug("Constructing match-all query")
             query_dsl['query']['bool']['must'].append({'match_all': {}})
+            if 'sort' not in query_dsl:
+                query_dsl['sort'] = [settings.sort_options.get('pubdate-desc')]
             return query_dsl
 
         must_queries = list()
@@ -29,6 +31,7 @@ class QueryBuilder(object):
             self._build_freetext_query(args.get(settings.FREETEXT_QUERY),
                                        args.get(settings.FREETEXT_FIELDS))
         )
+        must_queries.append(self._build_employer_query(args.get(settings.EMPLOYER)))
         must_queries.append(self._build_yrkes_query(args.get(taxonomy.OCCUPATION),
                                                     args.get(taxonomy.GROUP),
                                                     args.get(taxonomy.FIELD)))
@@ -212,6 +215,18 @@ class QueryBuilder(object):
                 }
             }
         ]
+
+    # Parses EMPLOYER
+    def _build_employer_query(self, employers):
+        if employers:
+            return {
+                "multi_match": {
+                    "query": " ".join(employers),
+                    "operator": "or",
+                    "fields": ["arbetsgivare.namn", "arbetsgivare.organisationsnummer"]
+                }
+            }
+        return None
 
     # Parses OCCUPATION, FIELD and GROUP
     def _build_yrkes_query(self, yrkesroller, yrkesgrupper, yrkesomraden):

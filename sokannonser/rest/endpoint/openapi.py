@@ -1,9 +1,9 @@
 import logging
 from flask_restplus import Resource, abort
 from requests import get, exceptions
+from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons, ns_open
-from sokannonser.rest.decorators import check_api_key
 from sokannonser.rest.model.platsannons_results import simple_lista
 from sokannonser.rest.model.queries import pb_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params

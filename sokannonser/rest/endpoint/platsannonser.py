@@ -1,9 +1,9 @@
 import logging
 import time
 from flask_restplus import Resource
+from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons
-from sokannonser.rest.decorators import check_api_key
 from sokannonser.rest.model.queries import annons_complete_query, pb_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
 from sokannonser.repository import platsannonser

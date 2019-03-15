@@ -1,5 +1,5 @@
 import logging
-from sokannonser.customlogging import NarvalLogFormatter
+from jobtech.common.customlogging import JobtechLogFormatter
 from flask import Flask
 from flask_cors import CORS
 from sokannonser.rest import api
@@ -36,7 +36,7 @@ def create_log_formatter():
         is_develop_mode = True
     else:
         is_develop_mode = False
-    f = NarvalLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s', '%Y-%m-%d %H:%M:%S%z',
+    f = JobtechLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s', '%Y-%m-%d %H:%M:%S%z',
                            is_develop_mode=is_develop_mode)
     return f
 

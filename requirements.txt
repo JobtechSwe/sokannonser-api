@@ -9,6 +9,7 @@ git+https://github.com/JobtechSwe/jobtech-common.git
 python-dateutil
 pytest
 pytest-cov
+pytest-envfiles
 elastic-apm[flask]
 flashtext
 Beaker

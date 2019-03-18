@@ -137,8 +137,13 @@ def __place_fields(searchword):
 def _build_query(querystring, fields_method):
     if not querystring:
         return None
-    inc_words = ' '.join([w for w in querystring.split(' ') if not w.startswith('-')])
-    exc_words = ' '.join([w[1:] for w in querystring.split(' ') if w.startswith('-')])
+    if isinstance(querystring, list):
+        inc_words = ' '.join([w for w in querystring if not w.startswith('-')])
+        exc_words = ' '.join([w[1:] for w in querystring if w.startswith('-')])
+    else:
+        inc_words = ' '.join([w for w in querystring.split(' ') if not w.startswith('-')])
+        exc_words = ' '.join([w[1:] for w in querystring.split(' ') if w.startswith('-')])
+
     shoulds = fields_method(inc_words) if inc_words else None
     mustnts = fields_method(exc_words) if exc_words else None
     ft_query = {"bool": {}}

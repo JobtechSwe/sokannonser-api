@@ -26,7 +26,7 @@ class OpenSearch(Resource):
             500: 'Technical exception'
         }
     )
-    @ns_platsannons.expect(pb_query)
+    @ns_open.expect(pb_query)
     def get(self):
         args = pb_query.parse_args()
         result = platsannonser.find_platsannonser(args, self.querybuilder)

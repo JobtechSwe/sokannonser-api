@@ -71,8 +71,7 @@ swagger_filter_doc_params = {
 
 
 annons_complete_query = reqparse.RequestParser()
-annons_complete_query.add_argument(settings.APIKEY, location='headers', required=True,
-                                   default=settings.APIKEY_BACKDOOR)
+annons_complete_query.add_argument(settings.APIKEY, location='headers', required=True)
 annons_complete_query.add_argument(settings.PUBLISHED_BEFORE,
                                    type=lambda x: datetime.strptime(x,
                                                                     '%Y-%m-%dT%H:%M:%S'))
@@ -131,13 +130,16 @@ auranest_query.add_argument(settings.STATISTICS,
 auranest_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 100), default=10)
 
 auranest_typeahead = reqparse.RequestParser()
-auranest_typeahead.add_argument(settings.APIKEY, location='headers', required=True,
-                                default=settings.APIKEY_BACKDOOR)
+auranest_typeahead.add_argument(settings.APIKEY, location='headers', required=True)
 auranest_typeahead.add_argument(settings.FREETEXT_QUERY)
 
+batch_query = reqparse.RequestParser()
+batch_query.add_argument(settings.APIKEY, location='headers', required=True)
+batch_query.add_argument(settings.ZIPDATE,
+                         type=inputs.regex('^\\d{4}-\\d{2}-\\d{2}$'))
+
 taxonomy_query = reqparse.RequestParser()
-taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True,
-                            default=settings.APIKEY_BACKDOOR)
+taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)
 taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)
 taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)

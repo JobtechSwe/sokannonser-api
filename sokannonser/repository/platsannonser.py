@@ -1,13 +1,43 @@
 import logging
 import json
 import time
+from io import BytesIO
+from zipfile import ZipFile
 from flask_restplus import abort
 from elasticsearch import exceptions
+from elasticsearch.helpers import scan
 from valuestore import taxonomy
 from sokannonser import settings
 from sokannonser.repository import elastic
 
 log = logging.getLogger(__name__)
+
+
+def load_ads_from(timetamp):
+
+    return []
+
+
+def zip_ads(day):
+    dsl = {
+        "query": {
+            "range": {
+                "status.uppdaterad": {
+                    "gte": day,
+                    "lte": day
+                }
+            }
+        }
+    }
+    scan_result = scan(elastic, dsl, index=settings.ES_INDEX)
+    in_memory = BytesIO()
+    zf = ZipFile(in_memory, mode="w")
+
+    ads = [ad['_source'] for ad in scan_result]
+    zf.writestr(f"ads_{day}.json", json.dumps(ads))
+    zf.close()
+    in_memory.seek(0)
+    return in_memory
 
 
 def get_stats_for(taxonomy_type):

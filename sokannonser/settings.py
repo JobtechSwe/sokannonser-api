@@ -69,6 +69,9 @@ SHOW_COUNT = 'show-count'
 # For auranest
 PLACE = 'place'
 
+# For Batch
+ZIPDATE = 'zip'
+
 # For all ads
 SHOW_EXPIRED = 'show-expired'
 

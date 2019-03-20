@@ -15,13 +15,13 @@ ns_auranest = Namespace('All job ads',
 ns_open = Namespace('Open-API',
                     description='Search and retrieve Arbetsförmedlingens (AF) job ads.')
 
-ns_batch = Namespace('Batch loder', description='Endpoint for batchloading all ads')
+ns_bulk = Namespace('Bulk loader', description='Endpoint for bulk loading all ads.')
 
 ns_valuestore = Namespace('Jobtech Taxonomy',
                           description='Find concepts in the Jobtech Taxonomy.')
 
 api.add_namespace(ns_open, '/open')
-api.add_namespace(ns_batch, '/batch')
+api.add_namespace(ns_bulk, '/bulk')
 api.add_namespace(ns_platsannons, '/af')
 api.add_namespace(ns_auranest, '/')
 api.add_namespace(ns_valuestore, '/vf')

@@ -7,6 +7,7 @@ from valuestore import taxonomy
 
 log = logging.getLogger(__name__)
 
+
 class QueryBuilder(object):
     def parse_args(self, args):
         """
@@ -109,14 +110,14 @@ class QueryBuilder(object):
                     {
                         'range': {
                             'publiceringsdatum': {
-                                'lte': 'now'
+                                'lte': 'now/m'
                             }
                         }
                     },
                     {
                         'range': {
                             'status.sista_publiceringsdatum': {
-                                'gte': 'now'
+                                'gte': 'now/m'
                             }
                         }
                     },

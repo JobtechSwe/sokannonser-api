@@ -65,7 +65,7 @@ stat_value = api.model('StatValue', {
 })
 
 auranest_lista = api.model('Ads', {
-    'total': fields.Integer(attribute='hits.total'),
+    'total': fields.Integer(attribute='aggregations.total.value'),
     'stats': fields.Nested({
         'employers': fields.List(fields.Nested(stat_value),
                                  attribute='employers.buckets'),

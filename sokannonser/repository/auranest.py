@@ -12,9 +12,10 @@ def find_annonser(args):
     aggregates = _statistics(args.pop(settings.STATISTICS),
                              args.pop(settings.STAT_LMT))
     query_dsl = _parse_args(args)
-    log.debug(json.dumps(query_dsl, indent=2))
+    query_dsl['aggs'] = {"total": {"cardinality": {"field": "group.id"}}}
     if aggregates:
-        query_dsl['aggs'] = aggregates
+        query_dsl['aggs'].update(aggregates)
+    log.debug(json.dumps(query_dsl, indent=2))
     try:
         query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
     except exceptions.ConnectionError as e:

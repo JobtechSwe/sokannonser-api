@@ -15,7 +15,8 @@ ns_auranest = Namespace('All job ads',
 ns_open = Namespace('Open-API',
                     description='Search and retrieve Arbetsförmedlingens (AF) job ads.')
 
-ns_bulk = Namespace('Bulk loader', description='Endpoint for bulk loading all ads.')
+ns_bulk = Namespace('Bulk loader', description='Endpoint for downloading all ads in '
+                    'zip-file formt.')
 
 ns_valuestore = Namespace('Jobtech Taxonomy',
                           description='Find concepts in the Jobtech Taxonomy.')

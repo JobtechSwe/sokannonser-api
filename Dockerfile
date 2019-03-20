@@ -22,7 +22,7 @@ COPY . /app
 COPY nginx.conf /etc/nginx/nginx.conf
 RUN rm /etc/nginx/conf.d/default.conf
 
-#cd COPY supervisord.conf /etc/supervisord.conf
+# COPY supervisord.conf /etc/supervisord.conf
 
 
 RUN mkdir -p /var/run/nginx && \

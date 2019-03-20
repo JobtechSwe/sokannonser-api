@@ -18,7 +18,7 @@ class BulkLoad(Resource):
     @ns_bulk.doc(
         params={
             "zip": "Date to zip ads for. Accepts date as YYYY-MM-DD, 'all' "
-            "or 'yesterday'."
+            "or 'yesterday'. (Note that 'all' can take a couple of minutes to compile.)"
         },
         responses={
             200: 'OK',

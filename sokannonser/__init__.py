@@ -7,7 +7,7 @@ from sokannonser.rest.endpoint.auranest import AuranestSearch
 from sokannonser.rest.endpoint.platsannonser import PBSearch
 from sokannonser.rest.endpoint.openapi import OpenSearch, Proxy
 from sokannonser.rest.endpoint.valuestore import Valuestore
-from sokannonser.rest.endpoint.batch import BatchLoad
+from sokannonser.rest.endpoint.bulk import BulkLoad
 from sokannonser import settings
 import os
 from elasticapm.contrib.flask import ElasticAPM
@@ -37,8 +37,8 @@ def create_log_formatter():
         is_develop_mode = True
     else:
         is_develop_mode = False
-    f = JobtechLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s', '%Y-%m-%d %H:%M:%S%z',
-                           is_develop_mode=is_develop_mode)
+    f = JobtechLogFormatter('%(asctime)s|%(levelname)s|%(name)s|MESSAGE: %(message)s',
+                            '%Y-%m-%d %H:%M:%S%z', is_develop_mode=is_develop_mode)
     return f
 
 

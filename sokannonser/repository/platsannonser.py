@@ -75,7 +75,7 @@ def get_stats_for(taxonomy_type):
         taxonomy.JobtechTaxonomy.WORKTIME_EXTENT: "arbetstidstyp.taxonomi-kod.keyword",
         taxonomy.JobtechTaxonomy.MUNICIPALITY:
         "arbetsplatsadress.taxonomi-kommun.keyword",
-        taxonomy.JobtechTaxonomy.COUNTY: "arbetsplatsadress.taxonomi-lan.keyword"
+        taxonomy.JobtechTaxonomy.REGION: "arbetsplatsadress.taxonomi-lan.keyword"
     }
     # Make sure we don't crash if we want to stat on missing type
     if taxonomy_type not in value_path:

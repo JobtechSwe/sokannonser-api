@@ -2,12 +2,9 @@ import logging
 from flask import Flask
 from flask_cors import CORS
 from sokannonser import appconf
-from sokannonser.rest import api
+from bulkloader.rest import api
 # Import all Resources that are to be made visible for the app
-from sokannonser.rest.endpoint.auranest import AuranestSearch
-from sokannonser.rest.endpoint.platsannonser import PBSearch
-from sokannonser.rest.endpoint.openapi import OpenSearch, Proxy
-from sokannonser.rest.endpoint.valuestore import Valuestore
+from bulkloader.rest.bulk import BulkLoad
 
 app = Flask(__name__)
 CORS(app)

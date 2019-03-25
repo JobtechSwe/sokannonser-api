@@ -3,10 +3,9 @@ import time
 from flask import send_file
 from flask_restplus import Resource
 from jobtech.common.rest.decorators import check_api_key
-from sokannonser import settings
-from sokannonser.rest import ns_bulk
-from sokannonser.rest.model.queries import bulk_query
+from bulkloader.rest import ns_bulk, bulk_query
 from sokannonser.repository import platsannonser
+from sokannonser import settings
 
 log = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ class BulkLoad(Resource):
         responses={
             200: 'OK',
             401: 'Invalid API-key',
-            500: 'Technical exception'
+            500: 'Technical error'
         }
     )
     @ns_bulk.expect(bulk_query)

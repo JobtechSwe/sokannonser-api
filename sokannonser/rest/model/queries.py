@@ -133,12 +133,6 @@ auranest_typeahead = reqparse.RequestParser()
 auranest_typeahead.add_argument(settings.APIKEY, location='headers', required=True)
 auranest_typeahead.add_argument(settings.FREETEXT_QUERY)
 
-bulk_query = reqparse.RequestParser()
-bulk_query.add_argument(settings.APIKEY, location='headers', required=True)
-bulk_query.add_argument(settings.ZIPDATE,
-                        type=inputs.regex('^\\d{4}-\\d{2}-\\d{2}|all|yesterday$'),
-                        required=True)
-
 taxonomy_query = reqparse.RequestParser()
 taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)
 taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)

@@ -71,8 +71,7 @@ swagger_filter_doc_params = {
 
 
 annons_complete_query = reqparse.RequestParser()
-annons_complete_query.add_argument(settings.APIKEY, location='headers', required=True,
-                                   default=settings.APIKEY_BACKDOOR)
+annons_complete_query.add_argument(settings.APIKEY, location='headers', required=True)
 annons_complete_query.add_argument(settings.PUBLISHED_BEFORE,
                                    type=lambda x: datetime.strptime(x,
                                                                     '%Y-%m-%dT%H:%M:%S'))
@@ -131,13 +130,11 @@ auranest_query.add_argument(settings.STATISTICS,
 auranest_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 100), default=10)
 
 auranest_typeahead = reqparse.RequestParser()
-auranest_typeahead.add_argument(settings.APIKEY, location='headers', required=True,
-                                default=settings.APIKEY_BACKDOOR)
+auranest_typeahead.add_argument(settings.APIKEY, location='headers', required=True)
 auranest_typeahead.add_argument(settings.FREETEXT_QUERY)
 
 taxonomy_query = reqparse.RequestParser()
-taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True,
-                            default=settings.APIKEY_BACKDOOR)
+taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)
 taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)
 taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)
@@ -150,7 +147,7 @@ taxonomy_query.add_argument('type',
                                 taxonomy.JobtechTaxonomy.SKILL,
                                 taxonomy.JobtechTaxonomy.LANGUAGE,
                                 taxonomy.JobtechTaxonomy.MUNICIPALITY,
-                                taxonomy.JobtechTaxonomy.COUNTY,
+                                taxonomy.JobtechTaxonomy.REGION,
                                 taxonomy.JobtechTaxonomy.COUNTRY,
                                 taxonomy.JobtechTaxonomy.WAGE_TYPE,
                                 taxonomy.JobtechTaxonomy.EMPLOYMENT_TYPE,

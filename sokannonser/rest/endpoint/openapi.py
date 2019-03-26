@@ -1,9 +1,9 @@
 import logging
 from flask_restplus import Resource, abort
 from requests import get, exceptions
+from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons, ns_open
-from sokannonser.rest.decorators import check_api_key
 from sokannonser.rest.model.platsannons_results import simple_lista
 from sokannonser.rest.model.queries import pb_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
@@ -26,7 +26,7 @@ class OpenSearch(Resource):
             500: 'Technical exception'
         }
     )
-    @ns_platsannons.expect(pb_query)
+    @ns_open.expect(pb_query)
     def get(self):
         args = pb_query.parse_args()
         result = platsannonser.find_platsannonser(args, self.querybuilder)

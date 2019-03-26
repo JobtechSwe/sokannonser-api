@@ -7,6 +7,7 @@ from valuestore import taxonomy
 
 log = logging.getLogger(__name__)
 
+
 class QueryBuilder(object):
     def parse_args(self, args):
         """
@@ -109,14 +110,14 @@ class QueryBuilder(object):
                     {
                         'range': {
                             'publiceringsdatum': {
-                                'lte': 'now'
+                                'lte': 'now/m'
                             }
                         }
                     },
                     {
                         'range': {
                             'status.sista_publiceringsdatum': {
-                                'gte': 'now'
+                                'gte': 'now/m'
                             }
                         }
                     },
@@ -173,7 +174,7 @@ class QueryBuilder(object):
         concepts = ttc.text_to_concepts(querystring)
         ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
                                                         ['occupations', 'skills',
-                                                         'traits'], 1, 'must', 10)
+                                                         'traits'], 1, 'should', 10)
         ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
                                                         ['occupations_must_not',
                                                          'skills_must_not',

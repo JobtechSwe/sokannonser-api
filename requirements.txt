@@ -10,6 +10,6 @@ python-dateutil
 pytest
 pytest-cov
 pytest-envfiles
-elastic-apm[flask]
+elastic-apm[flask]==4.1.0
 flashtext
 Beaker

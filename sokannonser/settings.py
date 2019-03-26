@@ -70,7 +70,7 @@ SHOW_COUNT = 'show-count'
 PLACE = 'place'
 
 # For Batch
-ZIPDATE = 'zip'
+DATE = 'date'
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'

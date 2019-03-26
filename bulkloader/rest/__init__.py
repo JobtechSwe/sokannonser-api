@@ -13,6 +13,6 @@ api.add_namespace(ns_bulk, '/bulk')
 
 bulk_query = reqparse.RequestParser()
 bulk_query.add_argument(settings.APIKEY, location='headers', required=True)
-bulk_query.add_argument(settings.ZIPDATE,
+bulk_query.add_argument(settings.DATE,
                         type=inputs.regex('^\\d{4}-\\d{2}-\\d{2}|all|yesterday$'),
                         required=True)

@@ -27,7 +27,8 @@ RESTPLUS_MASK_SWAGGER = False
 RESTPLUS_ERROR_404_HELP = False
 
 # Ad proxy URL
-AD_PROXY_URL = 'http://api.arbetsformedlingen.se/af/v0/platsannonser/'
+# AD_PROXY_URL = 'http://api.arbetsformedlingen.se/af/v0/platsannonser/'
+AD_PROXY_URL = 'https://www.arbetsformedlingen.se/rest/ledigtarbete/rest/af/v1/ledigtarbete/publikt/annonser/'
 # Base API URL
 BASE_URL = os.getenv('BASE_URL', 'https://base.url')
 
@@ -67,6 +68,9 @@ SHOW_COUNT = 'show-count'
 
 # For auranest
 PLACE = 'place'
+
+# For Batch
+DATE = 'date'
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'

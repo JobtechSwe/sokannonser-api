@@ -10,13 +10,13 @@ from sokannonser import settings
 log = logging.getLogger(__name__)
 
 
-@ns_bulk.route('/load')
-class BulkLoad(Resource):
+@ns_bulk.route('/zip')
+class BulkZip(Resource):
     method_decorators = [check_api_key('bulk')]
 
     @ns_bulk.doc(
         params={
-            "zip": "Date to zip ads for. Accepts date as YYYY-MM-DD, 'all' "
+            "date": "Date to zip ads for. Accepts date as YYYY-MM-DD, 'all' "
             "or 'yesterday'. (Note that 'all' can take a couple of minutes to compile.)"
         },
         responses={
@@ -35,3 +35,22 @@ class BulkLoad(Resource):
         return send_file(bytes_result,
                          attachment_filename=filename,
                          as_attachment=True)
+
+
+@ns_bulk.route('/load')
+class BulkLoad(Resource):
+    method_decorators = [check_api_key('bulk')]
+
+    @ns_bulk.doc(
+        params={
+            settings.DATE: "Load ad changes since date"
+        },
+        responses={
+            200: 'OK',
+            401: 'Invalid API-key',
+            500: 'Technical error'
+        }
+    )
+    @ns_bulk.expect(bulk_query)
+    def get(self):
+        return []

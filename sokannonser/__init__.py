@@ -6,7 +6,8 @@ from sokannonser.rest import api
 # Import all Resources that are to be made visible for the app
 from sokannonser.rest.endpoint.auranest import AuranestSearch
 from sokannonser.rest.endpoint.platsannonser import PBSearch
-from sokannonser.rest.endpoint.openapi import OpenSearch, Proxy
+# from sokannonser.rest.endpoint.openapi import Proxy
+# from sokannonser.rest.endpoint.openapi import OpenSearch
 from sokannonser.rest.endpoint.valuestore import Valuestore
 
 app = Flask(__name__)

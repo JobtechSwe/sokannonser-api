@@ -18,7 +18,7 @@ ns_open = Namespace('Open-API',
 ns_valuestore = Namespace('Jobtech Taxonomy',
                           description='Find concepts in the Jobtech Taxonomy.')
 
-api.add_namespace(ns_open, '/open')
-api.add_namespace(ns_platsannons, '/af')
+api.add_namespace(ns_open, '/oldopen')
+api.add_namespace(ns_platsannons, '/open')
 api.add_namespace(ns_auranest, '/')
 api.add_namespace(ns_valuestore, '/vf')

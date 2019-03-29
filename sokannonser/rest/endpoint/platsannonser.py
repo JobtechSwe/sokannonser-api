@@ -11,6 +11,30 @@ from sokannonser.repository.querybuilder import QueryBuilder, ttc
 
 log = logging.getLogger(__name__)
 
+@ns_platsannons.route('/ad/<id>')
+class Proxy(Resource):
+
+    @ns_platsannons.doc(
+        responses={
+            200: 'OK',
+            401: 'Invalid API-key',
+            404: 'Job ad not found exception',
+            500: 'Technical exception'
+        }
+    )
+    def get(self, id):
+        url = "%s%s" % (settings.AD_PROXY_URL, id)
+        headers = {'Accept-Language': 'sv', 'Accept': 'application/json'}
+        try:
+            response = get(url, headers=headers, timeout=10)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                abort(response.status_code)
+        except exceptions.RequestException as e:
+            log.error('Failed to connect', e)
+            abort(500)
+
 
 @ns_platsannons.route('/search')
 class PBSearch(Resource):

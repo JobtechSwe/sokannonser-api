@@ -38,19 +38,19 @@ class BulkZip(Resource):
 
 
 # @ns_bulk.route('/load')
-# class BulkLoad(Resource):
-#     method_decorators = [check_api_key('bulk')]
-#
-#     @ns_bulk.doc(
-#         params={
-#             settings.DATE: "Load ad changes since date"
-#         },
-#         responses={
-#             200: 'OK',
-#             401: 'Invalid API-key',
-#             500: 'Technical error'
-#         }
-#     )
-#     @ns_bulk.expect(bulk_query)
-#     def get(self):
-#         return []
+class BulkLoad(Resource):
+    method_decorators = [check_api_key('bulk')]
+
+    @ns_bulk.doc(
+        params={
+            settings.DATE: "Load ad changes since date"
+        },
+        responses={
+            200: 'OK',
+            401: 'Invalid API-key',
+            500: 'Technical error'
+        }
+    )
+    @ns_bulk.expect(bulk_query)
+    def get(self):
+        return []

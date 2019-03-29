@@ -5,7 +5,7 @@ from sokannonser import appconf
 from bulkloader.rest import api
 # Import all Resources that are to be made visible for the app
 from bulkloader.rest.bulk import BulkZip
-from bulkloader.rest.bulk import BulkLoad
+# from bulkloader.rest.bulk import BulkLoad
 
 app = Flask(__name__)
 CORS(app)

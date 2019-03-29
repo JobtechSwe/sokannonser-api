@@ -60,6 +60,7 @@ swagger_filter_doc_params = {
     "applydate-desc: last apply date, descending (newest apply date first)\n"
     "applydate-asc: last apply date, descending (oldest apply date first, few days left "
     "for application)\n"
+    "updated: sort by update date (descending)\n"
     "relevance: Relevance (points) (default sorting)",
     settings.STATISTICS: "Show statistics for specified fields "
     "(available fields: %s, %s and %s)" % (

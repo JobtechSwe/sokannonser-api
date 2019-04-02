@@ -37,13 +37,13 @@ class BulkZip(Resource):
                          as_attachment=True)
 
 
-@ns_bulk.route('/load')
+@ns_bulk.route('/stream')
 class BulkLoad(Resource):
     method_decorators = [check_api_key('bulk')]
 
     @ns_bulk.doc(
         params={
-            settings.DATE: "Load ad changes since date"
+            settings.DATE: "Stream ads updated since datetime"
         },
         responses={
             200: 'OK',

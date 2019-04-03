@@ -6,7 +6,7 @@ import sys
 
 import pytest
 
-from sokannonser.rest.endpoint.auranest import AuranestSearch
+from market.rest.endpoint import MarketSearch
 
 currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
@@ -20,9 +20,9 @@ def get_static_ads_from_file():
 
 @pytest.mark.unit
 def test_properties_and_types_marshal_mocked_elastic_result():
-    print('============================', sys._getframe().f_code.co_name, '============================ ')
+    print('========================', sys._getframe().f_code.co_name, '================ ')
 
-    asearch = AuranestSearch()
+    asearch = MarketSearch()
     esresult = get_static_ads_from_file()
     # pprint(esresult)
 

@@ -42,6 +42,7 @@ class PBSearch(Resource):
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
+        description='Search using parameters and/or freetext',
         params={**swagger_doc_params, **swagger_filter_doc_params},
         responses={
             200: 'OK',
@@ -87,6 +88,7 @@ class PBComplete(Resource):
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
+        description='Typeahead / Suggest next searchword',
         params=swagger_doc_params,
         responses={
             200: 'OK',

@@ -4,7 +4,6 @@ from flask_cors import CORS
 from sokannonser import appconf
 from sokannonser.rest import api
 # Import all Resources that are to be made visible for the app
-from sokannonser.rest.endpoint.auranest import AuranestSearch
 from sokannonser.rest.endpoint.platsannonser import PBSearch, Proxy
 # from sokannonser.rest.endpoint.openapi import OpenSearch
 from sokannonser.rest.endpoint.valuestore import Valuestore

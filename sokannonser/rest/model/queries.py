@@ -113,27 +113,6 @@ pb_query.add_argument(settings.STATISTICS, action='append',
                                taxonomy.FIELD])
 pb_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 20), required=False)
 
-auranest_query = reqparse.RequestParser()
-auranest_query.add_argument(settings.APIKEY, location='headers', required=True)
-auranest_query.add_argument(settings.OFFSET,
-                            type=inputs.int_range(0, settings.MAX_OFFSET),
-                            default=0)
-auranest_query.add_argument(settings.LIMIT,
-                            type=inputs.int_range(0, settings.MAX_LIMIT),
-                            default=10)
-auranest_query.add_argument(settings.SHOW_EXPIRED, choices=['true', 'false'])
-auranest_query.add_argument(settings.FREETEXT_QUERY)
-auranest_query.add_argument(settings.PLACE, action='append')
-auranest_query.add_argument(settings.EMPLOYER, action='append')
-auranest_query.add_argument(settings.STATISTICS,
-                            choices=list(settings.auranest_stats_options.keys()),
-                            action='append')
-auranest_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 100), default=10)
-
-auranest_typeahead = reqparse.RequestParser()
-auranest_typeahead.add_argument(settings.APIKEY, location='headers', required=True)
-auranest_typeahead.add_argument(settings.FREETEXT_QUERY)
-
 taxonomy_query = reqparse.RequestParser()
 taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)
 taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)

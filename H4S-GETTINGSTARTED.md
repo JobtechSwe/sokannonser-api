@@ -18,7 +18,9 @@ The second endpoint searches all job ads that are currently open for application
 This endpoint is mainly made for Arbetsförmedlingen's internal systems and will not be further described in this documentation.
 
 ### 3. All-Job-Ads
-TBC
+PLEASE NOTICE These endpoints can be used for Hack 4 Sweden but will be deprecated some time later this spring or summer. We hope to be able to bring back this functionality later on. 
+
+This data-set tries to bring you a complete set of current job adds from any source in Sweden. Since the sources of these adds are webpages
 
 ### 4. Jobtech-Taxonomy
 This endpoint provides labour market terms and their corresponding unique ID. The ID's are required in some parameters in the /open/search endpoint.

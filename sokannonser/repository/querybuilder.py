@@ -76,7 +76,6 @@ class QueryBuilder(object):
                     "size": args.get(settings.STAT_LMT) or 5
                 }
             }
-
         return query_dsl
 
     def filter_aggs(self, aggs, freetext):
@@ -137,7 +136,7 @@ class QueryBuilder(object):
                 dkey = "complete_%s" % field
                 query_dsl['aggs'][dkey] = {
                     "terms": {
-                        "field": "keywords.%s.raw" % field,
+                        "field": "keywords_enriched_binary.%s.raw" % field,
                         "size": 5,
                         "include": "%s.*" % complete
                     }

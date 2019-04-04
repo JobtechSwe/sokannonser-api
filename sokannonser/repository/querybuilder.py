@@ -88,6 +88,8 @@ class QueryBuilder(object):
                                                     key=lambda k: k['doc_count'],
                                                     reverse=True)
                          if kv['key'] not in fwords]
+        if len(filtered_aggs) > 10:
+            return filtered_aggs[0:10]
         return filtered_aggs
 
     def _bootstrap_query(self, args):

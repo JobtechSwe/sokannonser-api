@@ -132,12 +132,15 @@ class QueryBuilder(object):
         complete_fields = args.get(settings.FREETEXT_FIELDS) or queries.QF_CHOICES
         if complete_string:
             complete = complete_string.split(' ')[-1]
+            size = 12/len(complete_fields)
             for field in complete_fields:
                 dkey = "complete_%s" % field
+                field_path = "keywords" if field == 'location' \
+                    else "keywords_enriched_binary"
                 query_dsl['aggs'][dkey] = {
                     "terms": {
-                        "field": "keywords_enriched_binary.%s.raw" % field,
-                        "size": 5,
+                        "field": "%s.%s.raw" % (field_path, field),
+                        "size": size,
                         "include": "%s.*" % complete
                     }
                 }

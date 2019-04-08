@@ -63,6 +63,7 @@ def configure_app(flask_app):
         }
         apm = ElasticAPM(flask_app, logging=logging.INFO)
         log.info("ElasticAPM enabled")
+        log.debug("APM details: %s" % str(apm))
     else:
         log.info("ElasticAPM is disabled")
 

@@ -34,7 +34,6 @@ BASE_URL = os.getenv('BASE_URL', 'https://base.url')
 
 # Header parameters
 APIKEY = 'api-key'
-APIKEY_BACKDOOR = 'apa'  # TODO: Remove before production
 
 # Query parameters
 OFFSET = 'offset'

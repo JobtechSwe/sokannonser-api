@@ -1,3 +1,4 @@
+from flask import jsonify
 from flask_restplus import Resource
 from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
@@ -12,9 +13,11 @@ class MarketSearch(Resource):
 
     @ns_market.doc(description='Search with freetext query')
     @ns_market.expect(market_query)
+    @ns_market.marshal_with(market_list)
     def get(self):
         args = market_query.parse_args()
-        return self.marshal_default(repository.find_annonser(args))
+        return jsonify(repository.find_annonser(args))
+        # return marshal_default(repository.find_annonser(args))
 
     @ns_market.marshal_with(market_list)
     def marshal_default(self, results):

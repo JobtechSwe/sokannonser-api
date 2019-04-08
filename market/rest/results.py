@@ -57,7 +57,7 @@ sources = api.model('Sources', {
     'url': fields.String(attribute='_source.source.url'),
 })
 
-annons = api.model('Ad', {
+annons = api.model('JobAd', {
     'id': fields.String(attribute='_source.id'),
     'header': fields.String(attribute='_source.header'),
     'content': ShortString(attribute='_source.content.text'),
@@ -84,8 +84,13 @@ stats = api.model('Stats', {
                              attribute='locations.buckets'),
 })
 
-market_list = api.model('Ads', {
+market_list = api.model('JobAds', {
     'total': fields.Integer(attribute='aggregations.total.value'),
     'stats': fields.Nested(stats, attribute='aggregations', skip_none=True),
     'hits': fields.List(fields.Nested(annons), attribute='hits.hits')
+})
+
+# Autocomplete model
+autocomplete_list = api.model('AutocompleteResults', {
+    'typeahead': fields.List(fields.String)
 })

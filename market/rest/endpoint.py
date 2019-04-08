@@ -3,7 +3,7 @@ from flask_restplus import Resource
 from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
 from market.rest import ns_market, market_query, market_typeahead
-from market.rest.results import market_list
+from market.rest.results import market_list, autocomplete_list
 from market import repository
 
 
@@ -16,12 +16,7 @@ class MarketSearch(Resource):
     @ns_market.marshal_with(market_list)
     def get(self):
         args = market_query.parse_args()
-        return jsonify(repository.find_annonser(args))
-        # return marshal_default(repository.find_annonser(args))
-
-    @ns_market.marshal_with(market_list)
-    def marshal_default(self, results):
-        return results
+        return repository.find_annonser(args)
 
 
 @ns_market.route('/complete')
@@ -30,6 +25,7 @@ class MarketComplete(Resource):
 
     @ns_market.doc(description='Typeahead / Suggest the next search term')
     @ns_market.expect(market_typeahead)
+    @ns_market.marshal_with(autocomplete_list)
     def get(self):
         args = market_typeahead.parse_args()
-        return repository.autocomplete(args.get(settings.FREETEXT_QUERY))
+        return {'typeahead': repository.autocomplete(args.get(settings.FREETEXT_QUERY))}

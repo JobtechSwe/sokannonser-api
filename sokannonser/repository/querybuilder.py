@@ -137,11 +137,9 @@ class QueryBuilder(object):
             size = 12/len(complete_fields)
             for field in complete_fields:
                 dkey = "complete_%s" % field
-                field_path = "keywords" if field == 'location' \
-                    else "keywords_enriched_binary"
                 query_dsl['aggs'][dkey] = {
                     "terms": {
-                        "field": "%s.%s.raw" % (field_path, field),
+                        "field": "enriched.keywords.%s.raw" % field,
                         "size": size,
                         "include": "%s.*" % complete
                     }

@@ -76,7 +76,6 @@ class QueryBuilder(object):
                     "size": args.get(settings.STAT_LMT) or 5
                 }
             }
-
         return query_dsl
 
     def filter_aggs(self, aggs, freetext):
@@ -89,6 +88,8 @@ class QueryBuilder(object):
                                                     key=lambda k: k['doc_count'],
                                                     reverse=True)
                          if kv['key'] not in fwords]
+        if len(filtered_aggs) > 10:
+            return filtered_aggs[0:10]
         return filtered_aggs
 
     def _bootstrap_query(self, args):
@@ -133,12 +134,15 @@ class QueryBuilder(object):
         complete_fields = args.get(settings.FREETEXT_FIELDS) or queries.QF_CHOICES
         if complete_string:
             complete = complete_string.split(' ')[-1]
+            size = 12/len(complete_fields)
             for field in complete_fields:
                 dkey = "complete_%s" % field
+                field_path = "keywords" if field == 'location' \
+                    else "keywords_enriched_binary"
                 query_dsl['aggs'][dkey] = {
                     "terms": {
-                        "field": "keywords.%s.raw" % field,
-                        "size": 5,
+                        "field": "%s.%s.raw" % (field_path, field),
+                        "size": size,
                         "include": "%s.*" % complete
                     }
                 }

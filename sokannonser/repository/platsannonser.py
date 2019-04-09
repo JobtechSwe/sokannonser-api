@@ -1,68 +1,13 @@
 import logging
 import json
 import time
-from datetime import date, timedelta
-from io import BytesIO
-from zipfile import ZipFile
 from flask_restplus import abort
 from elasticsearch import exceptions
-from elasticsearch.helpers import scan
 from valuestore import taxonomy
 from sokannonser import settings
 from sokannonser.repository import elastic
 
 log = logging.getLogger(__name__)
-
-
-def zip_ads(day, start_time=0):
-    if start_time == 0:
-        start_time = int(time.time()*1000)
-    if day == 'yesterday':
-        day = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
-    dsl = {
-        "query": {
-            "bool": {
-                "must": [{
-                    "range": {
-                        "status.uppdaterad": {
-                            "gte": day,
-                            "lte": day
-                        }
-                    }
-                }],
-                'filter': [
-                    {
-                        'range': {
-                            'publiceringsdatum': {
-                                'lte': 'now/m'
-                            }
-                        }
-                    },
-                    {
-                        'range': {
-                            'status.sista_publiceringsdatum': {
-                                'gte': 'now/m'
-                            }
-                        }
-                    },
-                ]
-            }
-        },
-    }
-    if day == 'all':
-        dsl['query']['bool']['must'][0] = {"match_all": {}}
-    scan_result = scan(elastic, dsl, index=settings.ES_INDEX)
-    in_memory = BytesIO()
-    zf = ZipFile(in_memory, mode="w")
-
-    ads = [ad['_source'] for ad in scan_result]
-    log.debug("Number of ads: %d" % len(ads))
-    zf.writestr(f"ads_{day}.json", json.dumps(ads))
-    zf.close()
-    in_memory.seek(0)
-    log.debug("File constructed after %d milliseconds."
-              % (int(time.time()*1000)-start_time))
-    return in_memory
 
 
 def get_stats_for(taxonomy_type):

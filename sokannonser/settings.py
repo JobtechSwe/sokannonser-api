@@ -84,6 +84,7 @@ sort_options = {
     'pubdate-asc':  {"publiceringsdatum": "asc"},
     'applydate-desc':  {"sista_ansokningsdatum": "desc"},
     'applydate-asc':  {"sista_ansokningsdatum": "asc"},
+    'updated': {"timestamp": "desc"},
 }
 stats_options = {
     taxonomy.OCCUPATION: "yrkesroll.taxonomi-kod.keyword",

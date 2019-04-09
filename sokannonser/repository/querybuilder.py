@@ -164,57 +164,98 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES
-        inc_words = ' '.join([w for w in querystring.split(' ') if not w.startswith('-')])
-        exc_words = ' '.join([w[1:] for w in querystring.split(' ') if w.startswith('-')])
-        shoulds = self._freetext_fields(inc_words, queryfields) if inc_words else None
-        mustnts = self._freetext_fields(exc_words, queryfields) if exc_words else None
+
+        concepts = ttc.text_to_concepts(querystring)
+        # Sort all concepts by string length
+        all_concepts = sorted(concepts['occupation'] +
+                              concepts['skill'] +
+                              concepts['trait'] +
+                              concepts['occupation_must'] +
+                              concepts['skill_must'] +
+                              concepts['trait_must'] +
+                              concepts['occupation_must_not'] +
+                              concepts['skill_must_not'] +
+                              concepts['trait_must_not'],
+                              key=lambda c: len(c),
+                              reverse=True)
+        # Remove found concepts from querystring
+        for concept in all_concepts:
+            p = re.compile(f'(\\s*){concept}(\\s*)')
+            querystring = p.sub('\\1\\2', querystring).strip()
+
+        inc_words = ' '.join([w for w in querystring.split(' ')
+                              if w and not w.startswith('+')
+                              and not w.startswith('-')])
+        req_words = ' '.join([w[1:] for w in querystring.split(' ')
+                              if w.startswith('+')
+                              and w[1:].strip()])
+        exc_words = ' '.join([w[1:] for w in querystring.split(' ')
+                              if w.startswith('-')
+                              and w[1:].strip()])
+        shoulds = self.__freetext_fields(inc_words) if inc_words else []
+        musts = self.__freetext_fields(req_words) if req_words else []
+        mustnts = self.__freetext_fields(exc_words) if exc_words else []
+
         ft_query = {"bool": {}}
+        # Add "common" words to query
         if shoulds:
-            ft_query['bool']['should'] = shoulds
+            # Include all "must" words in should, to make sure any single "should"-word
+            # not becomes exclusive
+            ft_query['bool']['should'] = shoulds + musts
+        if musts:
+            ft_query['bool']['must'] = musts
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
-        concepts = ttc.text_to_concepts(querystring)
-        ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
-                                                        ['occupations', 'skills',
-                                                         'traits'], 1, 'should', 10)
-        ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
-                                                        ['occupations_must_not',
-                                                         'skills_must_not',
-                                                         'traits_must_not'],
-                                                        10, 'must_not')
+        # Make all "musts" "shoulds" as well
+        for qf in queryfields:
+            if qf in concepts:
+                must_key = "%s_must" % qf
+                concepts[qf] += concepts.get(must_key, [])
+        # Add concepts to query
+        for concept_type in queryfields:
+            sub_should = self.__freetext_concepts({"bool": {}}, concepts,
+                                                  [concept_type], "should")
+            if 'should' in sub_should['bool']:
+                if 'must' not in ft_query['bool']:
+                    ft_query['bool']['must'] = []
+                ft_query['bool']['must'].append(sub_should)
+        # Remove unwanted concepts from query
+        self.__freetext_concepts(ft_query, concepts, queryfields, 'must_not')
+
+        # Add required concepts to query
+        self.__freetext_concepts(ft_query, concepts, queryfields, 'must')
+
         return ft_query
 
-    def _freetext_enriched_fields_query(self, ft_query, concepts, fields,
-                                        rev_cut, bool_type, boost=None):
-        for field in fields:
-            key = "keywords_enriched_binary.%s.raw" % field[:-rev_cut]
-            for value in concepts.get(field, []):
-                if bool_type not in ft_query['bool']:
-                    ft_query['bool'][bool_type] = []
-
-                query = {
-                    "term": {
-                        key: {
-                            "value": value
+    def __freetext_concepts(self, query_dict, concepts, concept_keys, bool_type):
+        for key in concept_keys:
+            dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
+            for value in concepts.get(dict_key, []):
+                if bool_type not in query_dict['bool']:
+                    query_dict['bool'][bool_type] = []
+                field = "keywords.%s.raw" % key  # TODO: Update to "enriched.keywords"
+                query_dict['bool'][bool_type].append(
+                    {
+                        "term": {
+                            field: {
+                                "value": value,
+                                "boost": 10
+                            }
                         }
                     }
-                }
-                if boost:
-                    query['term'][key]['boost'] = boost
-                ft_query['bool'][bool_type].append(query)
-        return ft_query
+                )
+        return query_dict
 
-    def _freetext_fields(self, searchword, queryfields):
-        search_fields = ["rubrik^3", "arbetsgivare.namn^2",
-                         "beskrivning.annonstext"]
-        search_fields += ["keywords.%s" % qf for qf in queryfields]
+    def __freetext_fields(self, searchword):
         return [
             {
                 "multi_match": {
                     "query": searchword,
                     "type": "cross_fields",
                     "operator": "and",
-                    "fields": search_fields
+                    "fields": ["rubrik^3", "arbetsgivare.namn^2",
+                               "beskrivning.annonstext",
+                               "keywords.location^10"]
                 }
             }
         ]

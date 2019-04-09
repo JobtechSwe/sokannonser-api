@@ -103,15 +103,15 @@ class TextToConcept(object):
         traits_must_not = [c['concept'].lower() for c in ontology_concepts
                            if self.filter_concepts(c, self.TRAIT_KEY, OP_MINUS)]
 
-        result = {'skills': skills,
-                  'occupations': occupations,
-                  'traits': traits,
-                  'skills_must': skills_must,
-                  'occupations_must': occupations_must,
-                  'traits_must': traits_must,
-                  'skills_must_not': skills_must_not,
-                  'occupations_must_not': occupations_must_not,
-                  'traits_must_not': traits_must_not}
+        result = {'skill': skills,
+                  'occupation': occupations,
+                  'trait': traits,
+                  'skill_must': skills_must,
+                  'occupation_must': occupations_must,
+                  'trait_must': traits_must,
+                  'skill_must_not': skills_must_not,
+                  'occupation_must_not': occupations_must_not,
+                  'trait_must_not': traits_must_not}
 
         return result
 

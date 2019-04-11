@@ -1,8 +1,10 @@
 import logging
 import re
+import json
 from sokannonser import settings
 from sokannonser.repository import ttc
 from sokannonser.rest.model import queries
+from sokannonser.rest.model import fields as f
 from valuestore import taxonomy
 
 log = logging.getLogger(__name__)
@@ -43,32 +45,32 @@ class QueryBuilder(object):
         must_queries.append(self._build_plats_query(args.get(taxonomy.MUNICIPALITY),
                                                     args.get(taxonomy.REGION)))
         must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
-        must_queries.append(self._build_generic_query([queries.MUST_HAVE_SKILLS+"."+
-                                                       queries.CONCEPT_ID+".keyword",
-                                                       queries.MUST_HAVE_SKILLS+"."+
-                                                       queries.LEGACY_AMS_TAXONOMY_ID],
+        must_queries.append(self._build_generic_query([f.MUST_HAVE_SKILLS+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.MUST_HAVE_SKILLS+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.SKILL)))
-        must_queries.append(self._build_generic_query([queries.WORKING_HOURS_TYPE+"."+
-                                                       queries.CONCEPT_ID+".keyword",
-                                                       queries.WORKING_HOURS_TYPE+"."+
-                                                       queries.LEGACY_AMS_TAXONOMY_ID],
+        must_queries.append(self._build_generic_query([f.WORKING_HOURS_TYPE+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.WORKING_HOURS_TYPE+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.WORKTIME_EXTENT)))
-        must_queries.append(self._build_generic_query([queries.DRIVING_LICENCE+"."+
-                                                       queries.CONCEPT_ID+".keyword",
-                                                       queries.DRIVING_LICENCE+"."+
-                                                       queries.LEGACY_AMS_TAXONOMY_ID],
+        must_queries.append(self._build_generic_query([f.DRIVING_LICENCE+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.DRIVING_LICENCE+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.DRIVING_LICENCE)))
-        must_queries.append(self._build_generic_query([queries.EMPLOYMENT_TYPE+"."+
-                                                       queries.CONCEPT_ID+".keyword",
-                                                       queries.EMPLOYMENT_TYPE+"."+
-                                                       queries.LEGACY_AMS_TAXONOMY_ID],
+        must_queries.append(self._build_generic_query([f.EMPLOYMENT_TYPE+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.EMPLOYMENT_TYPE+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.EMPLOYMENT_TYPE)))
 
         # TODO: Maybe check if NO skills are listed in ad instead?
         if args.get(settings.EXPERIENCE_REQUIRED) == 'false':
-            must_queries.append({"term": {queries.EXPERIENCE_REQUIRED: False}})
+            must_queries.append({"term": {f.EXPERIENCE_REQUIRED: False}})
         if args.get(settings.EXPERIENCE_REQUIRED) == 'true':
-            must_queries.append({"term": {queries.EXPERIENCE_REQUIRED: True}})
+            must_queries.append({"term": {f.EXPERIENCE_REQUIRED: True}})
 
         filter_queries = list()
         geo_filter = self._build_geo_dist_filter(args.get(settings.POSITION),
@@ -84,6 +86,7 @@ class QueryBuilder(object):
                     "size": args.get(settings.STAT_LMT) or 5
                 }
             }
+        log.debug("Constructed query: %s" % json.dumps(query_dsl, indent=2))
         return query_dsl
 
     def filter_aggs(self, aggs, freetext):
@@ -105,11 +108,11 @@ class QueryBuilder(object):
         query_dsl['from'] = args.pop(settings.OFFSET, 0)
         query_dsl['size'] = args.pop(settings.LIMIT, 10)
         if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
-            query_dsl['_source'] = [queries.ID, queries.HEADLINE, queries.APPLICATION_DEADLINE,
-                                    queries.EMPLOYMENT_TYPE+"."+queries.LABEL,
-                                    queries.WORKING_HOURS_TYPE+"."+queries.LABEL,
-                                    queries.EMPLOYER_NAME,
-                                    queries.PUBLICATION_DATE]
+            query_dsl['_source'] = [f.ID, f.HEADLINE, f.APPLICATION_DEADLINE,
+                                    f.EMPLOYMENT_TYPE+"."+f.LABEL,
+                                    f.WORKING_HOURS_TYPE+"."+f.LABEL,
+                                    f.EMPLOYER_NAME,
+                                    f.PUBLICATION_DATE]
         # Remove api-key from args to make sure an empty query can occur
         args.pop(settings.APIKEY)
 
@@ -120,30 +123,29 @@ class QueryBuilder(object):
                 'filter': [
                     {
                         'range': {
-                            queries.PUBLICATION_DATE: {
+                            f.PUBLICATION_DATE: {
                                 'lte': 'now/m'
                             }
                         }
                     },
                     {
                         'range': {
-                            queries.LAST_PUBLICATION_DATE: {
+                            f.LAST_PUBLICATION_DATE: {
                                 'gte': 'now/m'
                             }
                         }
                     },
-                    # TODO: Enable once data in elastic
-                    # {
-                    #     'term': {
-                    #         queries.REMOVED: False
-                    #     }
-                    # },
+                    {
+                        'term': {
+                            f.REMOVED: False
+                        }
+                    },
                 ]
             },
         }
         query_dsl['aggs'] = {
             "positions": {
-                "sum": {"field": queries.NUMBER_OF_VACANCIES}
+                "sum": {"field": f.NUMBER_OF_VACANCIES}
             }
         }
         complete_string = args.get(settings.TYPEAHEAD_QUERY)
@@ -155,7 +157,7 @@ class QueryBuilder(object):
                 dkey = "complete_%s" % field
                 query_dsl['aggs'][dkey] = {
                     "terms": {
-                        "field": "%s.%s.raw" % (queries.KEYWORDS_ENRICHED, field),
+                        "field": "%s.%s.raw" % (f.KEYWORDS_ENRICHED, field),
                         "size": size,
                         "include": "%s.*" % complete
                     }
@@ -249,7 +251,7 @@ class QueryBuilder(object):
             for value in concepts.get(dict_key, []):
                 if bool_type not in query_dict['bool']:
                     query_dict['bool'][bool_type] = []
-                field = "%s.%s.raw" % (queries.KEYWORDS_ENRICHED, key)
+                field = "%s.%s.raw" % (f.KEYWORDS_ENRICHED, key)
                 query_dict['bool'][bool_type].append(
                     {
                         "term": {
@@ -269,10 +271,10 @@ class QueryBuilder(object):
                     "query": searchword,
                     "type": "cross_fields",
                     "operator": "and",
-                    "fields": [queries.HEADLINE+"^3", queries.EMPLOYER_NAME+"^2",
-                               queries.EMPLOYER_WORKPLACE+"^2", queries.DESCRIPTION_TEXT,
-                               queries.KEYWORDS_EXTRACTED+".location^10", queries.ID,
-                               queries.EXTERNAL_ID]
+                    "fields": [f.HEADLINE+"^3", f.EMPLOYER_NAME+"^2",
+                               f.EMPLOYER_WORKPLACE+"^2", f.DESCRIPTION_TEXT,
+                               f.KEYWORDS_EXTRACTED+".location^10", f.ID,
+                               f.EXTERNAL_ID]
                 }
             }
         ]
@@ -284,9 +286,9 @@ class QueryBuilder(object):
                 "multi_match": {
                     "query": " ".join(employers),
                     "operator": "or",
-                    "fields": [queries.EMPLOYER_NAME,
-                               queries.EMPLOYER_WORKPLACE,
-                               queries.EMPLOYER_ORGANIZATION_NUMBER]
+                    "fields": [f.EMPLOYER_NAME,
+                               f.EMPLOYER_WORKPLACE,
+                               f.EMPLOYER_ORGANIZATION_NUMBER]
                 }
             }
         return None
@@ -299,57 +301,57 @@ class QueryBuilder(object):
 
         yrke_term_query = [{
             "term": {
-                queries.OCCUPATION+"."+queries.CONCEPT_ID+".keyword": {
+                f.OCCUPATION+"."+f.CONCEPT_ID+".keyword": {
                     "value": y,
                     "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                queries.OCCUPATION+"."+queries.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                queries.OCCUPATION_GROUP+"."+queries.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_GROUP+"."+f.CONCEPT_ID+".keyword": {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                queries.OCCUPATION_GROUP+"."+queries.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_GROUP+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                queries.OCCUPATION_FIELD+"."+queries.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_FIELD+"."+f.CONCEPT_ID+".keyword": {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                queries.OCCUPATION_FIELD+"."+queries.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_FIELD+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
         neg_yrke_term_query = [{
             "term": {
-                queries.OCCUPATION+"."+queries.CONCEPT_ID+".keyword": {
+                f.OCCUPATION+"."+f.CONCEPT_ID+".keyword": {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
         neg_yrke_term_query = [{
             "term": {
-                queries.OCCUPATION+"."+queries.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                queries.OCCUPATION_GROUP+"."+queries.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_GROUP+"."+f.CONCEPT_ID+".keyword": {
                     "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                queries.OCCUPATION_GROUP+"."+queries.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_GROUP+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                queries.OCCUPATION_FIELD+"."+queries.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_FIELD+"."+f.CONCEPT_ID+".keyword": {
                     "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                queries.OCCUPATION_FIELD+"."+queries.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_FIELD+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
 
         if yrke_term_query or neg_yrke_term_query:
@@ -379,10 +381,10 @@ class QueryBuilder(object):
             else:
                 lan.append(lkod)
         plats_term_query = [{"term": {
-            queries.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
+            f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
         plats_term_query += [{"term": {
-            queries.WORKPLACE_ADDRESS_REGION_CODE: {
+            f.WORKPLACE_ADDRESS_REGION_CODE: {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]
         plats_bool_query = {"bool": {
             "should": plats_term_query}
@@ -391,11 +393,11 @@ class QueryBuilder(object):
         neg_lan_term_query = []
         if neg_komm:
             neg_komm_term_query = [{"term": {
-                queries.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
+                f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
                     "value": kkod}}} for kkod in neg_komm]
         if neg_lan:
             neg_lan_term_query = [{"term": {
-                queries.WORKPLACE_ADDRESS_REGION_CODE: {
+                f.WORKPLACE_ADDRESS_REGION_CODE: {
                     "value": lkod}}} for lkod in neg_lan]
         if neg_komm_term_query or neg_lan_term_query:
             if 'bool' not in plats_bool_query:
@@ -421,7 +423,7 @@ class QueryBuilder(object):
         } if county_term_query else {}
         if neg_land:
             neg_country_term_query = [{"term": {
-                queries.WORKPLACE_ADDRESS_COUNTRY_CODE: {
+                f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
                     "value": lkod}}} for lkod in neg_land]
             if 'bool' not in country_bool_query:
                 country_bool_query['bool'] = {}
@@ -432,11 +434,11 @@ class QueryBuilder(object):
     def _filter_timeframe(self, from_datetime, to_datetime):
         if not from_datetime and not to_datetime:
             return None
-        range_query = {"range": {queries.PUBLICATION_DATE: {}}}
+        range_query = {"range": {f.PUBLICATION_DATE: {}}}
         if from_datetime:
-            range_query['range'][queries.PUBLICATION_DATE]['gte'] = from_datetime.isoformat()
+            range_query['range'][f.PUBLICATION_DATE]['gte'] = from_datetime.isoformat()
         if to_datetime:
-            range_query['range'][queries.PUBLICATION_DATE]['lte'] = to_datetime.isoformat()
+            range_query['range'][f.PUBLICATION_DATE]['lte'] = to_datetime.isoformat()
         return range_query
 
     # Parses PARTTIME_MIN and PARTTIME_MAX
@@ -452,7 +454,7 @@ class QueryBuilder(object):
                 "must": [
                     {
                         "range": {
-                            queries.SCOPE_OF_WORK_MIN: {
+                            f.SCOPE_OF_WORK_MIN: {
                                 "lte": parttime_max,
                                 "gte": parttime_min
                             },
@@ -517,7 +519,7 @@ class QueryBuilder(object):
                   and (-90 <= latitude <= 90) and (coordinate_range > 0)):
                 geo_filter["geo_distance"] = {
                     "distance": str(coordinate_range) + "km",
-                    queries.WORKPLACE_ADDRESS_COORDINATES: [longitude, latitude]
+                    f.WORKPLACE_ADDRESS_COORDINATES: [longitude, latitude]
                 }
             if geo_filter:
                 geo_bool['bool']['should'].append(geo_filter)

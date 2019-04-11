@@ -122,6 +122,12 @@ class QueryBuilder(object):
                             }
                         }
                     },
+                    # TODO: Enable once data is in place
+                    # {
+                    #     'term': {
+                    #         'removed': False
+                    #     }
+                    # },
                 ]
             },
         }

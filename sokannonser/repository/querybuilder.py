@@ -139,7 +139,7 @@ class QueryBuilder(object):
                 dkey = "complete_%s" % field
                 query_dsl['aggs'][dkey] = {
                     "terms": {
-                        "field": "enriched.keywords.%s.raw" % field,
+                        "field": "keywords_enriched_binary.%s.raw" % field,
                         "size": size,
                         "include": "%s.*" % complete
                     }
@@ -233,7 +233,7 @@ class QueryBuilder(object):
             for value in concepts.get(dict_key, []):
                 if bool_type not in query_dict['bool']:
                     query_dict['bool'][bool_type] = []
-                field = "keywords.%s.raw" % key  # TODO: Update to "enriched.keywords"
+                field = "keywords.%s.raw" % key  # TODO: Update to "keywords.enriched"
                 query_dict['bool'][bool_type].append(
                     {
                         "term": {
@@ -255,7 +255,8 @@ class QueryBuilder(object):
                     "operator": "and",
                     "fields": ["rubrik^3", "arbetsgivare.namn^2",
                                "beskrivning.annonstext",
-                               "keywords.location^10"]
+                               "keywords.extracted.location^10",
+                               "id", "external_id"]
                 }
             }
         ]

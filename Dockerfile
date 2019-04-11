@@ -38,10 +38,11 @@ WORKDIR /app
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# delete all __pycache__-folders in tests-folder
-RUN find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
 # runs unit tests with @pytest.mark.unit annotation only
 RUN python3 -m pytest -svv -m unit tests/
+
+# delete all __pycache__-folders in tests-folder
+RUN find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
 
 USER 10000
 CMD ["/usr/bin/supervisord", "-n"]

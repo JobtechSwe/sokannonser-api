@@ -253,9 +253,8 @@ class QueryBuilder(object):
                     "query": searchword,
                     "type": "cross_fields",
                     "operator": "and",
-                    "fields": ["rubrik^3", "arbetsgivare.namn^2",
-                               "beskrivning.annonstext",
-                               "keywords.extracted.location^10",
+                    "fields": ["rubrik^3", "arbetsgivare.namn^2", "arbetsgivare.arbetsplats^2",
+                               "beskrivning.annonstext", "keywords.extracted.location^10",
                                "id", "external_id"]
                 }
             }

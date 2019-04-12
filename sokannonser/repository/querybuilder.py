@@ -155,9 +155,11 @@ class QueryBuilder(object):
             size = 12/len(complete_fields)
             for field in complete_fields:
                 dkey = "complete_%s" % field
+                base_field = f.KEYWORDS_EXTRACTED \
+                    if field in ['location'] else f.KEYWORDS_ENRICHED
                 query_dsl['aggs'][dkey] = {
                     "terms": {
-                        "field": "%s.%s.raw" % (f.KEYWORDS_ENRICHED, field),
+                        "field": "%s.%s.raw" % (base_field, field),
                         "size": size,
                         "include": "%s.*" % complete
                     }

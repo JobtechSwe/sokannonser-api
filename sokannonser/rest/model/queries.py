@@ -4,7 +4,7 @@ from valuestore import taxonomy
 from sokannonser import settings
 
 # Frågemodeller
-QF_CHOICES = ['occupation', 'skill', 'location']
+QF_CHOICES = ['occupation', 'skill', 'location', 'employer']
 OPTIONS_BRIEF = 'brief'
 OPTIONS_FULL = 'full'
 

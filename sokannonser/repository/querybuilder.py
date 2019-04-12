@@ -156,7 +156,7 @@ class QueryBuilder(object):
             for field in complete_fields:
                 dkey = "complete_%s" % field
                 base_field = f.KEYWORDS_EXTRACTED \
-                    if field in ['location'] else f.KEYWORDS_ENRICHED
+                    if field in ['location', 'employer'] else f.KEYWORDS_ENRICHED
                 query_dsl['aggs'][dkey] = {
                     "terms": {
                         "field": "%s.%s.raw" % (base_field, field),

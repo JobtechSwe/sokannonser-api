@@ -25,7 +25,7 @@ class QueryBuilder(object):
             log.debug("Constructing match-all query")
             query_dsl['query']['bool']['must'].append({'match_all': {}})
             if 'sort' not in query_dsl:
-                query_dsl['sort'] = [settings.sort_options.get('pubdate-desc')]
+                query_dsl['sort'] = [f.sort_options.get('pubdate-desc')]
             return query_dsl
 
         must_queries = list()
@@ -166,7 +166,7 @@ class QueryBuilder(object):
                 }
 
         if args.get(settings.SORT):
-            query_dsl['sort'] = [settings.sort_options.get(args.pop(settings.SORT))]
+            query_dsl['sort'] = [f.sort_options.get(args.pop(settings.SORT))]
         return query_dsl
 
     def _assemble_queries(self, query_dsl, additional_queries, additional_filters):

@@ -6,6 +6,7 @@ from elasticsearch import exceptions
 from valuestore import taxonomy
 from sokannonser import settings
 from sokannonser.repository import elastic
+from sokannonser.rest.model import fields
 
 log = logging.getLogger(__name__)
 
@@ -35,14 +36,14 @@ def get_stats_for(taxonomy_type):
                 'filter': [
                     {
                         'range': {
-                            'publiceringsdatum': {
+                            fields.PUBLICATION_DATE: {
                                 'lte': 'now/m'
                             }
                         }
                     },
                     {
                         'range': {
-                            'status.sista_publiceringsdatum': {
+                            fields.LAST_PUBLICATION_DATE: {
                                 'gte': 'now/m'
                             }
                         }
@@ -72,6 +73,7 @@ def find_platsannonser(args, querybuilder, start_time=0):
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
 
+    print(json.dumps(query_dsl, indent=2))
     try:
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         log.debug("Elastic results after %d milliseconds."

@@ -44,10 +44,10 @@ swagger_doc_params = {
                              "the taxonomy",
     taxonomy.REGION: "One or more region codes, code according to the taxonomy",
     taxonomy.COUNTRY: "One or more country codes, code according to the taxonomy",
-    settings.POSITION: "Latitude and longitude in the format \"59.329, 18.068\" "
-                         "(latitude, longitude)",
+    settings.POSITION: "Latitude and longitude in the format \"59.329,18.068\" "
+                         "(latitude,longitude)",
     settings.POSITION_RADIUS: "Radius from the specified " + settings.POSITION +
-                                " (latitude, longitude) in kilometers (km)",
+                                " (latitude,longitude) in kilometers (km)",
 }
 swagger_filter_doc_params = {
     settings.DETAILS: "Show 'full' (default) or 'brief' results details",
@@ -95,7 +95,8 @@ annons_complete_query.add_argument(taxonomy.MUNICIPALITY, action='append')
 annons_complete_query.add_argument(taxonomy.REGION, action='append')
 annons_complete_query.add_argument(taxonomy.COUNTRY, action='append')
 annons_complete_query.add_argument(settings.POSITION,
-                                   type=inputs.regex('^[\\d\\.]+, ?[\\d\\.]+$'),
+                                   type=inputs.regex('^[-+]?([1-8]?\d(\.\d*)?|90(\.0*)?),'
+                                     '[-+]?(180(\.0*)?|((1[0-7]\d)|([1-9]?\d))(\.\d*)?)$'),
                                    action='append')
 annons_complete_query.add_argument(settings.POSITION_RADIUS, type=int, action='append')
 annons_complete_query.add_argument(settings.EMPLOYER, action='append')
@@ -134,11 +135,11 @@ taxonomy_query.add_argument('type',
                                 taxonomy.JobtechTaxonomy.EMPLOYMENT_TYPE,
                                 taxonomy.JobtechTaxonomy.DRIVING_LICENCE,
                                 taxonomy.JobtechTaxonomy.WORKTIME_EXTENT,
-                                    taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_1,
-                                    taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_2,
-                                    taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_3,
-                                    taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_1,
-                                    taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_2,
-                                    taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_3,
+                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_1,
+                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_2,
+                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_3,
+                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_1,
+                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_2,
+                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_3,
                                 ))
 taxonomy_query.add_argument(settings.SHOW_COUNT, type=bool, default=False)

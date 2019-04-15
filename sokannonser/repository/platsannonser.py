@@ -66,16 +66,16 @@ def get_stats_for(taxonomy_type):
 
 def find_platsannonser(args, querybuilder, start_time=0):
     if start_time == 0:
-        start_time = int(time.time()*1000)
+        start_time = int(time.time() * 1000)
     query_dsl = querybuilder.parse_args(args)
     log.debug(json.dumps(query_dsl, indent=2))
     log.debug("Query constructed after %d milliseconds."
-              % (int(time.time()*1000)-start_time))
+              % (int(time.time() * 1000) - start_time))
 
     try:
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         log.debug("Elastic results after %d milliseconds."
-                  % (int(time.time()*1000)-start_time))
+                  % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
         logging.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
@@ -109,5 +109,19 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
                 ]
 
             })
+
+    delete_ml_enriched_values(results)
+
     # log.debug(json.dumps(results, indent=2))
     return results
+
+
+def delete_ml_enriched_values(results):
+    for hit in results['hits']:
+        print(hit.keys())
+        keyword_node = hit['_source']['keywords']
+        print(keyword_node.keys())
+        try:
+            del keyword_node['enriched']
+        except KeyError:
+            pass

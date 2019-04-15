@@ -17,6 +17,7 @@ class TextToConcept(object):
     COMPETENCE_KEY = 'KOMPETENS'
     OCCUPATION_KEY = 'YRKE'
     TRAIT_KEY = 'FORMAGA'
+    LOCATION_KEY='PLATS'
     REMOVED_TAG = '<removed>'
 
     def __init__(self, ontologyhost='localhost', ontologyport=9200,
@@ -37,6 +38,7 @@ class TextToConcept(object):
             log.info('Creating Ontology, ontologyindex: %s' % self.ontologyindex)
             self.ontology = Ontology(client=self.client,
                                      index=self.ontologyindex,
+                                     annons_index='platsannons-read',
                                      concept_type=None,
                                      include_misspelled=True)
             log.info('Done creating Ontology, ontologyindex: %s' % self.ontologyindex)
@@ -88,6 +90,8 @@ class TextToConcept(object):
                        if self.filter_concepts(c, self.OCCUPATION_KEY, OP_NONE)]
         traits = [c['concept'].lower() for c in ontology_concepts
                   if self.filter_concepts(c, self.TRAIT_KEY, OP_NONE)]
+        locations = [c['concept'].lower() for c in ontology_concepts
+                     if self.filter_concepts(c, self.LOCATION_KEY, OP_NONE)]
 
         skills_must = [c['concept'].lower() for c in ontology_concepts
                        if self.filter_concepts(c, self.COMPETENCE_KEY, OP_PLUS)]
@@ -95,6 +99,8 @@ class TextToConcept(object):
                             if self.filter_concepts(c, self.OCCUPATION_KEY, OP_PLUS)]
         traits_must = [c['concept'].lower() for c in ontology_concepts
                        if self.filter_concepts(c, self.TRAIT_KEY, OP_PLUS)]
+        locations_must = [c['concept'].lower() for c in ontology_concepts
+                          if self.filter_concepts(c, self.LOCATION_KEY, OP_PLUS)]
 
         skills_must_not = [c['concept'].lower() for c in ontology_concepts
                            if self.filter_concepts(c, self.COMPETENCE_KEY, OP_MINUS)]
@@ -102,16 +108,21 @@ class TextToConcept(object):
                                 if self.filter_concepts(c, self.OCCUPATION_KEY, OP_MINUS)]
         traits_must_not = [c['concept'].lower() for c in ontology_concepts
                            if self.filter_concepts(c, self.TRAIT_KEY, OP_MINUS)]
+        locations_must_not = [c['concept'].lower() for c in ontology_concepts
+                              if self.filter_concepts(c, self.LOCATION_KEY, OP_MINUS)]
 
         result = {'skill': skills,
                   'occupation': occupations,
                   'trait': traits,
+                  'location': locations,
                   'skill_must': skills_must,
                   'occupation_must': occupations_must,
                   'trait_must': traits_must,
+                  'location_must': locations_must,
                   'skill_must_not': skills_must_not,
                   'occupation_must_not': occupations_must_not,
-                  'trait_must_not': traits_must_not}
+                  'trait_must_not': traits_must_not,
+                  'location_must_not': locations_must_not}
 
         return result
 

@@ -14,14 +14,14 @@ log = logging.getLogger(__name__)
 def get_stats_for(taxonomy_type):
     log.info("Looking for %s" % taxonomy_type)
     value_path = {
-        taxonomy.JobtechTaxonomy.OCCUPATION_NAME: "yrkesroll.taxonomi-kod.keyword",
-        taxonomy.JobtechTaxonomy.OCCUPATION_GROUP: "yrkesgrupp.taxonomi-kod.keyword",
-        taxonomy.JobtechTaxonomy.OCCUPATION_FIELD: "yrkesomrade.taxonomi-kod.keyword",
-        taxonomy.JobtechTaxonomy.SKILL: "krav.kompetenser.taxonomi-kod.keyword",
-        taxonomy.JobtechTaxonomy.WORKTIME_EXTENT: "arbetstidstyp.taxonomi-kod.keyword",
-        taxonomy.JobtechTaxonomy.MUNICIPALITY:
-        "arbetsplatsadress.taxonomi-kommun.keyword",
-        taxonomy.JobtechTaxonomy.REGION: "arbetsplatsadress.taxonomi-lan.keyword"
+        taxonomy.JobtechTaxonomy.OCCUPATION_NAME: "%s.%s.keyword" % (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.JobtechTaxonomy.OCCUPATION_GROUP: "%s.%s.keyword" % (fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.JobtechTaxonomy.OCCUPATION_FIELD: "%s.%s.keyword" % (fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.JobtechTaxonomy.SKILL: "%s.%s.keyword" % (fields.MUST_HAVE_SKILLS, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.JobtechTaxonomy.WORKTIME_EXTENT: "%s.%s.keyword" % (fields.WORKING_HOURS_TYPE, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.JobtechTaxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
+        taxonomy.JobtechTaxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
+        taxonomy.JobtechTaxonomy.REGION: "%s.keyword" % fields.WORKPLACE_ADDRESS_REGION
     }
     # Make sure we don't crash if we want to stat on missing type
     if taxonomy_type not in value_path:

@@ -1,3 +1,5 @@
+from valuestore import taxonomy
+
 # QUERYFIELDS
 ID = 'id'
 EXTERNAL_ID = 'external_id'
@@ -72,4 +74,10 @@ sort_options = {
     'applydate-desc':  {APPLICATION_DEADLINE: "desc"},
     'applydate-asc':  {APPLICATION_DEADLINE: "asc"},
     'updated': {"timestamp": "desc"},
+}
+stats_options = {
+    taxonomy.OCCUPATION: "%s.%s.keyword" % (OCCUPATION, LEGACY_AMS_TAXONOMY_ID),
+    taxonomy.GROUP: "%s.%s.keyword" % (OCCUPATION_GROUP, LEGACY_AMS_TAXONOMY_ID),
+    taxonomy.FIELD: "%s.%s.keyword" % (OCCUPATION_FIELD, LEGACY_AMS_TAXONOMY_ID),
+    taxonomy.SKILL: "%s.%s.keyword" % (MUST_HAVE_SKILLS, LEGACY_AMS_TAXONOMY_ID),
 }

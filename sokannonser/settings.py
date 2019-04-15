@@ -1,5 +1,4 @@
 import os
-from valuestore import taxonomy
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "localhost")
@@ -77,12 +76,6 @@ SHOW_EXPIRED = 'show-expired'
 result_models = [
     'pbapi', 'simple'
 ]
-stats_options = {
-    taxonomy.OCCUPATION: "yrkesroll.taxonomi-kod.keyword",
-    taxonomy.GROUP: "yrkesgrupp.taxonomi-kod.keyword",
-    taxonomy.FIELD: "yrkesomrade.taxonomi-kod.keyword",
-    taxonomy.SKILL: "krav.kompetenser.taxonomi-kod.keyword",
-}
 auranest_sort_options = {
     'relevance': "_score",
     'pubdate-desc': {"source.firstSeenAt": "desc"},

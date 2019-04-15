@@ -6,7 +6,7 @@ from market.rest.results import market_list, autocomplete_list
 from market import repository
 
 
-@ns_market.route('search')
+@ns_market.route('/search')
 class MarketSearch(Resource):
     method_decorators = [check_api_key('all')]
 
@@ -18,7 +18,7 @@ class MarketSearch(Resource):
         return repository.find_annonser(args)
 
 
-@ns_market.route('complete')
+@ns_market.route('/complete')
 class MarketComplete(Resource):
     method_decorators = [check_api_key('all')]
 

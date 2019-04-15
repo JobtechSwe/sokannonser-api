@@ -77,14 +77,6 @@ SHOW_EXPIRED = 'show-expired'
 result_models = [
     'pbapi', 'simple'
 ]
-sort_options = {
-    'relevance': "_score",
-    'pubdate-desc': {"publiceringsdatum": "desc"},
-    'pubdate-asc':  {"publiceringsdatum": "asc"},
-    'applydate-desc':  {"sista_ansokningsdatum": "desc"},
-    'applydate-asc':  {"sista_ansokningsdatum": "asc"},
-    'updated': {"timestamp": "desc"},
-}
 stats_options = {
     taxonomy.OCCUPATION: "yrkesroll.taxonomi-kod.keyword",
     taxonomy.GROUP: "yrkesgrupp.taxonomi-kod.keyword",

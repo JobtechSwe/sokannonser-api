@@ -7,7 +7,7 @@ from sokannonser.rest import api
 from sokannonser.rest.endpoint.platsannonser import PBSearch, Proxy
 # from sokannonser.rest.endpoint.openapi import OpenSearch
 from sokannonser.rest.endpoint.valuestore import Valuestore
-from market.rest.endpoint import MarketComplete, MarketSearch
+# from market.rest.endpoint import MarketComplete, MarketSearch
 
 app = Flask(__name__)
 CORS(app)

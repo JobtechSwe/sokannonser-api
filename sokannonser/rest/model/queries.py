@@ -2,6 +2,7 @@ from flask_restplus import reqparse, inputs
 from datetime import datetime
 from valuestore import taxonomy
 from sokannonser import settings
+from sokannonser.rest.model import fields
 
 # Frågemodeller
 QF_CHOICES = ['occupation', 'skill', 'location', 'employer']
@@ -107,7 +108,7 @@ pb_query.add_argument(settings.OFFSET, type=inputs.int_range(0, settings.MAX_OFF
                       default=0)
 pb_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_LIMIT),
                       default=10)
-pb_query.add_argument(settings.SORT, choices=list(settings.sort_options.keys()))
+pb_query.add_argument(settings.SORT, choices=list(fields.sort_options.keys()))
 pb_query.add_argument(settings.STATISTICS, action='append',
                       choices=[taxonomy.OCCUPATION, taxonomy.GROUP,
                                taxonomy.FIELD])

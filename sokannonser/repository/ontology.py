@@ -95,7 +95,6 @@ class Ontology(object):
             else:
                 concepts = list(filter(lambda concept: concept['type'] ==
                                        concept_type, concepts))
-        print('Returning concepts', concepts)
         return concepts
 
     def elastic_iterator(self, maximum=None, query=None, _source=None, size=1000):

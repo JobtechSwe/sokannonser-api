@@ -1,6 +1,7 @@
 from flask_restplus import fields
 from sokannonser.rest import ns_platsannons
 from sokannonser import settings
+from sokannonser.rest.model import fields as f
 
 # Platsannonser
 resultat_plats = ns_platsannons.model('Plats', {
@@ -19,40 +20,16 @@ resultat_taxonomi = ns_platsannons.model('TaxonomiEntitet', {
 })
 
 
-matchande_annons = ns_platsannons.model('MatchandeAnnons', {
-    'arbetssokandeprofilId': fields.String(attribute='_source.id'),
-    'rubrik': fields.String(attribute='_source.rubrik'),
-    'senastModifierad': fields.String(attribute='_source.timestamp'),
-    'efterfragadArbetsplats': fields.Nested({
-        'land': fields.List(fields.Nested(resultat_plats), attribute='krav.land'),
-        'lan': fields.List(fields.Nested(resultat_plats), attribute='krav.lan'),
-        'kommun': fields.List(fields.Nested(resultat_plats), attribute='krav.kommun'),
-        'geoPosition': fields.List(fields.Nested(resultat_geoposition),
-                                   attribute='krav.geoPosition')
-    }, attribute='_source', skip_none=True),
-    'matchningsresultatKandidat': fields.Nested({
-        'efterfragade': fields.Nested({
-            'yrke': fields.List(fields.Nested(resultat_taxonomi)),
-            'anstallningstyp': fields.List(fields.Nested(resultat_taxonomi)),
-            'efterfragade': fields.List(fields.Nested(resultat_taxonomi)),
-        }, attribute='krav', skip_none=True),
-        'erbjudande': fields.Nested({
-            'yrke': fields.List(fields.Nested(resultat_taxonomi)),
-            'kompetens': fields.List(fields.Nested(resultat_taxonomi))
-        }, attribute='erfarenhet', skip_none=True)
-    }, attribute='_source')
-})
-
-
 class FormattedUrl(fields.Raw):
     def format(self, value):
         return "%s/af/ad/%s" % (settings.BASE_URL, value)
 
 
-matchande_annons_simple = ns_platsannons.model('MatchandeAnnons', {
+# DEPRECATED
+matchande_annons = ns_platsannons.model('MatchandeAnnons', {
     'annons': fields.Nested({
-        'annonsid': fields.String(attribute='id'),
-        'annons_url': FormattedUrl(attribute='id'),
+        'annonsid': fields.String(attribute=f.ID),
+        'annons_url': FormattedUrl(attribute=f.ID),
         'platsannons_url': fields.String(attribute='url'),
         'annonsrubrik': fields.String(attribute='rubrik'),
         'annonstext': fields.String(attribute='beskrivning.annonstext'),
@@ -110,5 +87,5 @@ pbapi_lista = ns_platsannons.model('Platsannonser', {
 simple_lista = ns_platsannons.model('Platsannonser', {
     'antal_platsannonser': fields.Integer(attribute='total'),
     'statistik': fields.Nested(statistics, attribute='stats'),
-    'platsannonser': fields.List(fields.Nested(matchande_annons_simple), attribute='hits')
+    'platsannonser': fields.List(fields.Nested(matchande_annons), attribute='hits')
 })

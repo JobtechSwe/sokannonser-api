@@ -25,7 +25,7 @@ class Proxy(Resource):
         }
     )
     def get(self, id):
-        return platsannonser.fetch_platsannons(id)
+        return platsannonser.fetch_platsannons(str(id))
 
 
 @ns_platsannons.route('/search')

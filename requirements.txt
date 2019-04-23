@@ -13,3 +13,5 @@ pytest-envfiles
 elastic-apm[flask]==4.1.0
 flashtext
 Beaker
+urllib3==1.24.2
+

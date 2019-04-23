@@ -66,10 +66,10 @@ pipeline {
             slackSend color: 'good', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} build: ${buildTag}."
         }
         failure {
-            slackSend color: 'bad', channel: '#narval-sokapi', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} failed to build to ${openshiftProject} build ${buildTag}. ${BUILD_URL}console"
+            slackSend color: 'FF0000', channel: '#narval-sokapi', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} FAILED to build to ${openshiftProject} build ${buildTag}. ${BUILD_URL}console"
         }
         unstable {
-            slackSend color: 'bad', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} unstable build for ${openshiftProject} build ${buildTag}. ${BUILD_URL}console"
+            slackSend color: 'FFFF00', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} unstable build for ${openshiftProject} build ${buildTag}. ${BUILD_URL}console"
         }
     }
 }

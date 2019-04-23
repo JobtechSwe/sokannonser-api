@@ -4,3 +4,5 @@ build
 *.eggs
 .pytest_cache/
 .coverage
+./idea/
+

@@ -13,9 +13,8 @@ from sokannonser.repository.querybuilder import QueryBuilder, ttc
 log = logging.getLogger(__name__)
 
 
-@ns_platsannons.route('/ad/<id>')
+@ns_platsannons.route('/ad/<id>', endpoint='ad')
 class Proxy(Resource):
-
     @ns_platsannons.doc(
         responses={
             200: 'OK',

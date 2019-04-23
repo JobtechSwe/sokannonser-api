@@ -23,6 +23,7 @@ class Proxy(Resource):
             500: 'Technical exception'
         }
     )
+    @ns_platsannons.param('id', 'Id for ad to get')
     def get(self, id):
         return platsannonser.fetch_platsannons(str(id))
 

@@ -92,7 +92,7 @@ def find_platsannonser(args, querybuilder, start_time=0):
 
 def fetch_platsannons(id):
     try:
-        query_result = elastic.get(settings.ES_INDEX, 'document', id)
+        query_result = elastic.get(index=settings.ES_INDEX, doc_type='document', id=id)
         if query_result and '_source' in query_result:
             source = query_result['_source']
             keyword_node = source['keywords']

@@ -15,10 +15,13 @@ def get_stats_for(taxonomy_type):
     log.info("Looking for %s" % taxonomy_type)
     value_path = {
         taxonomy.JobtechTaxonomy.OCCUPATION_NAME: "%s.%s.keyword" % (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
-        taxonomy.JobtechTaxonomy.OCCUPATION_GROUP: "%s.%s.keyword" % (fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
-        taxonomy.JobtechTaxonomy.OCCUPATION_FIELD: "%s.%s.keyword" % (fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.JobtechTaxonomy.OCCUPATION_GROUP: "%s.%s.keyword" % (
+        fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.JobtechTaxonomy.OCCUPATION_FIELD: "%s.%s.keyword" % (
+        fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.JobtechTaxonomy.SKILL: "%s.%s.keyword" % (fields.MUST_HAVE_SKILLS, fields.LEGACY_AMS_TAXONOMY_ID),
-        taxonomy.JobtechTaxonomy.WORKTIME_EXTENT: "%s.%s.keyword" % (fields.WORKING_HOURS_TYPE, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.JobtechTaxonomy.WORKTIME_EXTENT: "%s.%s.keyword" % (
+        fields.WORKING_HOURS_TYPE, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.JobtechTaxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
         taxonomy.JobtechTaxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
         taxonomy.JobtechTaxonomy.REGION: "%s.keyword" % fields.WORKPLACE_ADDRESS_REGION
@@ -85,6 +88,27 @@ def find_platsannonser(args, querybuilder, start_time=0):
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
     return transform_platsannons_query_result(args, query_result, querybuilder)
+
+
+def fetch_platsannons(id):
+    try:
+        query_result = elastic.get(settings.ES_INDEX, 'document', id)
+        if query_result and '_source' in query_result:
+            source = query_result['_source']
+            keyword_node = source['keywords']
+            try:
+                del keyword_node['enriched']
+            except KeyError:
+                pass
+            return source
+    except exceptions.NotFoundError:
+        logging.exception('Failed to find id: %s' % id)
+        abort(404, 'Ad not found')
+        return
+    except exceptions.ConnectionError as e:
+        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        abort(500, 'Failed to establish connection to database')
+        return
 
 
 def transform_platsannons_query_result(args, query_result, querybuilder):

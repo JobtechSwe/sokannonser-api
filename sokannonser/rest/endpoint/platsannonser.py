@@ -25,17 +25,7 @@ class Proxy(Resource):
         }
     )
     def get(self, id):
-        url = "%s%s" % (settings.AD_PROXY_URL, id)
-        headers = {'Accept-Language': 'sv', 'Accept': 'application/json'}
-        try:
-            response = get(url, headers=headers, timeout=10)
-            if response.status_code == 200:
-                return response.json()
-            else:
-                abort(response.status_code)
-        except exceptions.RequestException as e:
-            log.error('Failed to connect', e)
-            abort(500)
+        return platsannonser.fetch_platsannons(id)
 
 
 @ns_platsannons.route('/search')

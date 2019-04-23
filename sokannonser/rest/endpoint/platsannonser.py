@@ -1,6 +1,7 @@
 import logging
 import time
-from flask_restplus import Resource
+from flask_restplus import Resource, abort
+from requests import get, exceptions
 from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons
@@ -10,6 +11,7 @@ from sokannonser.repository import platsannonser
 from sokannonser.repository.querybuilder import QueryBuilder, ttc
 
 log = logging.getLogger(__name__)
+
 
 @ns_platsannons.route('/ad/<id>')
 class Proxy(Resource):

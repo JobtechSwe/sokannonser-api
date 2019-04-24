@@ -37,10 +37,13 @@ def create_log_formatter():
 def set_custom_log_level():
     # Set log level debug for module specific events
     # and level warning for all third party dependencies
+    master_module = str(__name__).split('.')[0]
     for key in logging.Logger.manager.loggerDict:
         # for handler in logging.getLogger(key).handlers[:]:
         #     logging.getLogger(key).removeHandler(handler)
-        if key.startswith(__name__) or key.startswith('valuestore'):
+        if key.startswith(master_module) or key.startswith('valuestore') \
+                or key.startswith('market'):
+            print("Setting loglevel DEBUG for %s" % key)
             logging.getLogger(key).setLevel(logging.DEBUG)
 
         else:

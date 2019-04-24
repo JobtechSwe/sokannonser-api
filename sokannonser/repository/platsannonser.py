@@ -72,11 +72,9 @@ def find_platsannonser(args, querybuilder, start_time=0):
     if start_time == 0:
         start_time = int(time.time() * 1000)
     query_dsl = querybuilder.parse_args(args)
-    log.debug(json.dumps(query_dsl, indent=2))
+    log.debug("Query: %s" % json.dumps(query_dsl))
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
-
-    log.debug(json.dumps(query_dsl, indent=2))
     try:
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         log.debug("Elastic results after %d milliseconds."

@@ -13,7 +13,7 @@ app = Flask(__name__)
 CORS(app)
 appconf.configure_logging()
 log = logging.getLogger(__name__)
-log.debug(logging.getLevelName(log.getEffectiveLevel()) + ' log level activated')
+log.info(logging.getLevelName(log.getEffectiveLevel()) + ' log level activated')
 log.info("Starting %s" % __name__)
 
 

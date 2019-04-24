@@ -96,9 +96,11 @@ annons_complete_query.add_argument(settings.EXPERIENCE_REQUIRED,
 annons_complete_query.add_argument(taxonomy.MUNICIPALITY, action='append')
 annons_complete_query.add_argument(taxonomy.REGION, action='append')
 annons_complete_query.add_argument(taxonomy.COUNTRY, action='append')
+# Matches(lat,long) +90.0,-127.554334; 45,180; -90,-180; -90.000,-180.0000; +90,+180
+position_regex = '^[-+]?([1-8]?\\d(\\.\\d*)?|90(\\.0*)?),' \
+            '[-+]?(180(\\.0*)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d*)?)$'
 annons_complete_query.add_argument(settings.POSITION,
-                                   type=inputs.regex('^[-+]?([1-8]?\d(\.\d*)?|90(\.0*)?),'
-                                     '[-+]?(180(\.0*)?|((1[0-7]\d)|([1-9]?\d))(\.\d*)?)$'),
+                                   type=inputs.regex(position_regex),
                                    action='append')
 annons_complete_query.add_argument(settings.POSITION_RADIUS, type=int, action='append')
 annons_complete_query.add_argument(settings.EMPLOYER, action='append')

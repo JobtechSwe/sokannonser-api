@@ -51,7 +51,7 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                17.1, 60.5
+                                                                  60.5, 17.1
                                                             ]}}]}}),
                                                    ({settings.APIKEY: "",
                                                      settings.POSITION: ["60.5, 399.1"],
@@ -62,7 +62,7 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                399.1, 60.5
+                                                                60.5, 399.1
                                                             ]}}]}}),
                                                    ({settings.APIKEY: "",
                                                      settings.POSITION: ["60.5, 17.1"],
@@ -73,7 +73,7 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "-5km",
                                                             "workplace_address.coordinates": [
-                                                                17.1, 60.5
+                                                                60.5, 17.1
                                                             ]}}]}}),
                                                    ({settings.APIKEY: "",
                                                      settings.POSITION: ["60.5, 17.1", "61.5, 18.1"],
@@ -84,12 +84,12 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                17.1, 60.5
+                                                                60.5, 17.1
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "10km",
                                                             "workplace_address.coordinates": [
-                                                                18.1, 61.5
+                                                                61.5, 18.1
                                                             ]
                                                          }}]
                                                     }}),
@@ -102,12 +102,12 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                17.1, 60.5
+                                                                60.5, 17.1
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "10km",
                                                             "workplace_address.coordinates": [
-                                                                18.1, 61.5
+                                                                61.5, 18.1
                                                             ]
                                                          }}]
                                                     }}),
@@ -120,12 +120,12 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "10km",
                                                             "workplace_address.coordinates": [
-                                                                17.1, 60.5
+                                                                60.5, 17.1
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                18.1, 61.5
+                                                                61.5, 18.1
                                                             ]
                                                          }}]
                                                     }}),
@@ -137,12 +137,12 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                17.1, 60.5
+                                                                60.5, 17.1
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                18.1, 61.5
+                                                                61.5, 18.1
                                                             ]
                                                          }}]
                                                     }})])

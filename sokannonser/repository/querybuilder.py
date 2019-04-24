@@ -536,8 +536,8 @@ class QueryBuilder(object):
     def _build_geo_dist_filter(self, positions, coordinate_ranges):
         geo_bool = {"bool": {"should": []}} if positions else {}
         for index, position in enumerate(positions or []):
-            longitude = None
             latitude = None
+            longitude = None
             coordinate_range = coordinate_ranges[index] \
                 if coordinate_ranges is not None and index < len(coordinate_ranges) \
                 else settings.DEFAULT_POSITION_RADIUS
@@ -546,16 +546,16 @@ class QueryBuilder(object):
                     latitude = float(re.split(', ?', position)[0])
                     longitude = float(re.split(', ?', position)[1])
                 except ValueError as e:
-                    log.debug("Bad position-parameter: \"%s\" (%s)" % (position, str(e)))
+                    log.info("Bad position-parameter: \"%s\" (%s)" % (position, str(e)))
 
             geo_filter = {}
-            if (not longitude or not latitude or not coordinate_range):
+            if (not latitude or not longitude or not coordinate_range):
                 return {}
-            elif ((-180 <= longitude <= 180)
-                  and (-90 <= latitude <= 90) and (coordinate_range > 0)):
+            elif ((-90 <= latitude <= 90)
+                  and (-180 <= longitude <= 180) and (coordinate_range > 0)):
                 geo_filter["geo_distance"] = {
                     "distance": str(coordinate_range) + "km",
-                    f.WORKPLACE_ADDRESS_COORDINATES: [longitude, latitude]
+                    f.WORKPLACE_ADDRESS_COORDINATES: [latitude, longitude]
                 }
             if geo_filter:
                 geo_bool['bool']['should'].append(geo_filter)

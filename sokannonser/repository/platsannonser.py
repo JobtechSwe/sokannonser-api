@@ -7,6 +7,7 @@ from valuestore import taxonomy
 from sokannonser import settings
 from sokannonser.repository import elastic
 from sokannonser.rest.model import fields
+from sokannonser.repository.querybuilder import ttc
 
 log = logging.getLogger(__name__)
 
@@ -16,12 +17,12 @@ def get_stats_for(taxonomy_type):
     value_path = {
         taxonomy.JobtechTaxonomy.OCCUPATION_NAME: "%s.%s.keyword" % (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.JobtechTaxonomy.OCCUPATION_GROUP: "%s.%s.keyword" % (
-        fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
+            fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.JobtechTaxonomy.OCCUPATION_FIELD: "%s.%s.keyword" % (
-        fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
+            fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.JobtechTaxonomy.SKILL: "%s.%s.keyword" % (fields.MUST_HAVE_SKILLS, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.JobtechTaxonomy.WORKTIME_EXTENT: "%s.%s.keyword" % (
-        fields.WORKING_HOURS_TYPE, fields.LEGACY_AMS_TAXONOMY_ID),
+            fields.WORKING_HOURS_TYPE, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.JobtechTaxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
         taxonomy.JobtechTaxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
         taxonomy.JobtechTaxonomy.REGION: "%s.keyword" % fields.WORKPLACE_ADDRESS_REGION
@@ -83,6 +84,10 @@ def find_platsannonser(args, querybuilder, start_time=0):
         logging.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
+
+    if args.get(settings.FREETEXT_QUERY):
+        query_result['concepts'] = ttc.text_to_concepts(args.get(settings.FREETEXT_QUERY))
+
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
     return transform_platsannons_query_result(args, query_result, querybuilder)
@@ -134,10 +139,41 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
 
             })
 
+    create_found_in_enriched(results, query_result)
     delete_ml_enriched_values(results)
 
     # log.debug(json.dumps(results, indent=2))
     return results
+
+
+def create_found_in_enriched(results, query_result):
+    found_in_enriched = False
+    freetext_concepts_node = query_result.get('concepts', {})
+
+    input_type_vals = []
+    type_names = ['occupation', 'skill', 'trait']
+
+    for type_name in type_names:
+        input_type_vals.extend(freetext_concepts_node[type_name])
+        input_type_vals.extend(freetext_concepts_node['%s_must' % type_name])
+
+    if len(input_type_vals) == 0:
+        for hit in results['hits']:
+            hit['_source']['found_in_enriched'] = False
+        return
+
+    for hit in results['hits']:
+        enriched_node = hit['_source']['keywords']['enriched']
+        enriched_vals = []
+        for type_name in type_names:
+            enriched_vals.extend(enriched_node[type_name])
+
+        for type_val in input_type_vals:
+            if type_val in enriched_vals:
+                found_in_enriched = True
+                break
+
+        hit['_source']['found_in_enriched'] = found_in_enriched
 
 
 def delete_ml_enriched_values(results):

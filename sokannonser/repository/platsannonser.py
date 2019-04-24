@@ -153,8 +153,11 @@ def create_found_in_enriched(results, query_result):
     type_names = ['occupation', 'skill', 'trait']
 
     for type_name in type_names:
-        input_type_vals.extend(freetext_concepts_node[type_name])
-        input_type_vals.extend(freetext_concepts_node['%s_must' % type_name])
+        if type_name in freetext_concepts_node:
+            input_type_vals.extend(freetext_concepts_node[type_name])
+        must_key = '%s_must' % type_name
+        if must_key in freetext_concepts_node:
+            input_type_vals.extend(freetext_concepts_node[must_key])
 
     if len(input_type_vals) == 0:
         for hit in results['hits']:

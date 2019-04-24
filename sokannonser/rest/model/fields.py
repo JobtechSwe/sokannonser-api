@@ -3,7 +3,7 @@ from valuestore import taxonomy
 # QUERYFIELDS
 ID = 'id'
 EXTERNAL_ID = 'external_id'
-HEADLINE = 'headlien'
+HEADLINE = 'headline'
 APPLICATION_DEADLINE = 'application_deadline'
 NUMBER_OF_VACANCIES = 'number_of_vacancies'
 DESCRIPTION_TEXT = 'description.text'

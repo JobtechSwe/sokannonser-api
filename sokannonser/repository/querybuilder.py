@@ -86,7 +86,6 @@ class QueryBuilder(object):
                     "size": args.get(settings.STAT_LMT) or 5
                 }
             }
-        log.debug("Constructed query: %s" % json.dumps(query_dsl, indent=2))
         return query_dsl
 
     def filter_aggs(self, aggs, freetext):
@@ -253,7 +252,10 @@ class QueryBuilder(object):
             for value in concepts.get(dict_key, []):
                 if bool_type not in query_dict['bool']:
                     query_dict['bool'][bool_type] = []
-                field = "%s.%s.raw" % (f.KEYWORDS_ENRICHED, key)
+
+                base_field = f.KEYWORDS_EXTRACTED \
+                    if key in ['location', 'employer'] else f.KEYWORDS_ENRICHED
+                field = "%s.%s.raw" % (base_field, key)
                 query_dict['bool'][bool_type].append(
                     {
                         "term": {

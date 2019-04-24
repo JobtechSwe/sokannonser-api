@@ -418,7 +418,7 @@ class QueryBuilder(object):
             else:
                 lander.append(lkod)
         county_term_query = [{"term": {
-            queires.WORKPLACE_ADDRESS_COUNTRY_CODE: {
+            f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
                 "value": lkod, "boost": 1.0}}} for lkod in lander]
         country_bool_query = {"bool": {
             "should": county_term_query}
@@ -464,7 +464,7 @@ class QueryBuilder(object):
                     },
                     {
                         "range": {
-                            queires.SCOPE_OF_WORK_MAX: {
+                            queries.SCOPE_OF_WORK_MAX: {
                                 "lte": parttime_max,
                                 "gte": parttime_min
                             }

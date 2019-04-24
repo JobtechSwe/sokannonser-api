@@ -142,8 +142,8 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
 
 def delete_ml_enriched_values(results):
     for hit in results['hits']:
-        keyword_node = hit['_source']['keywords']
         try:
+            keyword_node = hit['_source']['keywords']
             del keyword_node['enriched']
         except KeyError:
             pass

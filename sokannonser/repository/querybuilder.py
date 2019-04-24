@@ -48,8 +48,21 @@ class QueryBuilder(object):
         must_queries.append(self._build_generic_query([f.MUST_HAVE_SKILLS+"."+
                                                        f.CONCEPT_ID+".keyword",
                                                        f.MUST_HAVE_SKILLS+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID,
+                                                       f.NICE_TO_HAVE_SKILLS+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.NICE_TO_HAVE_SKILLS+"."+
                                                        f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.SKILL)))
+        must_queries.append(self._build_generic_query([f.MUST_HAVE_LANGUAGES+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.MUST_HAVE_LANGUAGES+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID,
+                                                       f.NICE_TO_HAVE_LANGUAGES+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.NICE_TO_HAVE_LANGUAGES+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID],
+                                                      args.get(taxonomy.LANGUAGE)))
         must_queries.append(self._build_generic_query([f.WORKING_HOURS_TYPE+"."+
                                                        f.CONCEPT_ID+".keyword",
                                                        f.WORKING_HOURS_TYPE+"."+
@@ -266,7 +279,27 @@ class QueryBuilder(object):
                         }
                     }
                 )
+                if bool_type in ['should', 'must_not'] and key in ['occupation', 'skill']:
+                    # Add a headline query as well
+                    query_dict['bool'][bool_type].append(
+                        {
+                            "match": {
+                                f.HEADLINE: {
+                                    "query": value,
+                                    "boost": 10
+                                }
+                            }
+                        }
+                    )
         return query_dict
+
+
+    def __freetext_headline(self, searchwords):
+        return {
+            "match": {
+                f.HEADLINE: searchwords
+            }
+        }
 
     def __freetext_fields(self, searchword):
         return [
@@ -277,8 +310,7 @@ class QueryBuilder(object):
                     "operator": "and",
                     "fields": [f.HEADLINE+"^3", f.EMPLOYER_NAME+"^2",
                                f.EMPLOYER_WORKPLACE+"^2", f.DESCRIPTION_TEXT,
-                               f.KEYWORDS_EXTRACTED+".location^10", f.ID,
-                               f.EXTERNAL_ID]
+                               f.ID, f.EXTERNAL_ID]
                 }
             }
         ]

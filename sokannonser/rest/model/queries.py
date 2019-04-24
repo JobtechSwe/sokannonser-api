@@ -29,6 +29,7 @@ swagger_doc_params = {
     taxonomy.GROUP: "One or more occupational group codes according to the taxonomy",
     taxonomy.FIELD: "One or more occupational area codes according to the taxonomy",
     taxonomy.SKILL: "One or more competency codes according to the taxonomy",
+    taxonomy.LANGUAGE: "One or more language codes according to the taxonomy",
     taxonomy.DRIVING_LICENCE: "One or more types of demanded driving licenses, code "
                                 "according to the taxonomy",
     taxonomy.EMPLOYMENT_TYPE: "Employment type, code according to the taxonomy",
@@ -84,6 +85,7 @@ annons_complete_query.add_argument(taxonomy.OCCUPATION, action='append')
 annons_complete_query.add_argument(taxonomy.GROUP, action='append')
 annons_complete_query.add_argument(taxonomy.FIELD, action='append')
 annons_complete_query.add_argument(taxonomy.SKILL, action='append')
+annons_complete_query.add_argument(taxonomy.LANGUAGE, action='append')
 annons_complete_query.add_argument(taxonomy.WORKTIME_EXTENT, action='append')
 annons_complete_query.add_argument(settings.PARTTIME_MIN, type=float)
 annons_complete_query.add_argument(settings.PARTTIME_MAX, type=float)

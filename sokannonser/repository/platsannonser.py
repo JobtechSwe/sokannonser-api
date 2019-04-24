@@ -15,22 +15,20 @@ log = logging.getLogger(__name__)
 def get_stats_for(taxonomy_type):
     log.info("Looking for %s" % taxonomy_type)
     value_path = {
-        taxonomy.JobtechTaxonomy.OCCUPATION_NAME: "%s.%s.keyword" % (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
-        taxonomy.JobtechTaxonomy.OCCUPATION_GROUP: "%s.%s.keyword" % (
-            fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
-        taxonomy.JobtechTaxonomy.OCCUPATION_FIELD: "%s.%s.keyword" % (
-            fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
-        taxonomy.JobtechTaxonomy.SKILL: "%s.%s.keyword" % (fields.MUST_HAVE_SKILLS, fields.LEGACY_AMS_TAXONOMY_ID),
-        taxonomy.JobtechTaxonomy.WORKTIME_EXTENT: "%s.%s.keyword" % (
-            fields.WORKING_HOURS_TYPE, fields.LEGACY_AMS_TAXONOMY_ID),
-        taxonomy.JobtechTaxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
-        taxonomy.JobtechTaxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
-        taxonomy.JobtechTaxonomy.REGION: "%s.keyword" % fields.WORKPLACE_ADDRESS_REGION
+        fields.OCCUPATION: "%s.%s.keyword" % (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
+        fields.OCCUPATION_GROUP: "%s.%s.keyword" % (
+        fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
+        fields.OCCUPATION_FIELD: "%s.%s.keyword" % (
+        fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.SKILL: "%s.%s.keyword" % (fields.MUST_HAVE_SKILLS, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
+        taxonomy.REGION: "%s.keyword" % fields.WORKPLACE_ADDRESS_REGION
     }
     # Make sure we don't crash if we want to stat on missing type
-    if taxonomy_type not in value_path:
-        log.warning("Taxonomy type %s not configured for aggs." % taxonomy_type)
-        return {}
+    for tt in taxonomy_type:
+        if tt not in value_path:
+            log.warning("Taxonomy type %s not configured for aggs." % taxonomy_type)
+            return {}
 
     aggs_query = {
         "from": 0, "size": 0,
@@ -57,12 +55,13 @@ def get_stats_for(taxonomy_type):
         },
         "aggs": {
             "antal_annonser": {
-                "terms": {"field": value_path[taxonomy_type], "size": 5000},
+                "terms": {"field": value_path[taxonomy_type[0]], "size": 50},
             }
         }
     }
-    log.debug('aggs_query', aggs_query)
+    log.debug('aggs_query: %s' % json.dumps(aggs_query))
     aggs_result = elastic.search(index=settings.ES_INDEX, body=aggs_query)
+
     code_count = {
         item['key']: item['doc_count']
         for item in aggs_result['aggregations']['antal_annonser']['buckets']}

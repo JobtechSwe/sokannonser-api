@@ -125,25 +125,16 @@ taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)
 taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)
 taxonomy_query.add_argument('parent-id', action='append')
-taxonomy_query.add_argument('type',
+taxonomy_query.add_argument('type', action='append',
                             choices=(
-                                taxonomy.JobtechTaxonomy.OCCUPATION_NAME,
-                                taxonomy.JobtechTaxonomy.OCCUPATION_GROUP,
-                                taxonomy.JobtechTaxonomy.OCCUPATION_FIELD,
-                                taxonomy.JobtechTaxonomy.SKILL,
-                                taxonomy.JobtechTaxonomy.LANGUAGE,
-                                taxonomy.JobtechTaxonomy.MUNICIPALITY,
-                                taxonomy.JobtechTaxonomy.REGION,
-                                taxonomy.JobtechTaxonomy.COUNTRY,
-                                taxonomy.JobtechTaxonomy.WAGE_TYPE,
-                                taxonomy.JobtechTaxonomy.EMPLOYMENT_TYPE,
-                                taxonomy.JobtechTaxonomy.DRIVING_LICENCE,
-                                taxonomy.JobtechTaxonomy.WORKTIME_EXTENT,
-                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_1,
-                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_2,
-                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_FIELD_3,
-                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_1,
-                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_2,
-                                taxonomy.JobtechTaxonomy.SUN_EDUCATION_LEVEL_3,
+                                fields.OCCUPATION,
+                                fields.OCCUPATION_GROUP,
+                                fields.OCCUPATION_FIELD,
+                                taxonomy.SKILL,
+                                taxonomy.LANGUAGE,
+                                taxonomy.MUNICIPALITY,
+                                taxonomy.REGION,
+                                taxonomy.COUNTRY,
+                                taxonomy.WAGE_TYPE,
                                 ))
 taxonomy_query.add_argument(settings.SHOW_COUNT, type=bool, default=False)

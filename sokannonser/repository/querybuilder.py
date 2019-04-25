@@ -2,10 +2,9 @@ import logging
 import re
 import json
 from sokannonser import settings
-from sokannonser.repository import ttc
+from sokannonser.repository import ttc, taxonomy
 from sokannonser.rest.model import queries
 from sokannonser.rest.model import fields as f
-from valuestore import taxonomy
 
 log = logging.getLogger(__name__)
 

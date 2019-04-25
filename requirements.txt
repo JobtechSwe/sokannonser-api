@@ -4,7 +4,6 @@ flask-restplus
 flask-cors
 requests
 certifi
-git+https://github.com/JobtechSwe/valuestore-module.git
 git+https://github.com/JobtechSwe/jobtech-common.git
 python-dateutil
 pytest

@@ -1,7 +1,7 @@
 from flask_restplus import reqparse, inputs
 from datetime import datetime
-from valuestore import taxonomy
 from sokannonser import settings
+from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
 
 # Frågemodeller

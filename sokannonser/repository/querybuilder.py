@@ -558,7 +558,8 @@ class QueryBuilder(object):
                   and (-180 <= longitude <= 180) and (coordinate_range > 0)):
                 geo_filter["geo_distance"] = {
                     "distance": str(coordinate_range) + "km",
-                    f.WORKPLACE_ADDRESS_COORDINATES: [latitude, longitude]
+                    # OBS! order in REST request: latitude,longitude
+                    f.WORKPLACE_ADDRESS_COORDINATES: [longitude, latitude]
                 }
             if geo_filter:
                 geo_bool['bool']['should'].append(geo_filter)

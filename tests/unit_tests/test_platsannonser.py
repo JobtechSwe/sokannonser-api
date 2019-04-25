@@ -43,7 +43,7 @@ def test_filter_timeframe(from_datetime, to_datetime):
 
 @pytest.mark.unit
 @pytest.mark.parametrize("args, exist, expected", [({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1"],
+                                                     settings.POSITION: ["66.6, 77.7"],
                                                      settings.POSITION_RADIUS: [5]},
                                                     True,
                                                     {"bool": {
@@ -51,10 +51,10 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                  60.5, 17.1
+                                                                  77.7, 66.6
                                                             ]}}]}}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 399.1"],
+                                                     settings.POSITION: ["66.6, 180.1"],
                                                      settings.POSITION_RADIUS: [5]},
                                                     False,
                                                     {"bool": {
@@ -62,10 +62,10 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                60.5, 399.1
+                                                                180.1, 66.6
                                                             ]}}]}}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1"],
+                                                     settings.POSITION: ["66.6, 77.7"],
                                                      settings.POSITION_RADIUS: [-5]},
                                                     False,
                                                     {"bool": {
@@ -73,10 +73,10 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "-5km",
                                                             "workplace_address.coordinates": [
-                                                                60.5, 17.1
+                                                                77.7, 66.6
                                                             ]}}]}}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"],
+                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
                                                      settings.POSITION_RADIUS: [5, 10]},
                                                     True,
                                                     {"bool": {
@@ -84,17 +84,17 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                60.5, 17.1
+                                                                77.7, 66.6
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "10km",
                                                             "workplace_address.coordinates": [
-                                                                61.5, 18.1
+                                                                18.1, 59.1
                                                             ]
                                                          }}]
                                                     }}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"],
+                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
                                                      settings.POSITION_RADIUS: [5, 10, 15]},
                                                     True,
                                                     {"bool": {
@@ -102,17 +102,17 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                60.5, 17.1
+                                                                77.7, 66.6
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "10km",
                                                             "workplace_address.coordinates": [
-                                                                61.5, 18.1
+                                                                18.1, 59.1
                                                             ]
                                                          }}]
                                                     }}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"],
+                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
                                                      settings.POSITION_RADIUS: [10]},
                                                     True,
                                                     {"bool": {
@@ -120,29 +120,29 @@ def test_filter_timeframe(from_datetime, to_datetime):
                                                         [{"geo_distance": {
                                                             "distance": "10km",
                                                             "workplace_address.coordinates": [
-                                                                60.5, 17.1
+                                                                77.7, 66.6
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                61.5, 18.1
+                                                                18.1, 59.1
                                                             ]
                                                          }}]
                                                     }}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"]},
+                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"]},
                                                     True,
                                                     {"bool": {
                                                         "should":
                                                         [{"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                60.5, 17.1
+                                                                77.7, 66.6
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "5km",
                                                             "workplace_address.coordinates": [
-                                                                61.5, 18.1
+                                                                18.1, 59.1
                                                             ]
                                                          }}]
                                                     }})])

@@ -115,6 +115,7 @@ def fetch_platsannons(id):
 def transform_platsannons_query_result(args, query_result, querybuilder):
     results = query_result.get('hits', {})
     results['took'] = query_result.get('took', 0)
+    results['concepts'] = query_result.get('concepts', {})
     if 'aggregations' in query_result:
         results['positions'] = int(query_result.get('aggregations', {})
                                    .get('positions', {}).get('value', 0))

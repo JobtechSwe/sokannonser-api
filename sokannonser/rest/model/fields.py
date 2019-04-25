@@ -1,4 +1,4 @@
-from valuestore import taxonomy
+from sokannonser.repository import taxonomy
 
 # QUERYFIELDS
 ID = 'id'

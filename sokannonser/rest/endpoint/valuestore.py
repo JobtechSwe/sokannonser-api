@@ -1,6 +1,6 @@
 from flask import request
 from flask_restplus import Resource, abort
-from valuestore import taxonomy
+from sokannonser.repository import taxonomy
 from sokannonser import settings
 from sokannonser.repository import elastic, platsannonser
 from sokannonser.rest import ns_valuestore

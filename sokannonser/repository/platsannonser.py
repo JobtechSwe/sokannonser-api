@@ -3,9 +3,8 @@ import json
 import time
 from flask_restplus import abort
 from elasticsearch import exceptions
-from valuestore import taxonomy
 from sokannonser import settings
-from sokannonser.repository import elastic
+from sokannonser.repository import elastic, taxonomy
 from sokannonser.rest.model import fields
 from sokannonser.repository.querybuilder import ttc
 

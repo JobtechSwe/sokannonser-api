@@ -6,6 +6,9 @@ from sokannonser.rest.model import fields
 
 # Frågemodeller
 QF_CHOICES = ['occupation', 'skill', 'location', 'employer']
+VF_TYPE_CHOICES = [taxonomy.OCCUPATION, taxonomy.GROUP, taxonomy.FIELD, taxonomy.SKILL,
+                   taxonomy.MUNICIPALITY, taxonomy.REGION, taxonomy.COUNTRY,
+                   taxonomy.PLACE]
 OPTIONS_BRIEF = 'brief'
 OPTIONS_FULL = 'full'
 
@@ -124,17 +127,7 @@ taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)
 taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)
 taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)
-taxonomy_query.add_argument('parent-id', action='append')
 taxonomy_query.add_argument('type', action='append',
-                            choices=(
-                                fields.OCCUPATION,
-                                fields.OCCUPATION_GROUP,
-                                fields.OCCUPATION_FIELD,
-                                taxonomy.SKILL,
-                                taxonomy.LANGUAGE,
-                                taxonomy.MUNICIPALITY,
-                                taxonomy.REGION,
-                                taxonomy.COUNTRY,
-                                taxonomy.WAGE_TYPE,
-                                ))
+                            choices=VF_TYPE_CHOICES),
 taxonomy_query.add_argument(settings.SHOW_COUNT, type=bool, default=False)
+taxonomy_query.add_argument('parent-id', action='append')

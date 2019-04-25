@@ -4,6 +4,7 @@ from sokannonser.repository import taxonomy
 from sokannonser import settings
 from sokannonser.repository import elastic, platsannonser
 from sokannonser.rest import ns_valuestore
+from sokannonser.rest.model import queries
 from sokannonser.rest.model.queries import taxonomy_query
 
 
@@ -18,7 +19,7 @@ class Valuestore(Resource):
                                      "(for example for autocomplete / type ahead)",
             "parent-id": "filter search for taxonomy values by specific parent conceptId"
                          " (useful in combination with the type parameter)",
-            "type": "filter by type ",
+            "type": "filter by type (available choices: %s)" % queries.VF_TYPE_CHOICES,
             settings.SHOW_COUNT: "fetch the number of job ads that matches a taxonomy "
                                  "value (only available when chosen type is provided)"
         }

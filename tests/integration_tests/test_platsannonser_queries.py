@@ -50,12 +50,15 @@ def test_freetext_query_one_param_found_in_enriched_pos():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/open/search', headers=headers, data={'q': 'diskare', 'limit': '100'})
+        # result = testclient.get('/open/search', headers=headers, data={ 'municipality': '1290',
+        #                                                                 'q': 'springare',
+        #                                                                 'occupation': 'rGGf_KLs_To7',
+        #                                                                'limit': '100'})
         json_response = result.json
         pprint(json_response)
         # hits_total = json_response['total']
         # assert int(hits_total) > 0
         hits = json_response['hits']
-
         # assert len(hits) > 0
         pprint(hits[0])
         assert 'found_in_enriched' in hits[0]

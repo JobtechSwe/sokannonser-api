@@ -39,6 +39,23 @@ def test_deprecated_ads_should_not_be_in_result():
                 assert hit['removed'] is False
 
 
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_freetext_query_job_title_with_hyphen():
+    print('============================', sys._getframe().f_code.co_name, '============================ ')
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        result = testclient.get('/open/search', headers=headers, data={'q': 'HR-specialister', 'limit': '1'})
+        json_response = result.json
+        # pprint(json_response)
+        assert json_response['freetext_concepts']
+        assert json_response['freetext_concepts']['occupation']
+        occupation_val = str(json_response['freetext_concepts']['occupation'][0])
+        assert occupation_val == 'hr-specialist'
+
+
 
 @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration

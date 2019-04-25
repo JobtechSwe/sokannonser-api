@@ -1,0 +1,7 @@
+'occupation' => 'occupation-name'
+'group' => 'occupation-group'
+'field' => 'occupation-field'
+'extent' => 'worktime-extent'
+'employmenttype' => 'employment-type'
+'drivinglicence' => 'driving-license'
+'wagetype' =>  'wage-type'

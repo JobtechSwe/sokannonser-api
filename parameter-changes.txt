@@ -5,3 +5,4 @@
 'employmenttype' => 'employment-type'
 'drivinglicence' => 'driving-license'
 'wagetype' =>  'wage-type'
+'duration' => 'employment-duration'

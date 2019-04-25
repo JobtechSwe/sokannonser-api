@@ -22,6 +22,26 @@ def test_freetext_query_one_param():
 
 @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
+def test_deprecated_ads_should_not_be_in_result():
+    print('============================', sys._getframe().f_code.co_name, '============================ ')
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        for offset in range(0,2000, 100):
+            # print(offs)
+            result = testclient.get('/open/search', headers=headers, data={'offset': offset, 'limit': '100'})
+            json_response = result.json
+            # # pprint(json_response)
+            hits = json_response['hits']
+            assert len(hits) > 0
+            for hit in hits:
+                assert hit['removed'] is False
+
+
+
+@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
 def test_freetext_query_one_param_deleted_enriched():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
 

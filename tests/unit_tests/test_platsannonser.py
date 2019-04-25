@@ -7,7 +7,7 @@ from dateutil import parser
 
 from sokannonser import settings
 from sokannonser.repository.querybuilder import QueryBuilder
-from valuestore import taxonomy
+from sokannonser.repository import taxonomy
 
 log = logging.getLogger(__name__)
 pbquery = QueryBuilder()

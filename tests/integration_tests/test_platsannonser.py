@@ -4,8 +4,8 @@ import pytest
 import sys
 import os
 
-from valuestore import taxonomy as t
-from valuestore.taxonomy import tax_type
+from sokannonser.repository import taxonomy as t
+from sokannonser.repository.taxonomy import tax_type
 from sokannonser.repository import platsannonser
 from sokannonser.repository.querybuilder import QueryBuilder
 import re

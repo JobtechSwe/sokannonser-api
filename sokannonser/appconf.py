@@ -41,8 +41,7 @@ def set_custom_log_level():
     for key in logging.Logger.manager.loggerDict:
         # for handler in logging.getLogger(key).handlers[:]:
         #     logging.getLogger(key).removeHandler(handler)
-        if key.startswith(master_module) or key.startswith('valuestore') \
-                or key.startswith('market'):
+        if key.startswith(master_module) or key.startswith('market'):
             print("Setting loglevel DEBUG for %s" % key)
             logging.getLogger(key).setLevel(logging.DEBUG)
 

@@ -2,9 +2,6 @@ FROM alpine:latest
 
 EXPOSE 8081
 
-ENV TZ=Europe/Paris
-RUN date +"%Y-%m-%dT%H:%M:%S %Z"
-
 RUN time apk update 
     # && apk upgrade
 
@@ -17,7 +14,10 @@ RUN time apk add --no-cache --update \
         git \
         curl \
         tzdata
-RUN rm -rfv /var/cache/apk/*
+RUN time rm -rfv /var/cache/apk/*
+
+ENV TZ=Europe/Paris
+RUN date +"%Y-%m-%dT%H:%M:%S %Z"
 
 COPY . /app
 
@@ -43,7 +43,7 @@ WORKDIR /app
 RUN echo "module = $flask_app" >> uwsgi.ini
 
 # RUN pip3 install --no-cache-dir -r requirements.txt
-RUN time pip3 install --no-cache-dir -r requirements.txt
+RUN time pip3 install -r requirements.txt
 
 # delete all __pycache__-folders in tests-folder
 RUN find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;

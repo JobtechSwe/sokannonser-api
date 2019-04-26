@@ -2,9 +2,11 @@ FROM alpine:latest
 
 EXPOSE 8081
 
-RUN apk update && apk upgrade
+RUN apk update 
+    # && apk upgrade
 
-RUN apk add --no-cache --update \
+# RUN apk add --no-cache --update \
+RUN apk add --update \
         supervisor \
         uwsgi-python3 \
         python3 \
@@ -40,7 +42,8 @@ ENV flask_app=$flask_app
 WORKDIR /app
 RUN echo "module = $flask_app" >> uwsgi.ini
 
-RUN pip3 install --no-cache-dir -r requirements.txt
+# RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 # delete all __pycache__-folders in tests-folder
 RUN find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;

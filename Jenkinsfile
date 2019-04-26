@@ -24,11 +24,11 @@ pipeline {
             steps{
                 sh 'echo "${GIT_BRANCH}"'
                 openshiftBuild(namespace:'${openshiftProject}', bldCfg: 'open-api', showBuildLogs: 'true')
-                openshiftTag(namespace:'${openshiftProject}', srcStream: 'open-api', srcTag: 'latest', destStream: 'sokapi', destTag:'${buildTag}')
+                openshiftTag(namespace:'${openshiftProject}', srcStream: 'open-api', srcTag: 'latest', destStream: 'open-api', destTag:'${buildTag}')
                 openshiftBuild(namespace:'${openshiftProject}', bldCfg: 'jobtechjobs-api', showBuildLogs: 'true')
-                openshiftTag(namespace:'${openshiftProject}', srcStream: 'jobtechjobs-api', srcTag: 'latest', destStream: 'sokapi', destTag:'${buildTag}')
+                openshiftTag(namespace:'${openshiftProject}', srcStream: 'jobtechjobs-api', srcTag: 'latest', destStream: 'jobtechjobs-api', destTag:'${buildTag}')
                 openshiftBuild(namespace:'${openshiftProject}', bldCfg: 'bulk-api', showBuildLogs: 'true')
-                openshiftTag(namespace:'${openshiftProject}', srcStream: 'bulk-api', srcTag: 'latest', destStream: 'sokapi', destTag:'${buildTag}')
+                openshiftTag(namespace:'${openshiftProject}', srcStream: 'bulk-api', srcTag: 'latest', destStream: 'bulk-api', destTag:'${buildTag}')
             }
         }
         stage('Deploy to Staging'){

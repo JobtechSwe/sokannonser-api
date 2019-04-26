@@ -34,7 +34,11 @@ RUN mkdir -p /var/run/nginx && \
     chmod -R 777 /var/log/* && \
     chmod -R 777 /var/tmp/nginx
 
+ARG flask_app=sokannonser
+ENV flask_app=$flask_app
+
 WORKDIR /app
+RUN echo "module = $flask_app" >> uwsgi.ini
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 

@@ -9,7 +9,7 @@ RUN time apk update
     # && apk upgrade
 
 # RUN apk add --no-cache --update \
-RUN time apk add --update \
+RUN time apk add --no-cache --update \
         supervisor \
         uwsgi-python3 \
         python3 \
@@ -17,7 +17,7 @@ RUN time apk add --update \
         git \
         curl \
         tzdata
-RUN time rm -rfv /var/cache/apk/*
+RUN rm -rfv /var/cache/apk/*
 
 COPY . /app
 
@@ -43,16 +43,16 @@ WORKDIR /app
 RUN echo "module = $flask_app" >> uwsgi.ini
 
 # RUN pip3 install --no-cache-dir -r requirements.txt
-RUN time pip3 install -r requirements.txt
+RUN time pip3 install --no-cache-dir -r requirements.txt
 
 # delete all __pycache__-folders in tests-folder
 RUN find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
 
 # runs unit tests with @pytest.mark.unit annotation only
-RUN python3 -m pytest -svv -m unit tests/
+RUN time python3 -m pytest -svv -m unit tests/
 
 # delete all __pycache__-folders in tests-folder
-RUN time find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
+RUN find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
 
 USER 10000
 CMD ["/usr/bin/supervisord", "-n"]

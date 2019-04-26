@@ -5,10 +5,9 @@ EXPOSE 8081
 ENV TZ=Europe/Paris
 RUN date +"%Y-%m-%dT%H:%M:%S %Z"
 
-RUN apk update 
+RUN time apk update 
     # && apk upgrade
 
-RUN date
 # RUN apk add --no-cache --update \
 RUN time apk add --update \
         supervisor \
@@ -18,9 +17,8 @@ RUN time apk add --update \
         git \
         curl \
         tzdata
-# RUN rm -rfv /var/cache/apk/*
+RUN time rm -rfv /var/cache/apk/*
 
-RUN date
 COPY . /app
 
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -44,11 +42,9 @@ ENV flask_app=$flask_app
 WORKDIR /app
 RUN echo "module = $flask_app" >> uwsgi.ini
 
-RUN date
 # RUN pip3 install --no-cache-dir -r requirements.txt
-RUN pip3 install -r requirements.txt
+RUN time pip3 install -r requirements.txt
 
-RUN date
 # delete all __pycache__-folders in tests-folder
 RUN find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
 
@@ -56,7 +52,7 @@ RUN find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
 RUN python3 -m pytest -svv -m unit tests/
 
 # delete all __pycache__-folders in tests-folder
-RUN find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
+RUN time find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
 
 USER 10000
 CMD ["/usr/bin/supervisord", "-n"]

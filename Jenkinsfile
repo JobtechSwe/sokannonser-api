@@ -65,7 +65,7 @@ pipeline {
                 sh "oc set image dc/jobtechjobs-api jobtechjobs-api=docker-registry.default.svc:5000/${openshiftProject}/jobtechjobs-api:${buildTag} -n ${openshiftProject}"
                 openshiftDeploy(depCfg: 'jobtechjobs-api', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
                 openshiftVerifyDeployment(depCfg: 'jobtechjobs-api', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
-                sh "oc set image dc/bulk-api sokapi=docker-registry.default.svc:5000/${openshiftProject}/bulk-api:${buildTag} -n ${openshiftProject}"
+                sh "oc set image dc/bulk-api bulk-api=docker-registry.default.svc:5000/${openshiftProject}/bulk-api:${buildTag} -n ${openshiftProject}"
                 openshiftDeploy(depCfg: 'bulk-api', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
                 openshiftVerifyDeployment(depCfg: 'bulk-api', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
             }

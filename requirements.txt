@@ -1,10 +1,10 @@
-elasticsearch
-flask
-flask-restplus
-flask-cors
-requests
-certifi
 git+https://github.com/JobtechSwe/jobtech-common.git
+# elasticsearch
+# flask
+# flask-restplus
+# flask-cors
+# requests
+# certifi
 python-dateutil
 # pytest
 pytest-cov

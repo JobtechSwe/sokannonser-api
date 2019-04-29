@@ -20,6 +20,23 @@ def test_freetext_query_one_param():
         hits_total = json_response['total']
         assert int(hits_total) > 0
 
+
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_too_big_offset():
+    print('============================', sys._getframe().f_code.co_name, '============================ ')
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        result = testclient.get('/open/search', headers=headers, data={'offset': '2001', 'limit': '10'})
+        json_response = result.json
+        pprint(json_response)
+        # hits_total = json_response['total']
+        # print(hits_total)
+
+
+
 @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_deprecated_ads_should_not_be_in_result():

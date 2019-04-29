@@ -7,7 +7,7 @@ from flask_restplus import inputs
 def test_regex_input_bulk_zip():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
 
-    bulk_regex = '(\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])|all)$'
+    bulk_regex = r'(\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])|all)$'
     input_regex = inputs.regex(bulk_regex)
 
     input = 'all'

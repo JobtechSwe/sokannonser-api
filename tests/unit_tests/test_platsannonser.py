@@ -7,7 +7,7 @@ from dateutil import parser
 
 from sokannonser import settings
 from sokannonser.repository.querybuilder import QueryBuilder
-from valuestore import taxonomy
+from sokannonser.repository import taxonomy
 
 log = logging.getLogger(__name__)
 pbquery = QueryBuilder()
@@ -25,124 +25,124 @@ def test_filter_timeframe(from_datetime, to_datetime):
     if from_datetime and to_datetime:
         d = pbquery._filter_timeframe(parser.parse(from_datetime),
                                       parser.parse(to_datetime))
-        assert d['range']['publiceringsdatum']['gte'] == \
+        assert d['range']['publication_date']['gte'] == \
             parser.parse(from_datetime).isoformat()
-        assert d['range']['publiceringsdatum']['lte'] == \
+        assert d['range']['publication_date']['lte'] == \
             parser.parse(to_datetime).isoformat()
         return
     if from_datetime:
         d = pbquery._filter_timeframe(parser.parse(from_datetime), to_datetime)
-        assert d['range']['publiceringsdatum']['gte'] == \
+        assert d['range']['publication_date']['gte'] == \
             parser.parse(from_datetime).isoformat()
         return
     if to_datetime:
         d = pbquery._filter_timeframe(from_datetime, parser.parse(to_datetime))
-        assert d['range']['publiceringsdatum']['lte'] == \
+        assert d['range']['publication_date']['lte'] == \
             parser.parse(to_datetime).isoformat()
 
 
 @pytest.mark.unit
 @pytest.mark.parametrize("args, exist, expected", [({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1"],
+                                                     settings.POSITION: ["66.6, 77.7"],
                                                      settings.POSITION_RADIUS: [5]},
                                                     True,
                                                     {"bool": {
                                                         "should":
                                                         [{"geo_distance": {
                                                             "distance": "5km",
-                                                            "arbetsplatsadress.coordinates": [
-                                                                17.1, 60.5
+                                                            "workplace_address.coordinates": [
+                                                                  77.7, 66.6
                                                             ]}}]}}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 399.1"],
+                                                     settings.POSITION: ["66.6, 180.1"],
                                                      settings.POSITION_RADIUS: [5]},
                                                     False,
                                                     {"bool": {
                                                         "should":
                                                         [{"geo_distance": {
                                                             "distance": "5km",
-                                                            "arbetsplatsadress.coordinates": [
-                                                                399.1, 60.5
+                                                            "workplace_address.coordinates": [
+                                                                180.1, 66.6
                                                             ]}}]}}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1"],
+                                                     settings.POSITION: ["66.6, 77.7"],
                                                      settings.POSITION_RADIUS: [-5]},
                                                     False,
                                                     {"bool": {
                                                         "should":
                                                         [{"geo_distance": {
                                                             "distance": "-5km",
-                                                            "arbetsplatsadress.coordinates": [
-                                                                17.1, 60.5
+                                                            "workplace_address.coordinates": [
+                                                                77.7, 66.6
                                                             ]}}]}}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"],
+                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
                                                      settings.POSITION_RADIUS: [5, 10]},
                                                     True,
                                                     {"bool": {
                                                         "should":
                                                         [{"geo_distance": {
                                                             "distance": "5km",
-                                                            "arbetsplatsadress.coordinates": [
-                                                                17.1, 60.5
+                                                            "workplace_address.coordinates": [
+                                                                77.7, 66.6
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "10km",
-                                                            "arbetsplatsadress.coordinates": [
-                                                                18.1, 61.5
+                                                            "workplace_address.coordinates": [
+                                                                18.1, 59.1
                                                             ]
                                                          }}]
                                                     }}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"],
+                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
                                                      settings.POSITION_RADIUS: [5, 10, 15]},
                                                     True,
                                                     {"bool": {
                                                         "should":
                                                         [{"geo_distance": {
                                                             "distance": "5km",
-                                                            "arbetsplatsadress.coordinates": [
-                                                                17.1, 60.5
+                                                            "workplace_address.coordinates": [
+                                                                77.7, 66.6
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "10km",
-                                                            "arbetsplatsadress.coordinates": [
-                                                                18.1, 61.5
+                                                            "workplace_address.coordinates": [
+                                                                18.1, 59.1
                                                             ]
                                                          }}]
                                                     }}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"],
+                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
                                                      settings.POSITION_RADIUS: [10]},
                                                     True,
                                                     {"bool": {
                                                         "should":
                                                         [{"geo_distance": {
                                                             "distance": "10km",
-                                                            "arbetsplatsadress.coordinates": [
-                                                                17.1, 60.5
+                                                            "workplace_address.coordinates": [
+                                                                77.7, 66.6
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "5km",
-                                                            "arbetsplatsadress.coordinates": [
-                                                                18.1, 61.5
+                                                            "workplace_address.coordinates": [
+                                                                18.1, 59.1
                                                             ]
                                                          }}]
                                                     }}),
                                                    ({settings.APIKEY: "",
-                                                     settings.POSITION: ["60.5, 17.1", "61.5, 18.1"]},
+                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"]},
                                                     True,
                                                     {"bool": {
                                                         "should":
                                                         [{"geo_distance": {
                                                             "distance": "5km",
-                                                            "arbetsplatsadress.coordinates": [
-                                                                17.1, 60.5
+                                                            "workplace_address.coordinates": [
+                                                                77.7, 66.6
                                                             ]}},
                                                          {"geo_distance": {
                                                             "distance": "5km",
-                                                            "arbetsplatsadress.coordinates": [
-                                                                18.1, 61.5
+                                                            "workplace_address.coordinates": [
+                                                                18.1, 59.1
                                                             ]
                                                          }}]
                                                     }})])
@@ -155,69 +155,69 @@ def test_geo_distance_filter(args, exist, expected):
 @pytest.mark.parametrize("args, expected_pos, expected_neg", [({settings.APIKEY: "",
                                                                 taxonomy.REGION: ["01", "02"]},
                                                                [
-                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                 {"term": {"workplace_address.region_code":
                                                            {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                 {"term": {"workplace_address.region_code":
                                                            {"value": "02", "boost": 1.0}}}],
                                                                []),
                                             ({settings.APIKEY: "",
                                               taxonomy.MUNICIPALITY: ["0111"]},
                                              [
-                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                 {"term": {"workplace_address.municipality_code":
                                                            {"value": "0111", "boost": 2.0}}}],
                                              []),
                                             ({settings.APIKEY: "",
                                               taxonomy.REGION: ["01", "02"],
                                               taxonomy.MUNICIPALITY: ["1111", "2222"]},
                                              [
-                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                 {"term": {"workplace_address.region_code":
                                                            {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                 {"term": {"workplace_address.region_code":
                                                            {"value": "02", "boost": 1.0}}},
-                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                 {"term": {"workplace_address.municipality_code":
                                                            {"value": "1111", "boost": 2.0}}},
-                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                 {"term": {"workplace_address.municipality_code":
                                                            {"value": "2222", "boost": 2.0}}}],
                                              []),
                                             ({settings.APIKEY: "",
                                               taxonomy.REGION: ["01", "-02"],
                                               taxonomy.MUNICIPALITY: ["1111", "-2222"]},
                                              [
-                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                 {"term": {"workplace_address.region_code":
                                                            {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                 {"term": {"workplace_address.municipality_code":
                                                            {"value": "1111", "boost": 2.0}}},
                                              ],
                                              [
-                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                 {"term": {"workplace_address.region_code":
                                                            {"value": "02"}}},
-                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                 {"term": {"workplace_address.municipality_code":
                                                            {"value": "2222"}}}
                                              ]),
                                             ({settings.APIKEY: "",
                                               taxonomy.REGION: ["01", "-02"],
                                               taxonomy.MUNICIPALITY: ["1111"]},
                                              [
-                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                 {"term": {"workplace_address.region_code":
                                                            {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                 {"term": {"workplace_address.municipality_code":
                                                            {"value": "1111", "boost": 2.0}}},
                                              ],
                                              [
-                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                 {"term": {"workplace_address.region_code":
                                                            {"value": "02"}}}
                                              ]),
                                             ({settings.APIKEY: "",
                                               taxonomy.REGION: ["01"],
                                               taxonomy.MUNICIPALITY: ["1111", "-2222"]},
                                              [
-                                                 {"term": {"arbetsplatsadress.lanskod":
+                                                 {"term": {"workplace_address.region_code":
                                                            {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                 {"term": {"workplace_address.municipality_code":
                                                            {"value": "1111", "boost": 2.0}}},
                                              ],
                                              [
-                                                 {"term": {"arbetsplatsadress.kommunkod":
+                                                 {"term": {"workplace_address.municipality_code":
                                                            {"value": "2222"}}}
                                              ])])
 def test_region_municipality_query(args, expected_pos, expected_neg):

@@ -16,8 +16,8 @@ class BulkZip(Resource):
 
     @ns_bulk.doc(
         params={
-            "date": "Date to zip ads for. Accepts date as YYYY-MM-DD, 'all' "
-            "or 'yesterday'. (Note that 'all' can take a couple of minutes to compile.)"
+            settings.DATE: "Date to zip ads for. Accepts date as YYYY-MM-DD or 'all'. "
+            "(Note that 'all' can take a couple of minutes to compile.)"
         },
         responses={
             200: 'OK',
@@ -33,7 +33,7 @@ class BulkZip(Resource):
         filename = "ads_%s.zip" % args.get(settings.DATE)
         log.debug("Elapsed time for completion: %d" % int((time.time()*1000)-start_time))
         return send_file(bytes_result,
-                         attachment_filename=filename,
+                         attachment_filename=filename, cache_timeout=1,
                          as_attachment=True)
 
 

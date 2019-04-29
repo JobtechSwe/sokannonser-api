@@ -30,14 +30,14 @@ def test_rewrite_unigram_competence():
     print('\n============================', sys._getframe().f_code.co_name, '============================')
     concepts = text_to_concept.text_to_concepts('noggrann systemutvecklare java')
     assert concepts is not None
-    assert_not_empty(concepts, 'occupations')
-    assert_not_empty(concepts, 'skills')
-    assert_not_empty(concepts, 'traits')
+    assert_not_empty(concepts, 'occupation')
+    assert_not_empty(concepts, 'skill')
+    assert_not_empty(concepts, 'trait')
     assert len(concepts) > 0
     pprint(concepts)
-    assert 'systemutvecklare' in concepts['occupations']
-    assert 'java' in concepts['skills']
-    assert 'noggrann' in concepts['traits']
+    assert 'systemutvecklare' in concepts['occupation']
+    assert 'java' in concepts['skill']
+    assert 'noggrann' in concepts['trait']
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -46,15 +46,26 @@ def test_rewrite_unigram_multiple_skills():
     print('\n============================', sys._getframe().f_code.co_name, '============================')
 
     concepts = text_to_concept.text_to_concepts('noggrann systemutvecklare java python cobol')
-    assert_not_empty(concepts, 'occupations')
-    assert_not_empty(concepts, 'skills')
-    assert_not_empty(concepts, 'traits')
+    assert_not_empty(concepts, 'occupation')
+    assert_not_empty(concepts, 'skill')
+    assert_not_empty(concepts, 'trait')
     # pprint(concepts)
-    assert 'systemutvecklare' in concepts['occupations']
-    assert 'java' in concepts['skills']
-    assert 'python' in concepts['skills']
-    assert 'cobol' in concepts['skills']
-    assert 'noggrann' in concepts['traits']
+    assert 'systemutvecklare' in concepts['occupation']
+    assert 'java' in concepts['skill']
+    assert 'python' in concepts['skill']
+    assert 'cobol' in concepts['skill']
+    assert 'noggrann' in concepts['trait']
+
+
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_rewrite_jobtitle_with_hyphen():
+    print('\n============================', sys._getframe().f_code.co_name, '============================')
+
+    concepts = text_to_concept.text_to_concepts('HR-specialister')
+    # pprint(concepts)
+    assert_not_empty(concepts, 'occupation')
+    assert 'hr-specialist' in concepts['occupation']
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -63,28 +74,28 @@ def test_rewrite_unigram_misspelled_input():
     print('\n============================', sys._getframe().f_code.co_name, '============================')
 
     concepts = text_to_concept.text_to_concepts('noggran sjukssköterska java')
-    assert_not_empty(concepts, 'occupations')
-    assert_not_empty(concepts, 'traits')
+    assert_not_empty(concepts, 'occupation')
+    assert_not_empty(concepts, 'trait')
     pprint(concepts)
-    assert 'sjuksköterska' in concepts['occupations']
-    assert 'noggrann' in concepts['traits']
+    assert 'sjuksköterska' in concepts['occupation']
+    assert 'noggrann' in concepts['trait']
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_rewrite_bigrams():
     concepts = text_to_concept.text_to_concepts('inhouse key account manager säljare')
-    assert_not_empty(concepts, 'occupations')
+    assert_not_empty(concepts, 'occupation')
     pprint(concepts)
 
-    assert 'key account manager' in concepts['occupations']
-    assert 'säljare' in concepts['occupations']
+    assert 'key account manager' in concepts['occupation']
+    assert 'säljare' in concepts['occupation']
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_rewrite_diverse_occupationterms_to_concepts():
-    input_type = 'occupations'
+    input_type = 'occupation'
     assert_concept_name = 'souschef'
 
     assert_term_to_concept('souschef', input_type, assert_concept_name)
@@ -98,10 +109,10 @@ def test_rewrite_diverse_occupationterms_to_concepts():
 def test_rewrite_uppercase_input():
     concepts = text_to_concept.text_to_concepts('Key Account Manager SÄLJARE')
     assert len(concepts) > 0
-    assert_not_empty(concepts, 'occupations')
+    assert_not_empty(concepts, 'occupation')
     # pprint(concepts)
-    assert 'key account manager' in concepts['occupations']
-    assert 'säljare' in concepts['occupations']
+    assert 'key account manager' in concepts['occupation']
+    assert 'säljare' in concepts['occupation']
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -112,9 +123,9 @@ def test_rewrite_plus_input():
     # concepts = text_to_concept.text_to_concepts('tyska+tyska')
     pprint(concepts)
     assert len(concepts) > 0
-    assert_not_empty(concepts, 'occupations')
-    assert 'psykolog' in concepts['occupations']
-    assert 'psykolog' in concepts['occupations_must']
+    assert_not_empty(concepts, 'occupation')
+    assert 'psykolog' in concepts['occupation']
+    assert 'psykolog' in concepts['occupation_must']
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -122,13 +133,13 @@ def test_rewrite_plus_input():
 def test_rewrite_non_concept_words():
     concepts = text_to_concept.text_to_concepts(
         'jättebra och flexibel Key Account Manager som vill jobba med försäljning på Spotify i Hartford, Connecticut')
-    assert_not_empty(concepts, 'occupations')
-    assert_not_empty(concepts, 'skills')
-    assert_not_empty(concepts, 'traits')
+    assert_not_empty(concepts, 'occupation')
+    assert_not_empty(concepts, 'skill')
+    assert_not_empty(concepts, 'trait')
     print(concepts)
-    assert 'key account manager' in concepts['occupations']
-    assert 'försäljning' in concepts['skills']
-    assert 'flexibel' in concepts['traits']
+    assert 'key account manager' in concepts['occupation']
+    assert 'försäljning' in concepts['skill']
+    assert 'flexibel' in concepts['trait']
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -136,24 +147,24 @@ def test_rewrite_non_concept_words():
 def test_rewrite_must_words():
     concepts = text_to_concept.text_to_concepts(
         'mållare +målare säljare +key account manager python +java positiv +noggrann -flexibel')
-    assert_not_empty(concepts, 'occupations')
-    assert_not_empty(concepts, 'occupations_must')
-    assert_not_empty(concepts, 'skills')
-    assert_not_empty(concepts, 'skills_must')
-    assert_not_empty(concepts, 'traits')
-    assert_not_empty(concepts, 'traits_must')
-    assert_not_empty(concepts, 'traits_must_not')
+    assert_not_empty(concepts, 'occupation')
+    assert_not_empty(concepts, 'occupation_must')
+    assert_not_empty(concepts, 'skill')
+    assert_not_empty(concepts, 'skill_must')
+    assert_not_empty(concepts, 'trait')
+    assert_not_empty(concepts, 'trait_must')
+    assert_not_empty(concepts, 'trait_must_not')
 
     print(concepts)
 
-    assert 'säljare' in concepts['occupations']
-    assert 'målare' in concepts['occupations_must']
-    assert 'key account manager' in concepts['occupations_must']
-    assert 'python' in concepts['skills']
-    assert 'java' in concepts['skills_must']
-    assert 'positiv' in concepts['traits']
-    assert 'noggrann' in concepts['traits_must']
-    assert 'flexibel' in concepts['traits_must_not']
+    assert 'säljare' in concepts['occupation']
+    assert 'målare' in concepts['occupation_must']
+    assert 'key account manager' in concepts['occupation_must']
+    assert 'python' in concepts['skill']
+    assert 'java' in concepts['skill_must']
+    assert 'positiv' in concepts['trait']
+    assert 'noggrann' in concepts['trait_must']
+    assert 'flexibel' in concepts['trait_must_not']
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -161,22 +172,22 @@ def test_rewrite_must_words():
 def test_rewrite_must_not_words():
     concepts = text_to_concept.text_to_concepts(
         'mållare -målare säljare -key account manager python -java -noggrann flexibel')
-    assert_not_empty(concepts, 'occupations')
-    assert_not_empty(concepts, 'occupations_must_not')
-    assert_not_empty(concepts, 'skills')
-    assert_not_empty(concepts, 'skills_must_not')
-    assert_not_empty(concepts, 'traits')
-    assert_not_empty(concepts, 'traits_must_not')
+    assert_not_empty(concepts, 'occupation')
+    assert_not_empty(concepts, 'occupation_must_not')
+    assert_not_empty(concepts, 'skill')
+    assert_not_empty(concepts, 'skill_must_not')
+    assert_not_empty(concepts, 'trait')
+    assert_not_empty(concepts, 'trait_must_not')
 
     print(concepts)
 
-    assert 'säljare' in concepts['occupations']
-    assert 'målare' in concepts['occupations_must_not']
-    assert 'key account manager' in concepts['occupations_must_not']
-    assert 'python' in concepts['skills']
-    assert 'java' in concepts['skills_must_not']
-    assert 'flexibel' in concepts['traits']
-    assert 'noggrann' in concepts['traits_must_not']
+    assert 'säljare' in concepts['occupation']
+    assert 'målare' in concepts['occupation_must_not']
+    assert 'key account manager' in concepts['occupation_must_not']
+    assert 'python' in concepts['skill']
+    assert 'java' in concepts['skill_must_not']
+    assert 'flexibel' in concepts['trait']
+    assert 'noggrann' in concepts['trait_must_not']
 
 
 def assert_term_to_concept(input_term, input_type, assert_concept_name):
@@ -186,9 +197,9 @@ def assert_term_to_concept(input_term, input_type, assert_concept_name):
 
 
 def assert_result_has_keys(concepts):
-    for name in ['skills', 'occupations', 'traits',
-                 'skills_must', 'occupations_must', 'traits_must',
-                 'skills_must_not', 'occupations_must_not', 'traits_must_not']:
+    for name in ['skill', 'occupation', 'trait',
+                 'skill_must', 'occupation_must', 'trait_must',
+                 'skill_must_not', 'occupation_must_not', 'trait_must_not']:
         assert name in concepts
 
 

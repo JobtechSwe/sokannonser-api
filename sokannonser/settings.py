@@ -1,5 +1,4 @@
 import os
-from valuestore import taxonomy
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "localhost")
@@ -26,15 +25,12 @@ RESTPLUS_VALIDATE = False
 RESTPLUS_MASK_SWAGGER = False
 RESTPLUS_ERROR_404_HELP = False
 
-# Ad proxy URL
-# AD_PROXY_URL = 'http://api.arbetsformedlingen.se/af/v0/platsannonser/'
-AD_PROXY_URL = 'https://www.arbetsformedlingen.se/rest/ledigtarbete/rest/af/v1/ledigtarbete/publikt/annonser/'
+
 # Base API URL
 BASE_URL = os.getenv('BASE_URL', 'https://base.url')
 
 # Header parameters
 APIKEY = 'api-key'
-APIKEY_BACKDOOR = 'apa'  # TODO: Remove before production
 
 # Query parameters
 OFFSET = 'offset'
@@ -78,20 +74,6 @@ SHOW_EXPIRED = 'show-expired'
 result_models = [
     'pbapi', 'simple'
 ]
-sort_options = {
-    'relevance': "_score",
-    'pubdate-desc': {"publiceringsdatum": "desc"},
-    'pubdate-asc':  {"publiceringsdatum": "asc"},
-    'applydate-desc':  {"sista_ansokningsdatum": "desc"},
-    'applydate-asc':  {"sista_ansokningsdatum": "asc"},
-    'updated': {"timestamp": "desc"},
-}
-stats_options = {
-    taxonomy.OCCUPATION: "yrkesroll.taxonomi-kod.keyword",
-    taxonomy.GROUP: "yrkesgrupp.taxonomi-kod.keyword",
-    taxonomy.FIELD: "yrkesomrade.taxonomi-kod.keyword",
-    taxonomy.SKILL: "krav.kompetenser.taxonomi-kod.keyword",
-}
 auranest_sort_options = {
     'relevance': "_score",
     'pubdate-desc': {"source.firstSeenAt": "desc"},

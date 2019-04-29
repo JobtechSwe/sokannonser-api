@@ -23,8 +23,12 @@ pipeline {
         stage('Build and Tag Openshift Image'){
             steps{
                 sh 'echo "${GIT_BRANCH}"'
-                openshiftBuild(namespace:'${openshiftProject}', bldCfg: 'sokapi', showBuildLogs: 'true')
-                openshiftTag(namespace:'${openshiftProject}', srcStream: 'sokapi', srcTag: 'latest', destStream: 'sokapi', destTag:'${buildTag}')
+                openshiftBuild(namespace:'${openshiftProject}', bldCfg: 'open-api', showBuildLogs: 'true')
+                openshiftTag(namespace:'${openshiftProject}', srcStream: 'open-api', srcTag: 'latest', destStream: 'open-api', destTag:'${buildTag}')
+                openshiftBuild(namespace:'${openshiftProject}', bldCfg: 'jobtechjobs-api', showBuildLogs: 'true')
+                openshiftTag(namespace:'${openshiftProject}', srcStream: 'jobtechjobs-api', srcTag: 'latest', destStream: 'jobtechjobs-api', destTag:'${buildTag}')
+                openshiftBuild(namespace:'${openshiftProject}', bldCfg: 'bulk-api', showBuildLogs: 'true')
+                openshiftTag(namespace:'${openshiftProject}', srcStream: 'bulk-api', srcTag: 'latest', destStream: 'bulk-api', destTag:'${buildTag}')
             }
         }
         stage('Deploy to Staging'){
@@ -55,9 +59,15 @@ pipeline {
             }
             steps{
                 sh 'echo "Deploying from ${GIT_BRANCH}"'
-                sh "oc set image dc/sokapi sokapi=docker-registry.default.svc:5000/${openshiftProject}/sokapi:${buildTag} -n ${openshiftProject}"
-                openshiftDeploy(depCfg: 'sokapi', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
-                openshiftVerifyDeployment(depCfg: 'sokapi', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+                sh "oc set image dc/open-api open-api=docker-registry.default.svc:5000/${openshiftProject}/open-api:${buildTag} -n ${openshiftProject}"
+                openshiftDeploy(depCfg: 'open-api', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
+                openshiftVerifyDeployment(depCfg: 'open-api', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+                sh "oc set image dc/jobtechjobs-api jobtechjobs-api=docker-registry.default.svc:5000/${openshiftProject}/jobtechjobs-api:${buildTag} -n ${openshiftProject}"
+                openshiftDeploy(depCfg: 'jobtechjobs-api', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
+                openshiftVerifyDeployment(depCfg: 'jobtechjobs-api', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+                sh "oc set image dc/bulk-api bulk-api=docker-registry.default.svc:5000/${openshiftProject}/bulk-api:${buildTag} -n ${openshiftProject}"
+                openshiftDeploy(depCfg: 'bulk-api', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
+                openshiftVerifyDeployment(depCfg: 'bulk-api', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
             }
         }
     }
@@ -66,10 +76,10 @@ pipeline {
             slackSend color: 'good', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} build: ${buildTag}."
         }
         failure {
-            slackSend color: 'bad', channel: '#narval-sokapi', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} failed to build to ${openshiftProject} build ${buildTag}. ${BUILD_URL}console"
+            slackSend color: 'FF0000', channel: '#narval-sokapi', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} FAILED to build to ${openshiftProject} build ${buildTag}. ${BUILD_URL}console"
         }
         unstable {
-            slackSend color: 'bad', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} unstable build for ${openshiftProject} build ${buildTag}. ${BUILD_URL}console"
+            slackSend color: 'FFFF00', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} unstable build for ${openshiftProject} build ${buildTag}. ${BUILD_URL}console"
         }
     }
 }

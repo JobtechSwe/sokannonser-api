@@ -1,10 +1,10 @@
 from flask import request
 from flask_restplus import Resource, abort
-from valuestore.taxonomy import tax_type, reverse_tax_type
-from valuestore import taxonomy
+from sokannonser.repository import taxonomy
 from sokannonser import settings
 from sokannonser.repository import elastic, platsannonser
 from sokannonser.rest import ns_valuestore
+from sokannonser.rest.model import queries
 from sokannonser.rest.model.queries import taxonomy_query
 
 
@@ -12,15 +12,16 @@ from sokannonser.rest.model.queries import taxonomy_query
 class Valuestore(Resource):
     @ns_valuestore.doc(
         params={
-            settings.OFFSET: "The offset parameter defines the offset from the first result you want to fetch",
+            settings.OFFSET: "The offset parameter defines the offset from the first "
+            "result you want to fetch",
             settings.LIMIT: "Number of result rows to fetch",
             settings.FREETEXT_QUERY: "Freetext query for fetching a filtered result. "
                                      "(for example for autocomplete / type ahead)",
             "parent-id": "filter search for taxonomy values by specific parent conceptId"
                          " (useful in combination with the type parameter)",
-            "type": "filter by type ",
-            settings.SHOW_COUNT: "fetch the number of job ads that matches a taxonomy value "
-                                 "(only available when chosen type is provided)"
+            "type": "filter by type (available choices: %s)" % queries.VF_TYPE_CHOICES,
+            settings.SHOW_COUNT: "fetch the number of job ads that matches a taxonomy "
+                                 "value (only available when chosen type is provided)"
         }
     )
     @ns_valuestore.expect(taxonomy_query)
@@ -28,12 +29,15 @@ class Valuestore(Resource):
         args = taxonomy_query.parse_args()
         q = request.args.get('q', None)
         parent_id = args.get('parent-id') if args.get('parent-id') else []
-        concept_type = request.args.get('type', None)
+        concept_type = args.get('type') or []
+
         offset = request.args.get(settings.OFFSET, 0)
         limit = request.args.get(settings.LIMIT, 10)
-        response = taxonomy.find_concepts(elastic, q, parent_id, concept_type, offset, limit)
+        response = taxonomy.find_concepts(elastic, q, parent_id, concept_type,
+                                          offset, limit)
         show_count = request.args.get(settings.SHOW_COUNT) == "true"
-        statistics = platsannonser.get_stats_for(concept_type) if concept_type and show_count else {}
+        statistics = platsannonser.get_stats_for(concept_type) \
+            if concept_type and show_count else {}
         if not response:
             abort(500, custom="The server failed to respond properly")
         query_dict = {}
@@ -60,7 +64,8 @@ class Valuestore(Resource):
             if foralder:
                 entity['parentId'] = foralder
             if statistics:
-                entity['antal'] = statistics.get(hit['_source']['legacy_ams_taxonomy_id'], 0)
+                entity['antal'] = statistics.get(hit['_source']['legacy_ams_taxonomy_id'],
+                                                 0)
             results.append(entity)
         return {'search': query,
                 'total': response.get('hits', {}).get('total', 0),

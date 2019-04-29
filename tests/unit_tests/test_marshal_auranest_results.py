@@ -6,7 +6,8 @@ import sys
 
 import pytest
 
-from sokannonser.rest.endpoint.auranest import AuranestSearch
+from market.rest import ns_market
+from market.rest.results import market_list
 
 currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
@@ -18,16 +19,20 @@ def get_static_ads_from_file():
         return result
 
 
+@ns_market.marshal_with(market_list)
+def mock_marshal_method(esresult):
+    return esresult
+
+
 @pytest.mark.unit
 def test_properties_and_types_marshal_mocked_elastic_result():
-    print('============================', sys._getframe().f_code.co_name, '============================ ')
+    print('========================', sys._getframe().f_code.co_name, '================ ')
 
-    asearch = AuranestSearch()
     esresult = get_static_ads_from_file()
     # pprint(esresult)
 
     # args = {settings.FREETEXT_QUERY: False, settings.STATISTICS: False}
-    marshalled_result = asearch.marshal_default(esresult)
+    marshalled_result = mock_marshal_method(esresult)
     # pprint(marshalled_result)
 
     for hit in marshalled_result['hits']:

@@ -40,7 +40,7 @@ ARG flask_app=sokannonser
 ENV flask_app=$flask_app
 
 WORKDIR /app
-RUN echo "module = $flask_app" >> uwsgi.ini
+RUN echo $flask_app && echo "module = $flask_app" >> uwsgi.ini
 
 # RUN pip3 install --no-cache-dir -r requirements.txt
 RUN time pip3 install -r requirements.txt

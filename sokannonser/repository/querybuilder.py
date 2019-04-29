@@ -105,11 +105,15 @@ class QueryBuilder(object):
         value_dicts = []
         for agg in aggs:
             if agg.startswith('complete_'):
-                value_dicts += aggs[agg]['buckets']
-        filtered_aggs = [kv['key'] for kv in sorted(value_dicts,
-                                                    key=lambda k: k['doc_count'],
-                                                    reverse=True)
-                         if kv['key'] not in fwords]
+                value_dicts += [{"type": agg[9:], **bucket} for bucket in aggs[agg]['buckets']]
+
+            filtered_aggs = [{"value": kv['key'],
+                              "type": kv['type'],
+                              "occurrences": kv['doc_count']}
+                             for kv in sorted(value_dicts,
+                                              key=lambda k: k['doc_count'],
+                                              reverse=True)
+                             if kv['key'] not in fwords]
         if len(filtered_aggs) > 10:
             return filtered_aggs[0:10]
         return filtered_aggs

@@ -22,7 +22,7 @@ resultat_taxonomi = ns_platsannons.model('TaxonomiEntitet', {
 
 class FormattedUrl(fields.Raw):
     def format(self, value):
-        return "%s/af/ad/%s" % (settings.BASE_URL, value)
+        return "%s/ad/%s" % (settings.BASE_URL, value)
 
 
 # DEPRECATED

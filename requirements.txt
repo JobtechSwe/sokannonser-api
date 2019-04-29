@@ -6,7 +6,7 @@ requests
 certifi
 git+https://github.com/JobtechSwe/jobtech-common.git
 python-dateutil
-pytest
+# pytest
 pytest-cov
 pytest-envfiles
 elastic-apm[flask]==4.1.0

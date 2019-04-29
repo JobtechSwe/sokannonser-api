@@ -183,8 +183,7 @@ class QueryBuilder(object):
         if args.get(settings.SORT):
             query_dsl['sort'] = [f.sort_options.get(args.pop(settings.SORT))]
         else:
-            # TODO: Remove ".keyword" once index is correctly mapped
-            query_dsl['sort'] = ["_score", {f.ID+".keyword": "asc"}]
+            query_dsl['sort'] = ["_score", {f.ID: "asc"}]
         return query_dsl
 
     def _assemble_queries(self, query_dsl, additional_queries, additional_filters):

@@ -2,10 +2,10 @@ import logging
 from flask import Flask
 from flask_cors import CORS
 from sokannonser import appconf
-from bulkloader.rest import api
+from market.rest import api
 # Import all Resources that are to be made visible for the app
-from bulkloader.rest.bulk import BulkZip
-from bulkloader.rest.bulk import BulkLoad
+from market.rest.endpoint import MarketSearch
+from market.rest.endpoint import MarketComplete
 
 app = Flask(__name__)
 CORS(app)

@@ -1,9 +1,10 @@
 import logging
 import re
+import json
 from sokannonser import settings
-from sokannonser.repository import ttc
+from sokannonser.repository import ttc, taxonomy
 from sokannonser.rest.model import queries
-from valuestore import taxonomy
+from sokannonser.rest.model import fields as f
 
 log = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class QueryBuilder(object):
             log.debug("Constructing match-all query")
             query_dsl['query']['bool']['must'].append({'match_all': {}})
             if 'sort' not in query_dsl:
-                query_dsl['sort'] = [settings.sort_options.get('pubdate-desc')]
+                query_dsl['sort'] = [f.sort_options.get('pubdate-desc')]
             return query_dsl
 
         must_queries = list()
@@ -43,24 +44,45 @@ class QueryBuilder(object):
         must_queries.append(self._build_plats_query(args.get(taxonomy.MUNICIPALITY),
                                                     args.get(taxonomy.REGION)))
         must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
-        must_queries.append(self._build_generic_query(["krav.kompetenser.kod.keyword",
-                                                       "krav.kompetenser.taxonomi-kod"],
+        must_queries.append(self._build_generic_query([f.MUST_HAVE_SKILLS+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.MUST_HAVE_SKILLS+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID,
+                                                       f.NICE_TO_HAVE_SKILLS+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.NICE_TO_HAVE_SKILLS+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.SKILL)))
-        must_queries.append(self._build_generic_query(["arbetstidstyp.kod.keyword",
-                                                       "arbetstidstyp.taxonomi-kod"],
+        must_queries.append(self._build_generic_query([f.MUST_HAVE_LANGUAGES+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.MUST_HAVE_LANGUAGES+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID,
+                                                       f.NICE_TO_HAVE_LANGUAGES+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.NICE_TO_HAVE_LANGUAGES+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID],
+                                                      args.get(taxonomy.LANGUAGE)))
+        must_queries.append(self._build_generic_query([f.WORKING_HOURS_TYPE+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.WORKING_HOURS_TYPE+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.WORKTIME_EXTENT)))
-        must_queries.append(self._build_generic_query(["korkort.kod.keyword",
-                                                       "korkort.taxonomi-kod"],
+        must_queries.append(self._build_generic_query([f.DRIVING_LICENCE+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.DRIVING_LICENCE+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.DRIVING_LICENCE)))
-        must_queries.append(self._build_generic_query(["anstallningstyp.kod.keyword",
-                                                       "anstallningstyp.taxonomi-kod"],
+        must_queries.append(self._build_generic_query([f.EMPLOYMENT_TYPE+"."+
+                                                       f.CONCEPT_ID+".keyword",
+                                                       f.EMPLOYMENT_TYPE+"."+
+                                                       f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.EMPLOYMENT_TYPE)))
 
         # TODO: Maybe check if NO skills are listed in ad instead?
         if args.get(settings.EXPERIENCE_REQUIRED) == 'false':
-            must_queries.append({"term": {"erfarenhet_kravs": False}})
+            must_queries.append({"term": {f.EXPERIENCE_REQUIRED: False}})
         if args.get(settings.EXPERIENCE_REQUIRED) == 'true':
-            must_queries.append({"term": {"erfarenhet_kravs": True}})
+            must_queries.append({"term": {f.EXPERIENCE_REQUIRED: True}})
 
         filter_queries = list()
         geo_filter = self._build_geo_dist_filter(args.get(settings.POSITION),
@@ -72,7 +94,7 @@ class QueryBuilder(object):
         for stat in args.get(settings.STATISTICS) or []:
             query_dsl['aggs'][stat] = {
                 "terms": {
-                    "field": settings.stats_options[stat],
+                    "field": f.stats_options[stat],
                     "size": args.get(settings.STAT_LMT) or 5
                 }
             }
@@ -83,11 +105,15 @@ class QueryBuilder(object):
         value_dicts = []
         for agg in aggs:
             if agg.startswith('complete_'):
-                value_dicts += aggs[agg]['buckets']
-        filtered_aggs = [kv['key'] for kv in sorted(value_dicts,
-                                                    key=lambda k: k['doc_count'],
-                                                    reverse=True)
-                         if kv['key'] not in fwords]
+                value_dicts += [{"type": agg[9:], **bucket} for bucket in aggs[agg]['buckets']]
+
+            filtered_aggs = [{"value": kv['key'],
+                              "type": kv['type'],
+                              "occurrences": kv['doc_count']}
+                             for kv in sorted(value_dicts,
+                                              key=lambda k: k['doc_count'],
+                                              reverse=True)
+                             if kv['key'] not in fwords]
         if len(filtered_aggs) > 10:
             return filtered_aggs[0:10]
         return filtered_aggs
@@ -97,9 +123,11 @@ class QueryBuilder(object):
         query_dsl['from'] = args.pop(settings.OFFSET, 0)
         query_dsl['size'] = args.pop(settings.LIMIT, 10)
         if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
-            query_dsl['_source'] = ["id", "rubrik", "sista_ansokningsdatum",
-                                    "anstallningstyp.term", "arbetstidstyp.term",
-                                    "arbetsgivare.name", "publiceringsdatum"]
+            query_dsl['_source'] = [f.ID, f.HEADLINE, f.APPLICATION_DEADLINE,
+                                    f.EMPLOYMENT_TYPE+"."+f.LABEL,
+                                    f.WORKING_HOURS_TYPE+"."+f.LABEL,
+                                    f.EMPLOYER_NAME,
+                                    f.PUBLICATION_DATE]
         # Remove api-key from args to make sure an empty query can occur
         args.pop(settings.APIKEY)
 
@@ -110,16 +138,21 @@ class QueryBuilder(object):
                 'filter': [
                     {
                         'range': {
-                            'publiceringsdatum': {
+                            f.PUBLICATION_DATE: {
                                 'lte': 'now/m'
                             }
                         }
                     },
                     {
                         'range': {
-                            'status.sista_publiceringsdatum': {
+                            f.LAST_PUBLICATION_DATE: {
                                 'gte': 'now/m'
                             }
+                        }
+                    },
+                    {
+                        'term': {
+                            f.REMOVED: False
                         }
                     },
                 ]
@@ -127,7 +160,7 @@ class QueryBuilder(object):
         }
         query_dsl['aggs'] = {
             "positions": {
-                "sum": {"field": "antal_platser"}
+                "sum": {"field": f.NUMBER_OF_VACANCIES}
             }
         }
         complete_string = args.get(settings.TYPEAHEAD_QUERY)
@@ -137,18 +170,21 @@ class QueryBuilder(object):
             size = 12/len(complete_fields)
             for field in complete_fields:
                 dkey = "complete_%s" % field
-                field_path = "keywords" if field == 'location' \
-                    else "keywords_enriched_binary"
+                base_field = f.KEYWORDS_EXTRACTED \
+                    if field in ['location', 'employer'] else f.KEYWORDS_ENRICHED
                 query_dsl['aggs'][dkey] = {
                     "terms": {
-                        "field": "%s.%s.raw" % (field_path, field),
+                        "field": "%s.%s.raw" % (base_field, field),
                         "size": size,
                         "include": "%s.*" % complete
                     }
                 }
 
         if args.get(settings.SORT):
-            query_dsl['sort'] = [settings.sort_options.get(args.pop(settings.SORT))]
+            query_dsl['sort'] = [f.sort_options.get(args.pop(settings.SORT))]
+        else:
+            # TODO: Remove ".keyword" once index is correctly mapped
+            query_dsl['sort'] = ["_score", {f.ID+".keyword": "asc"}]
         return query_dsl
 
     def _assemble_queries(self, query_dsl, additional_queries, additional_filters):
@@ -166,57 +202,121 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES
-        inc_words = ' '.join([w for w in querystring.split(' ') if not w.startswith('-')])
-        exc_words = ' '.join([w[1:] for w in querystring.split(' ') if w.startswith('-')])
-        shoulds = self._freetext_fields(inc_words, queryfields) if inc_words else None
-        mustnts = self._freetext_fields(exc_words, queryfields) if exc_words else None
+
+        concepts = ttc.text_to_concepts(querystring)
+        # Sort all concepts by string length
+        all_concepts = sorted(concepts['occupation'] +
+                              concepts['skill'] +
+                              concepts['trait'] +
+                              concepts['occupation_must'] +
+                              concepts['skill_must'] +
+                              concepts['trait_must'] +
+                              concepts['occupation_must_not'] +
+                              concepts['skill_must_not'] +
+                              concepts['trait_must_not'],
+                              key=lambda c: len(c),
+                              reverse=True)
+        # Remove found concepts from querystring
+        for concept in all_concepts:
+            p = re.compile(f'(\\s*){concept}(\\s*)')
+            querystring = p.sub('\\1\\2', querystring).strip()
+
+        inc_words = ' '.join([w for w in querystring.split(' ')
+                              if w and not w.startswith('+')
+                              and not w.startswith('-')])
+        req_words = ' '.join([w[1:] for w in querystring.split(' ')
+                              if w.startswith('+')
+                              and w[1:].strip()])
+        exc_words = ' '.join([w[1:] for w in querystring.split(' ')
+                              if w.startswith('-')
+                              and w[1:].strip()])
+        shoulds = self.__freetext_fields(inc_words) if inc_words else []
+        musts = self.__freetext_fields(req_words) if req_words else []
+        mustnts = self.__freetext_fields(exc_words) if exc_words else []
+
         ft_query = {"bool": {}}
+        # Add "common" words to query
         if shoulds:
-            ft_query['bool']['should'] = shoulds
+            # Include all "must" words in should, to make sure any single "should"-word
+            # not becomes exclusive
+            ft_query['bool']['should'] = shoulds + musts
+        if musts:
+            ft_query['bool']['must'] = musts
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
-        concepts = ttc.text_to_concepts(querystring)
-        ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
-                                                        ['occupations', 'skills',
-                                                         'traits'], 1, 'should', 10)
-        ft_query = self._freetext_enriched_fields_query(ft_query, concepts,
-                                                        ['occupations_must_not',
-                                                         'skills_must_not',
-                                                         'traits_must_not'],
-                                                        10, 'must_not')
+        # Make all "musts" "shoulds" as well
+        for qf in queryfields:
+            if qf in concepts:
+                must_key = "%s_must" % qf
+                concepts[qf] += concepts.get(must_key, [])
+        # Add concepts to query
+        for concept_type in queryfields:
+            sub_should = self.__freetext_concepts({"bool": {}}, concepts,
+                                                  [concept_type], "should")
+            if 'should' in sub_should['bool']:
+                if 'must' not in ft_query['bool']:
+                    ft_query['bool']['must'] = []
+                ft_query['bool']['must'].append(sub_should)
+        # Remove unwanted concepts from query
+        self.__freetext_concepts(ft_query, concepts, queryfields, 'must_not')
+
+        # Add required concepts to query
+        self.__freetext_concepts(ft_query, concepts, queryfields, 'must')
+
         return ft_query
 
-    def _freetext_enriched_fields_query(self, ft_query, concepts, fields,
-                                        rev_cut, bool_type, boost=None):
-        for field in fields:
-            key = "keywords_enriched_binary.%s.raw" % field[:-rev_cut]
-            for value in concepts.get(field, []):
-                if bool_type not in ft_query['bool']:
-                    ft_query['bool'][bool_type] = []
+    def __freetext_concepts(self, query_dict, concepts, concept_keys, bool_type):
+        for key in concept_keys:
+            dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
+            for value in concepts.get(dict_key, []):
+                if bool_type not in query_dict['bool']:
+                    query_dict['bool'][bool_type] = []
 
-                query = {
-                    "term": {
-                        key: {
-                            "value": value
+                base_field = f.KEYWORDS_EXTRACTED \
+                    if key in ['location', 'employer'] else f.KEYWORDS_ENRICHED
+                field = "%s.%s.raw" % (base_field, key)
+                query_dict['bool'][bool_type].append(
+                    {
+                        "term": {
+                            field: {
+                                "value": value,
+                                "boost": 10
+                            }
                         }
                     }
-                }
-                if boost:
-                    query['term'][key]['boost'] = boost
-                ft_query['bool'][bool_type].append(query)
-        return ft_query
+                )
+                if bool_type in ['should', 'must_not'] and key in ['occupation', 'skill']:
+                    # Add a headline query as well
+                    query_dict['bool'][bool_type].append(
+                        {
+                            "match": {
+                                f.HEADLINE: {
+                                    "query": value,
+                                    "boost": 10
+                                }
+                            }
+                        }
+                    )
+        return query_dict
 
-    def _freetext_fields(self, searchword, queryfields):
-        search_fields = ["rubrik^3", "arbetsgivare.namn^2",
-                         "beskrivning.annonstext"]
-        search_fields += ["keywords.%s" % qf for qf in queryfields]
+
+    def __freetext_headline(self, searchwords):
+        return {
+            "match": {
+                f.HEADLINE: searchwords
+            }
+        }
+
+    def __freetext_fields(self, searchword):
         return [
             {
                 "multi_match": {
                     "query": searchword,
                     "type": "cross_fields",
                     "operator": "and",
-                    "fields": search_fields
+                    "fields": [f.HEADLINE+"^3", f.EMPLOYER_NAME+"^2",
+                               f.EMPLOYER_WORKPLACE+"^2", f.DESCRIPTION_TEXT,
+                               f.ID, f.EXTERNAL_ID]
                 }
             }
         ]
@@ -228,7 +328,9 @@ class QueryBuilder(object):
                 "multi_match": {
                     "query": " ".join(employers),
                     "operator": "or",
-                    "fields": ["arbetsgivare.namn", "arbetsgivare.organisationsnummer"]
+                    "fields": [f.EMPLOYER_NAME,
+                               f.EMPLOYER_WORKPLACE,
+                               f.EMPLOYER_ORGANIZATION_NUMBER]
                 }
             }
         return None
@@ -241,57 +343,57 @@ class QueryBuilder(object):
 
         yrke_term_query = [{
             "term": {
-                "yrkesroll.kod.keyword": {
+                f.OCCUPATION+"."+f.CONCEPT_ID+".keyword": {
                     "value": y,
                     "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                "yrkesroll.taxonomi-kod": {
+                f.OCCUPATION+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                "yrkesgrupp.kod.keyword": {
+                f.OCCUPATION_GROUP+"."+f.CONCEPT_ID+".keyword": {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                "yrkesgrupp.taxonomi-kod": {
+                f.OCCUPATION_GROUP+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                "yrkesomrade.kod.keyword": {
+                f.OCCUPATION_FIELD+"."+f.CONCEPT_ID+".keyword": {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                "yrkesomrade.taxonomi-kod": {
+                f.OCCUPATION_FIELD+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
         neg_yrke_term_query = [{
             "term": {
-                "yrkesroll.kod.keyword": {
+                f.OCCUPATION+"."+f.CONCEPT_ID+".keyword": {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
         neg_yrke_term_query = [{
             "term": {
-                "yrkesroll.taxonomi-kod": {
+                f.OCCUPATION+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                "yrkesgrupp.kod.keyword": {
+                f.OCCUPATION_GROUP+"."+f.CONCEPT_ID+".keyword": {
                     "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                "yrkesgrupp.taxonomi-kod": {
+                f.OCCUPATION_GROUP+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                "yrkesomrade.kod.keyword": {
+                f.OCCUPATION_FIELD+"."+f.CONCEPT_ID+".keyword": {
                     "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                "yrkesomrade.taxonomi-kod": {
+                f.OCCUPATION_FIELD+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
 
         if yrke_term_query or neg_yrke_term_query:
@@ -321,10 +423,10 @@ class QueryBuilder(object):
             else:
                 lan.append(lkod)
         plats_term_query = [{"term": {
-            "arbetsplatsadress.kommunkod": {
+            f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
         plats_term_query += [{"term": {
-            "arbetsplatsadress.lanskod": {
+            f.WORKPLACE_ADDRESS_REGION_CODE: {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]
         plats_bool_query = {"bool": {
             "should": plats_term_query}
@@ -333,11 +435,11 @@ class QueryBuilder(object):
         neg_lan_term_query = []
         if neg_komm:
             neg_komm_term_query = [{"term": {
-                "arbetsplatsadress.kommunkod": {
+                f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
                     "value": kkod}}} for kkod in neg_komm]
         if neg_lan:
             neg_lan_term_query = [{"term": {
-                "arbetsplatsadress.lanskod": {
+                f.WORKPLACE_ADDRESS_REGION_CODE: {
                     "value": lkod}}} for lkod in neg_lan]
         if neg_komm_term_query or neg_lan_term_query:
             if 'bool' not in plats_bool_query:
@@ -356,14 +458,14 @@ class QueryBuilder(object):
             else:
                 lander.append(lkod)
         county_term_query = [{"term": {
-            "arbetsplatsadress.landskod": {
+            f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
                 "value": lkod, "boost": 1.0}}} for lkod in lander]
         country_bool_query = {"bool": {
             "should": county_term_query}
         } if county_term_query else {}
         if neg_land:
             neg_country_term_query = [{"term": {
-                "arbetsplatsadress.landskod": {
+                f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
                     "value": lkod}}} for lkod in neg_land]
             if 'bool' not in country_bool_query:
                 country_bool_query['bool'] = {}
@@ -374,11 +476,11 @@ class QueryBuilder(object):
     def _filter_timeframe(self, from_datetime, to_datetime):
         if not from_datetime and not to_datetime:
             return None
-        range_query = {"range": {"publiceringsdatum": {}}}
+        range_query = {"range": {f.PUBLICATION_DATE: {}}}
         if from_datetime:
-            range_query['range']['publiceringsdatum']['gte'] = from_datetime.isoformat()
+            range_query['range'][f.PUBLICATION_DATE]['gte'] = from_datetime.isoformat()
         if to_datetime:
-            range_query['range']['publiceringsdatum']['lte'] = to_datetime.isoformat()
+            range_query['range'][f.PUBLICATION_DATE]['lte'] = to_datetime.isoformat()
         return range_query
 
     # Parses PARTTIME_MIN and PARTTIME_MAX
@@ -394,7 +496,7 @@ class QueryBuilder(object):
                 "must": [
                     {
                         "range": {
-                            "arbetsomfattning.min": {
+                            f.SCOPE_OF_WORK_MIN: {
                                 "lte": parttime_max,
                                 "gte": parttime_min
                             },
@@ -402,7 +504,7 @@ class QueryBuilder(object):
                     },
                     {
                         "range": {
-                            "arbetsomfattning.max": {
+                            queries.SCOPE_OF_WORK_MAX: {
                                 "lte": parttime_max,
                                 "gte": parttime_min
                             }
@@ -440,8 +542,8 @@ class QueryBuilder(object):
     def _build_geo_dist_filter(self, positions, coordinate_ranges):
         geo_bool = {"bool": {"should": []}} if positions else {}
         for index, position in enumerate(positions or []):
-            longitude = None
             latitude = None
+            longitude = None
             coordinate_range = coordinate_ranges[index] \
                 if coordinate_ranges is not None and index < len(coordinate_ranges) \
                 else settings.DEFAULT_POSITION_RADIUS
@@ -450,16 +552,17 @@ class QueryBuilder(object):
                     latitude = float(re.split(', ?', position)[0])
                     longitude = float(re.split(', ?', position)[1])
                 except ValueError as e:
-                    log.debug("Bad position-parameter: \"%s\" (%s)" % (position, str(e)))
+                    log.info("Bad position-parameter: \"%s\" (%s)" % (position, str(e)))
 
             geo_filter = {}
-            if (not longitude or not latitude or not coordinate_range):
+            if (not latitude or not longitude or not coordinate_range):
                 return {}
-            elif ((-180 <= longitude <= 180)
-                  and (-90 <= latitude <= 90) and (coordinate_range > 0)):
+            elif ((-90 <= latitude <= 90)
+                  and (-180 <= longitude <= 180) and (coordinate_range > 0)):
                 geo_filter["geo_distance"] = {
                     "distance": str(coordinate_range) + "km",
-                    "arbetsplatsadress.coordinates": [longitude, latitude]
+                    # OBS! order in REST request: latitude,longitude
+                    f.WORKPLACE_ADDRESS_COORDINATES: [longitude, latitude]
                 }
             if geo_filter:
                 geo_bool['bool']['should'].append(geo_filter)

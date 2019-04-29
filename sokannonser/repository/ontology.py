@@ -1,4 +1,6 @@
 import logging
+from sokannonser.rest.model import fields
+from sokannonser.repository import text_to_concept as ttc
 from flashtext.keyword import KeywordProcessor
 from elasticsearch import ElasticsearchException
 from elasticsearch.helpers import scan
@@ -8,12 +10,13 @@ log = logging.getLogger(__name__)
 
 class Ontology(object):
 
-    def __init__(self, client=None, index='narvalontology', stoplist=None,
+    def __init__(self, client=None, index='narvalontology',
+                 annons_index='platsannons-read', stoplist=None,
                  concept_type=None, include_misspelled=False):
-
         self.client = client
 
         self.index = index
+        self.annons_index = annons_index
         if stoplist is None:
             stoplist = []
         self.stoplist = stoplist
@@ -24,7 +27,6 @@ class Ontology(object):
         self.keyword_processor = KeywordProcessor()
         self.init_keyword_processor(self.keyword_processor)
         self.init_ontology(self.keyword_processor)
-
 
     def __len__(self):
         return len(self.get_keyword_processor())
@@ -51,6 +53,30 @@ class Ontology(object):
             if concept_preferred_label not in self.concept_to_term:
                 self.concept_to_term[concept_preferred_label] = []
             self.concept_to_term[concept_preferred_label].append(term_obj)
+        # Load locations
+        query = {
+            "aggs": {
+                "locations": {
+                    "terms": {
+                        "field": "%s.location.raw" % fields.KEYWORDS_EXTRACTED,
+                        "size": 20000
+                    }
+                }
+            },
+            "query": {
+                "match_all": {}
+            },
+            "size": 0
+        }
+
+        results = self.client.search(body=query, index=self.annons_index)
+        buckets = results.get('aggregations', {}).get('locations', {}).get('buckets', [])
+        places = [p['key'] for p in buckets if not p['key'].isnumeric()]
+        for place in places:
+            place_obj = {'term': place, 'concept': place.capitalize(),
+                         'type': ttc.TextToConcept.LOCATION_KEY}
+            keyword_processor.add_keyword(place, place_obj)
+        return places
 
     @staticmethod
     def init_keyword_processor(keyword_processor):
@@ -60,13 +86,15 @@ class Ontology(object):
         return self.keyword_processor
 
     def get_concepts(self, text, concept_type=None, span_info=False):
-        concepts = self.get_keyword_processor().extract_keywords(text, span_info=span_info)
+        concepts = self.get_keyword_processor().extract_keywords(text,
+                                                                 span_info=span_info)
         if concept_type is not None:
             if span_info:
-                concepts = list(filter(lambda concept: concept[0]['type'] == concept_type, concepts))
+                concepts = list(filter(lambda concept: concept[0]['type'] ==
+                                       concept_type, concepts))
             else:
-                concepts = list(filter(lambda concept: concept['type'] == concept_type, concepts))
-        # print('Returning concepts', concepts)
+                concepts = list(filter(lambda concept: concept['type'] ==
+                                       concept_type, concepts))
         return concepts
 
     def elastic_iterator(self, maximum=None, query=None, _source=None, size=1000):
@@ -83,7 +111,8 @@ class Ontology(object):
 
         # print(elastic_query)
 
-        scan_result = scan(self.client, elastic_query, index=self.index, size=size, _source=_source)
+        scan_result = scan(self.client, elastic_query, index=self.index,
+                           size=size, _source=_source)
 
         i = 0
         try:

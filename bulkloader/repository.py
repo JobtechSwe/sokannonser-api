@@ -18,14 +18,14 @@ def _es_dsl():
                 'filter': [
                     {
                         'range': {
-                            'publiceringsdatum': {
+                            'publication_date': {
                                 'lte': 'now/m'
                             }
                         }
                     },
                     {
                         'range': {
-                            'status.sista_publiceringsdatum': {
+                            'last_publication_date': {
                                 'gte': 'now/m'
                             }
                         }
@@ -39,21 +39,25 @@ def _es_dsl():
 
 def zip_ads(day, start_time=0):
     if start_time == 0:
-        start_time = int(time.time()*1000)
-    if day == 'yesterday':
-        day = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
+        start_time = int(time.time() * 1000)
+
     dsl = _es_dsl()
+
     if day == 'all':
         dsl['query']['bool']['must'] = [{"match_all": {}}]
     else:
+        ts_from = convert_to_timestamp('%sT00:00:00' % str(day))
+        ts_to = convert_to_timestamp('%sT23:59:59' % str(day))
+
         dsl['query']['bool']['must'] = [{
             "range": {
-                "status.uppdaterad": {
-                    "gte": day,
-                    "lte": day
+                "timestamp": {
+                    "gte": ts_from,
+                    "lte": ts_to
                 }
             }
         }]
+    log.debug('zip_ads, dsl: %s' % dsl)
     scan_result = scan(elastic, dsl, index=settings.ES_INDEX)
     in_memory = BytesIO()
     zf = ZipFile(in_memory, mode="w")
@@ -64,22 +68,45 @@ def zip_ads(day, start_time=0):
     zf.close()
     in_memory.seek(0)
     log.debug("File constructed after %d milliseconds."
-              % (int(time.time()*1000)-start_time))
+              % (int(time.time() * 1000) - start_time))
     return in_memory
+
+
+def convert_to_timestamp(date):
+    if not date:
+        return None
+
+    ts = 0
+    for dateformat in [
+        '%Y-%m-%dT%H:%M:%S'
+    ]:
+
+        try:
+            ts = time.mktime(time.strptime(date, dateformat)) * 1000
+            log.debug("Converted date %s to %d" % (date, ts))
+            break
+        except ValueError as e:
+            log.debug("Failed to convert date %s" % date, e)
+
+    return int(ts)
 
 
 # Generator function
 def load_all(since):
     if since == 'yesterday':
         since = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
+
+    ts = time.mktime(since.timetuple()) * 1000
+
     dsl = _es_dsl()
     dsl['query']['bool']['must'] = [{
         "range": {
-            "status.uppdaterad": {
-                "gte": since
+            "timestamp": {
+                "gte": ts
             }
         }
     }]
+    log.debug('load_all, dsl: %s' % dsl)
     scan_result = scan(elastic, dsl, index=settings.ES_INDEX)
     counter = 0
     yield '['

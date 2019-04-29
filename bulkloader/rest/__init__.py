@@ -14,7 +14,8 @@ api.add_namespace(ns_bulk, '/bulk')
 bulk_zip_query = reqparse.RequestParser()
 bulk_zip_query.add_argument(settings.APIKEY, location='headers', required=True)
 
-bulk_regex = '^\\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])|\\ball\\b|\\byesterday\\b$'
+bulk_regex = '^(\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])|all)$'
+
 bulk_zip_query.add_argument(settings.DATE, type=inputs.regex(bulk_regex), required=True)
 
 bulk_stream_query = reqparse.RequestParser()

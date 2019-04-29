@@ -62,7 +62,7 @@ def zip_ads(day, start_time=0):
     in_memory = BytesIO()
     zf = ZipFile(in_memory, mode="w")
 
-    ads = [ad['_source'] for ad in scan_result]
+    ads = [remove_enriched_data(ad['_source']) for ad in scan_result]
     log.debug("Number of ads: %d" % len(ads))
     zf.writestr(f"ads_{day}.json", json.dumps(ads))
     zf.close()
@@ -113,7 +113,18 @@ def load_all(since):
     for ad in scan_result:
         if counter > 0:
             yield ','
-        yield json.dumps(ad['_source'])
+        source = ad['_source']
+        remove_enriched_data(source)
+        yield json.dumps(source)
         counter += 1
     log.info("Delivered %d ads as stream" % counter)
     yield ']'
+
+
+def remove_enriched_data(source):
+    keyword_node = source['keywords']
+    try:
+        del keyword_node['enriched']
+    except KeyError:
+        pass
+    return source

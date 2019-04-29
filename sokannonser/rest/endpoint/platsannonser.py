@@ -13,7 +13,7 @@ from sokannonser.repository.querybuilder import QueryBuilder
 log = logging.getLogger(__name__)
 
 
-@ns_platsannons.route('/ad/<id>', endpoint='ad')
+@ns_platsannons.route('ad/<id>', endpoint='ad')
 class Proxy(Resource):
     @ns_platsannons.doc(
         responses={
@@ -27,7 +27,7 @@ class Proxy(Resource):
         return platsannonser.fetch_platsannons(str(id))
 
 
-@ns_platsannons.route('/search')
+@ns_platsannons.route('search')
 class PBSearch(Resource):
     method_decorators = [check_api_key('pb')]
     querybuilder = QueryBuilder()
@@ -72,7 +72,7 @@ class PBSearch(Resource):
         return result
 
 
-@ns_platsannons.route('/complete')
+@ns_platsannons.route('complete')
 class PBComplete(Resource):
     method_decorators = [check_api_key('pb')]
     querybuilder = QueryBuilder()

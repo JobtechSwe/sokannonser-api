@@ -122,6 +122,7 @@ class QueryBuilder(object):
         query_dsl = dict()
         query_dsl['from'] = args.pop(settings.OFFSET, 0)
         query_dsl['size'] = args.pop(settings.LIMIT, 10)
+        query_dsl['track_total_hits'] = True
         if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
             query_dsl['_source'] = [f.ID, f.HEADLINE, f.APPLICATION_DEADLINE,
                                     f.EMPLOYMENT_TYPE+"."+f.LABEL,

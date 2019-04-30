@@ -182,7 +182,7 @@ class QueryBuilder(object):
                 }
 
         if args.get(settings.SORT):
-            query_dsl['sort'] = [f.sort_options.get(args.pop(settings.SORT))]
+            query_dsl['sort'] = f.sort_options.get(args.pop(settings.SORT))
         else:
             query_dsl['sort'] = ["_score", {f.ID: "asc"}]
         return query_dsl

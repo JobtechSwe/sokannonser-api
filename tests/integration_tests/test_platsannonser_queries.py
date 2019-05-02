@@ -14,14 +14,14 @@ def test_freetext_query_one_param():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/open/search', headers=headers, data={'q': 'gymnasielärare', 'limit': '1'})
+        result = testclient.get('/search', headers=headers, data={'q': 'gymnasielärare', 'limit': '1'})
         json_response = result.json
         # pprint(json_response)
-        hits_total = json_response['total']
+        hits_total = json_response['total']['value']
         assert int(hits_total) > 0
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_too_big_offset():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -29,12 +29,24 @@ def test_too_big_offset():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/open/search', headers=headers, data={'offset': '2001', 'limit': '10'})
+        result = testclient.get('/search', headers=headers, data={'offset': '2001', 'limit': '10'})
         json_response = result.json
-        pprint(json_response)
-        # hits_total = json_response['total']
-        # print(hits_total)
+        # pprint(json_response)
+        assert 'errors' in json_response
 
+@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_total_hits():
+    print('============================', sys._getframe().f_code.co_name, '============================ ')
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        result = testclient.get('/search', headers=headers, data={'offset': '0', 'limit': '10'})
+        json_response = result.json
+        # pprint(json_response)
+        hits_total = json_response['total']['value']
+        assert int(hits_total) > 10000
 
 
 @pytest.mark.skip(reason="Temporarily disabled")
@@ -47,7 +59,7 @@ def test_deprecated_ads_should_not_be_in_result():
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         for offset in range(0,2000, 100):
             # print(offs)
-            result = testclient.get('/open/search', headers=headers, data={'offset': offset, 'limit': '100'})
+            result = testclient.get('/search', headers=headers, data={'offset': offset, 'limit': '100'})
             json_response = result.json
             # # pprint(json_response)
             hits = json_response['hits']
@@ -56,7 +68,7 @@ def test_deprecated_ads_should_not_be_in_result():
                 assert hit['removed'] is False
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_job_title_with_hyphen():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -64,7 +76,7 @@ def test_freetext_query_job_title_with_hyphen():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/open/search', headers=headers, data={'q': 'HR-specialister', 'limit': '1'})
+        result = testclient.get('/search', headers=headers, data={'q': 'HR-specialister', 'limit': '1'})
         json_response = result.json
         # pprint(json_response)
         assert json_response['freetext_concepts']
@@ -82,7 +94,7 @@ def test_freetext_query_one_param_deleted_enriched():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/open/search', headers=headers, data={'q': 'gymnasielärare', 'limit': '10'})
+        result = testclient.get('/search', headers=headers, data={'q': 'gymnasielärare', 'limit': '10'})
         json_response = result.json
         # pprint(json_response)
         hits_total = json_response['total']
@@ -103,8 +115,8 @@ def test_freetext_query_one_param_found_in_enriched_pos():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/open/search', headers=headers, data={'q': 'diskare', 'limit': '100'})
-        # result = testclient.get('/open/search', headers=headers, data={ 'municipality': '1290',
+        result = testclient.get('/search', headers=headers, data={'q': 'diskare', 'limit': '100'})
+        # result = testclient.get('/search', headers=headers, data={ 'municipality': '1290',
         #                                                                 'q': 'springare',
         #                                                                 'occupation': 'rGGf_KLs_To7',
         #                                                                'limit': '100'})
@@ -126,7 +138,7 @@ def test_freetext_query_one_param_found_in_enriched_neg():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/open/search', headers=headers, data={'q': 'ninja', 'limit': '100'})
+        result = testclient.get('/search', headers=headers, data={'q': 'ninja', 'limit': '100'})
         json_response = result.json
         pprint(json_response)
         # hits_total = json_response['total']
@@ -148,7 +160,7 @@ def test_freetext_query_two_params():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/open/search', headers=headers, data={'q': 'gymnasielärare lokförare', 'limit': '0'})
+        result = testclient.get('/search', headers=headers, data={'q': 'gymnasielärare lokförare', 'limit': '0'})
         json_response = result.json
         # pprint(json_response)
         hits_total = json_response['total']

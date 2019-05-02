@@ -38,7 +38,7 @@ class TextToConcept(object):
             log.info('Creating Ontology, ontologyindex: %s' % self.ontologyindex)
             self.ontology = Ontology(client=self.client,
                                      index=self.ontologyindex,
-                                     annons_index='platsannons-read',
+                                     annons_index=settings.ES_INDEX,
                                      concept_type=None,
                                      include_misspelled=True)
             log.info('Done creating Ontology, ontologyindex: %s' % self.ontologyindex)

@@ -97,7 +97,7 @@ pipeline {
         success {
             slackSend color: 'good', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} build: ${buildTag}."
             script {
-                if (${GIT_BRANCH} == 'origin/master')
+                if ("${GIT_BRANCH}" == 'origin/master')
                     slackSend color: 'good', channel: '#narval-sokapi', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} build: ${buildTag}."
             }
         }

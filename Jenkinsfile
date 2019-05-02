@@ -31,15 +31,37 @@ pipeline {
                 openshiftTag(namespace:'${openshiftProject}', srcStream: 'bulk-api', srcTag: 'latest', destStream: 'bulk-api', destTag:'${buildTag}')
             }
         }
+        stage('Deploy to I1 Staging'){
+            when{
+                environment name: 'GIT_BRANCH', value: 'origin/master'
+            }
+            steps{
+                sh "oc set image dc/open-api open-api=docker-registry.default.svc:5000/${openshiftProject}/open-api:${buildTag} -n ${openshiftI1Project}"
+                openshiftDeploy(depCfg: 'open-api', namespace: '${openshiftI1Project}', verbose: 'false', waitTime: '', waitUnit: 'sec')
+                openshiftVerifyDeployment(depCfg: 'open-api', namespace: '${openshiftI1Project}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+                sh "oc set image dc/jobtechjobs-api jobtechjobs-api=docker-registry.default.svc:5000/${openshiftProject}/jobtechjobs-api:${buildTag} -n ${openshiftI1Project}"
+                openshiftDeploy(depCfg: 'jobtechjobs-api', namespace: '${openshiftI1Project}', verbose: 'false', waitTime: '', waitUnit: 'sec')
+                openshiftVerifyDeployment(depCfg: 'jobtechjobs-api', namespace: '${openshiftI1Project}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+                sh "oc set image dc/bulk-api bulk-api=docker-registry.default.svc:5000/${openshiftProject}/bulk-api:${buildTag} -n ${openshiftI1Project}"
+                openshiftDeploy(depCfg: 'bulk-api', namespace: '${openshiftI1Project}', verbose: 'false', waitTime: '', waitUnit: 'sec')
+                openshiftVerifyDeployment(depCfg: 'bulk-api', namespace: '${openshiftI1Project}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+            }
+        }
         stage('Deploy to Staging'){
             when{
                 environment name: 'GIT_BRANCH', value: 'origin/master'
             }
             steps{
-                sh "oc set image dc/staging-sokapi staging-sokapi=docker-registry.default.svc:5000/${openshiftProject}/sokapi:${buildTag} -n ${openshiftProject}"
-                openshiftDeploy(depCfg: 'staging-sokapi', namespace: '${openshiftProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
-                openshiftVerifyDeployment(depCfg: 'staging-sokapi', namespace: '${openshiftProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
-                slackSend color: 'good', channel: '#narval-sokapi', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} Staging build: ${buildTag}. You cannot build again from ${GIT_BRANCH} until build has been promoted or aborted. ${BUILD_URL}input"
+                sh "oc set image dc/open-api open-api=docker-registry.default.svc:5000/${openshiftProject}/open-api:${buildTag} -n ${openshiftStagingProject}"
+                openshiftDeploy(depCfg: 'open-api', namespace: '${openshiftStagingProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
+                openshiftVerifyDeployment(depCfg: 'open-api', namespace: '${openshiftStagingProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+                sh "oc set image dc/jobtechjobs-api jobtechjobs-api=docker-registry.default.svc:5000/${openshiftProject}/jobtechjobs-api:${buildTag} -n ${openshiftStagingProject}"
+                openshiftDeploy(depCfg: 'jobtechjobs-api', namespace: '${openshiftStagingProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
+                openshiftVerifyDeployment(depCfg: 'jobtechjobs-api', namespace: '${openshiftStagingProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+                sh "oc set image dc/bulk-api bulk-api=docker-registry.default.svc:5000/${openshiftProject}/bulk-api:${buildTag} -n ${openshiftStagingProject}"
+                openshiftDeploy(depCfg: 'bulk-api', namespace: '${openshiftStagingProject}', verbose: 'false', waitTime: '', waitUnit: 'sec')
+                openshiftVerifyDeployment(depCfg: 'bulk-api', namespace: '${openshiftStagingProject}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+                slackSend color: 'good', channel: '#narval-sokapi', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftStagingProject} Staging build: ${buildTag}. You cannot build again from ${GIT_BRANCH} until build has been promoted or aborted. ${BUILD_URL}input"
             }
         }
         stage('Deploy to Prod?'){
@@ -74,6 +96,10 @@ pipeline {
     post {
         success {
             slackSend color: 'good', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} build: ${buildTag}."
+            script {
+                if (${GIT_BRANCH} == 'origin/master')
+                    slackSend color: 'good', channel: '#narval-sokapi', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} build: ${buildTag}."
+            }
         }
         failure {
             slackSend color: 'FF0000', channel: '#narval-sokapi', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} FAILED to build to ${openshiftProject} build ${buildTag}. ${BUILD_URL}console"

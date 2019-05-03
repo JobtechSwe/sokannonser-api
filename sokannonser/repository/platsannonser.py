@@ -12,12 +12,12 @@ log = logging.getLogger(__name__)
 
 
 def get_stats_for(taxonomy_type):
-    log.info("Looking for %s" % taxonomy_type)
+    log.debug("Looking for %s" % taxonomy_type)
     value_path = {
-        fields.OCCUPATION: "%s.%s.keyword" % (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
-        fields.OCCUPATION_GROUP: "%s.%s.keyword" % (
+        taxonomy.OCCUPATION: "%s.%s.keyword" % (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.GROUP: "%s.%s.keyword" % (
         fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
-        fields.OCCUPATION_FIELD: "%s.%s.keyword" % (
+        taxonomy.FIELD: "%s.%s.keyword" % (
         fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.SKILL: "%s.%s.keyword" % (fields.MUST_HAVE_SKILLS, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
@@ -93,7 +93,7 @@ def find_platsannonser(args, querybuilder, start_time=0):
 
 def fetch_platsannons(id):
     try:
-        query_result = elastic.get(index=settings.ES_INDEX, doc_type='document', id=id)
+        query_result = elastic.get(index=settings.ES_INDEX, id=id)
         if query_result and '_source' in query_result:
             source = query_result['_source']
             keyword_node = source['keywords']

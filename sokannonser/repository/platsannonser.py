@@ -12,7 +12,6 @@ log = logging.getLogger(__name__)
 
 
 def get_stats_for(taxonomy_type):
-    log.debug("Looking for %s" % taxonomy_type)
     value_path = {
         taxonomy.OCCUPATION: "%s.%s.keyword" % (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.GROUP: "%s.%s.keyword" % (
@@ -26,7 +25,7 @@ def get_stats_for(taxonomy_type):
     # Make sure we don't crash if we want to stat on missing type
     for tt in taxonomy_type:
         if tt not in value_path:
-            log.warning("Taxonomy type %s not configured for aggs." % taxonomy_type)
+            log.warning("Taxonomy type \"%s\" not configured for aggs." % taxonomy_type)
             return {}
 
     aggs_query = {

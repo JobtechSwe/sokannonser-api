@@ -77,6 +77,13 @@ class QueryBuilder(object):
                                                        f.EMPLOYMENT_TYPE+"."+
                                                        f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.EMPLOYMENT_TYPE)))
+        if args.get(taxonomy.DRIVING_LICENCE_REQUIRED) is not None:
+            value = args.get(taxonomy.DRIVING_LICENCE_REQUIRED) == "true"
+            must_queries.append(
+                {"term": {
+                    f.DRIVING_LICENCE_REQUIRED: value
+                }}
+            )
 
         # TODO: Maybe check if NO skills are listed in ad instead?
         if args.get(settings.EXPERIENCE_REQUIRED) == 'false':

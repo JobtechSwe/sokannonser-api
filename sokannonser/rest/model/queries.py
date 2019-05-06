@@ -93,7 +93,7 @@ annons_complete_query.add_argument(taxonomy.LANGUAGE, action='append')
 annons_complete_query.add_argument(taxonomy.WORKTIME_EXTENT, action='append')
 annons_complete_query.add_argument(settings.PARTTIME_MIN, type=float)
 annons_complete_query.add_argument(settings.PARTTIME_MAX, type=float)
-annons_complete_query.add_argument(taxonomy.DRIVING_LICENCE_REQUIRED, type=bool)
+annons_complete_query.add_argument(taxonomy.DRIVING_LICENCE_REQUIRED, type=inputs.boolean)
 annons_complete_query.add_argument(taxonomy.DRIVING_LICENCE, action='append')
 annons_complete_query.add_argument(taxonomy.EMPLOYMENT_TYPE, action='append')
 annons_complete_query.add_argument(settings.EXPERIENCE_REQUIRED,

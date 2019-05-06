@@ -78,10 +78,9 @@ class QueryBuilder(object):
                                                        f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.EMPLOYMENT_TYPE)))
         if args.get(taxonomy.DRIVING_LICENCE_REQUIRED) is not None:
-            value = args.get(taxonomy.DRIVING_LICENCE_REQUIRED) == "true"
             must_queries.append(
                 {"term": {
-                    f.DRIVING_LICENCE_REQUIRED: value
+                    f.DRIVING_LICENCE_REQUIRED: args.get(taxonomy.DRIVING_LICENCE_REQUIRED)
                 }}
             )
 

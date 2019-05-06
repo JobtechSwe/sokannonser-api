@@ -2,6 +2,7 @@ import sys
 import os
 import pytest
 from pprint import pprint
+from dateutil import parser
 from sokannonser import app
 from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
@@ -173,6 +174,26 @@ def test_freetext_query_two_params():
         # pprint(json_response)
         hits_total = json_response['total']['value']
         assert int(hits_total) > 0
+
+
+@pytest.mark.integration
+def test_publication_range():
+    app.testing = True
+    with app.test_client() as testclient:
+        date_from = "2019-02-01T00:00:00"
+        date_until = "2019-04-20T00:00:00"
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        query = {search_settings.PUBLISHED_AFTER: date_from,
+                 search_settings.PUBLISHED_BEFORE: date_until,
+                 "limit": 100}
+        result = testclient.get('/search', headers=headers, data=query)
+        json_response = result.json
+        hits = json_response['hits']
+        including_max = False
+        including_min = False
+        for hit in hits:
+            assert parser.parse(hit[fields.PUBLICATION_DATE]) >= parser.parse(date_from)
+            assert parser.parse(hit[fields.PUBLICATION_DATE]) <= parser.parse(date_until)
 
 
 def _get_nested_value(path, dictionary):

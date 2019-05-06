@@ -3,6 +3,8 @@ import os
 import pytest
 from pprint import pprint
 from sokannonser import app
+from sokannonser.repository import taxonomy
+from sokannonser.rest.model import fields
 
 test_api_key = os.getenv('TEST_API_KEY_PLATSANNONSER')
 
@@ -90,6 +92,26 @@ def test_freetext_query_job_title_with_hyphen():
         assert json_response['freetext_concepts']['occupation']
         occupation_val = str(json_response['freetext_concepts']['occupation'][0])
         assert occupation_val == 'hr-specialist'
+
+
+@pytest.mark.integration
+def test_driving_license_required():
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        result = testclient.get('/search', headers=headers,
+                                data={taxonomy.DRIVING_LICENCE_REQUIRED: 'true'})
+        json_response = result.json
+        hits = json_response['hits']
+        for hit in hits:
+            assert hit[fields.DRIVING_LICENCE_REQUIRED]
+
+        result = testclient.get('/search', headers=headers,
+                                data={taxonomy.DRIVING_LICENCE_REQUIRED: 'false'})
+        json_response = result.json
+        hits = json_response['hits']
+        for hit in hits:
+            assert not hit[fields.DRIVING_LICENCE_REQUIRED]
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")

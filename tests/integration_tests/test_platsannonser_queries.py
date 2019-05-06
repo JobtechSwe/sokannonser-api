@@ -256,6 +256,12 @@ def test_skill():
 
 
 @pytest.mark.integration
+def test_worktime_extent():
+    _fetch_and_validate_result({taxonomy.WORKTIME_EXTENT: '947z_JGS_Uk2'},
+                               [fields.WORKING_HOURS_TYPE+".concept_id"], ['947z_JGS_Uk2'])
+
+
+@pytest.mark.integration
 def test_scope_of_work():
     app.testing = True
     with app.test_client() as testclient:

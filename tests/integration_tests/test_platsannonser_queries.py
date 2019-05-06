@@ -243,7 +243,7 @@ def test_skill():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        query = {taxonomy.SKILL: 'DHhX_uVf_y6X'}
+        query = {taxonomy.SKILL: 'DHhX_uVf_y6X', "limit": 100}
         result = testclient.get('/search', headers=headers, data=query)
         json_response = result.json
         hits = json_response['hits']

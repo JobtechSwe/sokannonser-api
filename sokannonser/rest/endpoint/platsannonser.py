@@ -88,6 +88,7 @@ class PBComplete(Resource):
     )
     @ns_platsannons.expect(annons_complete_query)
     def get(self):
+        start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         # This could be prettier
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
@@ -96,12 +97,16 @@ class PBComplete(Resource):
         args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1])
 
         result = platsannonser.find_platsannonser(args, self.querybuilder)
+        log.debug("Query results after %d milliseconds."
+                  % (int(time.time()*1000)-start_time))
 
-        return self.marshal_results(result)
+        return self.marshal_results(result, start_time)
 
-    def marshal_results(self, esresult):
+    def marshal_results(self, esresult, start_time):
         result = {
             "time_in_millis": esresult.get('took', 0),
             "typeahead": esresult.get('aggs', []),
         }
+        log.debug("Sending results after %d milliseconds."
+                  % (int(time.time()*1000) - start_time))
         return result

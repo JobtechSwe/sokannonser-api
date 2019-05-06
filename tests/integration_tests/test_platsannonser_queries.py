@@ -94,26 +94,6 @@ def test_freetext_query_job_title_with_hyphen():
         assert occupation_val == 'hr-specialist'
 
 
-@pytest.mark.integration
-def test_driving_license_required():
-    app.testing = True
-    with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers,
-                                data={taxonomy.DRIVING_LICENCE_REQUIRED: 'true'})
-        json_response = result.json
-        hits = json_response['hits']
-        for hit in hits:
-            assert hit[fields.DRIVING_LICENCE_REQUIRED]
-
-        result = testclient.get('/search', headers=headers,
-                                data={taxonomy.DRIVING_LICENCE_REQUIRED: 'false'})
-        json_response = result.json
-        hits = json_response['hits']
-        for hit in hits:
-            assert not hit[fields.DRIVING_LICENCE_REQUIRED]
-
-
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_one_param_deleted_enriched():
@@ -192,6 +172,69 @@ def test_freetext_query_two_params():
         # pprint(json_response)
         hits_total = json_response['total']['value']
         assert int(hits_total) > 0
+
+
+def _get_nested_value(path, dictionary):
+    keypath = path.split('.')
+    value = None
+    for i in range(len(keypath)):
+        element = dictionary.get(keypath[i])
+        if isinstance(element, dict):
+            dictionary = element
+        else:
+            value = element
+            break
+    return value
+
+
+def _fetch_and_validate_result(query, field, expected):
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        result = testclient.get('/search', headers=headers,
+                                data=query)
+        json_response = result.json
+        hits = json_response['hits']
+        for hit in hits:
+            assert _get_nested_value(field, hit) == expected
+
+
+@pytest.mark.integration
+def test_driving_license_required():
+    _fetch_and_validate_result({taxonomy.DRIVING_LICENCE_REQUIRED: 'true'},
+                               fields.DRIVING_LICENCE_REQUIRED, True)
+    _fetch_and_validate_result({taxonomy.DRIVING_LICENCE_REQUIRED: 'false'},
+                               fields.DRIVING_LICENCE_REQUIRED, False)
+
+
+@pytest.mark.parametrize("field, path, query, expected", [(taxonomy.OCCUPATION,
+                                                           fields.OCCUPATION+".concept_id",
+                                                           "D7Ns_RG6_hD2",
+                                                           "D7Ns_RG6_hD2"),
+                                                          (taxonomy.GROUP,
+                                                           fields.OCCUPATION_GROUP+".concept_id",
+                                                           "DJh5_yyF_hEM",
+                                                           "DJh5_yyF_hEM"),
+                                                          (taxonomy.FIELD,
+                                                           fields.OCCUPATION_FIELD+".concept_id",
+                                                           "apaJ_2ja_LuF",
+                                                           "apaJ_2ja_LuF"),
+                                                          (taxonomy.OCCUPATION,
+                                                           fields.OCCUPATION+".legacy_ams_taxonomy_id",
+                                                           "D7Ns_RG6_hD2",
+                                                           "2419"),
+                                                          (taxonomy.GROUP,
+                                                           fields.OCCUPATION_GROUP+".concept_id",
+                                                           "2512",
+                                                           "DJh5_yyF_hEM"),
+                                                          (taxonomy.FIELD,
+                                                           fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id",
+                                                           "3",
+                                                           "3")
+                                                          ])
+@pytest.mark.integration
+def test_occupation_codes(field, path, query, expected):
+    _fetch_and_validate_result({field: query}, path, expected)
 
 
 if __name__ == '__main__':

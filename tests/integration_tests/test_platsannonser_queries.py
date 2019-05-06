@@ -3,6 +3,7 @@ import os
 import pytest
 from pprint import pprint
 from sokannonser import app
+from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
 
@@ -230,7 +231,8 @@ def test_occupation_codes(query, path, expected):
 @pytest.mark.parametrize("query, path, expected",
                          [({taxonomy.OCCUPATION: "D7Ns_RG6_hD2",
                             taxonomy.MUNICIPALITY: "0180", "limit": 100},
-                           [fields.OCCUPATION+".concept_id", fields.WORKPLACE_ADDRESS_MUNICIPALITY],
+                           [fields.OCCUPATION+".concept_id",
+                            fields.WORKPLACE_ADDRESS_MUNICIPALITY],
                            ["D7Ns_RG6_hD2", "0180"]),
                           ])
 @pytest.mark.integration
@@ -251,6 +253,30 @@ def test_skill():
             must = hit["must_have"]["skills"]
             should = hit["nice_to_have"]["skills"]
             assert must or should
+
+
+@pytest.mark.integration
+def test_scope_of_work():
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        query = {search_settings.PARTTIME_MIN: 20, search_settings.PARTTIME_MAX: 80,
+                 "limit": 100}
+        result = testclient.get('/search', headers=headers, data=query)
+        json_response = result.json
+        hits = json_response['hits']
+        including_max = False
+        including_min = False
+        for hit in hits:
+            assert hit['scope_of_work']['min'] >= 20
+            assert hit['scope_of_work']['max'] <= 80
+            if hit['scope_of_work']['max'] == 80:
+                including_max = True
+            if hit['scope_of_work']['min'] == 20:
+                including_min = True
+
+        assert including_min
+        assert including_max
 
 
 if __name__ == '__main__':

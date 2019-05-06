@@ -132,5 +132,5 @@ taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)
 taxonomy_query.add_argument('type', action='append',
                             choices=VF_TYPE_CHOICES),
-taxonomy_query.add_argument(settings.SHOW_COUNT, type=bool, default=False)
+taxonomy_query.add_argument(settings.SHOW_COUNT, type=inputs.boolean, default=False)
 taxonomy_query.add_argument('parent-id', action='append')

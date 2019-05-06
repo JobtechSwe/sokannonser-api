@@ -512,7 +512,7 @@ class QueryBuilder(object):
                     },
                     {
                         "range": {
-                            queries.SCOPE_OF_WORK_MAX: {
+                            f.SCOPE_OF_WORK_MAX: {
                                 "lte": parttime_max,
                                 "gte": parttime_min
                             }

@@ -187,7 +187,7 @@ def _get_nested_value(path, dictionary):
     return value
 
 
-def _fetch_and_validate_result(query, field, expected):
+def _fetch_and_validate_result(query, resultfield, expected):
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
@@ -196,45 +196,61 @@ def _fetch_and_validate_result(query, field, expected):
         json_response = result.json
         hits = json_response['hits']
         for hit in hits:
-            assert _get_nested_value(field, hit) == expected
+            for i in range(len(resultfield)):
+                assert _get_nested_value(resultfield[i], hit) == expected[i]
 
 
 @pytest.mark.integration
 def test_driving_license_required():
     _fetch_and_validate_result({taxonomy.DRIVING_LICENCE_REQUIRED: 'true'},
-                               fields.DRIVING_LICENCE_REQUIRED, True)
+                               [fields.DRIVING_LICENCE_REQUIRED], [True])
     _fetch_and_validate_result({taxonomy.DRIVING_LICENCE_REQUIRED: 'false'},
-                               fields.DRIVING_LICENCE_REQUIRED, False)
+                               [fields.DRIVING_LICENCE_REQUIRED], [False])
 
 
-@pytest.mark.parametrize("field, path, query, expected", [(taxonomy.OCCUPATION,
-                                                           fields.OCCUPATION+".concept_id",
-                                                           "D7Ns_RG6_hD2",
-                                                           "D7Ns_RG6_hD2"),
-                                                          (taxonomy.GROUP,
-                                                           fields.OCCUPATION_GROUP+".concept_id",
-                                                           "DJh5_yyF_hEM",
-                                                           "DJh5_yyF_hEM"),
-                                                          (taxonomy.FIELD,
-                                                           fields.OCCUPATION_FIELD+".concept_id",
-                                                           "apaJ_2ja_LuF",
-                                                           "apaJ_2ja_LuF"),
-                                                          (taxonomy.OCCUPATION,
-                                                           fields.OCCUPATION+".legacy_ams_taxonomy_id",
-                                                           "D7Ns_RG6_hD2",
-                                                           "2419"),
-                                                          (taxonomy.GROUP,
-                                                           fields.OCCUPATION_GROUP+".concept_id",
-                                                           "2512",
-                                                           "DJh5_yyF_hEM"),
-                                                          (taxonomy.FIELD,
-                                                           fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id",
-                                                           "3",
-                                                           "3")
-                                                          ])
+@pytest.mark.parametrize("query, path, expected",
+                         [({taxonomy.OCCUPATION: "D7Ns_RG6_hD2"},
+                           [fields.OCCUPATION+".concept_id"], ["D7Ns_RG6_hD2"]),
+                          ({taxonomy.GROUP: "DJh5_yyF_hEM"},
+                           [fields.OCCUPATION_GROUP+".concept_id"], ["DJh5_yyF_hEM"]),
+                          ({taxonomy.FIELD: "apaJ_2ja_LuF"},
+                           [fields.OCCUPATION_FIELD+".concept_id"], ["apaJ_2ja_LuF"]),
+                          ({taxonomy.OCCUPATION: "D7Ns_RG6_hD2"},
+                           [fields.OCCUPATION+".legacy_ams_taxonomy_id"], ["2419"]),
+                          ({taxonomy.GROUP: "2512"},
+                           [fields.OCCUPATION_GROUP+".concept_id"], ["DJh5_yyF_hEM"]),
+                          ({taxonomy.FIELD: "3"},
+                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"], ["3"])
+                          ])
 @pytest.mark.integration
-def test_occupation_codes(field, path, query, expected):
-    _fetch_and_validate_result({field: query}, path, expected)
+def test_occupation_codes(query, path, expected):
+    _fetch_and_validate_result(query, path, expected)
+
+
+@pytest.mark.parametrize("query, path, expected",
+                         [({taxonomy.OCCUPATION: "D7Ns_RG6_hD2",
+                            taxonomy.MUNICIPALITY: "0180", "limit": 100},
+                           [fields.OCCUPATION+".concept_id", fields.WORKPLACE_ADDRESS_MUNICIPALITY],
+                           ["D7Ns_RG6_hD2", "0180"]),
+                          ])
+@pytest.mark.integration
+def test_occupation_location_combo(query, path, expected):
+    _fetch_and_validate_result(query, path, expected)
+
+
+@pytest.mark.integration
+def test_skill():
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        query = {taxonomy.SKILL: 'DHhX_uVf_y6X'}
+        result = testclient.get('/search', headers=headers, data=query)
+        json_response = result.json
+        hits = json_response['hits']
+        for hit in hits:
+            must = hit["must_have"]["skills"]
+            should = hit["nice_to_have"]["skills"]
+            assert must or should
 
 
 if __name__ == '__main__':

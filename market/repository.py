@@ -45,8 +45,8 @@ def autocomplete(querystring):
     query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
     if 'aggregations' in query_result:
         return [c['key'] for c in query_result.get('aggregations', {})
-                                              .get('complete', {})
-                                              .get('buckets', [])]
+            .get('complete', {})
+            .get('buckets', [])]
     return []
 
 
@@ -88,7 +88,10 @@ def _parse_args(args):
     }
     if args.pop(settings.SHOW_EXPIRED) != 'true':
         query_dsl['query']['bool']['filter'] = \
-            [{'bool': {'must_not': {'exists': {'field': 'source.removedAt'}}}}]
+            [
+                {'bool': {'must_not': {'exists': {'field': 'source.removedAt'}}}},
+                {'range': {'application.deadline': {'gte': 'now/m'}}}
+            ]
 
     if args.get(settings.SORT):
         query_dsl['sort'] = [settings.auranest_sort_options.get(args.pop(settings.SORT))]

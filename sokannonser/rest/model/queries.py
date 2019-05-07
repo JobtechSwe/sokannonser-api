@@ -8,7 +8,8 @@ from sokannonser.rest.model import fields
 QF_CHOICES = ['occupation', 'skill', 'location', 'employer']
 VF_TYPE_CHOICES = [taxonomy.OCCUPATION, taxonomy.GROUP, taxonomy.FIELD, taxonomy.SKILL,
                    taxonomy.MUNICIPALITY, taxonomy.REGION, taxonomy.COUNTRY,
-                   taxonomy.PLACE, taxonomy.WAGE_TYPE, taxonomy.WORKTIME_EXTENT]
+                   taxonomy.PLACE, taxonomy.WAGE_TYPE, taxonomy.WORKTIME_EXTENT,
+                   taxonomy.DRIVING_LICENCE, taxonomy.EMPLOYMENT_TYPE]
 OPTIONS_BRIEF = 'brief'
 OPTIONS_FULL = 'full'
 

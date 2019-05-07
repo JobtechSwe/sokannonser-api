@@ -209,7 +209,7 @@ def _get_nested_value(path, dictionary):
     return value
 
 
-def _fetch_and_validate_result(query, resultfield, expected):
+def _fetch_and_validate_result(query, resultfield, expected, non_negative=True):
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
@@ -219,7 +219,10 @@ def _fetch_and_validate_result(query, resultfield, expected):
         hits = json_response['hits']
         for hit in hits:
             for i in range(len(resultfield)):
-                assert _get_nested_value(resultfield[i], hit) == expected[i]
+                if non_negative:
+                    assert _get_nested_value(resultfield[i], hit) == expected[i]
+                else:
+                    assert not _get_nested_value(resultfield[i], hit) == expected[i]
 
 
 @pytest.mark.integration
@@ -230,23 +233,25 @@ def test_driving_license_required():
                                [fields.DRIVING_LICENCE_REQUIRED], [False])
 
 
-@pytest.mark.parametrize("query, path, expected",
+@pytest.mark.parametrize("query, path, expected, non_negative",
                          [({taxonomy.OCCUPATION: "D7Ns_RG6_hD2"},
-                           [fields.OCCUPATION+".concept_id"], ["D7Ns_RG6_hD2"]),
+                           [fields.OCCUPATION+".concept_id"], ["D7Ns_RG6_hD2"], True),
                           ({taxonomy.GROUP: "DJh5_yyF_hEM"},
-                           [fields.OCCUPATION_GROUP+".concept_id"], ["DJh5_yyF_hEM"]),
+                           [fields.OCCUPATION_GROUP+".concept_id"], ["DJh5_yyF_hEM"], True),
                           ({taxonomy.FIELD: "apaJ_2ja_LuF"},
-                           [fields.OCCUPATION_FIELD+".concept_id"], ["apaJ_2ja_LuF"]),
+                           [fields.OCCUPATION_FIELD+".concept_id"], ["apaJ_2ja_LuF"], True),
                           ({taxonomy.OCCUPATION: "D7Ns_RG6_hD2"},
-                           [fields.OCCUPATION+".legacy_ams_taxonomy_id"], ["2419"]),
+                           [fields.OCCUPATION+".legacy_ams_taxonomy_id"], ["2419"], True),
                           ({taxonomy.GROUP: "2512"},
-                           [fields.OCCUPATION_GROUP+".concept_id"], ["DJh5_yyF_hEM"]),
+                           [fields.OCCUPATION_GROUP+".concept_id"], ["DJh5_yyF_hEM"], True),
                           ({taxonomy.FIELD: "3"},
-                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"], ["3"])
+                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"], ["3"], True),
+                          ({taxonomy.FIELD: "-3"},
+                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"], ["3"], False)
                           ])
 @pytest.mark.integration
-def test_occupation_codes(query, path, expected):
-    _fetch_and_validate_result(query, path, expected)
+def test_occupation_codes(query, path, expected, non_negative):
+    _fetch_and_validate_result(query, path, expected, non_negative)
 
 
 @pytest.mark.parametrize("query, path, expected",
@@ -271,9 +276,27 @@ def test_skill():
         json_response = result.json
         hits = json_response['hits']
         for hit in hits:
-            must = hit["must_have"]["skills"]
-            should = hit["nice_to_have"]["skills"]
+            must = "DHhX_uVf_y6X" in [skill['concept_id']
+                                      for skill in hit["must_have"]["skills"]]
+            should = "DHhX_uVf_y6X" in [skill['concept_id']
+                                        for skill in hit["nice_to_have"]["skills"]]
             assert must or should
+
+
+@pytest.mark.integration
+def test_negative_skill():
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        query = {taxonomy.SKILL: '-DHhX_uVf_y6X', "limit": 100}
+        result = testclient.get('/search', headers=headers, data=query)
+        json_response = result.json
+        hits = json_response['hits']
+        for hit in hits:
+            assert "DHhX_uVf_y6X" not in [skill['concept_id']
+                                            for skill in hit["must_have"]["skills"]]
+            assert "DHhX_uVf_y6X" not in [skill['concept_id']
+                                            for skill in hit["nice_to_have"]["skills"]]
 
 
 @pytest.mark.integration
@@ -305,6 +328,50 @@ def test_scope_of_work():
         assert including_min
         assert including_max
 
+
+@pytest.mark.integration
+def test_driving_license():
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        query = {taxonomy.DRIVING_LICENCE: 'VTK8_WRx_GcM', "limit": 100}
+        result = testclient.get('/search', headers=headers, data=query)
+        json_response = result.json
+        hits = json_response['hits']
+        including_max = False
+        including_min = False
+        for hit in hits:
+            concept_ids = [item['concept_id'] for item in hit[fields.DRIVING_LICENCE]]
+            assert 'VTK8_WRx_GcM' in concept_ids
+
+
+@pytest.mark.integration
+def test_employment_type():
+    _fetch_and_validate_result({taxonomy.EMPLOYMENT_TYPE: 'PFZr_Syz_cUq'},
+                               [fields.EMPLOYMENT_TYPE+".concept_id"], ['PFZr_Syz_cUq'])
+
+
+@pytest.mark.integration
+def test_experience():
+    _fetch_and_validate_result({search_settings.EXPERIENCE_REQUIRED: 'true'},
+                               [fields.EXPERIENCE_REQUIRED], [True])
+    _fetch_and_validate_result({search_settings.EXPERIENCE_REQUIRED: 'false'},
+                               [fields.EXPERIENCE_REQUIRED], [False])
+
+@pytest.mark.integration
+def test_region():
+    _fetch_and_validate_result({taxonomy.REGION: '01'},
+                               [fields.WORKPLACE_ADDRESS_REGION_CODE], ['01'])
+    _fetch_and_validate_result({taxonomy.REGION: '-01'},
+                               [fields.WORKPLACE_ADDRESS_REGION_CODE], ['01'], False)
+
+
+@pytest.mark.integration
+def test_country():
+    _fetch_and_validate_result({taxonomy.REGION: '199'},
+                               [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'])
+    _fetch_and_validate_result({taxonomy.REGION: '-199'},
+                               [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'], False)
 
 if __name__ == '__main__':
     pytest.main([os.path.realpath(__file__), '-svv', '-ra', '-m integration'])

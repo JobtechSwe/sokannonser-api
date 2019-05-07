@@ -33,7 +33,7 @@ class BulkZip(Resource):
         filename = "ads_%s.zip" % args.get(settings.DATE)
         log.debug("Elapsed time for completion: %d" % int((time.time()*1000)-start_time))
         return send_file(bytes_result,
-                         attachment_filename=filename, cache_timeout=1,
+                         attachment_filename=filename, cache_timeout=None,
                          as_attachment=True)
 
 

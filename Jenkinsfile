@@ -39,12 +39,6 @@ pipeline {
                 sh "oc set image dc/open-api open-api=docker-registry.default.svc:5000/${openshiftProject}/open-api:${buildTag} -n ${openshiftI1Project}"
                 openshiftDeploy(depCfg: 'open-api', namespace: '${openshiftI1Project}', verbose: 'false', waitTime: '', waitUnit: 'sec')
                 openshiftVerifyDeployment(depCfg: 'open-api', namespace: '${openshiftI1Project}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
-                sh "oc set image dc/jobtechjobs-api jobtechjobs-api=docker-registry.default.svc:5000/${openshiftProject}/jobtechjobs-api:${buildTag} -n ${openshiftI1Project}"
-                openshiftDeploy(depCfg: 'jobtechjobs-api', namespace: '${openshiftI1Project}', verbose: 'false', waitTime: '', waitUnit: 'sec')
-                openshiftVerifyDeployment(depCfg: 'jobtechjobs-api', namespace: '${openshiftI1Project}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
-                sh "oc set image dc/bulk-api bulk-api=docker-registry.default.svc:5000/${openshiftProject}/bulk-api:${buildTag} -n ${openshiftI1Project}"
-                openshiftDeploy(depCfg: 'bulk-api', namespace: '${openshiftI1Project}', verbose: 'false', waitTime: '', waitUnit: 'sec')
-                openshiftVerifyDeployment(depCfg: 'bulk-api', namespace: '${openshiftI1Project}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
             }
         }
         stage('Deploy to Staging'){

@@ -22,7 +22,6 @@ COPY . /app
 # COPY nginx.conf /etc/nginx/nginx.conf
 
 RUN date +"%Y-%m-%dT%H:%M:%S %Z" && \
-    rm -v /etc/nginx/conf.d/default.conf && \
     mkdir -p /var/run/nginx && \
     chmod -R 777 /var/run/nginx && \ 
     mkdir -p /var/run/supervisord /var/log/supervisord && \

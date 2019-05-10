@@ -1,0 +1,381 @@
+{
+  "took" : 5,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 230,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [
+      {
+        "_index" : "platsannons",
+        "_type" : "_doc",
+        "_id" : "23174210",
+        "_score" : 138.06148,
+        "_source" : {
+          "id" : "23174210",
+          "external_id" : null,
+          "headline" : "Java-utvecklare",
+          "application_deadline" : "2019-05-12T23:59:59",
+          "number_of_vacancies" : 1,
+          "description" : {
+            "text" : "Är du en Java-utvecklare som brinner för webbutveckling? Vill du arbeta i en miljö där du utvecklas och får ta dig an nya utmaningar? Kan du jobba i stora projekt såväl som i mindre team och tänka både långsiktigt och pragmatiskt inför nästa sprint? Bra, då vill vi träffa dig!\n\n            Konsultrollen innebär möjlighet att forma din utveckling och/eller anta utmaningar inom projekt och områden som du kanske inte trott fanns inom räckhåll för dig. Du blir anställd av Not4real och det är vi som står för underbara kollegor, att hitta uppdrag och ge dig utbildning. Arbetet utförs mestadels hos någon av våra kunder och uppdragen varierar i längd och omfattning.\n\n            Vi tar för givet att du vill ha ett kontinuerligt utbyte med dina kollegor och att du gärna delar med dig av din kunskap och tar del av andras. Du gillar att prata med likasinnade och uppskattar en och annan biljardrunda eller LAN-kväll på kontoret.\n            Vi letar efter dig som har minst 2 års erfarenhet av systemutveckling inom Java som ska ingå i kunds leveransteam. Leveransteamen arbetar med utveckling och förvaltning av kundens it-tjänster som stödjer interna och externa användare. Huvudsakliga arbetsuppgifter är vanligtvis analys, utveckling och systemtest.\n\n            Krav:\n\n            * Erfarenhet av Java EE under minst 2 år\n            * Tala eller åtminstone förstå svenska bra\n\n\n            Du får också gärna ha erfarenhet om/inom några av följande:\n            * Jira\n            * Linux\n            * HTML5, jQuery eller CSS\n            * JavaScript\n            * XML\n            * SQL\n            * Bootstrap\n            * Oracle\n            Not4real har utsetts till Europas bästa arbetsgivare av European Business Awards som ligger bakom Europas största företagstävling.  Några av anledningarna till detta är att vi vuxit organisk tillsammans med våra medarbetare som har stort inflytande och tillsammans har vi ett eget ekosystem med egen skola och förmåner för medarbetarna som sträcker sig utanför kontorets väggar.\nSom anställd på Not4real erbjuder vi dig möjlighet att arbeta med nya och moderna tekniker. Utöver det får du möjlighet att arbeta med marknadsledande företag inom den privata och offentliga sektorn. Hos oss får du möjlighet att delta i konferenser, personlig utveckling/ kompetensutveckling, egen mentor samt ett brett erbjudande av personalförmåner.\n\n            ",
+            "company_information" : "Lite företagsinfo",
+            "needs" : "Vi har behov av något",
+            "requirements" : "Vi kräver något",
+            "conditions" : "Detta är våra villkor!"
+          },
+          "workplace_id" : "83549006",
+          "employment_type" : {
+            "concept_id" : "PFZr_Syz_cUq",
+            "label" : "Vanlig anställning",
+            "legacy_ams_taxonomy_id" : "1"
+          },
+          "salary_type" : {
+            "concept_id" : "oG8G_9cW_nRf",
+            "label" : "Fast månads- vecko- eller timlön",
+            "legacy_ams_taxonomy_id" : "1"
+          },
+          "duration" : {
+            "concept_id" : "a7uU_j21_mkL",
+            "label" : "Tillsvidare",
+            "legacy_ams_taxonomy_id" : "1"
+          },
+          "working_hours_type" : {
+            "concept_id" : "6YE1_gAC_R2G",
+            "label" : "Heltid",
+            "legacy_ams_taxonomy_id" : "1"
+          },
+          "scope_of_work" : {
+            "min" : 100,
+            "max" : 100
+          },
+          "access" : "Snarast",
+          "employer" : {
+            "id" : "20770769",
+            "phone_number" : "08999999999",
+            "email" : "donotemailuswewillnotansweryouneverever@not4real.se",
+            "url" : "http://www.Not4real.se",
+            "organization_number" : "1212124758",
+            "name" : "Not4real dream business AB",
+            "workplace" : "Not4real dream business AB"
+          },
+          "application_details" : {
+            "information" : "Information about the application",
+            "reference" : "John Doe",
+            "email" : "john.doe@not4realaddress.com",
+            "via_af" : false,
+            "url" : "http://not4realaddress.com",
+            "other" : "Something other"
+          },
+          "experience_required" : true,
+          "access_to_own_car" : false,
+          "driving_license_required" : true,
+          "occupation" : {
+            "concept_id" : "7wdX_4rv_33z",
+            "label" : "Backend-utvecklare",
+            "legacy_ams_taxonomy_id" : "7632"
+          },
+          "occupation_group" : {
+            "concept_id" : "DJh5_yyF_hEM",
+            "label" : "Mjukvaru- och systemutvecklare m.fl.",
+            "legacy_ams_taxonomy_id" : "2512"
+          },
+          "occupation_field" : {
+            "concept_id" : "apaJ_2ja_LuF",
+            "label" : "Data/IT",
+            "legacy_ams_taxonomy_id" : "3"
+          },
+          "workplace_address" : {
+            "municipality_code" : "0180",
+            "municipality" : "Stockholm",
+            "region_code" : "01",
+            "region" : "Stockholms län",
+            "country_code" : "01",
+            "country" : "Sverige",
+            "street_address" : "Regnbågsvägen 1337",
+            "postcode" : "13141",
+            "city" : "Nacka",
+            "coordinates" : [
+              18.0589775732623,
+              59.319856972671
+            ]
+          },
+          "must_have" : {
+            "skills" : [
+              {
+                "concept_id" : "29387234_yov_smw",
+                "label" : "Java",
+                "weight" : 10,
+                "legacy_ams_taxonomy_id" : "1234"
+              }
+            ],
+            "languages" : [
+              {
+                "concept_id" : "2sdfds34_yov_smw",
+                "label" : "Engelska",
+                "weight" : 10,
+                "legacy_ams_taxonomy_id" : "41313"
+              }
+            ],
+            "work_experiences" : [
+              {
+                "concept_id" : "fg7B_yov_smw",
+                "label" : "Systemutvecklare/Programmerare",
+                "weight" : 10,
+                "legacy_ams_taxonomy_id" : "2419"
+              }
+            ]
+          },
+          "nice_to_have" : {
+            "skills" : [
+              {
+                "concept_id" : "2938adsfdov_smw",
+                "label" : "Javascript",
+                "weight" : 10,
+                "legacy_ams_taxonomy_id" : "1234"
+              }
+            ],
+            "languages" : [
+              {
+                "concept_id" : "2sdfdsasdfov_smw",
+                "label" : "Finska",
+                "weight" : 10,
+                "legacy_ams_taxonomy_id" : "9879"
+              }
+            ],
+            "work_experiences" : [
+              {
+                "concept_id" : "fg7B_yoasdfw",
+                "label" : "Bagare",
+                "weight" : 10,
+                "legacy_ams_taxonomy_id" : "8978"
+              }
+            ]
+          },
+          "publication_date" : "2019-03-13T00:00:00",
+          "last_publication_date" : "2019-05-12T23:59:59",
+          "removed" : false,
+          "removed_date" : "2019-03-04T04:40:21",
+          "source_type" : "VIA_AF_FORMULAR",
+          "keywords" : {
+            "extracted" : {
+              "occupation" : [
+                "backend-utvecklare",
+                "mjukvaru- och systemutvecklare",
+                "it",
+                "data"
+              ],
+              "skill" : ["java"],
+              "location" : [
+                "stockholm",
+                "nacka",
+                "stockholms län"
+              ],
+              "employer" : [
+                "Not4real dream business ab",
+                "Not4real dream business"
+              ]
+            },
+            "enriched" : {
+              "occupation" : [
+                "backend-utvecklare",
+                "javautvecklare"
+              ],
+              "skill" : [
+                "svenska",
+                "webbutveckling",
+                "jquery",
+                "html5",
+                "java ee",
+                "css",
+                "java",
+                "systemutveckling",
+                "analys",
+                "systemtest"
+              ],
+              "trait" : [
+                "noggrann"
+              ]
+            }
+          },
+          "timestamp" : 1552410521222
+        },
+        "sort" : [
+          138.06148,
+          "23174210"
+        ]
+      },
+      {
+        "_index" : "platsannons",
+        "_type" : "_doc",
+        "_id" : "23187561",
+        "_score" : 138.06148,
+        "_source" : {
+          "id" : "23187561",
+          "external_id" : null,
+          "headline" : "Java-utvecklare",
+          "application_deadline" : "2019-05-31T23:59:59",
+          "number_of_vacancies" : 10,
+          "description" : {
+            "text" : "På hittepå letar vi efter duktiga Java-utvecklare som, precis som vi, tror att världen kan bli lite enklare och roligare med hjälp av teknik.\n\n            Att jobba hos oss är både utmanande och omväxlande. Vi förenklar och förbättrar dagligen för våra kunder. Vad och hur vi än gör det, så ser vi till att ha roligt på vägen.\n\n            Vi tror att du är bekväm inom objektorienterad java-utveckling. Databaser, APIer, arkitektur och ett par olika utvecklingsverktyg är heller inte obekant. Du är mest troligt analytisk och gillar utmaningen att lösa problem som ingen annan tycks lyckas lösa. Att skapa enkla och bra lösningar som kan förstås utav många värderar du högt.\n\n            Att vara hittepå-konsult är enkelt och roligt. Ditt ena uppdrag kan vara ute hos kund och ditt andra kan vara in-house. Vi har kunder och uppdrag inom så gott som alla branscher. Därför vågar vi lova att vi kan matcha de drivkrafter och önskemål om utmaningar som just du har.\n\n            För att du ska förstå lite mer om vad vi gör – har jag bett några utav mina  java-kollegor att name-droppa några av de tekniker, verktyg och metoder som de stött på under de senaste veckorna; Jakarta EE, Eclipse, TDD, Spring, SCRUM, API Management…\n\n            Vi tror att du:\n            -\tSer möjligheter där andra ser hinder.\n            -\tÄr trygg i din kompetens genom några års erfarenhet (du vet vad du kan och det märks).\n            -\tInte är rädd för att testa nya saker.\n            -\tÄr en teamspelare, som kan prata likaväl med kund som kollega.  Förbättra och förenkla världen med hjälp av teknik och kommunikation.                                         På hittepå gillar vi att, tillsammans, jobba mot att förenkla världen. Vi värdesätter team, glädje och gemenskap lika högt som teknik och innovation. Som konsult hos oss är du vår kärnkomptens - det absolut värdefullaste vi har. Det är dig vi skryter om!\n\n            Att spela i hittepås skånska lag innebär att jobba i en kreativ miljö med kunniga kollegor inom både teknik och kommunikation. Ibland driver vi hela projekt inhouse (på något av våra kontor i Malmö eller Lund), andra gånger jobbar vi ute hos våra kunder.\n\n\n            ",
+            "company_information" : null,
+            "needs" : null,
+            "requirements" : null,
+            "conditions" : null
+          },
+          "workplace_id" : "82138311",
+          "employment_type" : {
+            "concept_id" : "PFZr_Syz_cUq",
+            "label" : "Vanlig anställning",
+            "legacy_ams_taxonomy_id" : "1"
+          },
+          "salary_type" : {
+            "concept_id" : "oG8G_9cW_nRf",
+            "label" : "Fast månads- vecko- eller timlön",
+            "legacy_ams_taxonomy_id" : "1"
+          },
+          "duration" : {
+            "concept_id" : "a7uU_j21_mkL",
+            "label" : "Tillsvidare",
+            "legacy_ams_taxonomy_id" : "1"
+          },
+          "working_hours_type" : {
+            "concept_id" : "6YE1_gAC_R2G",
+            "label" : "Heltid",
+            "legacy_ams_taxonomy_id" : "1"
+          },
+          "scope_of_work" : {
+            "min" : 100,
+            "max" : 100
+          },
+          "access" : null,
+          "employer" : {
+            "id" : "20411358",
+            "phone_number" : "040888888888",
+            "email" : null,
+            "url" : "http://www.hittepå.se",
+            "organization_number" : "1212120136",
+            "name" : "hittepå Skåne AB",
+            "workplace" : "hittepå SKÅNE AB"
+          },
+          "application_details" : {
+            "information" : null,
+            "reference" : null,
+            "email" : null,
+            "via_af" : false,
+            "url" : "https://www.hittepå.se/jobb/annons/139129-skane",
+            "other" : null
+          },
+          "experience_required" : true,
+          "access_to_own_car" : false,
+          "driving_license_required" : false,
+          "occupation" : {
+            "concept_id" : "fg7B_yov_smw",
+            "label" : "Systemutvecklare/Programmerare",
+            "legacy_ams_taxonomy_id" : "2419"
+          },
+          "occupation_group" : {
+            "concept_id" : "DJh5_yyF_hEM",
+            "label" : "Mjukvaru- och systemutvecklare m.fl.",
+            "legacy_ams_taxonomy_id" : "2512"
+          },
+          "occupation_field" : {
+            "concept_id" : "apaJ_2ja_LuF",
+            "label" : "Data/IT",
+            "legacy_ams_taxonomy_id" : "3"
+          },
+          "workplace_address" : {
+            "municipality_code" : "1280",
+            "municipality" : "Malmö",
+            "region_code" : "12",
+            "region" : "Skåne län",
+            "country_code" : null,
+            "country" : null,
+            "street_address" : "Södra Drömgatan 99",
+            "postcode" : "21122",
+            "city" : "Malmö",
+            "coordinates" : [
+              12.9995440614651,
+              55.6070714014344
+            ]
+          },
+          "must_have" : {
+            "skills" : [ ],
+            "languages" : [ ],
+            "work_experiences" : [ ]
+          },
+          "nice_to_have" : {
+            "skills" : [ ],
+            "languages" : [ ],
+            "work_experiences" : [ ]
+          },
+          "publication_date" : "2019-03-19T00:00:00",
+          "last_publication_date" : "2019-05-31T23:59:59",
+          "removed" : false,
+          "removed_date" : "2019-02-02T00:20:30",
+          "source_type" : "VIA_AF_FORMULAR",
+          "keywords" : {
+            "extracted" : {
+              "occupation" : [
+                "it",
+                "data",
+                "programmerare",
+                "systemutvecklare",
+                "mjukvaru- och systemutvecklare"
+              ],
+              "skill" : [ ],
+              "location" : [
+                "malmö",
+                "skåne län"
+              ],
+              "employer" : [
+                "hittepå skåne",
+                "hittepå skåne ab"
+              ]
+            },
+            "enriched" : {
+              "occupation" : [
+                "systemutvecklare",
+                "javautvecklare"
+              ],
+              "skill" : [
+                "skånska",
+                "kommunikation",
+                "arkitektur",
+                "lag",
+                "api",
+                "objektorienterad",
+                "java",
+                "scrum",
+                "tdd",
+                "verktyg",
+                "eclipse"
+              ],
+              "trait" : [
+                "analytisk"
+              ]
+            }
+          },
+          "timestamp" : 1552979028459
+        },
+        "sort" : [
+          138.06148,
+          "23187561"
+        ]
+      }
+    ]
+  },
+  "aggregations" : {
+    "positions" : {
+      "value" : 596.0
+    }
+  }
+}

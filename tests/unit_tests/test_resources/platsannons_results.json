@@ -8,7 +8,10 @@
     "failed" : 0
   },
   "hits" : {
-    "total" : 880,
+    "total" : {
+        "value": 880,
+        "relation": "eq"
+    },
     "max_score" : 17.637318,
     "hits" : [
       {

@@ -332,15 +332,24 @@ class QueryBuilder(object):
     # Parses EMPLOYER
     def _build_employer_query(self, employers):
         if employers:
-            return {
-                "multi_match": {
-                    "query": " ".join(employers),
-                    "operator": "or",
-                    "fields": [f.EMPLOYER_NAME,
-                               f.EMPLOYER_WORKPLACE,
-                               f.EMPLOYER_ORGANIZATION_NUMBER]
-                }
-            }
+            bool_segment = {"bool": {"should": []}}
+            for employer in employers:
+                if employer.isdigit():
+                    bool_segment['bool']['should'].append(
+                        {"prefix": {f.EMPLOYER_ORGANIZATION_NUMBER: employer}}
+                    )
+                else:
+                    bool_segment['bool']['should'].append(
+                        {
+                            "multi_match": {
+                                "query": " ".join(employers),
+                                "operator": "or",
+                                "fields": [f.EMPLOYER_NAME,
+                                           f.EMPLOYER_WORKPLACE]
+                            }
+                        }
+                    )
+            return bool_segment
         return None
 
     # Parses OCCUPATION, FIELD and GROUP

@@ -9,7 +9,7 @@ api = Api(version='1.0', title='Download job ads',
 ns_bulk = Namespace('Bulk loader', description='Endpoint for downloading all ads in '
                                                'zip-file format or stream.')
 
-api.add_namespace(ns_bulk, '/bulk')
+api.add_namespace(ns_bulk, '/')
 
 bulk_zip_query = reqparse.RequestParser()
 bulk_zip_query.add_argument(settings.APIKEY, location='headers', required=True)

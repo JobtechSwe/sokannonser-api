@@ -5,7 +5,7 @@ from requests import get, exceptions
 from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons
-from sokannonser.rest.model.queries import annons_complete_query, pb_query
+from sokannonser.rest.model.queries import annons_complete_query, pb_query, load_ad_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
 from sokannonser.repository import platsannonser
 from sokannonser.repository.querybuilder import QueryBuilder
@@ -15,7 +15,9 @@ log = logging.getLogger(__name__)
 
 @ns_platsannons.route('ad/<id>', endpoint='ad')
 class Proxy(Resource):
+    method_decorators = [check_api_key('pb')]
     @ns_platsannons.doc(
+        description='Load a job ad by ID',
         responses={
             200: 'OK',
             401: 'Invalid API-key',
@@ -23,6 +25,7 @@ class Proxy(Resource):
             500: 'Technical exception'
         }
     )
+    @ns_platsannons.expect(load_ad_query)
     def get(self, id):
         return platsannonser.fetch_platsannons(str(id))
 

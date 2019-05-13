@@ -78,6 +78,9 @@ swagger_filter_doc_params = {
 }
 
 
+load_ad_query = reqparse.RequestParser()
+load_ad_query.add_argument(settings.APIKEY, location='headers', required=True)
+
 annons_complete_query = reqparse.RequestParser()
 annons_complete_query.add_argument(settings.APIKEY, location='headers', required=True)
 annons_complete_query.add_argument(settings.PUBLISHED_BEFORE,
@@ -114,6 +117,7 @@ annons_complete_query.add_argument(settings.EMPLOYER, action='append')
 annons_complete_query.add_argument(settings.FREETEXT_QUERY)
 annons_complete_query.add_argument(settings.FREETEXT_FIELDS, action='append',
                                    choices=QF_CHOICES)
+
 pb_query = annons_complete_query.copy()
 pb_query.add_argument(settings.DETAILS, choices=[OPTIONS_FULL, OPTIONS_BRIEF])
 pb_query.add_argument(settings.OFFSET, type=inputs.int_range(0, settings.MAX_OFFSET),

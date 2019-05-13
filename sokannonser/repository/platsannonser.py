@@ -90,9 +90,9 @@ def find_platsannonser(args, querybuilder, start_time=0):
     return transform_platsannons_query_result(args, query_result, querybuilder)
 
 
-def fetch_platsannons(id):
+def fetch_platsannons(ad_id):
     try:
-        query_result = elastic.get(index=settings.ES_INDEX, id=id)
+        query_result = elastic.get(index=settings.ES_INDEX, id=ad_id, ignore=404)
         if query_result and '_source' in query_result:
             source = query_result['_source']
             keyword_node = source['keywords']
@@ -101,8 +101,11 @@ def fetch_platsannons(id):
             except KeyError:
                 pass
             return source
+        else:
+            log.info("Job ad %s not found, returning 404 message" % ad_id)
+            abort(404, 'Ad not found')
     except exceptions.NotFoundError:
-        logging.exception('Failed to find id: %s' % id)
+        logging.exception('Failed to find id: %s' % ad_id)
         abort(404, 'Ad not found')
         return
     except exceptions.ConnectionError as e:

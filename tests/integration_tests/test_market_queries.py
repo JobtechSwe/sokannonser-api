@@ -7,8 +7,6 @@ from market import app
 test_api_key = os.getenv('TEST_API_KEY_MARKET')
 
 
-
-
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_passed_deadline():
@@ -19,14 +17,15 @@ def test_passed_deadline():
     with app.test_client() as testclient:
         # https://jobtechjobs-api.dev.services.jtech.se/market/search?show-expired=false&q=ekonomi&place=jokkmokk&place=ume%C3%A5&offset=0&limit=5
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/market/search', headers=headers, data={ 'show-expired': 'false',
-                                                                        'q': 'ekonomi',
-                                                                        'place': 'stockholm',
-                                                                        # 'place': 'umeå',
-                                                                        'offset': 0,
-                                                                        'limit': '100'})
+        result = testclient.get('/search', headers=headers,
+                                data={'show-expired': 'false',
+                                      'q': 'ekonomi',
+                                      'place': 'stockholm',
+                                      # 'place': 'umeå',
+                                      'offset': 0,
+                                      'limit': '100'})
         json_response = result.json
-        # pprint(json_response)
+        pprint(json_response)
         deadlines = [hit['application']['deadline'] for hit in json_response['hits']]
         dt_now = datetime.now()
 
@@ -34,7 +33,6 @@ def test_passed_deadline():
             dt_deadline = datetime.strptime(deadline, '%Y-%m-%dT%H:%M:%S+00:00')
             # print(dt_now, dt_deadline)
             assert dt_deadline >= dt_now
-
 
 
 if __name__ == '__main__':

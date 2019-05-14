@@ -48,4 +48,4 @@ RUN echo "" && echo $flask_app && echo "module = $flask_app" >> uwsgi.ini && \
 
 
 USER 10000
-CMD ["/usr/bin/supervisord", "-n"]
+CMD ["/usr/bin/supervisord", "-n", "-c", "/app/supervisord.conf"]

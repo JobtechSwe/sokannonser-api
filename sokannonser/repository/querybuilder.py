@@ -1,6 +1,5 @@
 import logging
 import re
-import json
 from sokannonser import settings
 from sokannonser.repository import ttc, taxonomy
 from sokannonser.rest.model import queries
@@ -44,43 +43,44 @@ class QueryBuilder(object):
         must_queries.append(self._build_plats_query(args.get(taxonomy.MUNICIPALITY),
                                                     args.get(taxonomy.REGION)))
         must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
-        must_queries.append(self._build_generic_query([f.MUST_HAVE_SKILLS+"."+
-                                                       f.CONCEPT_ID+".keyword",
-                                                       f.MUST_HAVE_SKILLS+"."+
+        must_queries.append(self._build_generic_query([f.MUST_HAVE_SKILLS + "." +
+                                                       f.CONCEPT_ID + ".keyword",
+                                                       f.MUST_HAVE_SKILLS + "." +
                                                        f.LEGACY_AMS_TAXONOMY_ID,
-                                                       f.NICE_TO_HAVE_SKILLS+"."+
-                                                       f.CONCEPT_ID+".keyword",
-                                                       f.NICE_TO_HAVE_SKILLS+"."+
+                                                       f.NICE_TO_HAVE_SKILLS + "." +
+                                                       f.CONCEPT_ID + ".keyword",
+                                                       f.NICE_TO_HAVE_SKILLS + "." +
                                                        f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.SKILL)))
-        must_queries.append(self._build_generic_query([f.MUST_HAVE_LANGUAGES+"."+
-                                                       f.CONCEPT_ID+".keyword",
-                                                       f.MUST_HAVE_LANGUAGES+"."+
+        must_queries.append(self._build_generic_query([f.MUST_HAVE_LANGUAGES + "." +
+                                                       f.CONCEPT_ID + ".keyword",
+                                                       f.MUST_HAVE_LANGUAGES + "." +
                                                        f.LEGACY_AMS_TAXONOMY_ID,
-                                                       f.NICE_TO_HAVE_LANGUAGES+"."+
-                                                       f.CONCEPT_ID+".keyword",
-                                                       f.NICE_TO_HAVE_LANGUAGES+"."+
+                                                       f.NICE_TO_HAVE_LANGUAGES + "." +
+                                                       f.CONCEPT_ID + ".keyword",
+                                                       f.NICE_TO_HAVE_LANGUAGES + "." +
                                                        f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.LANGUAGE)))
-        must_queries.append(self._build_generic_query([f.WORKING_HOURS_TYPE+"."+
-                                                       f.CONCEPT_ID+".keyword",
-                                                       f.WORKING_HOURS_TYPE+"."+
+        must_queries.append(self._build_generic_query([f.WORKING_HOURS_TYPE + "." +
+                                                       f.CONCEPT_ID + ".keyword",
+                                                       f.WORKING_HOURS_TYPE + "." +
                                                        f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.WORKTIME_EXTENT)))
-        must_queries.append(self._build_generic_query([f.DRIVING_LICENCE+"."+
-                                                       f.CONCEPT_ID+".keyword",
-                                                       f.DRIVING_LICENCE+"."+
+        must_queries.append(self._build_generic_query([f.DRIVING_LICENCE + "." +
+                                                       f.CONCEPT_ID + ".keyword",
+                                                       f.DRIVING_LICENCE + "." +
                                                        f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.DRIVING_LICENCE)))
-        must_queries.append(self._build_generic_query([f.EMPLOYMENT_TYPE+"."+
-                                                       f.CONCEPT_ID+".keyword",
-                                                       f.EMPLOYMENT_TYPE+"."+
+        must_queries.append(self._build_generic_query([f.EMPLOYMENT_TYPE + "." +
+                                                       f.CONCEPT_ID + ".keyword",
+                                                       f.EMPLOYMENT_TYPE + "." +
                                                        f.LEGACY_AMS_TAXONOMY_ID],
                                                       args.get(taxonomy.EMPLOYMENT_TYPE)))
         if args.get(taxonomy.DRIVING_LICENCE_REQUIRED) is not None:
             must_queries.append(
                 {"term": {
-                    f.DRIVING_LICENCE_REQUIRED: args.get(taxonomy.DRIVING_LICENCE_REQUIRED)
+                    f.DRIVING_LICENCE_REQUIRED:
+                    args.get(taxonomy.DRIVING_LICENCE_REQUIRED)
                 }}
             )
 
@@ -111,7 +111,8 @@ class QueryBuilder(object):
         value_dicts = []
         for agg in aggs:
             if agg.startswith('complete_'):
-                value_dicts += [{"type": agg[9:], **bucket} for bucket in aggs[agg]['buckets']]
+                value_dicts += [{"type": agg[9:], **bucket}
+                                for bucket in aggs[agg]['buckets']]
 
             filtered_aggs = [{"value": kv['key'],
                               "type": kv['type'],
@@ -199,9 +200,9 @@ class QueryBuilder(object):
         for query in additional_queries:
             if query:
                 query_dsl['query']['bool']['must'].append(query)
-        for f in additional_filters:
-            if f:
-                query_dsl['query']['bool']['filter'].append(f)
+        for af in additional_filters:
+            if af:
+                query_dsl['query']['bool']['filter'].append(af)
         return query_dsl
 
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
@@ -210,6 +211,7 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES
+        original_querystring = querystring
 
         concepts = ttc.text_to_concepts(querystring)
         # Sort all concepts by string length
@@ -225,8 +227,8 @@ class QueryBuilder(object):
                               key=lambda c: len(c),
                               reverse=True)
         # Remove found concepts from querystring
-        for concept in all_concepts:
-            p = re.compile(f'(\\s*){concept}(\\s*)')
+        for term in [concept['term'] for concept in all_concepts]:
+            p = re.compile(f'(\\s*){term}(\\s*)')
             querystring = p.sub('\\1\\2', querystring).strip()
 
         inc_words = ' '.join([w for w in querystring.split(' ')
@@ -256,27 +258,31 @@ class QueryBuilder(object):
         for qf in queryfields:
             if qf in concepts:
                 must_key = "%s_must" % qf
-                concepts[qf] += concepts.get(must_key, [])
+                concepts[qf] += [c['concept'].lower() for c in concepts.get(must_key, [])]
         # Add concepts to query
         for concept_type in queryfields:
             sub_should = self.__freetext_concepts({"bool": {}}, concepts,
+                                                  original_querystring,
                                                   [concept_type], "should")
             if 'should' in sub_should['bool']:
                 if 'must' not in ft_query['bool']:
                     ft_query['bool']['must'] = []
                 ft_query['bool']['must'].append(sub_should)
         # Remove unwanted concepts from query
-        self.__freetext_concepts(ft_query, concepts, queryfields, 'must_not')
+        self.__freetext_concepts(ft_query, concepts, original_querystring,
+                                 queryfields, 'must_not')
 
         # Add required concepts to query
-        self.__freetext_concepts(ft_query, concepts, queryfields, 'must')
+        self.__freetext_concepts(ft_query, concepts, original_querystring,
+                                 queryfields, 'must')
 
         return ft_query
 
-    def __freetext_concepts(self, query_dict, concepts, concept_keys, bool_type):
+    def __freetext_concepts(self, query_dict, concepts,
+                            original_querystring, concept_keys, bool_type):
         for key in concept_keys:
             dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
-            for value in concepts.get(dict_key, []):
+            for value in [c['concept'].lower() for c in concepts.get(dict_key, [])]:
                 if bool_type not in query_dict['bool']:
                     query_dict['bool'][bool_type] = []
 
@@ -295,25 +301,27 @@ class QueryBuilder(object):
                 )
                 if bool_type in ['should', 'must_not'] and key in ['occupation', 'skill']:
                     # Add a headline query as well
+                    # query_dict['bool'][bool_type].append(
+                    #     {
+                    #         "match": {
+                    #             f.HEADLINE: {
+                    #                 "query": value,
+                    #                 "boost": 1
+                    #             }
+                    #         }
+                    #     }
+                    # )
                     query_dict['bool'][bool_type].append(
                         {
                             "match": {
-                                f.HEADLINE: {
-                                    "query": value,
+                                f.HEADLINE+".words": {
+                                    "query": original_querystring,
                                     "boost": 10
                                 }
                             }
                         }
                     )
         return query_dict
-
-
-    def __freetext_headline(self, searchwords):
-        return {
-            "match": {
-                f.HEADLINE: searchwords
-            }
-        }
 
     def __freetext_fields(self, searchword):
         return [

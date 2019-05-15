@@ -13,12 +13,14 @@ log = logging.getLogger(__name__)
 
 def get_stats_for(taxonomy_type):
     value_path = {
-        taxonomy.OCCUPATION: "%s.%s.keyword" % (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.OCCUPATION: "%s.%s.keyword" %
+        (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.GROUP: "%s.%s.keyword" % (
-        fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
+            fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.FIELD: "%s.%s.keyword" % (
-        fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
-        taxonomy.SKILL: "%s.%s.keyword" % (fields.MUST_HAVE_SKILLS, fields.LEGACY_AMS_TAXONOMY_ID),
+            fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.SKILL: "%s.%s.keyword" % (fields.MUST_HAVE_SKILLS,
+                                           fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
         taxonomy.REGION: "%s.keyword" % fields.WORKPLACE_ADDRESS_REGION
     }
@@ -83,11 +85,21 @@ def find_platsannonser(args, querybuilder, start_time=0):
         return
 
     if args.get(settings.FREETEXT_QUERY):
-        query_result['concepts'] = ttc.text_to_concepts(args.get(settings.FREETEXT_QUERY))
+        query_result['concepts'] = \
+            _extract_concept_from_concepts(
+                ttc.text_to_concepts(args.get(settings.FREETEXT_QUERY))
+            )
 
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
     return transform_platsannons_query_result(args, query_result, querybuilder)
+
+
+def _extract_concept_from_concepts(concepts):
+    main_concepts = dict()
+    for key, value in concepts.items():
+        main_concepts[key] = [v['concept'].lower() for v in value]
+    return main_concepts
 
 
 def fetch_platsannons(ad_id):

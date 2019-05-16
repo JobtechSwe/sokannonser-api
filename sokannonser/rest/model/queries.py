@@ -8,7 +8,8 @@ from sokannonser.rest.model import fields
 QF_CHOICES = ['occupation', 'skill', 'location', 'employer']
 VF_TYPE_CHOICES = [taxonomy.OCCUPATION, taxonomy.GROUP, taxonomy.FIELD, taxonomy.SKILL,
                    taxonomy.MUNICIPALITY, taxonomy.REGION, taxonomy.COUNTRY,
-                   taxonomy.PLACE, taxonomy.WAGE_TYPE]
+                   taxonomy.PLACE, taxonomy.WAGE_TYPE, taxonomy.WORKTIME_EXTENT,
+                   taxonomy.DRIVING_LICENCE, taxonomy.EMPLOYMENT_TYPE]
 OPTIONS_BRIEF = 'brief'
 OPTIONS_FULL = 'full'
 
@@ -33,6 +34,7 @@ swagger_doc_params = {
     taxonomy.FIELD: "One or more occupational area codes according to the taxonomy",
     taxonomy.SKILL: "One or more competency codes according to the taxonomy",
     taxonomy.LANGUAGE: "One or more language codes according to the taxonomy",
+    taxonomy.DRIVING_LICENCE_REQUIRED: "Set to true if driving license required, false if not",
     taxonomy.DRIVING_LICENCE: "One or more types of demanded driving licenses, code "
                                 "according to the taxonomy",
     taxonomy.EMPLOYMENT_TYPE: "Employment type, code according to the taxonomy",
@@ -76,6 +78,9 @@ swagger_filter_doc_params = {
 }
 
 
+load_ad_query = reqparse.RequestParser()
+load_ad_query.add_argument(settings.APIKEY, location='headers', required=True)
+
 annons_complete_query = reqparse.RequestParser()
 annons_complete_query.add_argument(settings.APIKEY, location='headers', required=True)
 annons_complete_query.add_argument(settings.PUBLISHED_BEFORE,
@@ -92,6 +97,7 @@ annons_complete_query.add_argument(taxonomy.LANGUAGE, action='append')
 annons_complete_query.add_argument(taxonomy.WORKTIME_EXTENT, action='append')
 annons_complete_query.add_argument(settings.PARTTIME_MIN, type=float)
 annons_complete_query.add_argument(settings.PARTTIME_MAX, type=float)
+annons_complete_query.add_argument(taxonomy.DRIVING_LICENCE_REQUIRED, type=inputs.boolean)
 annons_complete_query.add_argument(taxonomy.DRIVING_LICENCE, action='append')
 annons_complete_query.add_argument(taxonomy.EMPLOYMENT_TYPE, action='append')
 annons_complete_query.add_argument(settings.EXPERIENCE_REQUIRED,
@@ -100,8 +106,9 @@ annons_complete_query.add_argument(taxonomy.MUNICIPALITY, action='append')
 annons_complete_query.add_argument(taxonomy.REGION, action='append')
 annons_complete_query.add_argument(taxonomy.COUNTRY, action='append')
 # Matches(lat,long) +90.0,-127.554334; 45,180; -90,-180; -90.000,-180.0000; +90,+180
-position_regex = '^[-+]?([1-8]?\\d(\\.\\d*)?|90(\\.0*)?),' \
-            '[-+]?(180(\\.0*)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d*)?)$'
+# r for raw, PEP8
+position_regex = r'^[-+]?([1-8]?\d(\.\d*)?|90(\.0*)?),' \
+            r'[-+]?(180(\.0*)?|((1[0-7]\d)|([1-9]?\d))(\.\d*)?)$'
 annons_complete_query.add_argument(settings.POSITION,
                                    type=inputs.regex(position_regex),
                                    action='append')
@@ -110,6 +117,7 @@ annons_complete_query.add_argument(settings.EMPLOYER, action='append')
 annons_complete_query.add_argument(settings.FREETEXT_QUERY)
 annons_complete_query.add_argument(settings.FREETEXT_FIELDS, action='append',
                                    choices=QF_CHOICES)
+
 pb_query = annons_complete_query.copy()
 pb_query.add_argument(settings.DETAILS, choices=[OPTIONS_FULL, OPTIONS_BRIEF])
 pb_query.add_argument(settings.OFFSET, type=inputs.int_range(0, settings.MAX_OFFSET),
@@ -129,5 +137,5 @@ taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)
 taxonomy_query.add_argument('type', action='append',
                             choices=VF_TYPE_CHOICES),
-taxonomy_query.add_argument(settings.SHOW_COUNT, type=bool, default=False)
+taxonomy_query.add_argument(settings.SHOW_COUNT, type=inputs.boolean, default=False)
 taxonomy_query.add_argument('parent-id', action='append')

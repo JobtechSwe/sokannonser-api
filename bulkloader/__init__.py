@@ -1,6 +1,7 @@
 import logging
 from flask import Flask
 from flask_cors import CORS
+from jobtech.common.customlogging import configure_logging
 from sokannonser import appconf
 from bulkloader.rest import api
 # Import all Resources that are to be made visible for the app
@@ -9,7 +10,7 @@ from bulkloader.rest.bulk import BulkLoad
 
 app = Flask(__name__)
 CORS(app)
-appconf.configure_logging()
+configure_logging()
 log = logging.getLogger(__name__)
 log.info(logging.getLevelName(log.getEffectiveLevel()) + ' log level activated')
 log.info("Starting %s" % __name__)

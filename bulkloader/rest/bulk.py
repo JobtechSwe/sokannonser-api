@@ -10,7 +10,7 @@ from sokannonser import settings
 log = logging.getLogger(__name__)
 
 
-@ns_bulk.route('/zip')
+@ns_bulk.route('zip')
 class BulkZip(Resource):
     method_decorators = [check_api_key('bulk')]
 
@@ -33,11 +33,11 @@ class BulkZip(Resource):
         filename = "ads_%s.zip" % args.get(settings.DATE)
         log.debug("Elapsed time for completion: %d" % int((time.time()*1000)-start_time))
         return send_file(bytes_result,
-                         attachment_filename=filename, cache_timeout=1,
+                         attachment_filename=filename, cache_timeout=60,
                          as_attachment=True)
 
 
-@ns_bulk.route('/stream')
+@ns_bulk.route('stream')
 class BulkLoad(Resource):
     method_decorators = [check_api_key('bulk')]
 

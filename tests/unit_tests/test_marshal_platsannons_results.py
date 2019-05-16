@@ -15,13 +15,13 @@ currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 
 def get_static_ads_from_file():
-    with open(currentdir + 'test_resources/platsannons_results.json') as f:
+    with open(currentdir + 'test_resources/platsannons_results_eng.json') as f:
         result = json.load(f)
         # pprint(result)
 
         return result
 
-
+# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_properties_and_types_marshal_mocked_elastic_result():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -63,34 +63,34 @@ def test_properties_and_types_marshal_mocked_elastic_result():
     assert test_hit is not None
 
     assert_is_type(test_hit, dict)
-    assert_has_properties(test_hit, ['ansokningsdetaljer', 'anstallningstyp', 'antal_platser',
-                                     'arbetsgivare', 'arbetsomfattning', 'arbetsplats_id',
-                                     'arbetsplatsadress', 'arbetstidstyp', 'beskrivning',
-                                     'egen_bil', 'erfarenhet_kravs', 'id',
-                                     'kalla', 'keywords', 'keywords_enriched_binary',
-                                     'korkort_kravs', 'krav',
-                                     'lonetyp', 'meriterande', 'publiceringsdatum',
-                                     'publiceringskanaler', 'rubrik', 'sista_ansokningsdatum',
-                                     'status', 'tilltrade', 'varaktighet',
-                                     'yrkesgrupp', 'yrkesomrade', 'yrkesroll'])
+    assert_has_properties(test_hit, ['application_details', 'employment_type', 'number_of_vacancies',
+                                     'employer', 'scope_of_work', 'workplace_id',
+                                     'workplace_address', 'working_hours_type', 'description',
+                                     'access_to_own_car', 'experience_required', 'id',
+                                     'source_type', 'keywords',
+                                     'driving_license_required', 'must_have',
+                                     'salary_type', 'nice_to_have', 'publication_date',
+                                     'headline', 'application_deadline',
+                                     'access', 'duration',
+                                     'occupation_group', 'occupation_field', 'occupation'])
 
-    assert_is_type(test_hit['ansokningsdetaljer'], dict)
-    assert_has_properties(test_hit['ansokningsdetaljer'],
-                          ['annat', 'epost', 'information', 'referens', 'via_af', 'webbadress'])
+    assert_is_type(test_hit['application_details'], dict)
+    assert_has_properties(test_hit['application_details'],
+                          ['information', 'reference', 'email', 'via_af', 'url', 'other'])
 
-    assert_is_type(test_hit['anstallningstyp'], dict)
-    assert_has_properties(test_hit['anstallningstyp'], ['kod', 'taxonomi-kod', 'term'])
+    assert_is_type(test_hit['employment_type'], dict)
+    assert_has_properties(test_hit['employment_type'], ['concept_id', 'label', 'legacy_ams_taxonomy_id'])
 
-    assert_is_type(test_hit['antal_platser'], int)
+    assert_is_type(test_hit['number_of_vacancies'], int)
 
-    assert_is_type(test_hit['arbetsgivare'], dict)
-    assert_has_properties(test_hit['arbetsgivare'],
-                          ['arbetsplats', 'epost', 'id', 'namn', 'organisationsnummer', 'telefonnummer', 'webbadress'])
+    assert_is_type(test_hit['employer'], dict)
+    assert_has_properties(test_hit['employer'],
+                          ['id', 'phone_number', 'email', 'url', 'organization_number', 'name', 'workplace'])
 
-    assert_is_type(test_hit['arbetsomfattning'], dict)
-    assert_has_properties(test_hit['arbetsomfattning'], ['min', 'max'])
+    assert_is_type(test_hit['scope_of_work'], dict)
+    assert_has_properties(test_hit['scope_of_work'], ['min', 'max'])
 
-
+# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_values_marshal_mocked_elastic_result():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -118,129 +118,121 @@ def test_values_marshal_mocked_elastic_result():
     assert_is_type(results_hits, list)
     assert len(results_hits) > 0
 
-    test_hit = results_hits[0]
+    ad_id = '23174210'
+
+    test_hit = [hit for hit in results_hits if hit['id'] == ad_id][0]
     # pprint(test_hit)
 
     assert test_hit is not None
     # print('test_hit[id]', test_hit['id'])
     assert sorted_query_hits[0]['id'] == test_hit['id']
 
-    ansokningsdetaljer = test_hit['ansokningsdetaljer']
-    assert_has_str_value(ansokningsdetaljer['annat'])
-    assert_has_str_value(ansokningsdetaljer['epost'])
+    ansokningsdetaljer = test_hit['application_details']
+    # 'information', 'reference', 'email', 'via_af', 'url', 'other'
     assert_has_str_value(ansokningsdetaljer['information'])
-    assert_has_str_value(ansokningsdetaljer['referens'])
+    assert_has_str_value(ansokningsdetaljer['reference'])
+    assert_has_str_value(ansokningsdetaljer['email'])
+    assert_has_str_value(ansokningsdetaljer['url'])
     assert_has_bool_value(ansokningsdetaljer['via_af'], False)
-    assert_has_str_value(ansokningsdetaljer['webbadress'])
+    assert_has_str_value(ansokningsdetaljer['other'])
 
-    anstallningstyp = test_hit['anstallningstyp']
+    assert_has_bool_value(test_hit['experience_required'], True)
+    assert_has_bool_value(test_hit['access_to_own_car'], False)
+    assert_has_bool_value(test_hit['driving_license_required'], True)
+
+    anstallningstyp = test_hit['employment_type']
     assert_has_taxonomy_values(anstallningstyp)
 
-    assert_has_int_value(test_hit['antal_platser'], 1)
+    assert_has_int_value(test_hit['number_of_vacancies'], 1)
 
-    arbetsgivare = test_hit['arbetsgivare']
-    assert_has_str_value(arbetsgivare['arbetsplats'])
-    assert_has_str_value(arbetsgivare['epost'])
+    arbetsgivare = test_hit['employer']
+    # ['id', 'phone_number', 'email', 'url', 'organization_number', 'name', 'workplace'])
     assert_has_str_value(arbetsgivare['id'])
-    assert_has_str_value(arbetsgivare['namn'])
-    assert_has_str_value(arbetsgivare['organisationsnummer'])
-    assert_has_str_value(arbetsgivare['telefonnummer'])
-    assert_has_str_value(arbetsgivare['webbadress'])
+    assert_has_str_value(arbetsgivare['workplace'])
+    assert_has_str_value(arbetsgivare['email'])
+    assert_has_str_value(arbetsgivare['name'])
+    assert_has_str_value(arbetsgivare['organization_number'])
+    assert_has_str_value(arbetsgivare['phone_number'])
+    assert_has_str_value(arbetsgivare['url'])
 
-    arbetsomfattning = test_hit['arbetsomfattning']
+    arbetsomfattning = test_hit['scope_of_work']
     assert_has_int_value(arbetsomfattning['min'], 100)
     assert_has_int_value(arbetsomfattning['max'], 100)
 
-    assert_has_str_value(test_hit['arbetsplats_id'])
+    assert_has_str_value(test_hit['workplace_id'])
 
-    arbetsplatsadress = test_hit['arbetsplatsadress']
+    arbetsplatsadress = test_hit['workplace_address']
 
     assert_has_list_values(arbetsplatsadress['coordinates'])
-    assert_has_str_value(arbetsplatsadress['gatuadress'])
-    assert_has_str_value(arbetsplatsadress['kommun'])
-    assert_has_str_value(arbetsplatsadress['kommunkod'])
-    assert_has_str_value(arbetsplatsadress['lan'])
-    assert_has_str_value(arbetsplatsadress['land'])
-    assert_has_str_value(arbetsplatsadress['landskod'])
-    assert_has_str_value(arbetsplatsadress['postnummer'])
-    assert_has_str_value(arbetsplatsadress['postort'])
+    assert_has_str_value(arbetsplatsadress['street_address'])
+    assert_has_str_value(arbetsplatsadress['municipality'])
+    assert_has_str_value(arbetsplatsadress['municipality_code'])
+    assert_has_str_value(arbetsplatsadress['region'])
+    assert_has_str_value(arbetsplatsadress['region_code'])
+    assert_has_str_value(arbetsplatsadress['country'])
+    assert_has_str_value(arbetsplatsadress['country_code'])
+    assert_has_str_value(arbetsplatsadress['postcode'])
+    assert_has_str_value(arbetsplatsadress['city'])
 
-    arbetstidstyp = test_hit['arbetstidstyp']
-    assert_has_taxonomy_values(arbetstidstyp)
 
-    beskrivning = test_hit['beskrivning']
-    assert_has_str_value(beskrivning['annonstext'])
-    assert_has_str_value(beskrivning['behov'])
-    assert_has_str_value(beskrivning['information'])
-    assert_has_str_value(beskrivning['krav'])
-    assert_has_str_value(beskrivning['villkor'])
+    assert_has_taxonomy_values(test_hit['working_hours_type'])
+    assert_has_taxonomy_values(test_hit['employment_type'])
+    assert_has_taxonomy_values(test_hit['salary_type'])
+    assert_has_taxonomy_values(test_hit['duration'])
+    assert_has_taxonomy_values(test_hit['occupation'])
+    assert_has_taxonomy_values(test_hit['occupation_group'])
+    assert_has_taxonomy_values(test_hit['occupation_field'])
 
-    assert_has_bool_value(test_hit['egen_bil'], True)
-    assert_has_bool_value(test_hit['erfarenhet_kravs'], True)
 
-    assert_has_int_value(test_hit['id'], 8052385)
+    beskrivning = test_hit['description']
+    assert_has_str_value(beskrivning['text'])
+    assert_has_str_value(beskrivning['needs'])
+    assert_has_str_value(beskrivning['company_information'])
+    assert_has_str_value(beskrivning['requirements'])
+    assert_has_str_value(beskrivning['conditions'])
 
-    assert_has_str_value(test_hit['kalla'])
 
-    keywords = test_hit['keywords']
+
+    assert_has_int_value(int(test_hit['id']), 23174210)
+
+    assert_has_str_value(test_hit['source_type'])
+
+    keywords = test_hit['keywords']['extracted']
     assert_has_list_values(keywords['location'])
     assert_has_list_values(keywords['occupation'])
     assert_has_list_values(keywords['skill'])
 
-    keywords_enriched_binary = test_hit['keywords_enriched_binary']
-    assert_has_list_values(keywords_enriched_binary['occupation'])
-    assert_has_list_values(keywords_enriched_binary['skill'])
-    assert_has_list_values(keywords_enriched_binary['trait'])
+    # print(test_hit['keywords'].keys())
+    assert 'enriched' not in test_hit['keywords'].keys()
 
-    assert_has_bool_value(test_hit['korkort_kravs'], True)
+    krav = test_hit['must_have']
+    assert_has_taxonomy_list_values(krav['skills'])
+    assert_has_taxonomy_list_values(krav['languages'])
+    assert_has_taxonomy_list_values(krav['work_experiences'])
 
-    krav = test_hit['krav']
-    assert_has_taxonomy_list_values(krav['kompetenser'])
-    assert_has_taxonomy_list_values(krav['sprak'])
-    assert_has_taxonomy_list_values(krav['utbildningsinriktning'])
-    assert_has_taxonomy_list_values(krav['utbildningsniva'])
-    assert_has_taxonomy_list_values(krav['yrkeserfarenheter'])
-
-    lonetyp = test_hit['lonetyp']
+    lonetyp = test_hit['salary_type']
     assert_has_taxonomy_values(lonetyp)
 
-    meriterande = test_hit['meriterande']
-    assert_has_taxonomy_list_values(meriterande['kompetenser'])
-    assert_has_taxonomy_list_values(meriterande['sprak'])
-    assert_has_taxonomy_list_values(meriterande['utbildningsinriktning'])
-    assert_has_taxonomy_list_values(meriterande['utbildningsniva'])
-    assert_has_taxonomy_list_values(meriterande['yrkeserfarenheter'])
+    meriterande = test_hit['nice_to_have']
+    assert_has_taxonomy_list_values(meriterande['skills'])
+    assert_has_taxonomy_list_values(meriterande['languages'])
+    assert_has_taxonomy_list_values(meriterande['work_experiences'])
 
-    assert_has_str_value(test_hit['publiceringsdatum'])
+    assert_has_str_value(test_hit['publication_date'])
 
-    publiceringskanaler = test_hit['publiceringskanaler']
+    assert_has_str_value(test_hit['headline'])
 
-    assert_has_bool_value(publiceringskanaler['ais'], True)
-    assert_has_bool_value(publiceringskanaler['platsbanken'], True)
-    assert_has_bool_value(publiceringskanaler['platsjournalen'], True)
+    assert_has_str_value(test_hit['application_deadline'])
 
-    assert_has_str_value(test_hit['rubrik'])
+    # status = test_hit['status']
 
-    assert_has_str_value(test_hit['sista_ansokningsdatum'])
+    assert_has_bool_value(test_hit['removed'], False)
 
-    status = test_hit['status']
+    assert_has_str_value(test_hit['last_publication_date'])
 
-    assert_has_str_value(status['anvandarId'])
-    assert_has_bool_value(status['publicerad'], False)
-    assert_has_str_value(status['sista_publiceringsdatum'])
-    assert_has_str_value(status['skapad'])
-    assert_has_str_value(status['skapad_av'])
-    assert_has_str_value(status['uppdaterad'])
-    assert_has_str_value(status['uppdaterad_av'])
+    assert_has_str_value(test_hit['access'])
 
-    assert_has_str_value(test_hit['tilltrade'])
-
-    assert_has_int_value(test_hit['timestamp'], 1550579758889)
-
-    assert_has_taxonomy_values(test_hit['varaktighet'])
-    assert_has_taxonomy_values(test_hit['yrkesgrupp'])
-    assert_has_taxonomy_values(test_hit['yrkesomrade'])
-    assert_has_taxonomy_values(test_hit['yrkesroll'])
+    assert_has_int_value(test_hit['timestamp'], 1552410521222)
 
 
 def assert_has_taxonomy_list_values(listitems):
@@ -281,6 +273,6 @@ def assert_has_list_values(value_to_check):
 
 
 def assert_has_taxonomy_values(hit_attr):
-    assert_has_str_value(hit_attr['kod'])
-    assert_has_str_value(hit_attr['taxonomi-kod'])
-    assert_has_str_value(hit_attr['term'])
+    assert_has_str_value(hit_attr['concept_id'])
+    assert_has_str_value(hit_attr['label'])
+    assert_has_str_value(hit_attr['legacy_ams_taxonomy_id'])

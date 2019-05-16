@@ -12,21 +12,22 @@ log = logging.getLogger(__name__)
 
 
 def get_stats_for(taxonomy_type):
-    log.info("Looking for %s" % taxonomy_type)
     value_path = {
-        fields.OCCUPATION: "%s.%s.keyword" % (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
-        fields.OCCUPATION_GROUP: "%s.%s.keyword" % (
-        fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
-        fields.OCCUPATION_FIELD: "%s.%s.keyword" % (
-        fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
-        taxonomy.SKILL: "%s.%s.keyword" % (fields.MUST_HAVE_SKILLS, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.OCCUPATION: "%s.%s.keyword" %
+        (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.GROUP: "%s.%s.keyword" % (
+            fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.FIELD: "%s.%s.keyword" % (
+            fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
+        taxonomy.SKILL: "%s.%s.keyword" % (fields.MUST_HAVE_SKILLS,
+                                           fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
         taxonomy.REGION: "%s.keyword" % fields.WORKPLACE_ADDRESS_REGION
     }
     # Make sure we don't crash if we want to stat on missing type
     for tt in taxonomy_type:
         if tt not in value_path:
-            log.warning("Taxonomy type %s not configured for aggs." % taxonomy_type)
+            log.warning("Taxonomy type \"%s\" not configured for aggs." % taxonomy_type)
             return {}
 
     aggs_query = {
@@ -84,16 +85,26 @@ def find_platsannonser(args, querybuilder, start_time=0):
         return
 
     if args.get(settings.FREETEXT_QUERY):
-        query_result['concepts'] = ttc.text_to_concepts(args.get(settings.FREETEXT_QUERY))
+        query_result['concepts'] = \
+            _extract_concept_from_concepts(
+                ttc.text_to_concepts(args.get(settings.FREETEXT_QUERY))
+            )
 
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
     return transform_platsannons_query_result(args, query_result, querybuilder)
 
 
-def fetch_platsannons(id):
+def _extract_concept_from_concepts(concepts):
+    main_concepts = dict()
+    for key, value in concepts.items():
+        main_concepts[key] = [v['concept'].lower() for v in value]
+    return main_concepts
+
+
+def fetch_platsannons(ad_id):
     try:
-        query_result = elastic.get(index=settings.ES_INDEX, doc_type='document', id=id)
+        query_result = elastic.get(index=settings.ES_INDEX, id=ad_id, ignore=404)
         if query_result and '_source' in query_result:
             source = query_result['_source']
             keyword_node = source['keywords']
@@ -102,8 +113,11 @@ def fetch_platsannons(id):
             except KeyError:
                 pass
             return source
+        else:
+            log.info("Job ad %s not found, returning 404 message" % ad_id)
+            abort(404, 'Ad not found')
     except exceptions.NotFoundError:
-        logging.exception('Failed to find id: %s' % id)
+        logging.exception('Failed to find id: %s' % ad_id)
         abort(404, 'Ad not found')
         return
     except exceptions.ConnectionError as e:

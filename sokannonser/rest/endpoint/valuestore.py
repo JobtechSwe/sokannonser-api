@@ -35,7 +35,7 @@ class Valuestore(Resource):
         limit = request.args.get(settings.LIMIT, 10)
         response = taxonomy.find_concepts(elastic, q, parent_id, concept_type,
                                           offset, limit)
-        show_count = request.args.get(settings.SHOW_COUNT) == "true"
+        show_count = request.args.get(settings.SHOW_COUNT)
         statistics = platsannonser.get_stats_for(concept_type) \
             if concept_type and show_count else {}
         if not response:

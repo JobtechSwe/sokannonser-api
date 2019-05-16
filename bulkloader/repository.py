@@ -30,6 +30,11 @@ def _es_dsl():
                             }
                         }
                     },
+                    {
+                        "term": {
+                            "removed": False
+                        }
+                    }
                 ]
             }
         },

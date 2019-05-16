@@ -5,4 +5,4 @@ build
 .pytest_cache/
 .coverage
 ./idea/
-
+pytest_secrets.env

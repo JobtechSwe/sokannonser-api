@@ -5,7 +5,7 @@ from requests import get, exceptions
 from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons
-from sokannonser.rest.model.queries import annons_complete_query, pb_query
+from sokannonser.rest.model.queries import annons_complete_query, pb_query, load_ad_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
 from sokannonser.repository import platsannonser
 from sokannonser.repository.querybuilder import QueryBuilder
@@ -15,7 +15,9 @@ log = logging.getLogger(__name__)
 
 @ns_platsannons.route('ad/<id>', endpoint='ad')
 class Proxy(Resource):
+    method_decorators = [check_api_key('pb')]
     @ns_platsannons.doc(
+        description='Load a job ad by ID',
         responses={
             200: 'OK',
             401: 'Invalid API-key',
@@ -23,6 +25,7 @@ class Proxy(Resource):
             500: 'Technical exception'
         }
     )
+    @ns_platsannons.expect(load_ad_query)
     def get(self, id):
         return platsannonser.fetch_platsannons(str(id))
 
@@ -59,7 +62,7 @@ class PBSearch(Resource):
 
     def marshal_results(self, esresult, hits, start_time):
         result = {
-            "total": esresult.get('total', 0),
+            "total": esresult.get('total', {}).get('value', 0),
             "positions": esresult.get('positions', 0),
             "query_time_in_millis": esresult.get('took', 0),
             "result_time_in_millis": int(time.time()*1000) - start_time,
@@ -88,6 +91,7 @@ class PBComplete(Resource):
     )
     @ns_platsannons.expect(annons_complete_query)
     def get(self):
+        start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         # This could be prettier
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
@@ -96,12 +100,16 @@ class PBComplete(Resource):
         args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1])
 
         result = platsannonser.find_platsannonser(args, self.querybuilder)
+        log.debug("Query results after %d milliseconds."
+                  % (int(time.time()*1000)-start_time))
 
-        return self.marshal_results(result)
+        return self.marshal_results(result, start_time)
 
-    def marshal_results(self, esresult):
+    def marshal_results(self, esresult, start_time):
         result = {
             "time_in_millis": esresult.get('took', 0),
             "typeahead": esresult.get('aggs', []),
         }
+        log.debug("Sending results after %d milliseconds."
+                  % (int(time.time()*1000) - start_time))
         return result

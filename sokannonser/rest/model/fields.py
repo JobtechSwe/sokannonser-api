@@ -34,8 +34,8 @@ APPLICATION_DETAILS_URL = 'application_details.url'
 APPLICATION_DETAILS_OTHER = 'application_details.other'
 EXPERIENCE_REQUIRED = 'experience_required'
 ACCESS_TO_OWN_CAR = 'access_to_own_car'
-DRIVING_LICENCE_REQUIRED = 'driving_licence_required'
-DRIVING_LICENCE = 'driving_licence'
+DRIVING_LICENCE_REQUIRED = 'driving_license_required'
+DRIVING_LICENCE = 'driving_license'
 OCCUPATION = 'occupation'
 OCCUPATION_GROUP = 'occupation_group'
 OCCUPATION_FIELD = 'occupation_field'
@@ -68,12 +68,12 @@ KEYWORDS_ENRICHED = 'keywords.enriched'
 KEYWORDS_EXTRACTED = 'keywords.extracted'
 
 sort_options = {
-    'relevance': "_score",
-    'pubdate-desc': {PUBLICATION_DATE: "desc"},
-    'pubdate-asc':  {PUBLICATION_DATE: "asc"},
-    'applydate-desc':  {APPLICATION_DEADLINE: "desc"},
-    'applydate-asc':  {APPLICATION_DEADLINE: "asc"},
-    'updated': {"timestamp": "desc"},
+    'relevance': ["_score", {ID: "asc"}],
+    'pubdate-desc': [{PUBLICATION_DATE: "desc", ID: "asc"}],
+    'pubdate-asc':  [{PUBLICATION_DATE: "asc", ID: "asc"}],
+    'applydate-desc': [{APPLICATION_DEADLINE: "desc", ID: "asc"}],
+    'applydate-asc': [{APPLICATION_DEADLINE: "asc", ID: "asc"}],
+    'updated': [{"timestamp": "desc", ID: "asc"}],
 }
 stats_options = {
     taxonomy.OCCUPATION: "%s.%s.keyword" % (OCCUPATION, LEGACY_AMS_TAXONOMY_ID),

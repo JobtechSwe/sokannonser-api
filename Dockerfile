@@ -1,31 +1,28 @@
-FROM alpine:latest
+FROM alpine:edge
 
 EXPOSE 8081
 
-RUN time apk update 
-    # && apk upgrade
-
-# RUN apk add --no-cache --update \
-RUN time apk add --no-cache --update \
+RUN apk update && \
+    apk add --no-cache --update \
         supervisor \
         uwsgi-python3 \
         python3 \
         nginx \
         git \
         curl \
-        tzdata
-RUN time rm -rfv /var/cache/apk/*
+        tzdata && \
+     rm -rfv /var/cache/apk/*
 
-ENV TZ=Europe/Paris
-RUN date +"%Y-%m-%dT%H:%M:%S %Z"
+ARG flask_app=sokannonser
+ENV flask_app=$flask_app \
+    TZ=Europe/Paris
 
 COPY . /app
 
-COPY nginx.conf /etc/nginx/nginx.conf
-RUN rm -v /etc/nginx/conf.d/default.conf
+# COPY nginx.conf /etc/nginx/nginx.conf
 
-
-RUN mkdir -p /var/run/nginx && \
+RUN date +"%Y-%m-%dT%H:%M:%S %Z" && \
+    mkdir -p /var/run/nginx && \
     chmod -R 777 /var/run/nginx && \ 
     mkdir -p /var/run/supervisord /var/log/supervisord && \
     chmod -R 777 /var/run/supervisord && \
@@ -36,23 +33,19 @@ RUN mkdir -p /var/run/nginx && \
     chmod -R 777 /var/log/* && \
     chmod -R 777 /var/tmp/nginx
 
-ARG flask_app=sokannonser
-ENV flask_app=$flask_app
 
 WORKDIR /app
-RUN echo "module = $flask_app" >> uwsgi.ini
 
 # RUN pip3 install --no-cache-dir -r requirements.txt
-RUN time pip3 install -r requirements.txt
-
 # delete all __pycache__-folders in tests-folder
-RUN find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
-
 # runs unit tests with @pytest.mark.unit annotation only
-RUN time python3 -m pytest -svv -m unit tests/
 
-# delete all __pycache__-folders in tests-folder
-RUN find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
+RUN echo "" && echo $flask_app && echo "module = $flask_app" >> uwsgi.ini && \
+    time pip3 install -r requirements.txt && \
+    find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \; && \
+    python3 -m pytest -svv -m unit tests/ && \
+    find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
+
 
 USER 10000
-CMD ["/usr/bin/supervisord", "-n"]
+CMD ["/usr/bin/supervisord", "-n", "-c", "/app/supervisord.conf"]

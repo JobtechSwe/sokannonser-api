@@ -11,7 +11,7 @@ api = Api(version='1.0', title='Market Search',
 ns_market = Namespace('All job ads',
                       description='Search and retrieve ~97% of all job ads.')
 
-api.add_namespace(ns_market, '/market')
+api.add_namespace(ns_market, '/')
 
 # Queries
 market_query = reqparse.RequestParser()

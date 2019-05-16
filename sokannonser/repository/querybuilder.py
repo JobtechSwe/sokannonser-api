@@ -211,7 +211,6 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES
-        original_querystring = querystring
 
         concepts = ttc.text_to_concepts(querystring)
         # Sort all concepts by string length
@@ -262,24 +261,24 @@ class QueryBuilder(object):
         # Add concepts to query
         for concept_type in queryfields:
             sub_should = self.__freetext_concepts({"bool": {}}, concepts,
-                                                  original_querystring,
+                                                  querystring,
                                                   [concept_type], "should")
             if 'should' in sub_should['bool']:
                 if 'must' not in ft_query['bool']:
                     ft_query['bool']['must'] = []
                 ft_query['bool']['must'].append(sub_should)
         # Remove unwanted concepts from query
-        self.__freetext_concepts(ft_query, concepts, original_querystring,
+        self.__freetext_concepts(ft_query, concepts, querystring,
                                  queryfields, 'must_not')
 
         # Add required concepts to query
-        self.__freetext_concepts(ft_query, concepts, original_querystring,
+        self.__freetext_concepts(ft_query, concepts, querystring,
                                  queryfields, 'must')
 
         return ft_query
 
     def __freetext_concepts(self, query_dict, concepts,
-                            original_querystring, concept_keys, bool_type):
+                            querystring, concept_keys, bool_type):
         for key in concept_keys:
             dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
             for value in [c['concept'].lower() for c in concepts.get(dict_key, [])]:
@@ -315,7 +314,7 @@ class QueryBuilder(object):
                         {
                             "match": {
                                 f.HEADLINE+".words": {
-                                    "query": original_querystring,
+                                    "query": querystring,
                                     "boost": 10
                                 }
                             }

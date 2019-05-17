@@ -10,6 +10,7 @@ RUN apk update && \
         nginx \
         git \
         curl \
+        memcached \
         tzdata && \
      rm -rfv /var/cache/apk/*
 

@@ -190,7 +190,9 @@ def _build_query(query_string, taxonomy_code, entity_type, offset, limit):
             }
     if sort:
         query_dsl['sort'] = sort
-    print(json.dumps(query_dsl))
+
+    query_dsl['track_total_hits'] = True
+    log.debug(json.dumps(query_dsl))
     return query_dsl
 
 

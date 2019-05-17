@@ -122,7 +122,7 @@ def load_all(since):
         remove_enriched_data(source)
         yield json.dumps(source)
         counter += 1
-    log.info("Delivered %d ads as stream" % counter)
+    log.debug("Delivered %d ads as stream" % counter)
     yield ']'
 
 

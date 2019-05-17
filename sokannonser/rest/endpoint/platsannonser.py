@@ -61,8 +61,9 @@ class PBSearch(Resource):
         return self.marshal_results(result, hits, start_time)
 
     def marshal_results(self, esresult, hits, start_time):
+        total_results = {'value': esresult.get('total', {}).get('value')}
         result = {
-            "total": esresult.get('total', {}),
+            "total": total_results,
             "positions": esresult.get('positions', 0),
             "query_time_in_millis": esresult.get('took', 0),
             "result_time_in_millis": int(time.time()*1000) - start_time,

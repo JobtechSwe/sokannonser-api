@@ -1,7 +1,6 @@
 import logging
 import time
-from flask_restplus import Resource, abort
-from requests import get, exceptions
+from flask_restplus import Resource
 from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons
@@ -16,6 +15,7 @@ log = logging.getLogger(__name__)
 @ns_platsannons.route('ad/<id>', endpoint='ad')
 class Proxy(Resource):
     method_decorators = [check_api_key('pb')]
+
     @ns_platsannons.doc(
         description='Load a job ad by ID',
         responses={
@@ -61,8 +61,9 @@ class PBSearch(Resource):
         return self.marshal_results(result, hits, start_time)
 
     def marshal_results(self, esresult, hits, start_time):
+        total_results = {'value': esresult.get('total', {}).get('value')}
         result = {
-            "total": esresult.get('total', {}).get('value', 0),
+            "total": total_results,
             "positions": esresult.get('positions', 0),
             "query_time_in_millis": esresult.get('took', 0),
             "result_time_in_millis": int(time.time()*1000) - start_time,

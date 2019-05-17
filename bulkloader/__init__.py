@@ -10,7 +10,7 @@ from bulkloader.rest.bulk import BulkLoad
 
 app = Flask(__name__)
 CORS(app)
-configure_logging([__name__.split('.')[0], 'bulkloader', 'jobtech'])
+configure_logging([__name__.split('.')[0], 'sokannonser', 'jobtech'])
 log = logging.getLogger(__name__)
 log.info(logging.getLevelName(log.getEffectiveLevel()) + ' log level activated')
 log.info("Starting %s" % __name__)

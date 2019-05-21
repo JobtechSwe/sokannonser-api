@@ -16,7 +16,6 @@ def find_annonser(args):
     if aggregates:
         query_dsl['aggs'].update(aggregates)
     log.debug(json.dumps(query_dsl, indent=2))
-    print(json.dumps(query_dsl, indent=2))
     try:
         query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
     except exceptions.ConnectionError as e:

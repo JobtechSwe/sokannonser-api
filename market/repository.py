@@ -16,6 +16,7 @@ def find_annonser(args):
     if aggregates:
         query_dsl['aggs'].update(aggregates)
     log.debug(json.dumps(query_dsl, indent=2))
+    print(json.dumps(query_dsl, indent=2))
     try:
         query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
     except exceptions.ConnectionError as e:
@@ -45,8 +46,8 @@ def autocomplete(querystring):
     query_result = elastic.search(index=settings.ES_AURANEST, body=query_dsl)
     if 'aggregations' in query_result:
         return [c['key'] for c in query_result.get('aggregations', {})
-            .get('complete', {})
-            .get('buckets', [])]
+                .get('complete', {})
+                .get('buckets', [])]
     return []
 
 
@@ -66,6 +67,7 @@ def _statistics(agg_fields, agg_size):
 
 def _parse_args(args):
     args = dict(args)
+    print("ARGS", args)
     query_dsl = dict()
     query_dsl['from'] = args.pop(settings.OFFSET, 0)
     query_dsl['size'] = args.pop(settings.LIMIT, 10)
@@ -110,6 +112,11 @@ def _parse_args(args):
                                __place_fields)
     if place_query:
         query_dsl['query']['bool']['must'].append(place_query)
+
+    employer_query = _build_query(args.get(settings.EMPLOYER),
+                                  __employer_fields)
+    if employer_query:
+        query_dsl['query']['bool']['must'].append(employer_query)
     return query_dsl
 
 
@@ -133,6 +140,16 @@ def __place_fields(searchword):
         {
             "match": {
                 "location.translations.sv-SE": searchword,
+            }
+        }
+    ]
+
+
+def __employer_fields(searchword):
+    return [
+        {
+            "match": {
+                "employer.name": searchword,
             }
         }
     ]

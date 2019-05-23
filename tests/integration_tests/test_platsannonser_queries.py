@@ -8,7 +8,7 @@ from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
 
-test_api_key = os.getenv('TEST_API_KEY_PLATSANNONSER')
+test_api_key = os.getenv('TEST_API_KEY')
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")

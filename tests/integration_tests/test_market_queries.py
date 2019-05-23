@@ -4,7 +4,7 @@ import pytest
 from pprint import pprint
 from market import app
 
-test_api_key = os.getenv('TEST_API_KEY_MARKET')
+test_api_key = os.getenv('TEST_API_KEY')
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")

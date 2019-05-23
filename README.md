@@ -79,7 +79,7 @@ ES_USER=<elastic username>
 ES_PWD=<elastic password>
 ES_HOST=<elastic host, utan protokoll och port>
 ES_PORT=9243
-TEST_API_KEY_PLATSANNONSER=<api key för integrationstestet mot AF-platsannonser>
+TEST_API_KEY=<api key>
 
     $ python3 -m pytest -svv -ra -m integration tests/
 

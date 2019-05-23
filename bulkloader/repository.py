@@ -1,9 +1,9 @@
 import logging
 import json
 import time
+import zipfile
 from datetime import date, timedelta
 from io import BytesIO
-from zipfile import ZipFile
 from elasticsearch.helpers import scan
 from sokannonser import settings
 from sokannonser.repository import elastic
@@ -65,7 +65,7 @@ def zip_ads(day, start_time=0):
     log.debug('zip_ads, dsl: %s' % dsl)
     scan_result = scan(elastic, dsl, index=settings.ES_INDEX)
     in_memory = BytesIO()
-    zf = ZipFile(in_memory, mode="w")
+    zf = zipfile.ZipFile(in_memory, "w", zipfile.ZIP_DEFLATED)
 
     ads = [remove_enriched_data(ad['_source']) for ad in scan_result]
     log.debug("Number of ads: %d" % len(ads))

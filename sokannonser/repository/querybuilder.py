@@ -294,11 +294,11 @@ class QueryBuilder(object):
     def __freetext_headline(self, query_dict, querystring):
         if 'must' not in query_dict['bool']:
             query_dict['bool']['must'] = []
-        if not query_dict.get('bool', {}).get('must'):
-            query_dict['bool']['must'] = [{'bool': {'should': []}}]
-
         musts = query_dict.get('bool', {}).get('must')
-        shoulds = musts[0].get('bool', {}).get('should', [])
+        if not musts:
+            shoulds = query_dict['bool']['should']
+        else:
+            shoulds = musts[0].get('bool', {}).get('should', [])
 
         shoulds.append(
             {

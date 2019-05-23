@@ -64,7 +64,30 @@ class Ontology(object):
                 }
             },
             "query": {
-                "match_all": {}
+                "bool": {
+                    "must": [],
+                    "filter": [
+                        {
+                            "range": {
+                                fields.PUBLICATION_DATE: {
+                                    "lte": "now/m"
+                                }
+                            }
+                        },
+                        {
+                            "range": {
+                                fields.LAST_PUBLICATION_DATE: {
+                                    "gte": "now/m"
+                                }
+                            }
+                        },
+                        {
+                            "term": {
+                                fields.REMOVED: False
+                            }
+                        },
+                    ],
+                }
             },
             "size": 0
         }

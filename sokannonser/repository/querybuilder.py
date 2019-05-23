@@ -205,6 +205,16 @@ class QueryBuilder(object):
                 query_dsl['query']['bool']['filter'].append(af)
         return query_dsl
 
+    def __rewrite_word_for_regex(self, word):
+        if '+' in word:
+            modded_term = ''
+            for c in word:
+                if c == '+':
+                    modded_term += '\\'
+                modded_term += c
+            return modded_term
+        return word
+
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
     def _build_freetext_query(self, querystring, queryfields):
         if not querystring:
@@ -227,6 +237,7 @@ class QueryBuilder(object):
                               reverse=True)
         # Remove found concepts from querystring
         for term in [concept['term'] for concept in all_concepts]:
+            term = self.__rewrite_word_for_regex(term)
             p = re.compile(f'(\\s*){term}(\\s*)')
             querystring = p.sub('\\1\\2', querystring).strip()
 

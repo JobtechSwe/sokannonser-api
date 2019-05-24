@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label 'jobtech-appdev'
+    }
     environment {
         scannerHome = tool 'Jobtech_Sokapi_SonarScanner'
         version = "1"
@@ -7,9 +9,13 @@ pipeline {
     }
     stages{
         stage('Checkout code'){
+            agent {
+                label 'alpinepython'
+            }
             steps{
                 checkout scm: [
-                    $class: 'GitSCM'
+                    $class: 'GitSCM',
+                    branches: [[name: '${GIT_BRANCH}']]
                 ]               
             }
         }
@@ -17,6 +23,31 @@ pipeline {
             steps {
                 withSonarQubeEnv('Jobtech_SonarQube_Server'){
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sokapi -Dsonar.sources=."
+                }
+            }
+        }
+        stage('Install dependencies'){
+            agent {
+                label 'alpinepython'
+            }
+            steps{
+                script{
+                    sh 'python3 -m pip install --user -r requirements.txt'
+                }
+            }
+        }
+        stage('Run integration tests'){
+            agent {
+                label 'alpinepython'
+            }
+            environment {
+                ES_USER='sokannonser-api'
+                ES_HOST='3d1803df463441cfb7759de0d6573943.eu-west-1.aws.found.io'
+                ES_PORT=9243
+            }
+            steps{
+                script{
+                    sh 'python3 -m pytest -svv -ra -m integration tests/'    
                 }
             }
         }

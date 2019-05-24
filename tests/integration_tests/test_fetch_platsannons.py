@@ -20,7 +20,7 @@ def test_fetch_ad_by_id():
         ad_id = found_ad.json.get("hits")[0].get("id")
         result = testclient.get('/ad/' + ad_id, headers=headers, data={})
         ad_result = result.json
-        pprint(ad_result)
+        # pprint(ad_result)
 
         assert 'id' in ad_result
         assert ad_result['id'] == ad_id

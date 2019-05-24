@@ -15,17 +15,7 @@ pipeline {
                 }
             }
         }
-        stage('Install dependencies'){
-            agent {
-                label 'alpinepython'
-            }
-            steps{
-                script{
-                    sh 'python3 -m pip install --user -r requirements.txt'
-                }
-            }
-        }
-        stage('Run integration tests'){
+        stage('Run Integrationtests'){
             agent {
                 label 'alpinepython'
             }
@@ -36,6 +26,7 @@ pipeline {
             }
             steps{
                 script{
+                    sh 'python3 -m pip install --user -r requirements.txt'
                     sh 'python3 -m pytest -svv -ra -m integration tests/'    
                 }
             }

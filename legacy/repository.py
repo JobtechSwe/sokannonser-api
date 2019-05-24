@@ -142,7 +142,6 @@ def _load_taxonomy(taxtype, key, value, jobad_field, zero_fill=0, label_string=N
     taxonomy_list = [{'id': hit['_source']['legacy_ams_taxonomy_num_id'],
                       'namn': hit['_source']['label']}
                      for hit in result.get('hits', {}).get('hits', [])]
-    print("TAXL", taxonomy_list)
 
     for entry in taxonomy_list:
         (a, p) = _get_total_hits(

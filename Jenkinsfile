@@ -8,24 +8,24 @@ pipeline {
         buildTag = "${version}.${BUILD_NUMBER}"
     }
     stages{
-        stage('Checkout code'){
-            agent {
-                label 'alpinepython'
-            }
-            steps{
-                checkout scm: [
-                    $class: 'GitSCM',
-                    branches: [[name: '${GIT_BRANCH}']]
-                ]               
-            }
-        }
-        stage('Code analysis'){
-            steps {
-                withSonarQubeEnv('Jobtech_SonarQube_Server'){
-                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sokapi -Dsonar.sources=."
-                }
-            }
-        }
+        // stage('Checkout code'){
+        //     agent {
+        //         label 'alpinepython'
+        //     }
+        //     steps{
+        //         checkout scm: [
+        //             $class: 'GitSCM',
+        //             branches: [[name: '${GIT_BRANCH}']]
+        //         ]               
+        //     }
+        // }
+        // stage('Code analysis'){
+        //     steps {
+        //         withSonarQubeEnv('Jobtech_SonarQube_Server'){
+        //         sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sokapi -Dsonar.sources=."
+        //         }
+        //     }
+        // }
         stage('Install dependencies'){
             agent {
                 label 'alpinepython'

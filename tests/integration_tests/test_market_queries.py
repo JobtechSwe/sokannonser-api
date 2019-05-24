@@ -25,7 +25,7 @@ def test_passed_deadline():
                                       'offset': 0,
                                       'limit': '100'})
         json_response = result.json
-        pprint(json_response)
+        # pprint(json_response)
         deadlines = [hit['application']['deadline'] for hit in json_response['hits']]
         dt_now = datetime.now()
 

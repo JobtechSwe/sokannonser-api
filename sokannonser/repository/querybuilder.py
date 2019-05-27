@@ -205,6 +205,16 @@ class QueryBuilder(object):
                 query_dsl['query']['bool']['filter'].append(af)
         return query_dsl
 
+    def __rewrite_word_for_regex(self, word):
+        if '+' in word:
+            modded_term = ''
+            for c in word:
+                if c == '+':
+                    modded_term += '\\'
+                modded_term += c
+            return modded_term
+        return word
+
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
     def _build_freetext_query(self, querystring, queryfields):
         if not querystring:
@@ -225,8 +235,10 @@ class QueryBuilder(object):
                               concepts['trait_must_not'],
                               key=lambda c: len(c),
                               reverse=True)
+        original_querystring = querystring
         # Remove found concepts from querystring
         for term in [concept['term'] for concept in all_concepts]:
+            term = self.__rewrite_word_for_regex(term)
             p = re.compile(f'(\\s*){term}(\\s*)')
             querystring = p.sub('\\1\\2', querystring).strip()
 
@@ -275,7 +287,30 @@ class QueryBuilder(object):
         self.__freetext_concepts(ft_query, concepts, querystring,
                                  queryfields, 'must')
 
+        # Add a headline query as well
+        ft_query = self.__freetext_headline(ft_query, original_querystring)
         return ft_query
+
+    def __freetext_headline(self, query_dict, querystring):
+        if 'must' not in query_dict['bool']:
+            query_dict['bool']['must'] = []
+        musts = query_dict.get('bool', {}).get('must')
+        if not musts:
+            shoulds = query_dict['bool']['should']
+        else:
+            shoulds = musts[0].get('bool', {}).get('should', [])
+
+        shoulds.append(
+            {
+                "match": {
+                    f.HEADLINE + ".words": {
+                        "query": querystring,
+                        "boost": 10
+                    }
+                }
+            }
+        )
+        return query_dict
 
     def __freetext_concepts(self, query_dict, concepts,
                             querystring, concept_keys, bool_type):
@@ -298,28 +333,7 @@ class QueryBuilder(object):
                         }
                     }
                 )
-                if bool_type in ['should', 'must_not'] and key in ['occupation', 'skill']:
-                    # Add a headline query as well
-                    # query_dict['bool'][bool_type].append(
-                    #     {
-                    #         "match": {
-                    #             f.HEADLINE: {
-                    #                 "query": value,
-                    #                 "boost": 1
-                    #             }
-                    #         }
-                    #     }
-                    # )
-                    query_dict['bool'][bool_type].append(
-                        {
-                            "match": {
-                                f.HEADLINE+".words": {
-                                    "query": querystring,
-                                    "boost": 10
-                                }
-                            }
-                        }
-                    )
+
         return query_dict
 
     def __freetext_fields(self, searchword):

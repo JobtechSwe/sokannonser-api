@@ -8,7 +8,7 @@ from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
 
-test_api_key = os.getenv('TEST_API_KEY_PLATSANNONSER')
+test_api_key = os.getenv('TEST_API_KEY')
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -23,7 +23,22 @@ def test_freetext_query_one_param():
                                                                   'limit': '1'})
         json_response = result.json
         # pprint(json_response)
-        hits_total = json_response['total']
+        hits_total = json_response['total']['value']
+        assert int(hits_total) > 0
+
+
+@pytest.mark.integration
+def test_freetext_query_with_special_characters():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        result = testclient.get('/search', headers=headers, data={'q': 'c++',
+                                                                  'limit': '1'})
+        json_response = result.json
+        # pprint(json_response)
+        hits_total = json_response['total']['value']
         assert int(hits_total) > 0
 
 
@@ -54,7 +69,7 @@ def test_total_hits():
                                                                   'limit': '10'})
         json_response = result.json
         # pprint(json_response)
-        hits_total = json_response['total']
+        hits_total = json_response['total']['value']
         assert int(hits_total) > 10000
 
 
@@ -108,7 +123,7 @@ def test_freetext_query_one_param_deleted_enriched():
                                                                   'limit': '10'})
         json_response = result.json
         # pprint(json_response)
-        hits_total = json_response['total']
+        hits_total = json_response['total']['value']
         assert int(hits_total) > 0
         hits = json_response['hits']
         assert len(hits) > 0
@@ -172,7 +187,7 @@ def test_freetext_query_two_params():
                                 data={'q': 'gymnasielärare lokförare', 'limit': '0'})
         json_response = result.json
         # pprint(json_response)
-        hits_total = json_response['total']
+        hits_total = json_response['total']['value']
         assert int(hits_total) > 0
 
 

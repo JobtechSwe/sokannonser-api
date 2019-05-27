@@ -34,7 +34,7 @@ def test_rewrite_unigram_competence():
     assert_not_empty(concepts, 'skill')
     assert_not_empty(concepts, 'trait')
     assert len(concepts) > 0
-    pprint(concepts)
+    # pprint(concepts)
     assert 'systemutvecklare' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'java' in [c['concept'].lower() for c in concepts['skill']]
     assert 'noggrann' in [c['concept'].lower() for c in concepts['trait']]
@@ -139,7 +139,7 @@ def test_rewrite_non_concept_words():
     assert_not_empty(concepts, 'occupation')
     assert_not_empty(concepts, 'skill')
     assert_not_empty(concepts, 'trait')
-    print(concepts)
+    # print(concepts)
     assert 'key account manager' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'försäljning' in [c['concept'].lower() for c in concepts['skill']]
     assert 'flexibel' in [c['concept'].lower() for c in concepts['trait']]
@@ -158,7 +158,7 @@ def test_rewrite_must_words():
     assert_not_empty(concepts, 'trait_must')
     assert_not_empty(concepts, 'trait_must_not')
 
-    print(concepts)
+    # print(concepts)
 
     assert 'säljare' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'målare' in [c['concept'].lower() for c in concepts['occupation_must']]
@@ -182,7 +182,7 @@ def test_rewrite_must_not_words():
     assert_not_empty(concepts, 'trait')
     assert_not_empty(concepts, 'trait_must_not')
 
-    print(concepts)
+    # print(concepts)
 
     assert 'säljare' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'målare' in [c['concept'].lower() for c in concepts['occupation_must_not']]

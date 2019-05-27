@@ -4,7 +4,7 @@ import pytest
 from pprint import pprint
 from market import app
 
-test_api_key = os.getenv('TEST_API_KEY_MARKET')
+test_api_key = os.getenv('TEST_API_KEY')
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -25,7 +25,7 @@ def test_passed_deadline():
                                       'offset': 0,
                                       'limit': '100'})
         json_response = result.json
-        pprint(json_response)
+        # pprint(json_response)
         deadlines = [hit['application']['deadline'] for hit in json_response['hits']]
         dt_now = datetime.now()
 

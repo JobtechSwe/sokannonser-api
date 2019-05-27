@@ -130,7 +130,7 @@ pb_query.add_argument(settings.SORT, choices=list(fields.sort_options.keys()))
 pb_query.add_argument(settings.STATISTICS, action='append',
                       choices=[taxonomy.OCCUPATION, taxonomy.GROUP,
                                taxonomy.FIELD])
-pb_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 20), required=False)
+pb_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 30), required=False)
 
 taxonomy_query = reqparse.RequestParser()
 taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)

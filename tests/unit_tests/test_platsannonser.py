@@ -158,13 +158,21 @@ def test_geo_distance_filter(args, exist, expected):
                                                  {"term": {"workplace_address.region_code":
                                                            {"value": "01", "boost": 1.0}}},
                                                  {"term": {"workplace_address.region_code":
-                                                           {"value": "02", "boost": 1.0}}}],
+                                                           {"value": "02", "boost": 1.0}}},
+                                                 {"term": {"workplace_address.region_concept_id":
+                                                           {"value": "01", "boost": 1.0}}},
+                                                 {"term": {"workplace_address.region_concept_id":
+                                                           {"value": "02", "boost": 1.0}}}
+                                                               ],
                                                                []),
                                             ({settings.APIKEY: "",
                                               taxonomy.MUNICIPALITY: ["0111"]},
                                              [
                                                  {"term": {"workplace_address.municipality_code":
-                                                           {"value": "0111", "boost": 2.0}}}],
+                                                           {"value": "0111", "boost": 2.0}}},
+                                                 {"term": {"workplace_address.municipality_concept_id":
+                                                           {"value": "0111", "boost": 2.0}}}
+                                             ],
                                              []),
                                             ({settings.APIKEY: "",
                                               taxonomy.REGION: ["01", "02"],
@@ -174,10 +182,19 @@ def test_geo_distance_filter(args, exist, expected):
                                                            {"value": "01", "boost": 1.0}}},
                                                  {"term": {"workplace_address.region_code":
                                                            {"value": "02", "boost": 1.0}}},
+                                                 {"term": {"workplace_address.region_concept_id":
+                                                           {"value": "01", "boost": 1.0}}},
+                                                 {"term": {"workplace_address.region_concept_id":
+                                                           {"value": "02", "boost": 1.0}}},
                                                  {"term": {"workplace_address.municipality_code":
                                                            {"value": "1111", "boost": 2.0}}},
                                                  {"term": {"workplace_address.municipality_code":
-                                                           {"value": "2222", "boost": 2.0}}}],
+                                                           {"value": "2222", "boost": 2.0}}},
+                                                 {"term": {"workplace_address.municipality_concept_id":
+                                                           {"value": "1111", "boost": 2.0}}},
+                                                 {"term": {"workplace_address.municipality_concept_id":
+                                                           {"value": "2222", "boost": 2.0}}}
+                                             ],
                                              []),
                                             ({settings.APIKEY: "",
                                               taxonomy.REGION: ["01", "-02"],
@@ -187,11 +204,19 @@ def test_geo_distance_filter(args, exist, expected):
                                                            {"value": "01", "boost": 1.0}}},
                                                  {"term": {"workplace_address.municipality_code":
                                                            {"value": "1111", "boost": 2.0}}},
+                                                 {"term": {"workplace_address.region_code":
+                                                           {"value": "01", "boost": 1.0}}},
+                                                 {"term": {"workplace_address.municipality_code":
+                                                           {"value": "1111", "boost": 2.0}}}
                                              ],
                                              [
                                                  {"term": {"workplace_address.region_code":
                                                            {"value": "02"}}},
                                                  {"term": {"workplace_address.municipality_code":
+                                                           {"value": "2222"}}},
+                                                 {"term": {"workplace_address.region_concept_id":
+                                                           {"value": "02"}}},
+                                                 {"term": {"workplace_address.municipality_concept_id":
                                                            {"value": "2222"}}}
                                              ]),
                                             ({settings.APIKEY: "",
@@ -202,9 +227,15 @@ def test_geo_distance_filter(args, exist, expected):
                                                            {"value": "01", "boost": 1.0}}},
                                                  {"term": {"workplace_address.municipality_code":
                                                            {"value": "1111", "boost": 2.0}}},
+                                                 {"term": {"workplace_address.region_concept_id":
+                                                           {"value": "01", "boost": 1.0}}},
+                                                 {"term": {"workplace_address.municipality_concept_id":
+                                                           {"value": "1111", "boost": 2.0}}},
                                              ],
                                              [
                                                  {"term": {"workplace_address.region_code":
+                                                           {"value": "02"}}},
+                                                 {"term": {"workplace_address.region_concept_id":
                                                            {"value": "02"}}}
                                              ]),
                                             ({settings.APIKEY: "",
@@ -215,9 +246,15 @@ def test_geo_distance_filter(args, exist, expected):
                                                            {"value": "01", "boost": 1.0}}},
                                                  {"term": {"workplace_address.municipality_code":
                                                            {"value": "1111", "boost": 2.0}}},
+                                                 {"term": {"workplace_address.region_concept_id":
+                                                           {"value": "01", "boost": 1.0}}},
+                                                 {"term": {"workplace_address.municipality_concept_id":
+                                                           {"value": "1111", "boost": 2.0}}},
                                              ],
                                              [
                                                  {"term": {"workplace_address.municipality_code":
+                                                           {"value": "2222"}}},
+                                                 {"term": {"workplace_address.municipality_concept_id":
                                                            {"value": "2222"}}}
                                              ])])
 def test_region_municipality_query(args, expected_pos, expected_neg):

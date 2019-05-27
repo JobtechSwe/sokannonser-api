@@ -465,7 +465,7 @@ class QueryBuilder(object):
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_MUNICIPALITY_CONCEPT_ID: {
-                "value": kkod, "boost": 1.0}}} for kkod in kommuner]
+                "value": kkod, "boost": 2.0}}} for kkod in kommuner]
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_REGION_CODE: {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]

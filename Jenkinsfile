@@ -19,11 +19,6 @@ pipeline {
             agent {
                 label 'alpinepython'
             }
-            environment {
-                ES_USER='sokannonser-api'
-                ES_HOST='3d1803df463441cfb7759de0d6573943.eu-west-1.aws.found.io'
-                ES_PORT=9243
-            }
             steps{
                 script{
                     sh 'python3 -m pip install --user -r requirements.txt'

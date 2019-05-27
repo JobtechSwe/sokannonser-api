@@ -464,7 +464,13 @@ class QueryBuilder(object):
             f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
         plats_term_query += [{"term": {
+            f.WORKPLACE_ADDRESS_MUNICIPALITY_CONCEPT_ID: {
+                "value": kkod, "boost": 1.0}}} for kkod in kommuner]
+        plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_REGION_CODE: {
+                "value": lkod, "boost": 1.0}}} for lkod in lan]
+        plats_term_query += [{"term": {
+            f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID: {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]
         plats_bool_query = {"bool": {
             "should": plats_term_query}
@@ -475,9 +481,15 @@ class QueryBuilder(object):
             neg_komm_term_query = [{"term": {
                 f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
                     "value": kkod}}} for kkod in neg_komm]
+            neg_komm_term_query += [{"term": {
+                f.WORKPLACE_ADDRESS_MUNICIPALITY_CONCEPT_ID: {
+                    "value": kkod}}} for kkod in neg_komm]
         if neg_lan:
             neg_lan_term_query = [{"term": {
                 f.WORKPLACE_ADDRESS_REGION_CODE: {
+                    "value": lkod}}} for lkod in neg_lan]
+            neg_lan_term_query += [{"term": {
+                f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID: {
                     "value": lkod}}} for lkod in neg_lan]
         if neg_komm_term_query or neg_lan_term_query:
             if 'bool' not in plats_bool_query:
@@ -490,20 +502,28 @@ class QueryBuilder(object):
     def _build_country_query(self, landskoder):
         lander = []
         neg_land = []
+        country_term_query = []
+        neg_country_term_query = []
         for lkod in landskoder if landskoder else []:
             if lkod.startswith('-'):
                 neg_land.append(lkod[1:])
             else:
                 lander.append(lkod)
-        county_term_query = [{"term": {
+        country_term_query = [{"term": {
             f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
                 "value": lkod, "boost": 1.0}}} for lkod in lander]
+        country_term_query += [{"term": {
+            f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+                "value": lkod, "boost": 1.0}}} for lkod in lander]
         country_bool_query = {"bool": {
-            "should": county_term_query}
-        } if county_term_query else {}
+            "should": country_term_query}
+        } if country_term_query else {}
         if neg_land:
             neg_country_term_query = [{"term": {
                 f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
+                    "value": lkod}}} for lkod in neg_land]
+            neg_country_term_query += [{"term": {
+                f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
                     "value": lkod}}} for lkod in neg_land]
             if 'bool' not in country_bool_query:
                 country_bool_query['bool'] = {}

@@ -79,7 +79,7 @@ def test_rewrite_unigram_misspelled_input():
     concepts = text_to_concept.text_to_concepts('noggran sjukssköterska java')
     assert_not_empty(concepts, 'occupation')
     assert_not_empty(concepts, 'trait')
-    pprint(concepts)
+    # pprint(concepts)
     assert 'sjuksköterska' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'noggrann' in [c['concept'].lower() for c in concepts['trait']]
 

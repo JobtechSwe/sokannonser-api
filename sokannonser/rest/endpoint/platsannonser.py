@@ -32,7 +32,7 @@ class Proxy(Resource):
 
 @ns_platsannons.route('search')
 class PBSearch(Resource):
-    # method_decorators = [check_api_key('pb')]
+    method_decorators = [check_api_key('pb')]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(

@@ -109,8 +109,13 @@ def fetch_platsannons(ad_id):
             source = query_result['_source']
             keyword_node = source['keywords']
             try:
+                # Remove enriched
                 del keyword_node['enriched']
-            except KeyError:
+                # Remove personal number
+                org_nr = source['employer']['organization_number']
+                if org_nr and int(org_nr[2]) < 2:
+                    source['employer']['organization_number'] = None
+            except KeyError | ValueError:
                 pass
             return source
         else:

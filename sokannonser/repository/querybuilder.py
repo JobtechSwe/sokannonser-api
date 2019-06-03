@@ -226,13 +226,10 @@ class QueryBuilder(object):
         # Sort all concepts by string length
         all_concepts = sorted(concepts['occupation'] +
                               concepts['skill'] +
-                              concepts['trait'] +
                               concepts['occupation_must'] +
                               concepts['skill_must'] +
-                              concepts['trait_must'] +
                               concepts['occupation_must_not'] +
-                              concepts['skill_must_not'] +
-                              concepts['trait_must_not'],
+                              concepts['skill_must_not'],
                               key=lambda c: len(c),
                               reverse=True)
         original_querystring = querystring
@@ -294,18 +291,21 @@ class QueryBuilder(object):
     def __freetext_headline(self, query_dict, querystring):
         if 'must' not in query_dict['bool']:
             query_dict['bool']['must'] = []
-        musts = query_dict.get('bool', {}).get('must')
+        musts = query_dict['bool']['must']
         if not musts:
+            if 'should' not in query_dict['bool']:
+                query_dict['bool']['should'] = []
             shoulds = query_dict['bool']['should']
         else:
-            shoulds = musts[0].get('bool', {}).get('should', [])
+            shoulds = musts[0]['bool']['should']
 
         shoulds.append(
             {
                 "match": {
                     f.HEADLINE + ".words": {
                         "query": querystring,
-                        "boost": 10
+                        "operator": "and",
+                        "boost": 5
                     }
                 }
             }

@@ -115,7 +115,9 @@ def fetch_platsannons(ad_id):
                 org_nr = source['employer']['organization_number']
                 if org_nr and int(org_nr[2]) < 2:
                     source['employer']['organization_number'] = None
-            except KeyError | ValueError:
+            except KeyError:
+                pass
+            except ValueError:
                 pass
             return source
         else:
@@ -207,5 +209,7 @@ def delete_sensitive_values(results):
             org_nr = hit['_source']['employer']['organization_number']
             if org_nr and int(org_nr[2]) < 2:
                 hit['_source']['employer']['organization_number'] = None
-        except KeyError | ValueError:
+        except KeyError:
+            pass
+        except ValueError:
             pass

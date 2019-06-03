@@ -1,5 +1,6 @@
 import logging
 import re
+import json
 from sokannonser import settings
 from sokannonser.repository import ttc, taxonomy
 from sokannonser.rest.model import queries
@@ -226,10 +227,13 @@ class QueryBuilder(object):
         # Sort all concepts by string length
         all_concepts = sorted(concepts['occupation'] +
                               concepts['skill'] +
+                              concepts['location'] +
                               concepts['occupation_must'] +
                               concepts['skill_must'] +
+                              concepts['location_must'] +
                               concepts['occupation_must_not'] +
-                              concepts['skill_must_not'],
+                              concepts['skill_must_not'] +
+                              concepts['location_must_not'],
                               key=lambda c: len(c),
                               reverse=True)
         original_querystring = querystring
@@ -266,7 +270,7 @@ class QueryBuilder(object):
         for qf in queryfields:
             if qf in concepts:
                 must_key = "%s_must" % qf
-                concepts[qf] += [c['concept'].lower() for c in concepts.get(must_key, [])]
+                concepts[qf] += [c for c in concepts.get(must_key, [])]
         # Add concepts to query
         for concept_type in queryfields:
             sub_should = self.__freetext_concepts({"bool": {}}, concepts,
@@ -297,7 +301,11 @@ class QueryBuilder(object):
                 query_dict['bool']['should'] = []
             shoulds = query_dict['bool']['should']
         else:
-            shoulds = musts[0]['bool']['should']
+            if 'bool' not in musts[0]:
+                musts.append({'bool': {'should': []}})
+                shoulds = musts[-1]['bool']['should']
+            else:
+                shoulds = musts[0]['bool']['should']
 
         shoulds.append(
             {
@@ -316,7 +324,7 @@ class QueryBuilder(object):
                             querystring, concept_keys, bool_type):
         for key in concept_keys:
             dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
-            for value in [c['concept'].lower() for c in concepts.get(dict_key, [])]:
+            for value in [c['concept'].lower() for c in concepts.get(dict_key, []) if c]:
                 if bool_type not in query_dict['bool']:
                     query_dict['bool'][bool_type] = []
 

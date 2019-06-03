@@ -71,6 +71,7 @@ def get_stats_for(taxonomy_type):
 def find_platsannonser(args, querybuilder, start_time=0):
     if start_time == 0:
         start_time = int(time.time() * 1000)
+    print(args)
     query_dsl = querybuilder.parse_args(args)
     log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
     log.debug("Query constructed after %d milliseconds."

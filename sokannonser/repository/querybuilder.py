@@ -186,7 +186,7 @@ class QueryBuilder(object):
                     "terms": {
                         "field": "%s.%s.raw" % (base_field, field),
                         "size": size,
-                        "include": "%s.*" % complete
+                        "include": "%s.*" % complete.lower()
                     }
                 }
 

@@ -21,10 +21,11 @@ def get_static_ads_from_file():
 
         return result
 
+
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_properties_and_types_marshal_mocked_elastic_result():
-    print('============================', sys._getframe().f_code.co_name, '============================ ')
+    print('==================', sys._getframe().f_code.co_name, '================== ')
 
     esresult = get_static_ads_from_file()
     # pprint(esresult)
@@ -45,7 +46,8 @@ def test_properties_and_types_marshal_mocked_elastic_result():
     # pprint(results)
 
     assert_has_properties(results,
-                          ['hits', 'positions', 'query_time_in_millis', 'result_time_in_millis', 'stats', 'total'])
+                          ['hits', 'positions', 'query_time_in_millis',
+                           'result_time_in_millis', 'stats', 'total'])
 
     results_hits = results['hits']
     assert_is_type(results_hits, list)
@@ -63,37 +65,43 @@ def test_properties_and_types_marshal_mocked_elastic_result():
     assert test_hit is not None
 
     assert_is_type(test_hit, dict)
-    assert_has_properties(test_hit, ['application_details', 'employment_type', 'number_of_vacancies',
+    assert_has_properties(test_hit, ['application_details', 'employment_type',
+                                     'number_of_vacancies',
                                      'employer', 'scope_of_work', 'workplace_id',
-                                     'workplace_address', 'working_hours_type', 'description',
+                                     'workplace_address', 'working_hours_type',
+                                     'description',
                                      'access_to_own_car', 'experience_required', 'id',
                                      'source_type', 'keywords',
                                      'driving_license_required', 'must_have',
                                      'salary_type', 'nice_to_have', 'publication_date',
                                      'headline', 'application_deadline',
                                      'access', 'duration',
-                                     'occupation_group', 'occupation_field', 'occupation'])
+                                     'occupation_group', 'occupation_field',
+                                     'occupation'])
 
     assert_is_type(test_hit['application_details'], dict)
     assert_has_properties(test_hit['application_details'],
                           ['information', 'reference', 'email', 'via_af', 'url', 'other'])
 
     assert_is_type(test_hit['employment_type'], dict)
-    assert_has_properties(test_hit['employment_type'], ['concept_id', 'label', 'legacy_ams_taxonomy_id'])
+    assert_has_properties(test_hit['employment_type'], ['concept_id', 'label',
+                                                        'legacy_ams_taxonomy_id'])
 
     assert_is_type(test_hit['number_of_vacancies'], int)
 
     assert_is_type(test_hit['employer'], dict)
     assert_has_properties(test_hit['employer'],
-                          ['id', 'phone_number', 'email', 'url', 'organization_number', 'name', 'workplace'])
+                          ['id', 'phone_number', 'email', 'url', 'organization_number',
+                           'name', 'workplace'])
 
     assert_is_type(test_hit['scope_of_work'], dict)
     assert_has_properties(test_hit['scope_of_work'], ['min', 'max'])
 
+
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_values_marshal_mocked_elastic_result():
-    print('============================', sys._getframe().f_code.co_name, '============================ ')
+    print('==================', sys._getframe().f_code.co_name, '================== ')
 
     esresult = get_static_ads_from_file()
     # pprint(esresult)
@@ -174,7 +182,6 @@ def test_values_marshal_mocked_elastic_result():
     assert_has_str_value(arbetsplatsadress['postcode'])
     assert_has_str_value(arbetsplatsadress['city'])
 
-
     assert_has_taxonomy_values(test_hit['working_hours_type'])
     assert_has_taxonomy_values(test_hit['employment_type'])
     assert_has_taxonomy_values(test_hit['salary_type'])
@@ -183,15 +190,12 @@ def test_values_marshal_mocked_elastic_result():
     assert_has_taxonomy_values(test_hit['occupation_group'])
     assert_has_taxonomy_values(test_hit['occupation_field'])
 
-
     beskrivning = test_hit['description']
     assert_has_str_value(beskrivning['text'])
     assert_has_str_value(beskrivning['needs'])
     assert_has_str_value(beskrivning['company_information'])
     assert_has_str_value(beskrivning['requirements'])
     assert_has_str_value(beskrivning['conditions'])
-
-
 
     assert_has_int_value(int(test_hit['id']), 23174210)
 
@@ -243,7 +247,6 @@ def assert_has_taxonomy_list_values(listitems):
 
 
 def assert_is_type(value_to_check, wanted_type):
-    # print('value: %s, type: %s, wanted_type: %s' % (value_to_check, type(value_to_check), wanted_type))
     assert wanted_type == type(value_to_check)
 
 

@@ -50,6 +50,11 @@ def get_stats_for(taxonomy_type):
                             }
                         }
                     },
+                    {
+                        'term': {
+                            fields.REMOVED: False
+                        }
+                    },
                 ]
             }
         },
@@ -109,8 +114,15 @@ def fetch_platsannons(ad_id):
             source = query_result['_source']
             keyword_node = source['keywords']
             try:
+                # Remove enriched
                 del keyword_node['enriched']
+                # Remove personal number
+                org_nr = source['employer']['organization_number']
+                if org_nr and int(org_nr[2]) < 2:
+                    source['employer']['organization_number'] = None
             except KeyError:
+                pass
+            except ValueError:
                 pass
             return source
         else:
@@ -153,7 +165,7 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
             })
 
     create_found_in_enriched(results, query_result)
-    delete_ml_enriched_values(results)
+    delete_sensitive_values(results)
 
     # log.debug(json.dumps(results, indent=2))
     return results
@@ -192,10 +204,17 @@ def create_found_in_enriched(results, query_result):
         hit['_source']['found_in_enriched'] = found_in_enriched
 
 
-def delete_ml_enriched_values(results):
+def delete_sensitive_values(results):
     for hit in results['hits']:
         try:
+            # Remove enriched
             keyword_node = hit['_source']['keywords']
             del keyword_node['enriched']
+            # Remove personal number
+            org_nr = hit['_source']['employer']['organization_number']
+            if org_nr and int(org_nr[2]) < 2:
+                hit['_source']['employer']['organization_number'] = None
         except KeyError:
+            pass
+        except ValueError:
             pass

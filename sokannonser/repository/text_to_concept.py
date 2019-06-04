@@ -17,14 +17,15 @@ class TextToConcept(object):
     COMPETENCE_KEY = 'KOMPETENS'
     OCCUPATION_KEY = 'YRKE'
     TRAIT_KEY = 'FORMAGA'
-    LOCATION_KEY='PLATS'
+    LOCATION_KEY = 'PLATS'
     REMOVED_TAG = '<removed>'
 
     def __init__(self, ontologyhost='localhost', ontologyport=9200,
                  ontologyindex='narvalontology', ontologyuser=None, ontologypwd=None):
         log.info('Creating TextToConcept')
 
-        self.client = self.create_elastic_client(ontologyhost, ontologyport, ontologyuser, ontologypwd)
+        self.client = self.create_elastic_client(ontologyhost, ontologyport, ontologyuser,
+                                                 ontologypwd)
         self.ontologyindex = ontologyindex
 
         self.ontology = None

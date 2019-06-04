@@ -50,6 +50,11 @@ def get_stats_for(taxonomy_type):
                             }
                         }
                     },
+                    {
+                        'term': {
+                            fields.REMOVED: False
+                        }
+                    },
                 ]
             }
         },

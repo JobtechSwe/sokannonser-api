@@ -353,7 +353,7 @@ def test_driving_license():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        query = {taxonomy.DRIVING_LICENCE: 'VTK8_WRx_GcM', "limit": 100}
+        query = {taxonomy.DRIVING_LICENCE: ['VTK8_WRx_GcM'], "limit": 100}
         result = testclient.get('/search', headers=headers, data=query)
         json_response = result.json
         hits = json_response['hits']

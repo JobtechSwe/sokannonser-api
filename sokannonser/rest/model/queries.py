@@ -134,8 +134,10 @@ pb_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 30), required=
 
 taxonomy_query = reqparse.RequestParser()
 taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)
-taxonomy_query.add_argument(settings.OFFSET, type=int, default=0)
-taxonomy_query.add_argument(settings.LIMIT, type=int, default=10)
+taxonomy_query.add_argument(settings.OFFSET, type=inputs.int_range(0, settings.MAX_OFFSET),
+                            default=0)
+taxonomy_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_LIMIT),
+                            default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)
 taxonomy_query.add_argument('type', action='append',
                             choices=VF_TYPE_CHOICES),

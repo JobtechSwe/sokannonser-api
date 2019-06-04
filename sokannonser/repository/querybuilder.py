@@ -1,5 +1,6 @@
 import logging
 import re
+import json
 from sokannonser import settings
 from sokannonser.repository import ttc, taxonomy
 from sokannonser.rest.model import queries
@@ -186,7 +187,7 @@ class QueryBuilder(object):
                     "terms": {
                         "field": "%s.%s.raw" % (base_field, field),
                         "size": size,
-                        "include": "%s.*" % complete
+                        "include": "%s.*" % complete.lower()
                     }
                 }
 
@@ -226,13 +227,13 @@ class QueryBuilder(object):
         # Sort all concepts by string length
         all_concepts = sorted(concepts['occupation'] +
                               concepts['skill'] +
-                              concepts['trait'] +
+                              concepts['location'] +
                               concepts['occupation_must'] +
                               concepts['skill_must'] +
-                              concepts['trait_must'] +
+                              concepts['location_must'] +
                               concepts['occupation_must_not'] +
                               concepts['skill_must_not'] +
-                              concepts['trait_must_not'],
+                              concepts['location_must_not'],
                               key=lambda c: len(c),
                               reverse=True)
         original_querystring = querystring
@@ -269,7 +270,7 @@ class QueryBuilder(object):
         for qf in queryfields:
             if qf in concepts:
                 must_key = "%s_must" % qf
-                concepts[qf] += [c['concept'].lower() for c in concepts.get(must_key, [])]
+                concepts[qf] += [c for c in concepts.get(must_key, [])]
         # Add concepts to query
         for concept_type in queryfields:
             sub_should = self.__freetext_concepts({"bool": {}}, concepts,
@@ -294,18 +295,25 @@ class QueryBuilder(object):
     def __freetext_headline(self, query_dict, querystring):
         if 'must' not in query_dict['bool']:
             query_dict['bool']['must'] = []
-        musts = query_dict.get('bool', {}).get('must')
+        musts = query_dict['bool']['must']
         if not musts:
+            if 'should' not in query_dict['bool']:
+                query_dict['bool']['should'] = []
             shoulds = query_dict['bool']['should']
         else:
-            shoulds = musts[0].get('bool', {}).get('should', [])
+            if 'bool' not in musts[0]:
+                musts.append({'bool': {'should': []}})
+                shoulds = musts[-1]['bool']['should']
+            else:
+                shoulds = musts[0]['bool']['should']
 
         shoulds.append(
             {
                 "match": {
                     f.HEADLINE + ".words": {
                         "query": querystring,
-                        "boost": 10
+                        "operator": "and",
+                        "boost": 5
                     }
                 }
             }
@@ -316,7 +324,7 @@ class QueryBuilder(object):
                             querystring, concept_keys, bool_type):
         for key in concept_keys:
             dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
-            for value in [c['concept'].lower() for c in concepts.get(dict_key, [])]:
+            for value in [c['concept'].lower() for c in concepts.get(dict_key, []) if c]:
                 if bool_type not in query_dict['bool']:
                     query_dict['bool'][bool_type] = []
 
@@ -464,7 +472,13 @@ class QueryBuilder(object):
             f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
         plats_term_query += [{"term": {
+            f.WORKPLACE_ADDRESS_MUNICIPALITY_CONCEPT_ID: {
+                "value": kkod, "boost": 2.0}}} for kkod in kommuner]
+        plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_REGION_CODE: {
+                "value": lkod, "boost": 1.0}}} for lkod in lan]
+        plats_term_query += [{"term": {
+            f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID: {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]
         plats_bool_query = {"bool": {
             "should": plats_term_query}
@@ -475,9 +489,15 @@ class QueryBuilder(object):
             neg_komm_term_query = [{"term": {
                 f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
                     "value": kkod}}} for kkod in neg_komm]
+            neg_komm_term_query += [{"term": {
+                f.WORKPLACE_ADDRESS_MUNICIPALITY_CONCEPT_ID: {
+                    "value": kkod}}} for kkod in neg_komm]
         if neg_lan:
             neg_lan_term_query = [{"term": {
                 f.WORKPLACE_ADDRESS_REGION_CODE: {
+                    "value": lkod}}} for lkod in neg_lan]
+            neg_lan_term_query += [{"term": {
+                f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID: {
                     "value": lkod}}} for lkod in neg_lan]
         if neg_komm_term_query or neg_lan_term_query:
             if 'bool' not in plats_bool_query:
@@ -490,20 +510,28 @@ class QueryBuilder(object):
     def _build_country_query(self, landskoder):
         lander = []
         neg_land = []
+        country_term_query = []
+        neg_country_term_query = []
         for lkod in landskoder if landskoder else []:
             if lkod.startswith('-'):
                 neg_land.append(lkod[1:])
             else:
                 lander.append(lkod)
-        county_term_query = [{"term": {
+        country_term_query = [{"term": {
             f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
                 "value": lkod, "boost": 1.0}}} for lkod in lander]
+        country_term_query += [{"term": {
+            f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+                "value": lkod, "boost": 1.0}}} for lkod in lander]
         country_bool_query = {"bool": {
-            "should": county_term_query}
-        } if county_term_query else {}
+            "should": country_term_query}
+        } if country_term_query else {}
         if neg_land:
             neg_country_term_query = [{"term": {
                 f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
+                    "value": lkod}}} for lkod in neg_land]
+            neg_country_term_query += [{"term": {
+                f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
                     "value": lkod}}} for lkod in neg_land]
             if 'bool' not in country_bool_query:
                 country_bool_query['bool'] = {}

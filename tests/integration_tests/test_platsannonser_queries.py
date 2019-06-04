@@ -356,7 +356,6 @@ def test_driving_license():
         query = {taxonomy.DRIVING_LICENCE: ['VTK8_WRx_GcM'], "limit": 100}
         result = testclient.get('/search', headers=headers, data=query)
         json_response = result.json
-        print("RESPONSE", json_response)
         hits = json_response['hits']
         including_max = False
         including_min = False

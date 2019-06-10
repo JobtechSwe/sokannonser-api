@@ -16,7 +16,7 @@ RUN apk update && \
 
 ARG flask_app=sokannonser
 ENV flask_app=$flask_app \
-    TZ=Europe/Paris
+    TZ=Europe/Stockholm
 
 COPY . /app
 

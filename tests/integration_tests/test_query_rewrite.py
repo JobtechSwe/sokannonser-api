@@ -71,6 +71,19 @@ def test_rewrite_jobtitle_with_hyphen():
     assert 'hr-specialist' in [c['concept'].lower() for c in concepts['occupation']]
 
 
+
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_rewrite_competence_special_characters():
+    print('\n==================', sys._getframe().f_code.co_name, '==================')
+
+    concepts = text_to_concept.text_to_concepts('java c++')
+    pprint(concepts)
+    assert_not_empty(concepts, 'skill')
+    assert 'java' in [c['concept'].lower() for c in concepts['skill']]
+    assert 'c++' in [c['concept'].lower() for c in concepts['skill']]
+
+
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_rewrite_unigram_misspelled_input():

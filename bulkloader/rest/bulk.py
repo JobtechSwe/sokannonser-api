@@ -43,7 +43,8 @@ class BulkLoad(Resource):
 
     @ns_bulk.doc(
         params={
-            settings.DATE: "Stream ads updated since datetime"
+            settings.DATE: "Stream ads updated since datetime. Accepts datetime as YYYY-MM-DDTHH:MM:SS, "
+            "for example 2019-06-11T10:00:00"
         },
         responses={
             200: 'OK',

@@ -27,6 +27,7 @@ def test_freetext_query_one_param():
         assert int(hits_total) > 0
 
 
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_with_special_characters():
     print('==================', sys._getframe().f_code.co_name, '================== ')

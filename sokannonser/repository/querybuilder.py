@@ -1,6 +1,5 @@
 import logging
 import re
-import json
 from sokannonser import settings
 from sokannonser.repository import ttc, taxonomy
 from sokannonser.rest.model import queries
@@ -293,6 +292,10 @@ class QueryBuilder(object):
         return ft_query
 
     def __freetext_headline(self, query_dict, querystring):
+        # Remove plus and minus from querystring for headline search
+        querystring = re.sub(r'(^| )[\\+]{1}', ' ', querystring)
+        querystring = ' '.join([word for word in querystring.split(' ')
+                                if not word.startswith('-')])
         if 'must' not in query_dict['bool']:
             query_dict['bool']['must'] = []
         musts = query_dict['bool']['must']
@@ -311,7 +314,7 @@ class QueryBuilder(object):
             {
                 "match": {
                     f.HEADLINE + ".words": {
-                        "query": querystring,
+                        "query": querystring.strip(),
                         "operator": "and",
                         "boost": 5
                     }

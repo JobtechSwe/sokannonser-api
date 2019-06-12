@@ -89,7 +89,7 @@ def test_deprecated_ads_should_not_be_in_result():
             json_response = result.json
             # # pprint(json_response)
             hits = json_response['hits']
-            assert len(hits) = 100
+            assert len(hits) == 100
             for hit in hits:
                 assert hit['removed'] is False
 

@@ -177,7 +177,7 @@ class QueryBuilder(object):
         complete_string = args.get(settings.TYPEAHEAD_QUERY)
         complete_fields = args.get(settings.FREETEXT_FIELDS) or queries.QF_CHOICES
         if complete_string:
-            complete = complete_string.split(' ')[-1]
+            complete = self._rewrite_word_for_regex(complete_string.split(' ')[-1])
             size = 12/len(complete_fields)
             for field in complete_fields:
                 dkey = "complete_%s" % field
@@ -206,15 +206,55 @@ class QueryBuilder(object):
                 query_dsl['query']['bool']['filter'].append(af)
         return query_dsl
 
-    def __rewrite_word_for_regex(self, word):
-        if '+' in word:
+    def _rewrite_word_for_regex(self, word):
+        bad_chars = ['+', '.', '[', ']', '{', '}', '(', ')', '^', '$',
+                     '*', '\\', '|', '?']
+        if any(c in bad_chars for c in word):
             modded_term = ''
             for c in word:
-                if c == '+':
+                if c in bad_chars:
                     modded_term += '\\'
                 modded_term += c
             return modded_term
         return word
+
+    # Parses FREETEXT_QUERY and FREETEXT_FIELDS
+    def _build_freetext_query(self, querystring, queryfields):
+        if not querystring:
+            return None
+        if not queryfields:
+            queryfields = queries.QF_CHOICES
+
+        original_querystring = querystring
+        concepts = ttc.text_to_concepts(querystring)
+        querystring = self.__rewrite_querystring(querystring, concepts)
+        ft_query = self.__create_base_ft_query(querystring)
+
+        # Make all "musts" concepts "shoulds" as well
+        for qf in queryfields:
+            if qf in concepts:
+                must_key = "%s_must" % qf
+                concepts[qf] += [c for c in concepts.get(must_key, [])]
+        # Add concepts to query
+        for concept_type in queryfields:
+            sub_should = self.__freetext_concepts({"bool": {}}, concepts,
+                                                  querystring, [concept_type], "should")
+            if 'should' in sub_should['bool']:
+                if 'must' not in ft_query['bool']:
+                    ft_query['bool']['must'] = []
+                ft_query['bool']['must'].append(sub_should)
+        # Remove unwanted concepts from query
+        self.__freetext_concepts(ft_query, concepts, querystring,
+                                 queryfields, 'must_not')
+
+        # Add required concepts to query
+        self.__freetext_concepts(ft_query, concepts, querystring,
+                                 queryfields, 'must')
+
+        # Add a headline query as well
+        ft_query = self.__freetext_headline(ft_query, original_querystring)
+        log.debug("Freetext query dict: %s" % json.dumps(ft_query, indent=2))
+        return ft_query
 
     # Removes identified concepts from querystring
     def __rewrite_querystring(self, querystring, concepts):
@@ -232,12 +272,14 @@ class QueryBuilder(object):
                               reverse=True)
         # Remove found concepts from querystring
         for term in [concept['term'] for concept in all_concepts]:
-            term = self.__rewrite_word_for_regex(term)
+            term = self._rewrite_word_for_regex(term)
             p = re.compile(f'(\\s*){term}(\\s*)')
             querystring = p.sub('\\1\\2', querystring).strip()
 
         return querystring
 
+    # Creates a base query dict for "independent" freetext words
+    # (e.g. words not found in text_to_concepts)
     def __create_base_ft_query(self, querystring):
         inc_words = ' '.join([w for w in querystring.split(' ')
                               if w and not w.startswith('+')
@@ -264,45 +306,6 @@ class QueryBuilder(object):
             ft_query['bool']['must'] = musts
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
-        return ft_query
-
-    # Parses FREETEXT_QUERY and FREETEXT_FIELDS
-    def _build_freetext_query(self, querystring, queryfields):
-        if not querystring:
-            return None
-        if not queryfields:
-            queryfields = queries.QF_CHOICES
-
-        original_querystring = querystring
-        concepts = ttc.text_to_concepts(querystring)
-        querystring = self.__rewrite_querystring(querystring, concepts)
-        ft_query = self.__create_base_ft_query(querystring)
-
-        # Make all "musts" "shoulds" as well
-        for qf in queryfields:
-            if qf in concepts:
-                must_key = "%s_must" % qf
-                concepts[qf] += [c for c in concepts.get(must_key, [])]
-        # Add concepts to query
-        for concept_type in queryfields:
-            sub_should = self.__freetext_concepts({"bool": {}}, concepts,
-                                                  querystring,
-                                                  [concept_type], "should")
-            if 'should' in sub_should['bool']:
-                if 'must' not in ft_query['bool']:
-                    ft_query['bool']['must'] = []
-                ft_query['bool']['must'].append(sub_should)
-        # Remove unwanted concepts from query
-        self.__freetext_concepts(ft_query, concepts, querystring,
-                                 queryfields, 'must_not')
-
-        # Add required concepts to query
-        self.__freetext_concepts(ft_query, concepts, querystring,
-                                 queryfields, 'must')
-
-        # Add a headline query as well
-        ft_query = self.__freetext_headline(ft_query, original_querystring)
-        log.debug("Freetext query dict: %s" % json.dumps(ft_query, indent=2))
         return ft_query
 
     def __freetext_headline(self, query_dict, querystring):

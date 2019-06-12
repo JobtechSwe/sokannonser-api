@@ -27,7 +27,7 @@ def test_freetext_query_one_param():
         assert int(hits_total) > 0
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
+# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_with_special_characters():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -52,7 +52,7 @@ def test_too_big_offset():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/search', headers=headers, data={'offset': '2001',
-                                                                  'limit': '10'})
+                                                                  'limit':  '0'})
         json_response = result.json
         # pprint(json_response)
         assert 'errors' in json_response
@@ -67,7 +67,7 @@ def test_total_hits():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/search', headers=headers, data={'offset': '0',
-                                                                  'limit': '10'})
+                                                                  'limit':  '0'})
         json_response = result.json
         # pprint(json_response)
         hits_total = json_response['total']['value']
@@ -89,7 +89,7 @@ def test_deprecated_ads_should_not_be_in_result():
             json_response = result.json
             # # pprint(json_response)
             hits = json_response['hits']
-            assert len(hits) > 0
+            assert len(hits) = 100
             for hit in hits:
                 assert hit['removed'] is False
 
@@ -127,7 +127,7 @@ def test_freetext_query_one_param_deleted_enriched():
         hits_total = json_response['total']['value']
         assert int(hits_total) > 0
         hits = json_response['hits']
-        assert len(hits) > 0
+        assert len(hits) <= 10
         # pprint(hits[0])
 
         assert 'extracted' in hits[0]['keywords']

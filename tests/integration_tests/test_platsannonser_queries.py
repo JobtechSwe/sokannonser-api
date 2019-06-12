@@ -1,7 +1,6 @@
 import sys
 import os
 import pytest
-from pprint import pprint
 from dateutil import parser
 from sokannonser import app
 from sokannonser import settings as search_settings
@@ -205,8 +204,6 @@ def test_publication_range():
         result = testclient.get('/search', headers=headers, data=query)
         json_response = result.json
         hits = json_response['hits']
-        including_max = False
-        including_min = False
         for hit in hits:
             assert parser.parse(hit[fields.PUBLICATION_DATE]) >= parser.parse(date_from)
             assert parser.parse(hit[fields.PUBLICATION_DATE]) <= parser.parse(date_until)
@@ -255,19 +252,25 @@ def test_driving_license_required():
                           ({taxonomy.OCCUPATION: "-D7Ns_RG6_hD2"},
                            [fields.OCCUPATION+".concept_id"], ["D7Ns_RG6_hD2"], False),
                           ({taxonomy.GROUP: "DJh5_yyF_hEM"},
-                           [fields.OCCUPATION_GROUP+".concept_id"], ["DJh5_yyF_hEM"], True),
+                           [fields.OCCUPATION_GROUP+".concept_id"],
+                           ["DJh5_yyF_hEM"], True),
                           ({taxonomy.FIELD: "apaJ_2ja_LuF"},
-                           [fields.OCCUPATION_FIELD+".concept_id"], ["apaJ_2ja_LuF"], True),
+                           [fields.OCCUPATION_FIELD+".concept_id"],
+                           ["apaJ_2ja_LuF"], True),
                           ({taxonomy.FIELD: "-apaJ_2ja_LuF"},
-                           [fields.OCCUPATION_FIELD+".concept_id"], ["apaJ_2ja_LuF"], False),
+                           [fields.OCCUPATION_FIELD+".concept_id"],
+                           ["apaJ_2ja_LuF"], False),
                           ({taxonomy.OCCUPATION: "D7Ns_RG6_hD2"},
                            [fields.OCCUPATION+".legacy_ams_taxonomy_id"], ["2419"], True),
                           ({taxonomy.GROUP: "2512"},
-                           [fields.OCCUPATION_GROUP+".concept_id"], ["DJh5_yyF_hEM"], True),
+                           [fields.OCCUPATION_GROUP+".concept_id"],
+                           ["DJh5_yyF_hEM"], True),
                           ({taxonomy.FIELD: "3"},
-                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"], ["3"], True),
+                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"],
+                           ["3"], True),
                           ({taxonomy.FIELD: "-3"},
-                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"], ["3"], False)
+                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"],
+                           ["3"], False)
                           ])
 @pytest.mark.integration
 def test_occupation_codes(query, path, expected, non_negative):
@@ -314,15 +317,16 @@ def test_negative_skill():
         hits = json_response['hits']
         for hit in hits:
             assert "DHhX_uVf_y6X" not in [skill['concept_id']
-                                            for skill in hit["must_have"]["skills"]]
+                                          for skill in hit["must_have"]["skills"]]
             assert "DHhX_uVf_y6X" not in [skill['concept_id']
-                                            for skill in hit["nice_to_have"]["skills"]]
+                                          for skill in hit["nice_to_have"]["skills"]]
 
 
 @pytest.mark.integration
 def test_worktime_extent():
     _fetch_and_validate_result({taxonomy.WORKTIME_EXTENT: '947z_JGS_Uk2'},
-                               [fields.WORKING_HOURS_TYPE+".concept_id"], ['947z_JGS_Uk2'])
+                               [fields.WORKING_HOURS_TYPE+".concept_id"],
+                               ['947z_JGS_Uk2'])
 
 
 @pytest.mark.integration
@@ -358,8 +362,6 @@ def test_driving_license():
         result = testclient.get('/search', headers=headers, data=query)
         json_response = result.json
         hits = json_response['hits']
-        including_max = False
-        including_min = False
         for hit in hits:
             concept_ids = [item['concept_id'] for item in hit[fields.DRIVING_LICENCE]]
             assert 'VTK8_WRx_GcM' in concept_ids
@@ -378,6 +380,7 @@ def test_experience():
     _fetch_and_validate_result({search_settings.EXPERIENCE_REQUIRED: 'false'},
                                [fields.EXPERIENCE_REQUIRED], [False])
 
+
 @pytest.mark.integration
 def test_region():
     _fetch_and_validate_result({taxonomy.REGION: '01'},
@@ -392,6 +395,7 @@ def test_country():
                                [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'])
     _fetch_and_validate_result({taxonomy.REGION: '-199'},
                                [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'], False)
+
 
 if __name__ == '__main__':
     pytest.main([os.path.realpath(__file__), '-svv', '-ra', '-m integration'])

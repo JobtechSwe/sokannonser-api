@@ -216,14 +216,8 @@ class QueryBuilder(object):
             return modded_term
         return word
 
-    # Parses FREETEXT_QUERY and FREETEXT_FIELDS
-    def _build_freetext_query(self, querystring, queryfields):
-        if not querystring:
-            return None
-        if not queryfields:
-            queryfields = queries.QF_CHOICES
-
-        concepts = ttc.text_to_concepts(querystring)
+    # Removes identified concepts from querystring
+    def __rewrite_querystring(self, querystring, concepts):
         # Sort all concepts by string length
         all_concepts = sorted(concepts['occupation'] +
                               concepts['skill'] +
@@ -236,13 +230,15 @@ class QueryBuilder(object):
                               concepts['location_must_not'],
                               key=lambda c: len(c),
                               reverse=True)
-        original_querystring = querystring
         # Remove found concepts from querystring
         for term in [concept['term'] for concept in all_concepts]:
             term = self.__rewrite_word_for_regex(term)
             p = re.compile(f'(\\s*){term}(\\s*)')
             querystring = p.sub('\\1\\2', querystring).strip()
 
+        return querystring
+
+    def __create_base_ft_query(self, querystring):
         inc_words = ' '.join([w for w in querystring.split(' ')
                               if w and not w.startswith('+')
                               and not w.startswith('-')])
@@ -268,6 +264,20 @@ class QueryBuilder(object):
             ft_query['bool']['must'] = musts
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
+        return ft_query
+
+    # Parses FREETEXT_QUERY and FREETEXT_FIELDS
+    def _build_freetext_query(self, querystring, queryfields):
+        if not querystring:
+            return None
+        if not queryfields:
+            queryfields = queries.QF_CHOICES
+
+        original_querystring = querystring
+        concepts = ttc.text_to_concepts(querystring)
+        querystring = self.__rewrite_querystring(querystring, concepts)
+        ft_query = self.__create_base_ft_query(querystring)
+
         # Make all "musts" "shoulds" as well
         for qf in queryfields:
             if qf in concepts:

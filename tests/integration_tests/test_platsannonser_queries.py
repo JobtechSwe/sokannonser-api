@@ -330,7 +330,7 @@ def test_scope_of_work():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        query = {search_settings.PARTTIME_MIN: 20, search_settings.PARTTIME_MAX: 80,
+        query = {search_settings.PARTTIME_MIN: 50, search_settings.PARTTIME_MAX: 80,
                  "limit": 100}
         result = testclient.get('/search', headers=headers, data=query)
         json_response = result.json
@@ -338,11 +338,11 @@ def test_scope_of_work():
         including_max = False
         including_min = False
         for hit in hits:
-            assert hit['scope_of_work']['min'] >= 20
+            assert hit['scope_of_work']['min'] >= 50
             assert hit['scope_of_work']['max'] <= 80
             if hit['scope_of_work']['max'] == 80:
                 including_max = True
-            if hit['scope_of_work']['min'] == 20:
+            if hit['scope_of_work']['min'] == 50:
                 including_min = True
 
         assert including_min

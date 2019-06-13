@@ -7,6 +7,7 @@ from sokannonser.rest import ns_platsannons
 from sokannonser.rest.model.queries import annons_complete_query, pb_query, load_ad_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
 from sokannonser.repository import platsannonser
+from sokannonser.rest.model.platsannons_results import open_results
 from sokannonser.repository.querybuilder import QueryBuilder
 
 log = logging.getLogger(__name__)
@@ -38,13 +39,10 @@ class PBSearch(Resource):
     @ns_platsannons.doc(
         description='Search using parameters and/or freetext',
         params={**swagger_doc_params, **swagger_filter_doc_params},
-        responses={
-            200: 'OK',
-            401: 'Invalid API-key',
-            500: 'Technical exception'
-        }
     )
+    @ns_platsannons.response(401, 'Invalid API key')
     @ns_platsannons.expect(pb_query)
+    @ns_platsannons.marshal_with(open_results, skip_none=True)
     def get(self):
         start_time = int(time.time()*1000)
         args = pb_query.parse_args()
@@ -67,8 +65,8 @@ class PBSearch(Resource):
             "positions": esresult.get('positions', 0),
             "query_time_in_millis": esresult.get('took', 0),
             "result_time_in_millis": int(time.time()*1000) - start_time,
-            "stats": esresult.get('stats', {}),
-            "freetext_concepts": esresult.get('concepts', {}),
+            "stats": esresult.get('stats', None),
+            "freetext_concepts": esresult.get('concepts', None),
             "hits": hits
         }
         log.debug("Sending results after %d milliseconds."

@@ -1,6 +1,5 @@
 import logging
 import re
-import json
 from sokannonser import settings
 from sokannonser.repository import ttc, taxonomy
 from sokannonser.rest.model import queries
@@ -253,7 +252,6 @@ class QueryBuilder(object):
 
         # Add a headline query as well
         ft_query = self.__freetext_headline(ft_query, original_querystring)
-        log.debug("Freetext query dict: %s" % json.dumps(ft_query, indent=2))
         return ft_query
 
     # Removes identified concepts from querystring
@@ -372,7 +370,7 @@ class QueryBuilder(object):
                     "type": "cross_fields",
                     "operator": "and",
                     "fields": [f.HEADLINE+"^3", f.KEYWORDS_EXTRACTED+".employer^2",
-                               f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID]
+                               f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE]
                 }
             }
         ]

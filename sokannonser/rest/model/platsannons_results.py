@@ -25,67 +25,133 @@ class FormattedUrl(fields.Raw):
         return "%s/ad/%s" % (settings.BASE_URL, value)
 
 
-# DEPRECATED
-matchande_annons = ns_platsannons.model('MatchandeAnnons', {
-    'annons': fields.Nested({
-        'annonsid': fields.String(attribute=f.ID),
-        'annons_url': FormattedUrl(attribute=f.ID),
-        'platsannons_url': fields.String(attribute='url'),
-        'annonsrubrik': fields.String(attribute='rubrik'),
-        'annonstext': fields.String(attribute='beskrivning.annonstext'),
-        'yrkesbenamning': fields.String(attribute='yrkesroll.term'),
-        'yrkesid': fields.String(attribute='yrkesroll.kod'),
-        'publiceraddatum': fields.DateTime(attribute='publiceringsdatum'),
-        'antal_platser': fields.Integer(attribute='antal_platser'),
-        'kommunnamn': fields.String(attribute='arbetsplatsadress.komun'),
-        'kommunkod': fields.Integer(attribute='arbetsplatsadress.kommunkod')
-    }, attribute='_source', skip_none=True),
-    'villkor': fields.Nested({
-        'varaktighet': fields.String(attribute='varaktighet.term'),
-        'arbetstid': fields.String(attribute='arbetstidstyp.term'),
-        'lonetyp': fields.String(attribute='lonetyp.term'),
-        'loneform': fields.String(attribute='lonetyp.term')
-    }, attribute='_source', skip_none=True),
-    'ansokan': fields.Nested({
-        'referens': fields.String(attribute='ansokningsdetaljer.referens'),
-        'epostadress': fields.String(attribute='ansokningsdetaljer.epost'),
-        'sista_ansokningsdag': fields.DateTime(attribute='sista_ansokningsdatum'),
-        'ovrigt_om_ansokan': fields.String(attribute='ansokningsdetaljer.annat')
-    }, attribute='_source', skip_none=True),
-    'arbetsplats': fields.Nested({
-        'arbetsplatsnamn': fields.String(attribute='arbetsgivare.arbetsplats'),
-        'postnummer': fields.String(attribute='arbetsplatsadress.postnummer'),
-        'postadress': fields.String(attribute='arbetsplatsadress.gatuadress'),
-        'postort': fields.String(attribute='arbetsplatsadress.postort'),
-        'postland': fields.String(attribute='postadress.land'),
-        'land': fields.String(attribute='arbetsplatsadress.land.term'),
-        'besoksadress': fields.String(attribute='besoksadress.gatuadress'),
-        'besoksort': fields.String(attribute='besoksadress.postort'),
-        'telefonnummer': fields.String(attribute='arbetsgivare.telefonnummer'),
-        'faxnummer': fields.String(attribute='arbetsgivare.faxnummer'),
-        'epostadress': fields.String(attribute='arbetsgivare.epost'),
-        'hemsida': fields.String(attribute='arbetsgivare.webbadress')
-    }, attribute='_source', skip_none=True),
-    'krav': fields.Nested({'egen_bil': fields.Boolean(attribute='_source.egen_bil')},
-                          skip_none=True)
-}, skip_none=True)
-
-statistics = ns_platsannons.model('Statistik', {
-    'typ': fields.String(attribute='type'),
-    'poster': fields.List(fields.Nested({
-        'term': fields.String(),
-        'kod': fields.String(attribute='code'),
-        'antal': fields.Integer(attribute='count')
-    }), attribute='values')
+taxonomy_item = ns_platsannons.model('JobTechTaxonomyItem', {
+    'concept_id': fields.String(),
+    'label': fields.String(),
+    'legacy_ams_taxonomy_id': fields.String()
 })
 
-pbapi_lista = ns_platsannons.model('Platsannonser', {
-    'antal': fields.Integer(attribute='total'),
-    'annonser': fields.List(fields.Nested(matchande_annons), attribute='hits')
+weighted_taxonomy_item = ns_platsannons.inherit('WeightedJobtechTaxonomyItem',
+                                                taxonomy_item, {
+                                                    'weight': fields.Integer()
+                                                })
+
+min_max = ns_platsannons.model('ScopeOfWork', {
+    'min': fields.Integer(),
+    'max': fields.Integer()
 })
 
-simple_lista = ns_platsannons.model('Platsannonser', {
-    'antal_platsannonser': fields.Integer(attribute='total'),
-    'statistik': fields.Nested(statistics, attribute='stats'),
-    'platsannonser': fields.List(fields.Nested(matchande_annons), attribute='hits')
+description = ns_platsannons.model('JobAdDescription', {
+    'text': fields.String(),
+    'company_information': fields.String(),
+    'needs': fields.String(),
+    'requirements': fields.String(),
+    'conditions': fields.String()
+})
+
+employer = ns_platsannons.model('Employer', {
+    'phone_number': fields.String(),
+    'email': fields.String(),
+    'url': fields.String(),
+    'organization_number': fields.String(),
+    'name': fields.String(),
+    'workplace': fields.String()
+})
+
+appl_details = ns_platsannons.model('ApplicationDetails', {
+    'information': fields.String(),
+    'reference': fields.String(),
+    'email': fields.String(),
+    'via_af': fields.Boolean(),
+    'url': fields.String(),
+    'other': fields.String()
+})
+
+work_address = ns_platsannons.model('WorkplaceAddress', {
+    'municipality_code': fields.String(),
+    'municipality': fields.String(),
+    'region_code': fields.String(),
+    'region': fields.String(),
+    'country_code': fields.String(),
+    'country': fields.String(),
+    'street_address': fields.String(),
+    'postcode': fields.String(),
+    'city': fields.String(),
+    'coordinates': fields.List(fields.Integer())
+})
+
+requirements = ns_platsannons.model('Requirements', {
+    'skills': fields.List(fields.Nested(weighted_taxonomy_item)),
+    'languages': fields.List(fields.Nested(weighted_taxonomy_item)),
+    'work_experiences': fields.List(fields.Nested(weighted_taxonomy_item)),
+})
+
+job_ad = ns_platsannons.model('JobAd', {
+    f.ID: fields.String(),
+    f.EXTERNAL_ID: fields.String(),
+    f.HEADLINE: fields.String(),
+    f.APPLICATION_DEADLINE: fields.DateTime(),
+    f.NUMBER_OF_VACANCIES: fields.Integer(),
+    'description': fields.Nested(description, skip_none=True),
+    'employment_type': fields.Nested(taxonomy_item),
+    'salary_type': fields.Nested(taxonomy_item),
+    'duration': fields.Nested(taxonomy_item),
+    'working_hours_type': fields.Nested(taxonomy_item),
+    'scope_of_work': fields.Nested(min_max),
+    f.ACCESS: fields.String(),
+    'employer': fields.Nested(employer, skip_none=True),
+    'application_details': fields.Nested(appl_details, skip_none=True),
+    f.EXPERIENCE_REQUIRED: fields.Boolean(),
+    f.ACCESS_TO_OWN_CAR: fields.Boolean(),
+    f.DRIVING_LICENCE_REQUIRED: fields.Boolean(),
+    'occupation': fields.Nested(taxonomy_item),
+    'occupation_group': fields.Nested(taxonomy_item),
+    'occupation_field': fields.Nested(taxonomy_item),
+    'workplace_address': fields.Nested(work_address, skip_none=True),
+    'must_have': fields.Nested(requirements),
+    'nice_to_have': fields.Nested(requirements),
+    f.PUBLICATION_DATE: fields.DateTime(),
+    f.LAST_PUBLICATION_DATE: fields.DateTime(),
+    f.REMOVED: fields.Boolean(),
+    f.REMOVED_DATE: fields.DateTime(),
+    f.SOURCE_TYPE: fields.String(),
+    'timestamp': fields.Integer(),
+    'found_in_enriched': fields.Boolean()
+})
+
+stat_item = ns_platsannons.model('StatDetail', {
+    'term': fields.String(),
+    'code': fields.String(),
+    'count': fields.Integer()
+})
+
+search_stats = ns_platsannons.model('Stats', {
+    'type': fields.String(),
+    'values': fields.List(fields.Nested(stat_item, skip_none=True))
+})
+
+freetext_concepts = ns_platsannons.model('FreetextConcepts', {
+    'skill': fields.List(fields.String()),
+    'occupation': fields.List(fields.String()),
+    'location': fields.List(fields.String()),
+    'skill_must': fields.List(fields.String()),
+    'occupation_must': fields.List(fields.String()),
+    'location_must': fields.List(fields.String()),
+    'skill_must_not': fields.List(fields.String()),
+    'occupation_must_not': fields.List(fields.String()),
+    'location_must_not': fields.List(fields.String()),
+})
+
+number_of_hits = ns_platsannons.model('NumberOfHits', {
+    'value': fields.Integer()
+})
+
+open_results = ns_platsannons.model('SearchResults', {
+    'total': fields.Nested(number_of_hits),
+    'positions': fields.Integer(),
+    'query_time_in_millis': fields.Integer(),
+    'result_time_in_millis': fields.Integer(),
+    'stats': fields.List(fields.Nested(search_stats, skip_none=True)),
+    'freetext_concepts': fields.Nested(freetext_concepts, skip_none=True),
+    'hits': fields.List(fields.Nested(job_ad), attribute='hits', skip_none=True)
 })

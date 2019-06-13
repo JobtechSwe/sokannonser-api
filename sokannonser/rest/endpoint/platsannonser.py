@@ -42,7 +42,7 @@ class PBSearch(Resource):
     )
     @ns_platsannons.response(401, 'Invalid API key')
     @ns_platsannons.expect(pb_query)
-    @ns_platsannons.marshal_with(open_results, skip_none=True)
+    @ns_platsannons.marshal_with(open_results)
     def get(self):
         start_time = int(time.time()*1000)
         args = pb_query.parse_args()

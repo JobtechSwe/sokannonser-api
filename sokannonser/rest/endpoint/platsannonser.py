@@ -1,5 +1,6 @@
 import logging
 import time
+from flask import request
 from flask_restplus import Resource
 from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
@@ -49,7 +50,9 @@ class PBSearch(Resource):
         log.debug("Query parsed after %d milliseconds."
                   % (int(time.time()*1000)-start_time))
         result = platsannonser.find_platsannonser(args,
-                                                  self.querybuilder, start_time)
+                                                  self.querybuilder,
+                                                  start_time,
+                                                  request.headers.get('X-Fields'))
 
         log.debug("Query results after %d milliseconds."
                   % (int(time.time()*1000)-start_time))

@@ -9,14 +9,14 @@ log = logging.getLogger(__name__)
 
 
 class QueryBuilder(object):
-    def parse_args(self, args):
+    def parse_args(self, args, x_fields=None):
         """
         Parse arguments for query and return an elastic query dsl
 
         Keyword arguments:
         args -- dictionary containing parameters from query
         """
-        query_dsl = self._bootstrap_query(args)
+        query_dsl = self._bootstrap_query(args, x_fields)
 
         # Check for empty query
         if not any(v is not None for v in args.values()):
@@ -125,19 +125,51 @@ class QueryBuilder(object):
             return filtered_aggs[0:10]
         return filtered_aggs
 
-    def _bootstrap_query(self, args):
+    def _parse_x_fields(self, x_fields):
+        # Remove all spaces from field
+        x_fields = re.sub(r'\s', '', x_fields).lower()
+        if 'hits{' in x_fields:
+            # Find out which fields are wanted
+            hitsfields = self._find_hits_subelement(x_fields)
+            # Remove lower nestings
+            hitsfields = re.sub("[{].*?[}]", "", hitsfields)
+            return hitsfields.split(',')
+        return []
+
+    def _find_hits_subelement(self, text):
+        istart = []  # stack of indices of opening parentheses
+        bracket_positions = {}
+        for i, c in enumerate(text):
+            if c == '{':
+                istart.append(i)
+
+            if c == '}':
+                try:
+                    bracket_positions[istart.pop()] = i
+                except IndexError:
+                    pass
+        idx = text.find('hits{')+4
+        r = text[idx+1:bracket_positions[idx]]
+        return r
+
+    def _bootstrap_query(self, args, x_fields):
         query_dsl = dict()
         query_dsl['from'] = args.pop(settings.OFFSET, 0)
         query_dsl['size'] = args.pop(settings.LIMIT, 10)
         # No need to track all results if used for typeahead
         if not args.get(settings.TYPEAHEAD_QUERY):
             query_dsl['track_total_hits'] = True
+
         if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
             query_dsl['_source'] = [f.ID, f.HEADLINE, f.APPLICATION_DEADLINE,
                                     f.EMPLOYMENT_TYPE+"."+f.LABEL,
                                     f.WORKING_HOURS_TYPE+"."+f.LABEL,
                                     f.EMPLOYER_NAME,
                                     f.PUBLICATION_DATE]
+
+        if x_fields:
+            query_dsl['_source'] = self._parse_x_fields(x_fields)
+
         # Remove api-key from args to make sure an empty query can occur
         args.pop(settings.APIKEY)
 

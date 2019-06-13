@@ -65,8 +65,8 @@ class PBSearch(Resource):
             "positions": esresult.get('positions', 0),
             "query_time_in_millis": esresult.get('took', 0),
             "result_time_in_millis": int(time.time()*1000) - start_time,
-            "stats": esresult.get('stats', None),
-            "freetext_concepts": esresult.get('concepts', None),
+            "stats": esresult.get('stats', []),
+            "freetext_concepts": esresult.get('concepts', {}),
             "hits": hits
         }
         log.debug("Sending results after %d milliseconds."

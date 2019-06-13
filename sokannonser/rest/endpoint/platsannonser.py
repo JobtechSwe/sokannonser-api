@@ -8,7 +8,8 @@ from sokannonser.rest import ns_platsannons
 from sokannonser.rest.model.queries import annons_complete_query, pb_query, load_ad_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
 from sokannonser.repository import platsannonser
-from sokannonser.rest.model.platsannons_results import open_results
+from sokannonser.rest.model.platsannons_results import (open_results, job_ad,
+                                                        typeahead_results)
 from sokannonser.repository.querybuilder import QueryBuilder
 
 log = logging.getLogger(__name__)
@@ -20,14 +21,11 @@ class Proxy(Resource):
 
     @ns_platsannons.doc(
         description='Load a job ad by ID',
-        responses={
-            200: 'OK',
-            401: 'Invalid API-key',
-            404: 'Job ad not found exception',
-            500: 'Technical exception'
-        }
     )
+    @ns_platsannons.response(401, 'Invalid API-key')
+    @ns_platsannons.response(404, 'Job ad not found')
     @ns_platsannons.expect(load_ad_query)
+    @ns_platsannons.marshal_with(job_ad)
     def get(self, id):
         return platsannonser.fetch_platsannons(str(id))
 
@@ -84,14 +82,11 @@ class PBComplete(Resource):
 
     @ns_platsannons.doc(
         description='Typeahead / Suggest next searchword',
-        params=swagger_doc_params,
-        responses={
-            200: 'OK',
-            401: 'Invalid API-key',
-            500: 'Technical exception'
-        }
+        params=swagger_doc_params
     )
+    @ns_platsannons.response(401, 'Invalid API-key')
     @ns_platsannons.expect(annons_complete_query)
+    @ns_platsannons.marshal_with(typeahead_results)
     def get(self):
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()

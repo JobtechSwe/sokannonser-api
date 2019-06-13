@@ -77,7 +77,7 @@ work_address = ns_platsannons.model('WorkplaceAddress', {
     'street_address': fields.String(),
     'postcode': fields.String(),
     'city': fields.String(),
-    'coordinates': fields.List(fields.Integer())
+    'coordinates': fields.List(fields.Float())
 })
 
 requirements = ns_platsannons.model('Requirements', {
@@ -154,4 +154,15 @@ open_results = ns_platsannons.model('SearchResults', {
     'stats': fields.List(fields.Nested(search_stats, skip_none=True)),
     'freetext_concepts': fields.Nested(freetext_concepts, skip_none=True),
     'hits': fields.List(fields.Nested(job_ad), attribute='hits', skip_none=True)
+})
+
+typeahead_item = ns_platsannons.model('TypeaheadItem', {
+    'value': fields.String(),
+    'type': fields.String(),
+    'occurrences': fields.Integer()
+})
+
+typeahead_results = ns_platsannons.model('TypeaheadResults', {
+    'time_in_millis': fields.Integer(),
+    'typeahead': fields.List(fields.Nested(typeahead_item))
 })

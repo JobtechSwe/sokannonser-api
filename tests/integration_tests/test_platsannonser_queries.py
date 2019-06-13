@@ -111,7 +111,7 @@ def test_freetext_query_job_title_with_hyphen():
         assert occupation_val == 'hr-specialist'
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="To be removed.")
 @pytest.mark.integration
 def test_freetext_query_one_param_deleted_enriched():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -133,7 +133,7 @@ def test_freetext_query_one_param_deleted_enriched():
         assert 'enriched' not in hits[0]['keywords']
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="To be removed")
 @pytest.mark.integration
 def test_freetext_query_one_param_found_in_enriched_pos():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -153,7 +153,7 @@ def test_freetext_query_one_param_found_in_enriched_pos():
         assert 'found_in_enriched' in hits[0]
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="To be removed")
 @pytest.mark.integration
 def test_freetext_query_one_param_found_in_enriched_neg():
     print('==================', sys._getframe().f_code.co_name, '================== ')

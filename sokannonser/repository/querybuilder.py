@@ -208,7 +208,14 @@ class QueryBuilder(object):
         complete_string = args.get(settings.TYPEAHEAD_QUERY)
         complete_fields = args.get(settings.FREETEXT_FIELDS) or queries.QF_CHOICES
         if complete_string:
-            complete = self._rewrite_word_for_regex(complete_string.split(' ')[-1])
+            word_list = complete_string.split(' ')
+            complete = word_list[-1]
+            if len(word_list) > 1 and word_list[-1] == '':
+                # Add previous word to list
+                complete = "%s " % word_list[-2]
+
+            complete = self._rewrite_word_for_regex(complete)
+
             size = 12/len(complete_fields)
             for field in complete_fields:
                 dkey = "complete_%s" % field

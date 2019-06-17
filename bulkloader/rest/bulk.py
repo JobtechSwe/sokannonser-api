@@ -12,16 +12,18 @@ log = logging.getLogger(__name__)
 
 @ns_bulk.route('zip')
 class BulkZip(Resource):
-    method_decorators = [check_api_key('bulk')]
+    method_decorators = [check_api_key('bulk', 300)]
 
     @ns_bulk.doc(
         params={
             settings.DATE: "Date to zip ads for. Accepts date as YYYY-MM-DD or 'all'. "
             "(Note that 'all' can take a couple of minutes to compile.)"
+            " Rate limit is one request every five minutes."
         },
         responses={
             200: 'OK',
             401: 'Invalid API-key',
+            429: 'Rate limit exceeded',
             500: 'Technical error'
         }
     )
@@ -39,16 +41,19 @@ class BulkZip(Resource):
 
 @ns_bulk.route('stream')
 class BulkLoad(Resource):
-    method_decorators = [check_api_key('bulk')]
+    method_decorators = [check_api_key('bulk', 60)]
 
     @ns_bulk.doc(
         params={
-            settings.DATE: "Stream ads updated since datetime. Accepts datetime as YYYY-MM-DDTHH:MM:SS, "
-            "for example 2019-06-11T10:00:00"
+            settings.DATE: "Stream ads updated since datetime. "
+            "Accepts datetime as YYYY-MM-DDTHH:MM:SS, "
+            "for example 2019-06-11T10:00:00. "
+            "Rate limit is one request per minute."
         },
         responses={
             200: 'OK',
             401: 'Invalid API-key',
+            429: 'Rate limit exceeded',
             500: 'Technical error'
         }
     )

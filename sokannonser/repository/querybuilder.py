@@ -253,7 +253,7 @@ class QueryBuilder(object):
 
     def _rewrite_word_for_regex(self, word):
         bad_chars = ['+', '.', '[', ']', '{', '}', '(', ')', '^', '$',
-                     '*', '\\', '|', '?']
+                     '*', '\\', '|', '?', '"', '\'']
         if any(c in bad_chars for c in word):
             modded_term = ''
             for c in word:

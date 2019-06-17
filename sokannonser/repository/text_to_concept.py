@@ -1,4 +1,5 @@
 import logging
+import re
 import certifi
 from ssl import create_default_context
 from elasticsearch import Elasticsearch
@@ -61,26 +62,30 @@ class TextToConcept(object):
 
         return client
 
-    def text_to_concepts(self, text):
-        ontology_concepts_orig = self.get_ontology().get_concepts(text, concept_type=None,
-                                                                  span_info=True)
 
-        ontology_concepts = []
-        for concept_data in ontology_concepts_orig:
-            concept = copy(concept_data[0])
-            concept['span_begin'] = concept_data[1]
-            concept['span_end'] = concept_data[2]
-            ontology_concepts.append(concept)
+    RE_PLUS_MINUS = re.compile(r"((^| )[+-])", re.UNICODE)
+
+    def clean_plus_minus(self, text):
+        return self.RE_PLUS_MINUS.sub(" ", text).strip()
+
+    def text_to_concepts(self, text):
+        # Note: Remove eventual '+' and '-' in every freetext query word since flashText is configured
+        # so it can't find words starting with minus/hyphen.
+        searchtext = self.clean_plus_minus(text)
+        text_lower = text.lower()
+        ontology_concepts_orig = self.get_ontology().get_concepts(searchtext, concept_type=None,
+                                                                  span_info=True)
+        ontology_concepts = [c[0] for c in ontology_concepts_orig]
 
         # print(ontology_concepts)
-        text_lower = text.lower()
+        text_lower_plus_blank_end = text_lower + ' '
 
         for concept in ontology_concepts:
-            term_index = concept['span_begin']
-            prev_char = text_lower[term_index - 1:term_index]
-            if prev_char == OP_MINUS:
+            # print(concept)
+            concept_term = concept['term']
+            if '-' + concept_term + ' ' in text_lower_plus_blank_end:
                 concept['operator'] = OP_MINUS
-            elif prev_char == OP_PLUS:
+            elif '+' + concept_term + ' ' in text_lower_plus_blank_end:
                 concept['operator'] = OP_PLUS
             else:
                 concept['operator'] = OP_NONE

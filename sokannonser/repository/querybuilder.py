@@ -352,29 +352,23 @@ class QueryBuilder(object):
                                 if not word.startswith('-')])
         if 'must' not in query_dict['bool']:
             query_dict['bool']['must'] = []
-        musts = query_dict['bool']['must']
-        if not musts:
-            if 'should' not in query_dict['bool']:
-                query_dict['bool']['should'] = []
-            shoulds = query_dict['bool']['should']
-        else:
-            if 'bool' not in musts[0]:
-                musts.append({'bool': {'should': []}})
-                shoulds = musts[-1]['bool']['should']
-            else:
-                shoulds = musts[0]['bool']['should']
 
-        shoulds.append(
-            {
-                "match": {
-                    f.HEADLINE + ".words": {
-                        "query": querystring.strip(),
-                        "operator": "and",
-                        "boost": 5
-                    }
-                }
-            }
-        )
+        for should in query_dict['bool']['must']:
+            print("ELEMENT", should)
+            try:
+                should['bool']['should'].append(
+                    {
+                        "match": {
+                            f.HEADLINE + ".words": {
+                                "query": querystring.strip(),
+                                "operator": "and",
+                                "boost": 5
+                            }
+                        }
+                    })
+            except KeyError:
+                log.error("No bool clause for headline query")
+
         return query_dict
 
     def __freetext_concepts(self, query_dict, concepts,

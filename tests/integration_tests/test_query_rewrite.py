@@ -71,6 +71,22 @@ def test_rewrite_jobtitle_with_hyphen():
     assert 'hr-specialist' in [c['concept'].lower() for c in concepts['occupation']]
 
 
+
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_rewrite_competence_special_characters():
+    print('\n==================', sys._getframe().f_code.co_name, '==================')
+
+    concepts = text_to_concept.text_to_concepts('java c++ .net c# c-level')
+    # pprint(concepts)
+    assert_not_empty(concepts, 'skill')
+    assert 'java' in [c['concept'].lower() for c in concepts['skill']]
+    assert 'c++' in [c['concept'].lower() for c in concepts['skill']]
+    assert '.net' in [c['concept'].lower() for c in concepts['skill']]
+    assert 'c-sharp' in [c['concept'].lower() for c in concepts['skill']]
+    assert 'c' not in [c['concept'].lower() for c in concepts['skill']]
+
+
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_rewrite_unigram_misspelled_input():
@@ -89,7 +105,7 @@ def test_rewrite_unigram_misspelled_input():
 def test_rewrite_bigrams():
     concepts = text_to_concept.text_to_concepts('inhouse key account manager säljare')
     assert_not_empty(concepts, 'occupation')
-    pprint(concepts)
+    # pprint(concepts)
 
     assert 'key account manager' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'säljare' in [c['concept'].lower() for c in concepts['occupation']]
@@ -103,8 +119,7 @@ def test_rewrite_diverse_occupationterms_to_concepts():
 
     assert_term_to_concept('souschef', input_type, assert_concept_name)
     assert_term_to_concept('sous-chef', input_type, assert_concept_name)
-    # TODO: Lägg till även 'sous chef' när denna term finns i narvalontology i prod
-    # assert_term_to_concept('sous chef', input_type, assert_concept_name)
+    assert_term_to_concept('sous chef', input_type, assert_concept_name)
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -124,7 +139,7 @@ def test_rewrite_plus_input():
     # concepts = text_to_concept.text_to_concepts('chef+chef')
     concepts = text_to_concept.text_to_concepts('psykolog+psykologer')
     # concepts = text_to_concept.text_to_concepts('tyska+tyska')
-    pprint(concepts)
+    # pprint(concepts)
     assert len(concepts) > 0
     assert_not_empty(concepts, 'occupation')
     assert 'psykolog' in [c['concept'].lower() for c in concepts['occupation']]
@@ -149,7 +164,10 @@ def test_rewrite_non_concept_words():
 @pytest.mark.integration
 def test_rewrite_must_words():
     concepts = text_to_concept.text_to_concepts(
-        'mållare +målare säljare +key account manager python +java positiv +noggrann -flexibel')
+        'mållare +målare säljare +key account manager c-sharp +java positiv +noggrann -flexibel')
+
+    # print(concepts)
+
     assert_not_empty(concepts, 'occupation')
     assert_not_empty(concepts, 'occupation_must')
     assert_not_empty(concepts, 'skill')
@@ -158,23 +176,31 @@ def test_rewrite_must_words():
     assert_not_empty(concepts, 'trait_must')
     assert_not_empty(concepts, 'trait_must_not')
 
-    # print(concepts)
+
 
     assert 'säljare' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'målare' in [c['concept'].lower() for c in concepts['occupation_must']]
     assert 'key account manager' in [c['concept'].lower() for c in concepts['occupation_must']]
-    assert 'python' in [c['concept'].lower() for c in concepts['skill']]
+    assert 'c-sharp' in [c['concept'].lower() for c in concepts['skill']]
     assert 'java' in [c['concept'].lower() for c in concepts['skill_must']]
     assert 'positiv' in [c['concept'].lower() for c in concepts['trait']]
     assert 'noggrann' in [c['concept'].lower() for c in concepts['trait_must']]
     assert 'flexibel' in [c['concept'].lower() for c in concepts['trait_must_not']]
+
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_clean_plus_minus():
+    cleaned_text = text_to_concept.clean_plus_minus('-mållare målare +undersköterska java-utvecklare -key account manager c-sharp -java -noggrann flexibel')
+    # print(cleaned_text)
+    assert cleaned_text == 'mållare målare undersköterska java-utvecklare key account manager c-sharp java noggrann flexibel'
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_rewrite_must_not_words():
     concepts = text_to_concept.text_to_concepts(
-        'mållare -målare säljare -key account manager python -java -noggrann flexibel')
+        'mållare -målare java-utvecklare -key account manager c-sharp -java -noggrann flexibel')
+    # print(concepts)
     assert_not_empty(concepts, 'occupation')
     assert_not_empty(concepts, 'occupation_must_not')
     assert_not_empty(concepts, 'skill')
@@ -182,12 +208,12 @@ def test_rewrite_must_not_words():
     assert_not_empty(concepts, 'trait')
     assert_not_empty(concepts, 'trait_must_not')
 
-    # print(concepts)
 
-    assert 'säljare' in [c['concept'].lower() for c in concepts['occupation']]
+
+    assert 'javautvecklare' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'målare' in [c['concept'].lower() for c in concepts['occupation_must_not']]
     assert 'key account manager' in [c['concept'].lower() for c in concepts['occupation_must_not']]
-    assert 'python' in [c['concept'].lower() for c in concepts['skill']]
+    assert 'c-sharp' in [c['concept'].lower() for c in concepts['skill']]
     assert 'java' in [c['concept'].lower() for c in concepts['skill_must_not']]
     assert 'flexibel' in [c['concept'].lower() for c in concepts['trait']]
     assert 'noggrann' in [c['concept'].lower() for c in concepts['trait_must_not']]

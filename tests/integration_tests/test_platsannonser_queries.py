@@ -1,7 +1,6 @@
 import sys
 import os
 import pytest
-from pprint import pprint
 from dateutil import parser
 from sokannonser import app
 from sokannonser import settings as search_settings
@@ -27,6 +26,7 @@ def test_freetext_query_one_param():
         assert int(hits_total) > 0
 
 
+# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_with_special_characters():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -51,7 +51,7 @@ def test_too_big_offset():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/search', headers=headers, data={'offset': '2001',
-                                                                  'limit': '10'})
+                                                                  'limit':  '0'})
         json_response = result.json
         # pprint(json_response)
         assert 'errors' in json_response
@@ -66,7 +66,7 @@ def test_total_hits():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/search', headers=headers, data={'offset': '0',
-                                                                  'limit': '10'})
+                                                                  'limit':  '0'})
         json_response = result.json
         # pprint(json_response)
         hits_total = json_response['total']['value']
@@ -88,7 +88,7 @@ def test_deprecated_ads_should_not_be_in_result():
             json_response = result.json
             # # pprint(json_response)
             hits = json_response['hits']
-            assert len(hits) > 0
+            assert len(hits) == 100
             for hit in hits:
                 assert hit['removed'] is False
 
@@ -111,7 +111,7 @@ def test_freetext_query_job_title_with_hyphen():
         assert occupation_val == 'hr-specialist'
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="To be removed.")
 @pytest.mark.integration
 def test_freetext_query_one_param_deleted_enriched():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -126,14 +126,14 @@ def test_freetext_query_one_param_deleted_enriched():
         hits_total = json_response['total']['value']
         assert int(hits_total) > 0
         hits = json_response['hits']
-        assert len(hits) > 0
+        assert len(hits) <= 10
         # pprint(hits[0])
 
         assert 'extracted' in hits[0]['keywords']
         assert 'enriched' not in hits[0]['keywords']
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="To be removed")
 @pytest.mark.integration
 def test_freetext_query_one_param_found_in_enriched_pos():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -153,7 +153,7 @@ def test_freetext_query_one_param_found_in_enriched_pos():
         assert 'found_in_enriched' in hits[0]
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="To be removed")
 @pytest.mark.integration
 def test_freetext_query_one_param_found_in_enriched_neg():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -204,8 +204,6 @@ def test_publication_range():
         result = testclient.get('/search', headers=headers, data=query)
         json_response = result.json
         hits = json_response['hits']
-        including_max = False
-        including_min = False
         for hit in hits:
             assert parser.parse(hit[fields.PUBLICATION_DATE]) >= parser.parse(date_from)
             assert parser.parse(hit[fields.PUBLICATION_DATE]) <= parser.parse(date_until)
@@ -254,19 +252,25 @@ def test_driving_license_required():
                           ({taxonomy.OCCUPATION: "-D7Ns_RG6_hD2"},
                            [fields.OCCUPATION+".concept_id"], ["D7Ns_RG6_hD2"], False),
                           ({taxonomy.GROUP: "DJh5_yyF_hEM"},
-                           [fields.OCCUPATION_GROUP+".concept_id"], ["DJh5_yyF_hEM"], True),
+                           [fields.OCCUPATION_GROUP+".concept_id"],
+                           ["DJh5_yyF_hEM"], True),
                           ({taxonomy.FIELD: "apaJ_2ja_LuF"},
-                           [fields.OCCUPATION_FIELD+".concept_id"], ["apaJ_2ja_LuF"], True),
+                           [fields.OCCUPATION_FIELD+".concept_id"],
+                           ["apaJ_2ja_LuF"], True),
                           ({taxonomy.FIELD: "-apaJ_2ja_LuF"},
-                           [fields.OCCUPATION_FIELD+".concept_id"], ["apaJ_2ja_LuF"], False),
+                           [fields.OCCUPATION_FIELD+".concept_id"],
+                           ["apaJ_2ja_LuF"], False),
                           ({taxonomy.OCCUPATION: "D7Ns_RG6_hD2"},
                            [fields.OCCUPATION+".legacy_ams_taxonomy_id"], ["2419"], True),
                           ({taxonomy.GROUP: "2512"},
-                           [fields.OCCUPATION_GROUP+".concept_id"], ["DJh5_yyF_hEM"], True),
+                           [fields.OCCUPATION_GROUP+".concept_id"],
+                           ["DJh5_yyF_hEM"], True),
                           ({taxonomy.FIELD: "3"},
-                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"], ["3"], True),
+                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"],
+                           ["3"], True),
                           ({taxonomy.FIELD: "-3"},
-                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"], ["3"], False)
+                           [fields.OCCUPATION_FIELD+".legacy_ams_taxonomy_id"],
+                           ["3"], False)
                           ])
 @pytest.mark.integration
 def test_occupation_codes(query, path, expected, non_negative):
@@ -313,15 +317,16 @@ def test_negative_skill():
         hits = json_response['hits']
         for hit in hits:
             assert "DHhX_uVf_y6X" not in [skill['concept_id']
-                                            for skill in hit["must_have"]["skills"]]
+                                          for skill in hit["must_have"]["skills"]]
             assert "DHhX_uVf_y6X" not in [skill['concept_id']
-                                            for skill in hit["nice_to_have"]["skills"]]
+                                          for skill in hit["nice_to_have"]["skills"]]
 
 
 @pytest.mark.integration
 def test_worktime_extent():
     _fetch_and_validate_result({taxonomy.WORKTIME_EXTENT: '947z_JGS_Uk2'},
-                               [fields.WORKING_HOURS_TYPE+".concept_id"], ['947z_JGS_Uk2'])
+                               [fields.WORKING_HOURS_TYPE+".concept_id"],
+                               ['947z_JGS_Uk2'])
 
 
 @pytest.mark.integration
@@ -329,7 +334,7 @@ def test_scope_of_work():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        query = {search_settings.PARTTIME_MIN: 20, search_settings.PARTTIME_MAX: 80,
+        query = {search_settings.PARTTIME_MIN: 50, search_settings.PARTTIME_MAX: 80,
                  "limit": 100}
         result = testclient.get('/search', headers=headers, data=query)
         json_response = result.json
@@ -337,11 +342,11 @@ def test_scope_of_work():
         including_max = False
         including_min = False
         for hit in hits:
-            assert hit['scope_of_work']['min'] >= 20
+            assert hit['scope_of_work']['min'] >= 50
             assert hit['scope_of_work']['max'] <= 80
             if hit['scope_of_work']['max'] == 80:
                 including_max = True
-            if hit['scope_of_work']['min'] == 20:
+            if hit['scope_of_work']['min'] == 50:
                 including_min = True
 
         assert including_min
@@ -357,8 +362,6 @@ def test_driving_license():
         result = testclient.get('/search', headers=headers, data=query)
         json_response = result.json
         hits = json_response['hits']
-        including_max = False
-        including_min = False
         for hit in hits:
             concept_ids = [item['concept_id'] for item in hit[fields.DRIVING_LICENCE]]
             assert 'VTK8_WRx_GcM' in concept_ids
@@ -377,6 +380,7 @@ def test_experience():
     _fetch_and_validate_result({search_settings.EXPERIENCE_REQUIRED: 'false'},
                                [fields.EXPERIENCE_REQUIRED], [False])
 
+
 @pytest.mark.integration
 def test_region():
     _fetch_and_validate_result({taxonomy.REGION: '01'},
@@ -391,6 +395,7 @@ def test_country():
                                [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'])
     _fetch_and_validate_result({taxonomy.REGION: '-199'},
                                [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'], False)
+
 
 if __name__ == '__main__':
     pytest.main([os.path.realpath(__file__), '-svv', '-ra', '-m integration'])

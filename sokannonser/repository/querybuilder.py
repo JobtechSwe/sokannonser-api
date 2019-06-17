@@ -1,6 +1,6 @@
 import logging
 import re
-import json
+import time
 from sokannonser import settings
 from sokannonser.repository import ttc, taxonomy
 from sokannonser.rest.model import queries
@@ -10,14 +10,14 @@ log = logging.getLogger(__name__)
 
 
 class QueryBuilder(object):
-    def parse_args(self, args):
+    def parse_args(self, args, x_fields=None):
         """
         Parse arguments for query and return an elastic query dsl
 
         Keyword arguments:
         args -- dictionary containing parameters from query
         """
-        query_dsl = self._bootstrap_query(args)
+        query_dsl = self._bootstrap_query(args, x_fields)
 
         # Check for empty query
         if not any(v is not None for v in args.values()):
@@ -126,23 +126,56 @@ class QueryBuilder(object):
             return filtered_aggs[0:10]
         return filtered_aggs
 
-    def _bootstrap_query(self, args):
+    def _parse_x_fields(self, x_fields):
+        # Remove all spaces from field
+        x_fields = re.sub(r'\s', '', x_fields).lower()
+        if 'hits{' in x_fields:
+            # Find out which fields are wanted
+            hitsfields = self._find_hits_subelement(x_fields)
+            # Remove lower nestings
+            hitsfields = re.sub("[{].*?[}]", "", hitsfields)
+            return hitsfields.split(',')
+        return []
+
+    def _find_hits_subelement(self, text):
+        istart = []  # stack of indices of opening parentheses
+        bracket_positions = {}
+        for i, c in enumerate(text):
+            if c == '{':
+                istart.append(i)
+
+            if c == '}':
+                try:
+                    bracket_positions[istart.pop()] = i
+                except IndexError:
+                    pass
+        idx = text.find('hits{')+4
+        r = text[idx+1:bracket_positions[idx]]
+        return r
+
+    def _bootstrap_query(self, args, x_fields):
         query_dsl = dict()
         query_dsl['from'] = args.pop(settings.OFFSET, 0)
         query_dsl['size'] = args.pop(settings.LIMIT, 10)
         # No need to track all results if used for typeahead
         if not args.get(settings.TYPEAHEAD_QUERY):
             query_dsl['track_total_hits'] = True
+
         if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
             query_dsl['_source'] = [f.ID, f.HEADLINE, f.APPLICATION_DEADLINE,
                                     f.EMPLOYMENT_TYPE+"."+f.LABEL,
                                     f.WORKING_HOURS_TYPE+"."+f.LABEL,
                                     f.EMPLOYER_NAME,
                                     f.PUBLICATION_DATE]
+
+        if x_fields:
+            query_dsl['_source'] = self._parse_x_fields(x_fields)
+
         # Remove api-key from args to make sure an empty query can occur
         args.pop(settings.APIKEY)
 
         # Make sure to only serve published ads
+        offset = self._calculate_utc_offset()
         query_dsl['query'] = {
             'bool': {
                 'must': [],
@@ -150,14 +183,14 @@ class QueryBuilder(object):
                     {
                         'range': {
                             f.PUBLICATION_DATE: {
-                                'lte': 'now/m'
+                                'lte': 'now+%dH/m' % offset
                             }
                         }
                     },
                     {
                         'range': {
                             f.LAST_PUBLICATION_DATE: {
-                                'gte': 'now/m'
+                                'gte': 'now+%dH/m' % offset
                             }
                         }
                     },
@@ -177,7 +210,14 @@ class QueryBuilder(object):
         complete_string = args.get(settings.TYPEAHEAD_QUERY)
         complete_fields = args.get(settings.FREETEXT_FIELDS) or queries.QF_CHOICES
         if complete_string:
-            complete = complete_string.split(' ')[-1]
+            word_list = complete_string.split(' ')
+            complete = word_list[-1]
+            if len(word_list) > 1 and word_list[-1] == '':
+                # Add previous word to list
+                complete = "%s " % word_list[-2]
+
+            complete = self._rewrite_word_for_regex(complete)
+
             size = 12/len(complete_fields)
             for field in complete_fields:
                 dkey = "complete_%s" % field
@@ -197,6 +237,11 @@ class QueryBuilder(object):
             query_dsl['sort'] = ["_score", {f.ID: "asc"}]
         return query_dsl
 
+    def _calculate_utc_offset(self):
+        is_dst = time.daylight and time.localtime().tm_isdst > 0
+        utc_offset = - (time.altzone if is_dst else time.timezone)
+        return int(utc_offset/3600) if utc_offset > 0 else 0
+
     def _assemble_queries(self, query_dsl, additional_queries, additional_filters):
         for query in additional_queries:
             if query:
@@ -206,11 +251,13 @@ class QueryBuilder(object):
                 query_dsl['query']['bool']['filter'].append(af)
         return query_dsl
 
-    def __rewrite_word_for_regex(self, word):
-        if '+' in word:
+    def _rewrite_word_for_regex(self, word):
+        bad_chars = ['+', '.', '[', ']', '{', '}', '(', ')', '^', '$',
+                     '*', '\\', '|', '?', '"', '\'']
+        if any(c in bad_chars for c in word):
             modded_term = ''
             for c in word:
-                if c == '+':
+                if c in bad_chars:
                     modded_term += '\\'
                 modded_term += c
             return modded_term
@@ -223,7 +270,38 @@ class QueryBuilder(object):
         if not queryfields:
             queryfields = queries.QF_CHOICES
 
+        original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
+        querystring = self.__rewrite_querystring(querystring, concepts)
+        ft_query = self.__create_base_ft_query(querystring)
+
+        # Make all "musts" concepts "shoulds" as well
+        for qf in queryfields:
+            if qf in concepts:
+                must_key = "%s_must" % qf
+                concepts[qf] += [c for c in concepts.get(must_key, [])]
+        # Add concepts to query
+        for concept_type in queryfields:
+            sub_should = self.__freetext_concepts({"bool": {}}, concepts,
+                                                  querystring, [concept_type], "should")
+            if 'should' in sub_should['bool']:
+                if 'must' not in ft_query['bool']:
+                    ft_query['bool']['must'] = []
+                ft_query['bool']['must'].append(sub_should)
+        # Remove unwanted concepts from query
+        self.__freetext_concepts(ft_query, concepts, querystring,
+                                 queryfields, 'must_not')
+
+        # Add required concepts to query
+        self.__freetext_concepts(ft_query, concepts, querystring,
+                                 queryfields, 'must')
+
+        # Add a headline query as well
+        ft_query = self.__freetext_headline(ft_query, original_querystring)
+        return ft_query
+
+    # Removes identified concepts from querystring
+    def __rewrite_querystring(self, querystring, concepts):
         # Sort all concepts by string length
         all_concepts = sorted(concepts['occupation'] +
                               concepts['skill'] +
@@ -236,13 +314,17 @@ class QueryBuilder(object):
                               concepts['location_must_not'],
                               key=lambda c: len(c),
                               reverse=True)
-        original_querystring = querystring
         # Remove found concepts from querystring
         for term in [concept['term'] for concept in all_concepts]:
-            term = self.__rewrite_word_for_regex(term)
+            term = self._rewrite_word_for_regex(term)
             p = re.compile(f'(\\s*){term}(\\s*)')
             querystring = p.sub('\\1\\2', querystring).strip()
 
+        return querystring
+
+    # Creates a base query dict for "independent" freetext words
+    # (e.g. words not found in text_to_concepts)
+    def __create_base_ft_query(self, querystring):
         inc_words = ' '.join([w for w in querystring.split(' ')
                               if w and not w.startswith('+')
                               and not w.startswith('-')])
@@ -261,63 +343,38 @@ class QueryBuilder(object):
         if shoulds:
             # Include all "must" words in should, to make sure any single "should"-word
             # not becomes exclusive
-            ft_query['bool']['should'] = shoulds + musts
+            if 'must' not in ft_query['bool']:
+                ft_query['bool']['must'] = []
+            ft_query['bool']['must'].append({"bool": {"should": shoulds + musts}})
         if musts:
             ft_query['bool']['must'] = musts
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
-        # Make all "musts" "shoulds" as well
-        for qf in queryfields:
-            if qf in concepts:
-                must_key = "%s_must" % qf
-                concepts[qf] += [c for c in concepts.get(must_key, [])]
-        # Add concepts to query
-        for concept_type in queryfields:
-            sub_should = self.__freetext_concepts({"bool": {}}, concepts,
-                                                  querystring,
-                                                  [concept_type], "should")
-            if 'should' in sub_should['bool']:
-                if 'must' not in ft_query['bool']:
-                    ft_query['bool']['must'] = []
-                ft_query['bool']['must'].append(sub_should)
-        # Remove unwanted concepts from query
-        self.__freetext_concepts(ft_query, concepts, querystring,
-                                 queryfields, 'must_not')
-
-        # Add required concepts to query
-        self.__freetext_concepts(ft_query, concepts, querystring,
-                                 queryfields, 'must')
-
-        # Add a headline query as well
-        ft_query = self.__freetext_headline(ft_query, original_querystring)
         return ft_query
 
     def __freetext_headline(self, query_dict, querystring):
+        # Remove plus and minus from querystring for headline search
+        querystring = re.sub(r'(^| )[\\+]{1}', ' ', querystring)
+        querystring = ' '.join([word for word in querystring.split(' ')
+                                if not word.startswith('-')])
         if 'must' not in query_dict['bool']:
             query_dict['bool']['must'] = []
-        musts = query_dict['bool']['must']
-        if not musts:
-            if 'should' not in query_dict['bool']:
-                query_dict['bool']['should'] = []
-            shoulds = query_dict['bool']['should']
-        else:
-            if 'bool' not in musts[0]:
-                musts.append({'bool': {'should': []}})
-                shoulds = musts[-1]['bool']['should']
-            else:
-                shoulds = musts[0]['bool']['should']
 
-        shoulds.append(
-            {
-                "match": {
-                    f.HEADLINE + ".words": {
-                        "query": querystring,
-                        "operator": "and",
-                        "boost": 5
-                    }
-                }
-            }
-        )
+        for should in query_dict['bool']['must']:
+            try:
+                should['bool']['should'].append(
+                    {
+                        "match": {
+                            f.HEADLINE + ".words": {
+                                "query": querystring.strip(),
+                                "operator": "and",
+                                "boost": 5
+                            }
+                        }
+                    })
+            except KeyError:
+                log.error("No bool clause for headline query")
+
         return query_dict
 
     def __freetext_concepts(self, query_dict, concepts,
@@ -351,9 +408,8 @@ class QueryBuilder(object):
                     "query": searchword,
                     "type": "cross_fields",
                     "operator": "and",
-                    "fields": [f.HEADLINE+"^3", f.EMPLOYER_NAME+"^2",
-                               f.EMPLOYER_WORKPLACE+"^2", f.DESCRIPTION_TEXT,
-                               f.ID, f.EXTERNAL_ID]
+                    "fields": [f.HEADLINE+"^3", f.KEYWORDS_EXTRACTED+".employer^2",
+                               f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE]
                 }
             }
         ]

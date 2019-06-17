@@ -73,10 +73,10 @@ def get_stats_for(taxonomy_type):
     return code_count
 
 
-def find_platsannonser(args, querybuilder, start_time=0):
+def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)
-    query_dsl = querybuilder.parse_args(args)
+    query_dsl = querybuilder.parse_args(args, x_fields)
     log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
@@ -191,10 +191,10 @@ def create_found_in_enriched(results, query_result):
         return
 
     for hit in results['hits']:
-        enriched_node = hit['_source']['keywords']['enriched']
+        enriched_node = hit['_source'].get('keywords', {}).get('enriched', {})
         enriched_vals = []
         for type_name in type_names:
-            enriched_vals.extend(enriched_node[type_name])
+            enriched_vals.extend(enriched_node.get(type_name, {}))
 
         for type_val in input_type_vals:
             if type_val in enriched_vals:

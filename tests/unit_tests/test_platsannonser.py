@@ -42,221 +42,221 @@ def test_filter_timeframe(from_datetime, to_datetime):
 
 
 @pytest.mark.unit
-@pytest.mark.parametrize("args, exist, expected", [({settings.APIKEY: "",
-                                                     settings.POSITION: ["66.6, 77.7"],
-                                                     settings.POSITION_RADIUS: [5]},
-                                                    True,
-                                                    {"bool": {
-                                                        "should":
-                                                        [{"geo_distance": {
-                                                            "distance": "5km",
-                                                            "workplace_address.coordinates": [
-                                                                  77.7, 66.6
-                                                            ]}}]}}),
-                                                   ({settings.APIKEY: "",
-                                                     settings.POSITION: ["66.6, 180.1"],
-                                                     settings.POSITION_RADIUS: [5]},
-                                                    False,
-                                                    {"bool": {
-                                                        "should":
-                                                        [{"geo_distance": {
-                                                            "distance": "5km",
-                                                            "workplace_address.coordinates": [
-                                                                180.1, 66.6
-                                                            ]}}]}}),
-                                                   ({settings.APIKEY: "",
-                                                     settings.POSITION: ["66.6, 77.7"],
-                                                     settings.POSITION_RADIUS: [-5]},
-                                                    False,
-                                                    {"bool": {
-                                                        "should":
-                                                        [{"geo_distance": {
-                                                            "distance": "-5km",
-                                                            "workplace_address.coordinates": [
-                                                                77.7, 66.6
-                                                            ]}}]}}),
-                                                   ({settings.APIKEY: "",
-                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
-                                                     settings.POSITION_RADIUS: [5, 10]},
-                                                    True,
-                                                    {"bool": {
-                                                        "should":
-                                                        [{"geo_distance": {
-                                                            "distance": "5km",
-                                                            "workplace_address.coordinates": [
-                                                                77.7, 66.6
-                                                            ]}},
-                                                         {"geo_distance": {
-                                                            "distance": "10km",
-                                                            "workplace_address.coordinates": [
-                                                                18.1, 59.1
-                                                            ]
-                                                         }}]
-                                                    }}),
-                                                   ({settings.APIKEY: "",
-                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
-                                                     settings.POSITION_RADIUS: [5, 10, 15]},
-                                                    True,
-                                                    {"bool": {
-                                                        "should":
-                                                        [{"geo_distance": {
-                                                            "distance": "5km",
-                                                            "workplace_address.coordinates": [
-                                                                77.7, 66.6
-                                                            ]}},
-                                                         {"geo_distance": {
-                                                            "distance": "10km",
-                                                            "workplace_address.coordinates": [
-                                                                18.1, 59.1
-                                                            ]
-                                                         }}]
-                                                    }}),
-                                                   ({settings.APIKEY: "",
-                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
-                                                     settings.POSITION_RADIUS: [10]},
-                                                    True,
-                                                    {"bool": {
-                                                        "should":
-                                                        [{"geo_distance": {
-                                                            "distance": "10km",
-                                                            "workplace_address.coordinates": [
-                                                                77.7, 66.6
-                                                            ]}},
-                                                         {"geo_distance": {
-                                                            "distance": "5km",
-                                                            "workplace_address.coordinates": [
-                                                                18.1, 59.1
-                                                            ]
-                                                         }}]
-                                                    }}),
-                                                   ({settings.APIKEY: "",
-                                                     settings.POSITION: ["66.6, 77.7", "59.1, 18.1"]},
-                                                    True,
-                                                    {"bool": {
-                                                        "should":
-                                                        [{"geo_distance": {
-                                                            "distance": "5km",
-                                                            "workplace_address.coordinates": [
-                                                                77.7, 66.6
-                                                            ]}},
-                                                         {"geo_distance": {
-                                                            "distance": "5km",
-                                                            "workplace_address.coordinates": [
-                                                                18.1, 59.1
-                                                            ]
-                                                         }}]
-                                                    }})])
+@pytest.mark.parametrize("args, exist, expected",
+                         [({settings.APIKEY: "",
+                            settings.POSITION: ["66.6, 77.7"],
+                            settings.POSITION_RADIUS: [5]},
+                           True,
+                           {"bool": {
+                               "should":
+                               [{"geo_distance": {
+                                   "distance": "5km",
+                                   "workplace_address.coordinates":
+                                   [77.7, 66.6]}}]}}),
+                          ({settings.APIKEY: "",
+                            settings.POSITION: ["66.6, 180.1"],
+                            settings.POSITION_RADIUS: [5]},
+                           False,
+                           {"bool": {
+                               "should":
+                               [{"geo_distance": {
+                                   "distance": "5km",
+                                   "workplace_address.coordinates":
+                                   [180.1, 66.6]}}]}}),
+                          ({settings.APIKEY: "",
+                            settings.POSITION: ["66.6, 77.7"],
+                            settings.POSITION_RADIUS: [-5]},
+                           False,
+                           {"bool": {
+                               "should":
+                               [{"geo_distance": {
+                                   "distance": "-5km",
+                                   "workplace_address.coordinates": [
+                                       77.7, 66.6
+                                   ]}}]}}),
+                          ({settings.APIKEY: "",
+                            settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
+                            settings.POSITION_RADIUS: [5, 10]},
+                           True,
+                           {"bool": {
+                               "should":
+                               [{"geo_distance": {
+                                   "distance": "5km",
+                                   "workplace_address.coordinates": [
+                                       77.7, 66.6
+                                   ]}},
+                                   {"geo_distance": {
+                                       "distance": "10km",
+                                       "workplace_address.coordinates": [
+                                           18.1, 59.1
+                                       ]
+                                   }}]
+                           }}),
+                          ({settings.APIKEY: "",
+                            settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
+                            settings.POSITION_RADIUS: [5, 10, 15]},
+                           True,
+                           {"bool": {
+                               "should":
+                               [{"geo_distance": {
+                                   "distance": "5km",
+                                   "workplace_address.coordinates": [
+                                       77.7, 66.6
+                                   ]}},
+                                   {"geo_distance": {
+                                       "distance": "10km",
+                                       "workplace_address.coordinates": [
+                                           18.1, 59.1
+                                       ]
+                                   }}]
+                           }}),
+                          ({settings.APIKEY: "",
+                            settings.POSITION: ["66.6, 77.7", "59.1, 18.1"],
+                            settings.POSITION_RADIUS: [10]},
+                           True,
+                           {"bool": {
+                               "should":
+                               [{"geo_distance": {
+                                   "distance": "10km",
+                                   "workplace_address.coordinates": [
+                                       77.7, 66.6
+                                   ]}},
+                                   {"geo_distance": {
+                                       "distance": "5km",
+                                       "workplace_address.coordinates": [
+                                           18.1, 59.1
+                                       ]
+                                   }}]
+                           }}),
+                          ({settings.APIKEY: "",
+                            settings.POSITION: ["66.6, 77.7", "59.1, 18.1"]},
+                           True,
+                           {"bool": {
+                               "should":
+                               [{"geo_distance": {
+                                   "distance": "5km",
+                                   "workplace_address.coordinates": [
+                                       77.7, 66.6
+                                   ]}},
+                                   {"geo_distance": {
+                                       "distance": "5km",
+                                       "workplace_address.coordinates": [
+                                           18.1, 59.1
+                                       ]
+                                   }}]
+                           }})])
 def test_geo_distance_filter(args, exist, expected):
     query_dsl = pbquery.parse_args(args)
     assert (expected in query_dsl["query"]["bool"]["filter"]) == exist
 
 
 @pytest.mark.unit
-@pytest.mark.parametrize("args, expected_pos, expected_neg", [({settings.APIKEY: "",
-                                                                taxonomy.REGION: ["01", "02"]},
-                                                               [
-                                                 {"term": {"workplace_address.region_code":
-                                                           {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.region_code":
-                                                           {"value": "02", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.region_concept_id":
-                                                           {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.region_concept_id":
-                                                           {"value": "02", "boost": 1.0}}}
-                                                               ],
-                                                               []),
-                                            ({settings.APIKEY: "",
-                                              taxonomy.MUNICIPALITY: ["0111"]},
-                                             [
-                                                 {"term": {"workplace_address.municipality_code":
-                                                           {"value": "0111", "boost": 2.0}}},
-                                                 {"term": {"workplace_address.municipality_concept_id":
-                                                           {"value": "0111", "boost": 2.0}}}
-                                             ],
-                                             []),
-                                            ({settings.APIKEY: "",
-                                              taxonomy.REGION: ["01", "02"],
-                                              taxonomy.MUNICIPALITY: ["1111", "2222"]},
-                                             [
-                                                 {"term": {"workplace_address.region_code":
-                                                           {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.region_code":
-                                                           {"value": "02", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.region_concept_id":
-                                                           {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.region_concept_id":
-                                                           {"value": "02", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.municipality_code":
-                                                           {"value": "1111", "boost": 2.0}}},
-                                                 {"term": {"workplace_address.municipality_code":
-                                                           {"value": "2222", "boost": 2.0}}},
-                                                 {"term": {"workplace_address.municipality_concept_id":
-                                                           {"value": "1111", "boost": 2.0}}},
-                                                 {"term": {"workplace_address.municipality_concept_id":
-                                                           {"value": "2222", "boost": 2.0}}}
-                                             ],
-                                             []),
-                                            ({settings.APIKEY: "",
-                                              taxonomy.REGION: ["01", "-02"],
-                                              taxonomy.MUNICIPALITY: ["1111", "-2222"]},
-                                             [
-                                                 {"term": {"workplace_address.region_code":
-                                                           {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.municipality_code":
-                                                           {"value": "1111", "boost": 2.0}}},
-                                                 {"term": {"workplace_address.region_code":
-                                                           {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.municipality_code":
-                                                           {"value": "1111", "boost": 2.0}}}
-                                             ],
-                                             [
-                                                 {"term": {"workplace_address.region_code":
-                                                           {"value": "02"}}},
-                                                 {"term": {"workplace_address.municipality_code":
-                                                           {"value": "2222"}}},
-                                                 {"term": {"workplace_address.region_concept_id":
-                                                           {"value": "02"}}},
-                                                 {"term": {"workplace_address.municipality_concept_id":
-                                                           {"value": "2222"}}}
-                                             ]),
-                                            ({settings.APIKEY: "",
-                                              taxonomy.REGION: ["01", "-02"],
-                                              taxonomy.MUNICIPALITY: ["1111"]},
-                                             [
-                                                 {"term": {"workplace_address.region_code":
-                                                           {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.municipality_code":
-                                                           {"value": "1111", "boost": 2.0}}},
-                                                 {"term": {"workplace_address.region_concept_id":
-                                                           {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.municipality_concept_id":
-                                                           {"value": "1111", "boost": 2.0}}},
-                                             ],
-                                             [
-                                                 {"term": {"workplace_address.region_code":
-                                                           {"value": "02"}}},
-                                                 {"term": {"workplace_address.region_concept_id":
-                                                           {"value": "02"}}}
-                                             ]),
-                                            ({settings.APIKEY: "",
-                                              taxonomy.REGION: ["01"],
-                                              taxonomy.MUNICIPALITY: ["1111", "-2222"]},
-                                             [
-                                                 {"term": {"workplace_address.region_code":
-                                                           {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.municipality_code":
-                                                           {"value": "1111", "boost": 2.0}}},
-                                                 {"term": {"workplace_address.region_concept_id":
-                                                           {"value": "01", "boost": 1.0}}},
-                                                 {"term": {"workplace_address.municipality_concept_id":
-                                                           {"value": "1111", "boost": 2.0}}},
-                                             ],
-                                             [
-                                                 {"term": {"workplace_address.municipality_code":
-                                                           {"value": "2222"}}},
-                                                 {"term": {"workplace_address.municipality_concept_id":
-                                                           {"value": "2222"}}}
-                                             ])])
+@pytest.mark.parametrize("args, expected_pos, expected_neg",
+                         [({settings.APIKEY: "",
+                            taxonomy.REGION: ["01", "02"]},
+                           [
+                               {"term": {"workplace_address.region_code":
+                                         {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_code":
+                                         {"value": "02", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_concept_id":
+                                         {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_concept_id":
+                                         {"value": "02", "boost": 1.0}}}
+                           ],
+                           []),
+                          ({settings.APIKEY: "",
+                            taxonomy.MUNICIPALITY: ["0111"]},
+                           [
+                               {"term": {"workplace_address.municipality_code":
+                                         {"value": "0111", "boost": 2.0}}},
+                               {"term": {"workplace_address.municipality_concept_id":
+                                         {"value": "0111", "boost": 2.0}}}
+                           ],
+                           []),
+                          ({settings.APIKEY: "",
+                            taxonomy.REGION: ["01", "02"],
+                            taxonomy.MUNICIPALITY: ["1111", "2222"]},
+                           [
+                               {"term": {"workplace_address.region_code":
+                                         {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_code":
+                                         {"value": "02", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_concept_id":
+                                         {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_concept_id":
+                                         {"value": "02", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_code":
+                                         {"value": "1111", "boost": 2.0}}},
+                               {"term": {"workplace_address.municipality_code":
+                                         {"value": "2222", "boost": 2.0}}},
+                               {"term": {"workplace_address.municipality_concept_id":
+                                         {"value": "1111", "boost": 2.0}}},
+                               {"term": {"workplace_address.municipality_concept_id":
+                                         {"value": "2222", "boost": 2.0}}}
+                           ],
+                           []),
+                          ({settings.APIKEY: "",
+                            taxonomy.REGION: ["01", "-02"],
+                            taxonomy.MUNICIPALITY: ["1111", "-2222"]},
+                           [
+                               {"term": {"workplace_address.region_code":
+                                         {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_code":
+                                         {"value": "1111", "boost": 2.0}}},
+                               {"term": {"workplace_address.region_code":
+                                         {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_code":
+                                         {"value": "1111", "boost": 2.0}}}
+                           ],
+                           [
+                               {"term": {"workplace_address.region_code":
+                                         {"value": "02"}}},
+                               {"term": {"workplace_address.municipality_code":
+                                         {"value": "2222"}}},
+                               {"term": {"workplace_address.region_concept_id":
+                                         {"value": "02"}}},
+                               {"term": {"workplace_address.municipality_concept_id":
+                                         {"value": "2222"}}}
+                           ]),
+                          ({settings.APIKEY: "",
+                            taxonomy.REGION: ["01", "-02"],
+                            taxonomy.MUNICIPALITY: ["1111"]},
+                           [
+                               {"term": {"workplace_address.region_code":
+                                         {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_code":
+                                         {"value": "1111", "boost": 2.0}}},
+                               {"term": {"workplace_address.region_concept_id":
+                                         {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_concept_id":
+                                         {"value": "1111", "boost": 2.0}}},
+                           ],
+                           [
+                               {"term": {"workplace_address.region_code":
+                                         {"value": "02"}}},
+                               {"term": {"workplace_address.region_concept_id":
+                                         {"value": "02"}}}
+                           ]),
+                          ({settings.APIKEY: "",
+                            taxonomy.REGION: ["01"],
+                            taxonomy.MUNICIPALITY: ["1111", "-2222"]},
+                           [
+                               {"term": {"workplace_address.region_code":
+                                         {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_code":
+                                         {"value": "1111", "boost": 2.0}}},
+                               {"term": {"workplace_address.region_concept_id":
+                                         {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_concept_id":
+                                         {"value": "1111", "boost": 2.0}}},
+                           ],
+                           [
+                               {"term": {"workplace_address.municipality_code":
+                                         {"value": "2222"}}},
+                               {"term": {"workplace_address.municipality_concept_id":
+                                         {"value": "2222"}}}
+                           ])])
 def test_region_municipality_query(args, expected_pos, expected_neg):
     query_dsl = pbquery.parse_args(args)
     if expected_pos:
@@ -270,3 +270,12 @@ def test_region_municipality_query(args, expected_pos, expected_neg):
         for e in expected_neg:
             assert (e in neg_query)
     print('====================', sys._getframe().f_code.co_name, '==================== ')
+
+
+# Querybuilder tests
+@pytest.mark.unit
+def test_rewrite_word_for_regex():
+    assert pbquery._rewrite_word_for_regex("[python3]") == "\\[python3\\]"
+    assert pbquery._rewrite_word_for_regex("python3") == "python3"
+    assert pbquery._rewrite_word_for_regex("asp.net") == "asp\\.net"
+    assert pbquery._rewrite_word_for_regex("c++") == "c\\+\\+"

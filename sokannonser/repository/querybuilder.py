@@ -1,5 +1,6 @@
 import logging
 import re
+import time
 from sokannonser import settings
 from sokannonser.repository import ttc, taxonomy
 from sokannonser.rest.model import queries
@@ -174,6 +175,7 @@ class QueryBuilder(object):
         args.pop(settings.APIKEY)
 
         # Make sure to only serve published ads
+        offset = self._calculate_utc_offset()
         query_dsl['query'] = {
             'bool': {
                 'must': [],
@@ -181,14 +183,14 @@ class QueryBuilder(object):
                     {
                         'range': {
                             f.PUBLICATION_DATE: {
-                                'lte': 'now/m'
+                                'lte': 'now+%dH/m' % offset
                             }
                         }
                     },
                     {
                         'range': {
                             f.LAST_PUBLICATION_DATE: {
-                                'gte': 'now/m'
+                                'gte': 'now+%dH/m' % offset
                             }
                         }
                     },
@@ -234,6 +236,11 @@ class QueryBuilder(object):
         else:
             query_dsl['sort'] = ["_score", {f.ID: "asc"}]
         return query_dsl
+
+    def _calculate_utc_offset(self):
+        is_dst = time.daylight and time.localtime().tm_isdst > 0
+        utc_offset = - (time.altzone if is_dst else time.timezone)
+        return int(utc_offset/3600) if utc_offset > 0 else 0
 
     def _assemble_queries(self, query_dsl, additional_queries, additional_filters):
         for query in additional_queries:
@@ -354,7 +361,6 @@ class QueryBuilder(object):
             query_dict['bool']['must'] = []
 
         for should in query_dict['bool']['must']:
-            print("ELEMENT", should)
             try:
                 should['bool']['should'].append(
                     {

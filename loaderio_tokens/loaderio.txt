@@ -9,3 +9,6 @@ loaderio-6b7df9ede7fa23c6a87eddb74d3bf406
 
 # dev-bulk-api
 loaderio-194c61a1d3e78db3606a75d20fcb9029
+
+# dev-open-api
+loaderio-ac6fc487eb95cd41a68f4e43e8998908

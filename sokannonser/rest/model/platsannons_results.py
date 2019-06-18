@@ -158,6 +158,7 @@ open_results = ns_platsannons.model('SearchResults', {
 
 typeahead_item = ns_platsannons.model('TypeaheadItem', {
     'value': fields.String(),
+    'found_phrase': fields.String(),
     'type': fields.String(),
     'occurrences': fields.Integer()
 })

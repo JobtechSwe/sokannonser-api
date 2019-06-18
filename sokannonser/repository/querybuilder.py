@@ -272,7 +272,7 @@ class QueryBuilder(object):
 
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
-        querystring = self.__rewrite_querystring(querystring, concepts)
+        querystring = self.__rewrite_querystring(querystring.lower(), concepts)
         ft_query = self.__create_base_ft_query(querystring)
 
         # Make all "musts" concepts "shoulds" as well

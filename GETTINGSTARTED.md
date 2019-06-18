@@ -1,7 +1,7 @@
 # Search API for job adds - getting started
 
-The aim of this text is to walk you through what you're seeing in the Swagger UI at https://open-api.dev.services.jtech.se/ to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our bulk load API. I'ts going to be A LOT easier and you'll just have to make a fraction of the amount of calls.
-This API is intended for user search not scraping. 
+The aim of this text is to walk you through what you're seeing in the Swagger UI at https://open-api.dev.services.jtech.se/ to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk load API] (https://bulk-api.dev.services.jtech.se)
+This API is intended for user search not downloading all the job ads. 
 
 
 
@@ -15,13 +15,13 @@ This API is intended for user search not scraping.
 [Examples](#Examples)
 
 ##Short version
-The API is meant for searching, we want you to be able to just slap on a nice frontend on top of our free text query field q in /search like this...
+The API is meant for searching, we want you to be able to just build your own customized GUI on top of ourfree text query field q in /search like this...
  
 	/search?q=Flen&offset=0&limit=100
-...and live happily ever after.
-If you want to narrow down the search you should be able to find the filters you need out of the box. Most filters needs to be combined with id-keys found under /taxonomy/search these will help you get sharper hits for structured data. We will always work on improving the hits for free queries  hoping you'll see less and less use for filtering.
+...and not have to worry about the users finding the most relevant ads.
+If you want to narrow down the search result, use the available search filters. Some of the filters needs id-keys as input for searching structured data. The id-keys can be found at /taxonomy/search these will help you get sharper hits for structured data. We will always work on improving the hits for free queries  hoping you'll see less and less use for filtering.
 
-If you want to improve on your front end you can use the typeahead meant for very quick searches on the most common terms found in our job ads. This should work great with an auto complete feature in your search box. If i request
+If you want to help your end users with term suggestions you can use the typeahead function, which will return common terms found in the job ads. This should work great with an auto complete feature in your search box. If i request
 	
 	complete?q=stor
 I get storkök, storhushåll, storesupport, storage. As they are the most common terms starting with "stor*" in ads.
@@ -38,7 +38,7 @@ For this API, you will need to register your own API key at www.jobtechdev.se
 This API service is divided into two major sections.
 
 ### 1. Open AF-job ads
-The endpoints in the first section will return job ads from Arbetsförmedlingen that are currently open for applications. The ads published in Arbetsförmedlingen are tagged with some meta data like "annonsid", "logotypurl", "yrkesbenamning" and "yrkesid" and the information in the ads is divided into sections with headlines like "annonsrubrik", "annonstext", "arbetstidvaraktighet" and "loneform". The ads may have information in all the fields or some of them.
+The endpoints in the first section will return job ads from Arbetsförmedlingen that are currently open for applications. The ads published in Arbetsförmedlingen are tagged with some meta data like "id", "logotypurl", "yrkesbenamning" and "yrkesid" and the information in the ads is divided into sections with headlines like "headline", "text", "arbetstidvaraktighet" and "loneform". The ads may have information in all the fields or some of them.
 
 #### Open-Ad-ID
 /ad/{id} This endpoint is used for fetching specific job ads with all available meta data, by their ad ID number. The ID number can be found by doing a query with the other endpoint within this section, _Open-Search_.
@@ -46,12 +46,13 @@ The endpoints in the first section will return job ads from Arbetsförmedlingen 
 #### Open-Search
 /search finds what you want among all the indexed job ads that are currently open. With the possibility to filter by specific parameters like occupation, location, or required skills. Some are these parameters are set using an ID which you find in _Jobtech-Taxonomy_ (see the second headline on the page).
 
+
 #### Complete
-/complete This endpoint is meant to help you create autocomplete functions AKA type aheads. The result set will return the most frequent job market terms starting with the letters you put in. It's most easily described using the q field. Put in LÄK and you get läkarsekreterare","läkare","läkemedel" etc. 
+/complete This endpoint is meant to help you create autocomplete functions AKA type aheads. The result set will return the most frequent job market terms starting with the letters you put in. It's most easily understood by trying it out using the free query field q. If input is LÄK you will get "läkarsekreterare","läkare","läkemedel" etc. 
 If you put in more than one word you get the most common terms for that context for example "läkare L" and you get "linköping","lund" etc
 
 
-### 2. Jobtech-Taxonomy
+### Jobtech-Taxonomy
 This endpoint provides labour market terms and their corresponding unique ID. The ID's are required in some parameters in the /open/search endpoint.
 
 Taxonomy contains terms within different categories. In the drop down list under "filter by type" all available categories are listed.
@@ -67,10 +68,11 @@ Taxonomy contains terms within different categories. In the drop down list under
 * Sun education _fields_. These three categories describes different fields of education. The top level, _Sun Education Field 1_, contains the broad descriptions of education areas. The next level _Sun Education Field 2_ narrows the fields down a bit. _Sun Education Field 3_ contains specific education programs or trainings. Each concept in level 3 has a "parent" in level 2, and each level 2 concept has a level 1 "parent".
 * Sun education _levels_. The three categories describes different levels of formal education in Sweden. _Sun Education Level 1_ is the top category and contains broad descriptions of education levels. The next level is _Sun Education Field 2_ describes more specific levels or generic degrees. _Sun Education Field 3_ contains specific degrees from Swedish formal education. Each concept in level 3 has a "parent" in level 2, and each level 2 concept has a level 1 "parent".
 
+
 ## Results
-When making a search request the resulting response will start with some meta-info about your result
 
 ### Meta data for your search request
+When making a search request the resulting response will start with some meta-info about your result
 
 #### "total": 
 "value": Total Number of ads matching your search
@@ -79,16 +81,18 @@ When making a search request the resulting response will start with some meta-in
   
 "query_time_in_millis": How long did the actuals search take
   
-"result_time_in_millis": How long did the roundtrip take
+"result_time_in_millis": How long did  the total roundtrip take
   
 "stats": {},
   
 "freetext_concepts": {},
   
-"hits": These are the actual ads
+"hits": Placeholder for zero to * ads
   
-  
+
+ 
 ### Object data
+Then comes the actual ads 
     
 "id": The ID you can use in Open-AD-ID Endpoint
       
@@ -229,18 +233,20 @@ When making a search request the resulting response will start with some meta-in
 "skills": []
 "concept_id": Stable ID for label
 
-"label": The sought after skill            
+"label": The name of a skill            
 
 "weight": Weights for must_have are normally 10
-            "legacy_ams_taxonomy_id": Legacy id for label
+
+"legacy_ams_taxonomy_id": Legacy id for label
 
 "languages": []
 "concept_id": Stable ID for label
 
-"label": The sought after language            
+"label": The name of a language            
 
 "weight": Weights for must_have are normally 10
-            "legacy_ams_taxonomy_id": Legacy id for label
+            
+"legacy_ams_taxonomy_id": Legacy id for label
         
 "work_experiences": []
  
@@ -249,7 +255,8 @@ When making a search request the resulting response will start with some meta-in
 "label": The sought after experience            
 
 "weight": Weights for must_have are normally 10
-            "legacy_ams_taxonomy_id": Legacy id for label
+
+"legacy_ams_taxonomy_id": Legacy id for label
 
 #### "nice_to have":
 "skills": []
@@ -259,7 +266,8 @@ When making a search request the resulting response will start with some meta-in
 "label": The sought after skill            
 
 "weight": Weights for must_have are normally 10
-            "legacy_ams_taxonomy_id": Legacy id for label
+
+"legacy_ams_taxonomy_id": Legacy id for label
 
 "languages":[]
         
@@ -267,24 +275,29 @@ When making a search request the resulting response will start with some meta-in
 
 "label": The sought after language            
 
-"weight": Weights for must_have are normally 10
-            "legacy_ams_taxonomy_id": Legacy id for label
+"weight": Weights for must_have are below 10
+           
+"legacy_ams_taxonomy_id": Legacy id for label
 
 "work_experiences": []
         
 "concept_id": Stable ID for label
 
-"label": The sought after experience            
+"label": The name of a experience            
 
 "weight": Weights for must_have are normally 10
-            "legacy_ams_taxonomy_id": Legacy id for label
+            
+"legacy_ams_taxonomy_id": Legacy id for label
       
       
- "publication_date": When was the ad published
+"publication_date": When was the ad published
  
-"last_publication_date": When is the add unpublished
+"last_publication_date": When the ad will be unpublished
+
 "removed": Boolean if the add unpublished or not which can occur before the last publication date
+
 "removed_date": When was the add removed
+
 "source_type": Where did the add come from
       
 #### "keywords": {
@@ -329,7 +342,7 @@ Request URL
 
 	/open/search?occupation=iugg_Qq9_QHH&offset=0&limit=10
 
-This will give a smaller result set with a higher certainty of actually being for a souschef, however the result set will likely miss a few relevant ads since the occupation-name field isn't always set by employers. You should find that a larger set is more useful since there are multiple sorting factors working to show the most relevant hits first. We're also working to always improve the API in regards to unstructured data. The term Souschef has three popular formats when found out in the wild. "Souschef", "sous chef", "sous-chef" but as the API recognise them as synonyms they will fetch the same number of adds. There are a lot of cases like these that we are constantly adding. Our machine learning model also works in favour of the free query, it can to a pretty high degree distinguish between competences asked for by the employer and words just mentioned in the ad.
+This will give a smaller result set with a higher certainty of actually being for a souschef, however the result set will likely miss a few relevant ads since the occupation-name field isn't always set by employers. You should find that a larger set is more useful since there are multiple sorting factors working to show the most relevant hits first. We're also working to always improve the API in regards to unstructured data. The term Souschef has three popular formats when found out in the wild. "Souschef", "sous chef", "sous-chef" but as the API recognise them as synonyms they will fetch the same number of adds. There are a lot of cases like these that we are constantly adding. Our machine learning model also works in favour of the free query. 
 
 ### Searching only within a specific field of work
 Firstly use the _Jobtech-Taxonomy_ endpoint to get the Id for Data/IT (occupation field). I'll make a free text search on the term "IT" narrowing down the search to occupation-field

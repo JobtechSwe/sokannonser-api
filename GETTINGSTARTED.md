@@ -1,6 +1,7 @@
 #Search API for job adds - getting started
 
 The aim of this text is to walk you through what you're seeing in the Swagger UI at https://open-api.dev.services.jtech.se/ to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our bulk load API. I'ts going to be A LOT easier and you'll just have to make a fraction of the amount of calls.
+This API is intended for user search not scraping. 
 
 
 
@@ -18,12 +19,12 @@ The API is meant for searching, we want you to be able to just slap on a nice fr
  
 	/search?q=Flen&offset=0&limit=100
 ...and live happily ever after.
-If you want to narrow down the search you should be able to find the filters you need out of the box. Most filters needs to be combined with id-keys found under /taxonomy/search these will help you get sharper hits for structured data. We will work on improving the hits for free queries for a long time hoping you'll see less and less use for filtering.
+If you want to narrow down the search you should be able to find the filters you need out of the box. Most filters needs to be combined with id-keys found under /taxonomy/search these will help you get sharper hits for structured data. We will always work on improving the hits for free queries  hoping you'll see less and less use for filtering.
 
-If you want to improve on you front end you can use the typeahead meant for very quick searches on the most common terms found in our job ads. This should work great with an auto complete feature in your search box. If i request
+If you want to improve on your front end you can use the typeahead meant for very quick searches on the most common terms found in our job ads. This should work great with an auto complete feature in your search box. If i request
 	
 	complete?q=stor
-I get storkök, storhushåll, storesupport, storage as they are the most common terms in ads.
+I get storkök, storhushåll, storesupport, storage. As they are the most common terms starting with "stor*" in ads.
 If I request 
 
 	/complete?q=storage%20s

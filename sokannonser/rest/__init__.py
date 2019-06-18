@@ -1,6 +1,6 @@
 from flask_restplus import Api, Namespace
 
-api = Api(version='1.0', title='Search job ads',
+api = Api(version='1.1.0', title='Search job ads',
           description='An API for searching and retrieving job ads and for finding '
           'concepts in the Jobtech Taxonomy.',
           default='sokannonser',

@@ -115,7 +115,8 @@ class QueryBuilder(object):
                 value_dicts += [{"type": agg[9:], **bucket}
                                 for bucket in aggs[agg]['buckets']]
 
-            filtered_aggs = [{"value": kv['key'],
+            filtered_aggs = [{"value": re.sub(f'^{freetext}', '', kv['key']).strip(),
+                              "found_phrase": kv['key'],
                               "type": kv['type'],
                               "occurrences": kv['doc_count']}
                              for kv in sorted(value_dicts,
@@ -210,26 +211,46 @@ class QueryBuilder(object):
         complete_string = args.get(settings.TYPEAHEAD_QUERY)
         complete_fields = args.get(settings.FREETEXT_FIELDS) or queries.QF_CHOICES
         if complete_string:
+            complete_string = self._rewrite_word_for_regex(complete_string.lower())
             word_list = complete_string.split(' ')
             complete = word_list[-1]
-            if len(word_list) > 1 and word_list[-1] == '':
-                # Add previous word to list
-                complete = "%s " % word_list[-2]
 
-            complete = self._rewrite_word_for_regex(complete)
+            bigram_complete = None
+            if len(word_list) > 1 and word_list[-1] == '':
+                bigram_complete = "%s " % word_list[-2]
 
             size = 12/len(complete_fields)
+
             for field in complete_fields:
                 dkey = "complete_%s" % field
                 base_field = f.KEYWORDS_EXTRACTED \
                     if field in ['location', 'employer'] else f.KEYWORDS_ENRICHED
-                query_dsl['aggs'][dkey] = {
-                    "terms": {
-                        "field": "%s.%s.raw" % (base_field, field),
-                        "size": size,
-                        "include": "%s.*" % complete.lower()
+
+                if complete:
+                    query_dsl['aggs'][dkey] = {
+                        "terms": {
+                            "field": "%s.%s.raw" % (base_field, field),
+                            "size": size,
+                            "include": "%s.*" % complete
+                        }
                     }
-                }
+                elif bigram_complete:
+                    query_dsl['aggs'][dkey+"_remainder"] = {
+                        "terms": {
+                            "field": "%s.%s.raw" % (base_field, field),
+                            "size": size,
+                            "include": "%s.*" % bigram_complete
+                        }
+                    }
+
+                if complete_string != bigram_complete and complete_string != complete:
+                    query_dsl['aggs'][dkey+"_remainder"] = {
+                        "terms": {
+                            "field": "%s.%s.raw" % (base_field, field),
+                            "size": size,
+                            "include": "%s.*" % complete_string
+                        }
+                    }
 
         if args.get(settings.SORT):
             query_dsl['sort'] = f.sort_options.get(args.pop(settings.SORT))

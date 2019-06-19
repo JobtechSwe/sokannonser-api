@@ -274,7 +274,7 @@ class QueryBuilder(object):
 
     def _rewrite_word_for_regex(self, word):
         bad_chars = ['+', '.', '[', ']', '{', '}', '(', ')', '^', '$',
-                     '*', '\\', '|', '?', '"', '\'']
+                     '*', '\\', '|', '?', '"', '\'', '&']
         if any(c in bad_chars for c in word):
             modded_term = ''
             for c in word:
@@ -290,6 +290,7 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES
+            queryfields.remove('location')
 
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
@@ -325,14 +326,11 @@ class QueryBuilder(object):
     def __rewrite_querystring(self, querystring, concepts):
         # Sort all concepts by string length
         all_concepts = sorted(concepts['occupation'] +
-                              concepts['skill'] +
-                              concepts['location'] +
                               concepts['occupation_must'] +
-                              concepts['skill_must'] +
-                              concepts['location_must'] +
                               concepts['occupation_must_not'] +
-                              concepts['skill_must_not'] +
-                              concepts['location_must_not'],
+                              concepts['skill'] +
+                              concepts['skill_must'] +
+                              concepts['skill_must_not'],
                               key=lambda c: len(c),
                               reverse=True)
         # Remove found concepts from querystring
@@ -440,7 +438,8 @@ class QueryBuilder(object):
                     "type": "cross_fields",
                     "operator": "and",
                     "fields": [f.HEADLINE+"^3", f.KEYWORDS_EXTRACTED+".employer^2",
-                               f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE]
+                               f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
+                               f.KEYWORDS_EXTRACTED+".location^5"]
                 }
             }
         ]

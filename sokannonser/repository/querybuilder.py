@@ -290,7 +290,8 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES
-            queryfields.remove('location')
+            if 'location' in queryfields:
+                queryfields.remove('location')
 
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)

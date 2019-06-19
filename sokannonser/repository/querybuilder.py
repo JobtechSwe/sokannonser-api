@@ -393,6 +393,16 @@ class QueryBuilder(object):
                             }
                         }
                     })
+                should['bool']['should'].append(
+                    {
+                        "match": {
+                            f.KEYWORDS_EXTRACTED+".employer": {
+                                "query": querystring.strip(),
+                                "operator": "and",
+                                "boost": 1
+                            }
+                        }
+                    })
             except KeyError:
                 log.error("No bool clause for headline query")
 

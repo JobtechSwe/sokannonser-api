@@ -144,13 +144,25 @@ def _build_query(query_string, taxonomy_code, entity_type, offset, limit):
     musts = []
     sort = None
     if query_string:
-        musts.append({
-            "match_phrase_prefix": {
-                "label": {
-                    "query": query_string
+        musts.append({"bool": {"should": [
+            {
+                "match_phrase_prefix": {
+                    "label": {
+                        "query": query_string
+                    }
+                }
+            },
+            {
+                "term": {
+                    "concept_id": {"value": query_string}
+                }
+            },
+            {
+                "term": {
+                    "legacy_ams_taxonomy_id": {"value": query_string}
                 }
             }
-        })
+        ]}})
     else:
         # Sort numerically for non-query_string-queries
         sort = [

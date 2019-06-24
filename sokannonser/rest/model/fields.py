@@ -77,7 +77,6 @@ sort_options = {
     'applydate-desc': [{APPLICATION_DEADLINE: "desc", ID: "asc"}],
     'applydate-asc': [{APPLICATION_DEADLINE: "asc", ID: "asc"}],
     'updated': [{"timestamp": "desc", ID: "asc"}],
-    'id': [{ID: "asc"}],
 }
 stats_options = {
     taxonomy.OCCUPATION: "%s.%s.keyword" % (OCCUPATION, LEGACY_AMS_TAXONOMY_ID),

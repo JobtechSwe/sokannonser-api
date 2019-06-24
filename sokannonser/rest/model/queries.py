@@ -69,8 +69,7 @@ swagger_filter_doc_params = {
     "applydate-desc: last apply date, descending (newest apply date first)\n"
     "applydate-asc: last apply date, descending (oldest apply date first, "
     "few days left for application)\n"
-    "updated: sort by update date (descending)\n"
-    "id: sort by job ad id (ascending)\n",
+    "updated: sort by update date (descending)\n",
     settings.STATISTICS: "Show statistics for specified fields "
     "(available fields: %s, %s and %s)" % (
         taxonomy.OCCUPATION,
@@ -134,7 +133,8 @@ pb_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 30), required=
 
 taxonomy_query = reqparse.RequestParser()
 taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)
-taxonomy_query.add_argument(settings.OFFSET, type=inputs.int_range(0, settings.MAX_OFFSET),
+taxonomy_query.add_argument(settings.OFFSET,
+                            type=inputs.int_range(0, settings.MAX_OFFSET),
                             default=0)
 taxonomy_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_LIMIT),
                             default=10)

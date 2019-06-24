@@ -125,7 +125,8 @@ pb_query.add_argument(settings.OFFSET, type=inputs.int_range(0, settings.MAX_OFF
                       default=0)
 pb_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_LIMIT),
                       default=10)
-pb_query.add_argument(settings.SORT, choices=list(fields.sort_options.keys()))
+# TODO: Remove sort_option 'id' in next major version
+pb_query.add_argument(settings.SORT, choices=list(fields.sort_options.keys()) + ['id'])
 pb_query.add_argument(settings.STATISTICS, action='append',
                       choices=[taxonomy.OCCUPATION, taxonomy.GROUP,
                                taxonomy.FIELD])

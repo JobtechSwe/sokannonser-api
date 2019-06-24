@@ -1,5 +1,6 @@
 from flask import request
 from flask_restplus import Resource, abort
+from jobtech.common.rest.decorators import check_api_key
 from sokannonser.repository import taxonomy
 from sokannonser import settings
 from sokannonser.repository import elastic, platsannonser
@@ -10,6 +11,8 @@ from sokannonser.rest.model.queries import taxonomy_query
 
 @ns_valuestore.route('/search')
 class Valuestore(Resource):
+    method_decorators = [check_api_key('taxonomy')]
+
     @ns_valuestore.doc(
         params={
             settings.OFFSET: "The offset parameter defines the offset from the first "

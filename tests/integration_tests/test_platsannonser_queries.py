@@ -2,6 +2,7 @@ import sys
 import os
 import pytest
 from dateutil import parser
+from pprint import pprint
 from sokannonser import app
 from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
@@ -19,6 +20,41 @@ def test_freetext_query_one_param():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/search', headers=headers, data={'q': 'gymnasielärare',
+                                                                  'limit': '1'})
+        json_response = result.json
+        # pprint(json_response)
+        hits_total = json_response['total']['value']
+        assert int(hits_total) > 0
+
+
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_freetext_query_misspelled_param():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        # result = testclient.get('/search', headers=headers, data={'q': 'sjukssköterska noggran javasscript',
+        #                                                           'limit': '1'})
+        result = testclient.get('/search', headers=headers, data={'q': 'sjukssköterska',
+                                                                  'limit': '1'})
+        json_response = result.json
+        # pprint(json_response)
+        hits_total = json_response['total']['value']
+        assert int(hits_total) > 0
+
+
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_freetext_query_synonym_param():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        # Note: Should get hits enriched with 'montessoripedagogik'.
+        result = testclient.get('/search', headers=headers, data={'q': 'montessori',
                                                                   'limit': '1'})
         json_response = result.json
         # pprint(json_response)

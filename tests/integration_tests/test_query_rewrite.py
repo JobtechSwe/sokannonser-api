@@ -99,6 +99,16 @@ def test_rewrite_unigram_misspelled_input():
     assert 'sjuksköterska' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'noggrann' in [c['concept'].lower() for c in concepts['trait']]
 
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_rewrite_unigram_misspelled_single_word_input():
+    print('\n==================', sys._getframe().f_code.co_name, '==================')
+
+    concepts = text_to_concept.text_to_concepts('noggran')
+    assert_not_empty(concepts, 'trait')
+    # pprint(concepts)
+    assert 'noggrann' in [c['concept'].lower() for c in concepts['trait']]
+
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration

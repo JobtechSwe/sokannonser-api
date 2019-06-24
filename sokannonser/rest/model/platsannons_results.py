@@ -133,13 +133,13 @@ search_stats = ns_platsannons.model('Stats', {
 freetext_concepts = ns_platsannons.model('FreetextConcepts', {
     'skill': fields.List(fields.String()),
     'occupation': fields.List(fields.String()),
-    'location': fields.List(fields.String()),
+    # 'location': fields.List(fields.String()),
     'skill_must': fields.List(fields.String()),
     'occupation_must': fields.List(fields.String()),
-    'location_must': fields.List(fields.String()),
+    # 'location_must': fields.List(fields.String()),
     'skill_must_not': fields.List(fields.String()),
     'occupation_must_not': fields.List(fields.String()),
-    'location_must_not': fields.List(fields.String()),
+    # 'location_must_not': fields.List(fields.String()),
 })
 
 number_of_hits = ns_platsannons.model('NumberOfHits', {
@@ -158,6 +158,7 @@ open_results = ns_platsannons.model('SearchResults', {
 
 typeahead_item = ns_platsannons.model('TypeaheadItem', {
     'value': fields.String(),
+    'found_phrase': fields.String(),
     'type': fields.String(),
     'occurrences': fields.Integer()
 })

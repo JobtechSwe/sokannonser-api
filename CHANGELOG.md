@@ -1,6 +1,9 @@
 Changelog Application Jobsearch
 ===============================
 
+## 1.1.1
+* Fixes a bug in typeahead for capitalized searchwords
+
 ## 1.1.0
 * Adds ability to search for IDs in Jobtech Taxonomy.
 * More comprehensive typeahead functionality which includes bigrams and complete phrase.

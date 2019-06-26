@@ -115,7 +115,8 @@ class QueryBuilder(object):
                 value_dicts += [{"type": agg[9:], **bucket}
                                 for bucket in aggs[agg]['buckets']]
 
-            filtered_aggs = [{"value": re.sub(f'^{freetext}', '', kv['key']).strip(),
+            filtered_aggs = [{"value": re.sub(f'^{freetext.lower()}',
+                                              '', kv['key']).strip(),
                               "found_phrase": kv['key'],
                               "type": kv['type'],
                               "occurrences": kv['doc_count']}

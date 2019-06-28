@@ -115,15 +115,17 @@ class QueryBuilder(object):
                 value_dicts += [{"type": agg[9:], **bucket}
                                 for bucket in aggs[agg]['buckets']]
 
-            filtered_aggs = [{"value": re.sub(f'^{freetext.lower()}',
-                                              '', kv['key']).strip(),
-                              "found_phrase": kv['key'],
-                              "type": kv['type'],
-                              "occurrences": kv['doc_count']}
-                             for kv in sorted(value_dicts,
-                                              key=lambda k: k['doc_count'],
-                                              reverse=True)
-                             if kv['key'] not in fwords]
+        filtered_aggs = [
+            {
+                "value": re.sub('^%s' % self._rewrite_word_for_regex(freetext.lower()),
+                                '', kv['key']).strip(),
+                "found_phrase": kv['key'],
+                "type": kv['type'],
+                "occurrences": kv['doc_count']
+            } for kv in sorted(value_dicts,
+                               key=lambda k: k['doc_count'],
+                               reverse=True)
+            if kv['key'] not in fwords]
         if len(filtered_aggs) > 10:
             return filtered_aggs[0:10]
         return filtered_aggs

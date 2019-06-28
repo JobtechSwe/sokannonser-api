@@ -290,7 +290,7 @@ class QueryBuilder(object):
         if not querystring:
             return None
         if not queryfields:
-            queryfields = queries.QF_CHOICES
+            queryfields = queries.QF_CHOICES.copy()
             if 'location' in queryfields:
                 queryfields.remove('location')
 

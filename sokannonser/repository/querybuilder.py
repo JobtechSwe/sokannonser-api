@@ -293,8 +293,6 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES.copy()
-            if 'location' in queryfields:
-                queryfields.remove('location')
 
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
@@ -324,6 +322,7 @@ class QueryBuilder(object):
 
         # Add a headline query as well
         ft_query = self.__freetext_headline(ft_query, original_querystring)
+        ft_query = self.__freetext_headline(ft_query, original_querystring)
         return ft_query
 
     # Removes identified concepts from querystring
@@ -334,7 +333,10 @@ class QueryBuilder(object):
                               concepts['occupation_must_not'] +
                               concepts['skill'] +
                               concepts['skill_must'] +
-                              concepts['skill_must_not'],
+                              concepts['skill_must_not'] +
+                              concepts['location'] +
+                              concepts['location_must'] +
+                              concepts['location_must_not'],
                               key=lambda c: len(c),
                               reverse=True)
         # Remove found concepts from querystring
@@ -431,6 +433,17 @@ class QueryBuilder(object):
                         }
                     }
                 )
+                if key == 'location':
+                    query_dict['bool'][bool_type].append(
+                        {
+                            "match": {
+                                f.DESCRIPTION_TEXT: {
+                                    "query": value,
+                                    "boost": 0.5
+                                }
+                            }
+                        }
+                    )
 
         return query_dict
 

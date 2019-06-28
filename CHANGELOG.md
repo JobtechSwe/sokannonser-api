@@ -2,6 +2,7 @@ Changelog Application Jobsearch
 ===============================
 
 ## 1.1.1
+* Fixes a bug in typeahead where location would be removed from choices
 * Fixes a bug in typeahead for capitalized searchwords
 * Fixes a bug in typeahead for '<' and '>'
 

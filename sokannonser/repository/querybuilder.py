@@ -112,17 +112,22 @@ class QueryBuilder(object):
         value_dicts = []
         for agg in aggs:
             if agg.startswith('complete_'):
-                value_dicts += [{"type": agg[9:], **bucket}
+                value_dicts += [{"type": agg[12:], **bucket}
                                 for bucket in aggs[agg]['buckets']]
 
-            filtered_aggs = [{"value": re.sub(f'^{freetext}', '', kv['key']).strip(),
-                              "found_phrase": kv['key'],
-                              "type": kv['type'],
-                              "occurrences": kv['doc_count']}
-                             for kv in sorted(value_dicts,
-                                              key=lambda k: k['doc_count'],
-                                              reverse=True)
-                             if kv['key'] not in fwords]
+        filtered_aggs = []
+        for kv in sorted(value_dicts, key=lambda k: k['doc_count'], reverse=True):
+            found_words = kv['key'].split(' ')
+            value = ' '.join([w for w in found_words if w not in fwords])
+            if kv['key'] not in fwords:
+                ac_hit = {
+                    "value": value,
+                    "found_phrase": kv['key'],
+                    "type": kv['type'],
+                    "occurrences": kv['doc_count']
+                }
+                filtered_aggs.append(ac_hit)
+
         if len(filtered_aggs) > 10:
             return filtered_aggs[0:10]
         return filtered_aggs
@@ -215,42 +220,36 @@ class QueryBuilder(object):
             word_list = complete_string.split(' ')
             complete = word_list[-1]
 
-            bigram_complete = None
-            if len(word_list) > 1 and word_list[-1] == '':
-                bigram_complete = "%s " % word_list[-2]
+            ngrams_complete = []
+            for n in list(range(len(word_list)-1)):
+                ngrams_complete.append(' '.join(word_list[n:]))
 
             size = 12/len(complete_fields)
 
             for field in complete_fields:
-                dkey = "complete_%s" % field
                 base_field = f.KEYWORDS_EXTRACTED \
                     if field in ['location', 'employer'] else f.KEYWORDS_ENRICHED
 
                 if complete:
-                    query_dsl['aggs'][dkey] = {
+                    query_dsl['aggs']["complete_00_%s" % field] = {
                         "terms": {
                             "field": "%s.%s.raw" % (base_field, field),
                             "size": size,
                             "include": "%s.*" % complete
                         }
                     }
-                elif bigram_complete:
-                    query_dsl['aggs'][dkey+"_remainder"] = {
-                        "terms": {
-                            "field": "%s.%s.raw" % (base_field, field),
-                            "size": size,
-                            "include": "%s.*" % bigram_complete
+                x = 1
+                for ngram in ngrams_complete:
+                    if ngram != complete:
+                        query_dsl['aggs']["complete_%s_%s_remainder"
+                                          % (str(x).zfill(2), field)] = {
+                            "terms": {
+                                "field": "%s.%s.raw" % (base_field, field),
+                                "size": size,
+                                "include": "%s.*" % ngram
+                            }
                         }
-                    }
-
-                if complete_string != bigram_complete and complete_string != complete:
-                    query_dsl['aggs'][dkey+"_remainder"] = {
-                        "terms": {
-                            "field": "%s.%s.raw" % (base_field, field),
-                            "size": size,
-                            "include": "%s.*" % complete_string
-                        }
-                    }
+                        x += 1
 
         if args.get(settings.SORT) and args.get(settings.SORT) in f.sort_options.keys():
             query_dsl['sort'] = f.sort_options.get(args.pop(settings.SORT))
@@ -274,7 +273,7 @@ class QueryBuilder(object):
 
     def _rewrite_word_for_regex(self, word):
         bad_chars = ['+', '.', '[', ']', '{', '}', '(', ')', '^', '$',
-                     '*', '\\', '|', '?', '"', '\'', '&']
+                     '*', '\\', '|', '?', '"', '\'', '&', '<', '>']
         if any(c in bad_chars for c in word):
             modded_term = ''
             for c in word:
@@ -289,9 +288,7 @@ class QueryBuilder(object):
         if not querystring:
             return None
         if not queryfields:
-            queryfields = queries.QF_CHOICES
-            if 'location' in queryfields:
-                queryfields.remove('location')
+            queryfields = queries.QF_CHOICES.copy()
 
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
@@ -321,6 +318,7 @@ class QueryBuilder(object):
 
         # Add a headline query as well
         ft_query = self.__freetext_headline(ft_query, original_querystring)
+        ft_query = self.__freetext_headline(ft_query, original_querystring)
         return ft_query
 
     # Removes identified concepts from querystring
@@ -331,7 +329,10 @@ class QueryBuilder(object):
                               concepts['occupation_must_not'] +
                               concepts['skill'] +
                               concepts['skill_must'] +
-                              concepts['skill_must_not'],
+                              concepts['skill_must_not'] +
+                              concepts['location'] +
+                              concepts['location_must'] +
+                              concepts['location_must_not'],
                               key=lambda c: len(c),
                               reverse=True)
         # Remove found concepts from querystring
@@ -428,6 +429,17 @@ class QueryBuilder(object):
                         }
                     }
                 )
+                if key == 'location':
+                    query_dict['bool'][bool_type].append(
+                        {
+                            "match": {
+                                f.DESCRIPTION_TEXT: {
+                                    "query": value,
+                                    "boost": 0.5
+                                }
+                            }
+                        }
+                    )
 
         return query_dict
 

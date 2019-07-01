@@ -214,7 +214,11 @@ class QueryBuilder(object):
             }
         }
         complete_string = args.get(settings.TYPEAHEAD_QUERY)
-        complete_fields = args.get(settings.FREETEXT_FIELDS) or queries.QF_CHOICES
+        complete_fields = args.get(settings.FREETEXT_FIELDS)
+        if not complete_fields:
+            complete_fields = queries.QF_CHOICES.copy()
+            complete_fields.remove('employer')
+
         if complete_string:
             complete_string = self._rewrite_word_for_regex(complete_string.lower())
             word_list = complete_string.split(' ')

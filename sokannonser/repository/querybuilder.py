@@ -432,7 +432,7 @@ class QueryBuilder(object):
                 if key == 'location':
                     query_dict['bool'][bool_type].append(
                         {
-                            "match": {
+                            "match_phrase": {
                                 f.DESCRIPTION_TEXT: {
                                     "query": value,
                                     "boost": 0.5

@@ -15,8 +15,9 @@ OPTIONS_FULL = 'full'
 
 swagger_doc_params = {
     settings.APIKEY: "Required API key",
-    settings.PUBLISHED_AFTER: "Fetch job ads published after specified date and time "
-    "(format YYYY-mm-ddTHH:MM:SS)",
+    settings.PUBLISHED_AFTER: "Fetch job ads published after specified date and time."
+    "Accepts either datetime (format YYYY-mm-ddTHH:MM:SS) or number of minutes "
+    "(e.g 120 means published in the last two hours)",
     settings.PUBLISHED_BEFORE: "Fetch job ads published before specified date and time "
     "(format YYYY-mm-ddTHH:MM:SS)",
     settings.FREETEXT_QUERY: "Freetext query. Search in ad headline, ad description and "
@@ -87,9 +88,12 @@ annons_complete_query.add_argument(settings.APIKEY, location='headers', required
 annons_complete_query.add_argument(settings.PUBLISHED_BEFORE,
                                    type=lambda x: datetime.strptime(x,
                                                                     '%Y-%m-%dT%H:%M:%S'))
+# annons_complete_query.add_argument(settings.PUBLISHED_AFTER,
+#                                    type=lambda x: datetime.strptime(x,
+#                                                                     '%Y-%m-%dT%H:%M:%S'))
+datetime_or_minutes_regex = r'^(\d\d\d\d-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])T(00|[0-9]|1[0-9]|2[0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9]))|(\d+)$'
 annons_complete_query.add_argument(settings.PUBLISHED_AFTER,
-                                   type=lambda x: datetime.strptime(x,
-                                                                    '%Y-%m-%dT%H:%M:%S'))
+                                   type=inputs.regex(datetime_or_minutes_regex))
 annons_complete_query.add_argument(taxonomy.OCCUPATION, action='append')
 annons_complete_query.add_argument(taxonomy.GROUP, action='append')
 annons_complete_query.add_argument(taxonomy.FIELD, action='append')

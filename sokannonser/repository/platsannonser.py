@@ -107,11 +107,9 @@ def _extract_concept_from_concepts(concepts):
     return main_concepts
 
 
-def fetch_platsannons(ad_id):
-    try:
-        query_result = elastic.get(index=settings.ES_INDEX, id=ad_id, ignore=404)
-        if query_result and '_source' in query_result:
-            source = query_result['_source']
+def _format_ad_for_fetch(result):
+        source = result.get('_source')
+        if source:
             keyword_node = source['keywords']
             try:
                 # Remove enriched
@@ -124,8 +122,27 @@ def fetch_platsannons(ad_id):
                 pass
             except ValueError:
                 pass
-            return source
+        return source
+
+
+def fetch_platsannons(ad_id):
+    try:
+        query_result = elastic.get(index=settings.ES_INDEX, id=ad_id, ignore=404)
+        if query_result and '_source' in query_result:
+            return _format_ad_for_fetch(query_result)
         else:
+            ext_id_query = {
+                'query': {
+                    'term': {
+                        fields.EXTERNAL_ID: ad_id
+                    }
+                }
+            }
+            query_result = elastic.search(index=settings.ES_INDEX, body=ext_id_query)
+            hits = query_result.get('hits', {}).get('hits', [])
+            if hits:
+                return _format_ad_for_fetch(hits[0])
+
             log.info("Job ad %s not found, returning 404 message" % ad_id)
             abort(404, 'Ad not found')
     except exceptions.NotFoundError:

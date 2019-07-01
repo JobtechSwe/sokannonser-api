@@ -10,7 +10,7 @@ from sokannonser import settings
 log = logging.getLogger(__name__)
 
 
-@ns_bulk.route('zip')
+# @ns_bulk.route('zip')
 class BulkZip(Resource):
     method_decorators = [check_api_key('bulk', 300)]
 

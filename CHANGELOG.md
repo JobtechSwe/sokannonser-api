@@ -2,6 +2,7 @@ Changelog Application Jobsearch
 ===============================
 
 ## 1.1.1
+* Ad loading now accepts alternate id
 * Queries now once again supports alternate locations in query
 * Typeahead rework to include all variants of query string
 * Fixes a bug in typeahead where location would be removed from choices

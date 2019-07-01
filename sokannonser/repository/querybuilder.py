@@ -1,6 +1,7 @@
 import logging
 import re
 import time
+from datetime import datetime, timedelta
 from sokannonser import settings
 from sokannonser.repository import ttc, taxonomy
 from sokannonser.rest.model import queries
@@ -642,11 +643,18 @@ class QueryBuilder(object):
         return country_bool_query
 
     # Parses PUBLISHED_AFTER and PUBLISHED_BEFORE
-    def _filter_timeframe(self, from_datetime, to_datetime):
-        if not from_datetime and not to_datetime:
+    def _filter_timeframe(self, from_datestring, to_datetime):
+        if not from_datestring and not to_datetime:
             return None
         range_query = {"range": {f.PUBLICATION_DATE: {}}}
+        if re.match(r'^\d+$', from_datestring):
+            now = datetime.now()
+            from_datetime = now - timedelta(minutes=int(from_datestring))
+        else:
+            from_datetime = datetime.strptime(from_datestring,
+                                              '%Y-%m-%dT%H:%M:%S')
         if from_datetime:
+            log.debug("Filter ads from %s" % from_datetime)
             range_query['range'][f.PUBLICATION_DATE]['gte'] = from_datetime.isoformat()
         if to_datetime:
             range_query['range'][f.PUBLICATION_DATE]['lte'] = to_datetime.isoformat()

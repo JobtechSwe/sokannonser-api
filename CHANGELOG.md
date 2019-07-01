@@ -2,6 +2,8 @@ Changelog Application Jobsearch
 ===============================
 
 ## 1.1.1
+* Location search in ad description requires exact phrase
+* Employer name is no longer default in typeahead
 * Ad loading now accepts alternate id
 * Queries now once again supports alternate locations in query
 * Typeahead rework to include all variants of query string

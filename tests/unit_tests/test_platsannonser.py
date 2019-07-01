@@ -13,7 +13,6 @@ log = logging.getLogger(__name__)
 pbquery = QueryBuilder()
 
 
-@pytest.mark.unit
 @pytest.mark.parametrize("from_datetime", ["2018-09-28T00:00:00",
                                            '2018-09-28', '', None, []])
 @pytest.mark.parametrize("to_datetime", ["2018-09-28T00:01",
@@ -23,7 +22,7 @@ def test_filter_timeframe(from_datetime, to_datetime):
         assert pbquery._filter_timeframe(from_datetime, to_datetime) is None
         return
     if from_datetime and to_datetime:
-        d = pbquery._filter_timeframe(parser.parse(from_datetime),
+        d = pbquery._filter_timeframe(from_datetime,
                                       parser.parse(to_datetime))
         assert d['range']['publication_date']['gte'] == \
             parser.parse(from_datetime).isoformat()
@@ -31,7 +30,7 @@ def test_filter_timeframe(from_datetime, to_datetime):
             parser.parse(to_datetime).isoformat()
         return
     if from_datetime:
-        d = pbquery._filter_timeframe(parser.parse(from_datetime), to_datetime)
+        d = pbquery._filter_timeframe(from_datetime, to_datetime)
         assert d['range']['publication_date']['gte'] == \
             parser.parse(from_datetime).isoformat()
         return

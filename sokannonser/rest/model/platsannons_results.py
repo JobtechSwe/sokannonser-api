@@ -90,7 +90,7 @@ job_ad = ns_platsannons.model('JobAd', {
     f.ID: fields.String(),
     f.EXTERNAL_ID: fields.String(),
     f.HEADLINE: fields.String(),
-    'score': fields.Float(),
+    'relevance': fields.Float(),
     f.APPLICATION_DEADLINE: fields.DateTime(),
     f.NUMBER_OF_VACANCIES: fields.Integer(),
     'description': fields.Nested(description),

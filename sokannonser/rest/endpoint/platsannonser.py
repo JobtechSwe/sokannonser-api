@@ -57,7 +57,8 @@ class PBSearch(Resource):
 
         max_score = result.get('max_score', 1.0)
         hits = [dict(hit['_source'],
-                     **{'score': (hit['_score'] / max_score) if max_score > 0 else 0.0})
+                     **{'relevance': (hit['_score'] / max_score)
+                        if max_score > 0 else 0.0})
                 for hit in result.get('hits', [])]
 
         return self.marshal_results(result, hits, start_time)

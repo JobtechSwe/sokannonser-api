@@ -2,7 +2,7 @@ Changelog Application Jobsearch
 ===============================
 
 ## 1.3.0
-* New parameter: relevance_threshold
+* New parameter: relevance-threshold
 * Introduces new field: score
 * Lowers relevance boost for location description search
 

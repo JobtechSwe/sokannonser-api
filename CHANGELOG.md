@@ -1,6 +1,11 @@
 Changelog Application Jobsearch
 ===============================
 
+## 1.3.0
+* New parameter: relevance_threshold
+* Introduces new field: score
+* Lowers relevance boost for location description search
+
 ## 1.2.0
 * Parameter published-after now supports number of minutes as parameter
 * Location search in ad description requires exact phrase

@@ -58,6 +58,7 @@ MAX_LIMIT = 100
 
 RESULT_MODEL = 'resultmodel'
 DETAILS = 'resdet'
+MIN_RELEVANCE = 'relevance-threshold'
 
 # For taxonomy
 SHOW_COUNT = 'show-count'

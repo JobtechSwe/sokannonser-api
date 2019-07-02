@@ -168,6 +168,7 @@ class QueryBuilder(object):
         # No need to track all results if used for typeahead
         if not args.get(settings.TYPEAHEAD_QUERY):
             query_dsl['track_total_hits'] = True
+            query_dsl['track_scores'] = True
 
         if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
             query_dsl['_source'] = [f.ID, f.HEADLINE, f.APPLICATION_DEADLINE,
@@ -441,7 +442,7 @@ class QueryBuilder(object):
                             "match_phrase": {
                                 f.DESCRIPTION_TEXT: {
                                     "query": value,
-                                    "boost": 0.5
+                                    "boost": 0.1
                                 }
                             }
                         }

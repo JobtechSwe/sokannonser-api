@@ -58,6 +58,7 @@ swagger_doc_params = {
     " (latitude,longitude) in kilometers (km)",
 }
 swagger_filter_doc_params = {
+    settings.MIN_RELEVANCE: "Set a result relevance threshold between 0 and 1",
     settings.DETAILS: "Show 'full' (default) or 'brief' results details",
     settings.OFFSET: "The offset parameter defines the offset from the first result you "
     "want to fetch"
@@ -124,6 +125,7 @@ annons_complete_query.add_argument(settings.FREETEXT_FIELDS, action='append',
                                    choices=QF_CHOICES)
 
 pb_query = annons_complete_query.copy()
+pb_query.add_argument(settings.MIN_RELEVANCE, type=float),
 pb_query.add_argument(settings.DETAILS, choices=[OPTIONS_FULL, OPTIONS_BRIEF])
 pb_query.add_argument(settings.OFFSET, type=inputs.int_range(0, settings.MAX_OFFSET),
                       default=0)

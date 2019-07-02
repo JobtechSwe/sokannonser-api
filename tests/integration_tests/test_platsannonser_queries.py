@@ -283,10 +283,10 @@ def test_driving_license_required():
 
 
 @pytest.mark.parametrize("query, path, expected, non_negative",
-                         [({taxonomy.OCCUPATION: "D7Ns_RG6_hD2"},
-                           [fields.OCCUPATION+".concept_id"], ["D7Ns_RG6_hD2"], True),
-                          ({taxonomy.OCCUPATION: "-D7Ns_RG6_hD2"},
-                           [fields.OCCUPATION+".concept_id"], ["D7Ns_RG6_hD2"], False),
+                         [({taxonomy.OCCUPATION: "fg7B_yov_smw"},
+                           [fields.OCCUPATION+".concept_id"], ["fg7B_yov_smw"], True),
+                          ({taxonomy.OCCUPATION: "-fg7B_yov_smw"},
+                           [fields.OCCUPATION+".concept_id"], ["fg7B_yov_smw"], False),
                           ({taxonomy.GROUP: "DJh5_yyF_hEM"},
                            [fields.OCCUPATION_GROUP+".concept_id"],
                            ["DJh5_yyF_hEM"], True),

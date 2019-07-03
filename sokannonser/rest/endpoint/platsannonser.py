@@ -55,7 +55,11 @@ class PBSearch(Resource):
         log.debug("Query results after %d milliseconds."
                   % (int(time.time()*1000)-start_time))
 
-        hits = [hit['_source'] for hit in result.get('hits', [])]
+        max_score = result.get('max_score', 1.0)
+        hits = [dict(hit['_source'],
+                     **{'relevance': (hit['_score'] / max_score)
+                        if max_score > 0 else 0.0})
+                for hit in result.get('hits', [])]
 
         return self.marshal_results(result, hits, start_time)
 

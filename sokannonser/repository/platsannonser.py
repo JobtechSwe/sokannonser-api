@@ -77,10 +77,22 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)
     query_dsl = querybuilder.parse_args(args, x_fields)
-    log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
     try:
+        # First pass, find highest score:
+        if args.get(settings.MIN_RELEVANCE):
+            max_score_query = query_dsl.copy()
+            max_score_query['from'] = 0
+            max_score_query['size'] = 1
+            max_score_query['track_total_hits'] = False
+            del max_score_query['aggs']
+            del max_score_query['sort']
+            max_score_result = elastic.search(index=settings.ES_INDEX, body=max_score_query)
+            max_score = max_score_result.get('hits', {}).get('max_score')
+            if max_score:
+                query_dsl['min_score'] = max_score * args.get(settings.MIN_RELEVANCE)
+        log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         log.debug("Elastic results after %d milliseconds."
                   % (int(time.time() * 1000) - start_time))
@@ -181,7 +193,7 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
 
             })
 
-    create_found_in_enriched(results, query_result)
+    # create_found_in_enriched(results, query_result)
     delete_sensitive_values(results)
 
     # log.debug(json.dumps(results, indent=2))

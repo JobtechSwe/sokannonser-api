@@ -297,6 +297,7 @@ class QueryBuilder(object):
         if not queryfields:
             queryfields = queries.QF_CHOICES.copy()
 
+        querystring = ' '.join([w.strip(',.!?:; ') for w in querystring.split(' ')])
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
         querystring = self.__rewrite_querystring(querystring.lower(), concepts)

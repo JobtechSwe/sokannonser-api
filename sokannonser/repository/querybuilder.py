@@ -441,9 +441,9 @@ class QueryBuilder(object):
                     query_dict['bool'][bool_type].append(
                         {
                             "match_phrase": {
-                                f.DESCRIPTION_TEXT: {
+                                f.HEADLINE: {
                                     "query": value,
-                                    "boost": 0.1
+                                    "boost": 1
                                 }
                             }
                         }

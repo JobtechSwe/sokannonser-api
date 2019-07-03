@@ -5,6 +5,7 @@ Changelog Application Jobsearch
 * New parameter: relevance-threshold
 * Introduces new field: score
 * Lowers relevance boost for location description search
+* Adds secondary sorting on relevance for all sort options
 
 ## 1.2.0
 * Parameter published-after now supports number of minutes as parameter

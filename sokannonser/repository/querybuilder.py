@@ -168,6 +168,7 @@ class QueryBuilder(object):
         # No need to track all results if used for typeahead
         if not args.get(settings.TYPEAHEAD_QUERY):
             query_dsl['track_total_hits'] = True
+            query_dsl['track_scores'] = True
 
         if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
             query_dsl['_source'] = [f.ID, f.HEADLINE, f.APPLICATION_DEADLINE,
@@ -296,6 +297,7 @@ class QueryBuilder(object):
         if not queryfields:
             queryfields = queries.QF_CHOICES.copy()
 
+        querystring = ' '.join([w.strip(',.!?:; ') for w in querystring.split(' ')])
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
         querystring = self.__rewrite_querystring(querystring.lower(), concepts)
@@ -439,9 +441,9 @@ class QueryBuilder(object):
                     query_dict['bool'][bool_type].append(
                         {
                             "match_phrase": {
-                                f.DESCRIPTION_TEXT: {
+                                f.HEADLINE: {
                                     "query": value,
-                                    "boost": 0.5
+                                    "boost": 1
                                 }
                             }
                         }

@@ -72,11 +72,11 @@ KEYWORDS_EXTRACTED = 'keywords.extracted'
 
 sort_options = {
     'relevance': ["_score", {ID: "asc"}],
-    'pubdate-desc': [{PUBLICATION_DATE: "desc", ID: "asc"}],
-    'pubdate-asc':  [{PUBLICATION_DATE: "asc", ID: "asc"}],
-    'applydate-desc': [{APPLICATION_DEADLINE: "desc", ID: "asc"}],
-    'applydate-asc': [{APPLICATION_DEADLINE: "asc", ID: "asc"}],
-    'updated': [{"timestamp": "desc", ID: "asc"}],
+    'pubdate-desc': [{PUBLICATION_DATE: "desc"}, "_score", {ID: "asc"}],
+    'pubdate-asc':  [{PUBLICATION_DATE: "asc"}, "_score",  {ID: "asc"}],
+    'applydate-desc': [{APPLICATION_DEADLINE: "desc"}, "_score", {ID: "asc"}],
+    'applydate-asc': [{APPLICATION_DEADLINE: "asc"}, "_score", {ID: "asc"}],
+    'updated': [{"timestamp": "desc"}, "_score", {ID: "asc"}],
 }
 stats_options = {
     taxonomy.OCCUPATION: "%s.%s.keyword" % (OCCUPATION, LEGACY_AMS_TAXONOMY_ID),

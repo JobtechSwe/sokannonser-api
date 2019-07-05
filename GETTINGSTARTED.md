@@ -31,6 +31,7 @@ I get storkök, storhushåll, storesupport, storage. As they are the most common
 If I request
 
 	/complete?q=storage%20s
+
 I get sverige, stockholms län, stockholm, svenska, script. Since they are the most common terms beginning with S for ads that contain the word Storage 	
 
 
@@ -304,18 +305,21 @@ Then comes the actual ads
 The easiest way to get the adds that contain a specific word like a jobtitle is to use a free text query (q) with the _Open-Search_ endpoint. This will give you ads with the specified word in either headline, ad description or place of work.
 
 Request URL
+
 	/search?q=sous-chef&offset=0&limit=10
 
 
 If you want to be certain that the ad is for a souschef - and not just mentions a souschef - you can use the occupation ID in the field "occupation". If the ad has been registered by the recruiter with the occupation field set to "souschef", the ad will show up in this search. To do this query you use both the _Jobtech-Taxonomy_ endpoint and the _Open-Search_ endpoint. First of all, you need to find the occupation ID for souschef by text searching (q) in _Jobtech Taxonomy_ for the term in the right category (occupation-name).
 
 Request URL
+
 	/search?occupation-name=iugg_Qq9_QHH&offset=0&limit=10
 
 
 Now you can use the ID in _Open-Search_ to fetch the ads registered with the term souschef in the occupation-name field
 
 Request URL
+
 	/open/search?occupation=iugg_Qq9_QHH&offset=0&limit=10
 
 This will give a smaller result set with a higher certainty of actually being for a souschef, however the result set will likely miss a few relevant ads since the occupation-name field isn't always set by employers. You should find that a larger set is more useful since there are multiple sorting factors working to show the most relevant hits first. We're also working to always improve the API in regards to unstructured data. The term Souschef has three popular formats when found out in the wild. "Souschef", "sous chef", "sous-chef" but as the API recognise them as synonyms they will fetch the same number of adds. There are a lot of cases like these that we are constantly adding. Our machine learning model also works in favour of the free query.
@@ -324,11 +328,13 @@ This will give a smaller result set with a higher certainty of actually being fo
 Firstly use the _Jobtech-Taxonomy_ endpoint to get the Id for Data/IT (occupation field). I'll make a free text search on the term "IT" narrowing down the search to occupation-field
 
 Request URL
+
 	/taxonomy/search?offset=0&limit=10&q=it&type=occupation-field&show-count=false
 
 In the response body you’ll find the conceptId for the term Data/IT. Use this with the search endpoint to define the field in which you want to get all the open-api. So now I want to combine this with my favourite language with out all those pesky zoo keeper jobs ruining my search.
 
 Request URL
+
 	/search?occupation-field=apaJ_2ja_LuF&q=python%20Malm%C3%B6&offset=0&limit=10
 
 
@@ -337,11 +343,13 @@ You can filter your search on geographical terms picked up from the Taxonomy jus
 If i want to search for jobs in Norway i free text query the taxonomy for "Norge"
 
 Request URL
+
 		/taxonomy/search?offset=0&limit=10&q=norge&show-count=false
 
 And add that parameter id to an empty free text query
 
 Request URL
+
 	/search?country=155&offset=0&limit=10
 
 If I make a query which includes 2 different geographical filters the most local one will be promoted. As in this case where i'm searching for "lärare" using the municipality code for Haparanda and the region code for Norbottens Län. The jobs that are in Haparanda will be the first ones in the result set.
@@ -372,11 +380,13 @@ Request URL
 Some times a filter can work to broadly and then it's easier to use a negative search to remove specific results you don't want. In this case i'm going to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" I'm using the country code and the country field in the search. So first I get the country code for "Sverige" from the taxonomy end point.
 
 Request URL
+
 	/taxonomy/search?q=Sverige&type=country
 
 And then I use the ID I got as a country code prefixed by a minus symbol.
 
 Request URL
+
   /search?country=-199&q=swedish
 
 

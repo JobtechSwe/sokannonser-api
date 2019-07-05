@@ -1,6 +1,6 @@
 # Search API for job adds - getting started
 
-The aim of this text is to walk you through what you're seeing in the Swagger UI at https://open-api.dev.services.jtech.se/ to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk load API] (https://bulk-api.dev.services.jtech.se)
+The aim of this text is to walk you through what you're seeing in the Swagger UI at https://open-api.dev.services.jtech.se/ to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk load API] https://bulk-api.dev.services.jtech.se
 This API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that dont fit the intended purpose of this API.
 
 A bad practice typically means searching for every job of every region every five minutes.
@@ -18,17 +18,17 @@ A good practice means making lots of varied calls initiated by a real user.
 [Examples](#Examples)
 
 ##Short version
-The API is meant for searching, we want you to be able to just build your own customized GUI on top of our free text query field q in /search like this...
- 
+The API is meant for searching, we want you to be able to just build your own customised GUI on top of our free text query field q in /search like this...
+
 	/search?q=Flen&offset=0&limit=100
 ...and not have to worry about the users finding the most relevant ads, search engine should do this for you.
 If you want to narrow down the search result, use the available search filters. Some of the filters needs id-keys as input for searching structured data. The id-keys can be found at /taxonomy/search these will help you get sharper hits for structured data. We will always work on improving the hits for free queries hoping you'll see less and less use for filtering.
 
 If you want to help your end users with term suggestions you can use the typeahead function, which will return common terms found in the job ads. This should work great with an auto complete feature in your search box. If i request
-	
-	complete?q=stor
+
+	/complete?q=stor
 I get storkök, storhushåll, storesupport, storage. As they are the most common terms starting with "stor*" in ads.
-If I request 
+If I request
 
 	/complete?q=storage%20s
 I get sverige, stockholms län, stockholm, svenska, script. Since they are the most common terms beginning with S for ads that contain the word Storage 	
@@ -51,7 +51,7 @@ The endpoints in the first section will return job ads from Arbetsförmedlingen 
 
 
 #### Complete
-/complete This endpoint is meant to help you create autocomplete functions AKA type aheads. The result set will return the most frequent job market terms starting with the letters you put in. It's most easily understood by trying it out using the free query field q. If input is LÄK you will get "läkarsekreterare","läkare","läkemedel" etc. 
+/complete This endpoint is meant to help you create autocomplete functions AKA type aheads. The result set will return the most frequent job market terms starting with the letters you put in. It's most easily understood by trying it out using the free query field q. If input is LÄK you will get "läkarsekreterare","läkare","läkemedel" etc.
 If you put in more than one word you get the most common terms for that context for example "läkare L" and you get "linköping","lund" etc
 
 
@@ -77,298 +77,282 @@ Taxonomy contains terms within different categories. In the drop down list under
 ### Meta data for your search request
 When making a search request the resulting response will start with some meta-info about your result
 
-#### "total": 
-"value": Total Number of ads matching your search
-  
-"positions": Total number of  vaccancies for your search
-  
-"query_time_in_millis": How long did the actuals search take
-  
-"result_time_in_millis": How long did  the total roundtrip take
-  
+#### "total":
+"value": total Number of ads matching your search
+
+"positions": total number of vacancies for your search
+
+"query_time_in_millis": how long did the actuals search take
+
+"result_time_in_millis": how long did the total roundtrip take
+
 "stats": {},
-  
+
 "freetext_concepts": {},
-  
-"hits": Placeholder for zero to * ads
-  
 
- 
+"hits": placeholder for zero to * ads
+
 ### Object data
-Then comes the actual ads 
-    
-"id": The ID you can use in Open-AD-ID Endpoint
-      
- !!! PB vill ha men vill externa? "external_id":
+Then comes the actual ads
 
-"headline": The headline of the ad
+"id": the ID you can use in Open-AD-ID Endpoint
 
-"application_deadline": Last possible day to apply for the job,
+"headline": the headline of the ad
+
+"application_deadline": last possible day to apply for the job,
 
 "number_of_vacancies": number of vacancies for this ad
-      
-#### "description": 
-"text": The text body of the ad 
-        
-"company_information": Usually null
 
-"needs": Usually null
+#### "description":
+"text": the text body of the ad
 
-"requirements": Usually null
+"company_information": usually null
 
-"conditions": Full time, part time, until further notice etc
-            
-#### "employment_type": {
+"needs": usually null
 
+"requirements": usually null
+
+"conditions": full time, part time, until further notice etc
+
+#### "employment_type":
+"concept_id": stable ID for label
+
+"label": one out of these four "Vanlig anställning", "Sommarjobb / feriejobb", "Arbete utomlands", "Behovsanställning"
+
+"legacy_ams_taxonomy_id": legacy id for label
+
+
+#### "salary_type":
+"concept_id": stable ID for label
+
+"label": "Fast månads- vecko- eller timlön"
+
+"legacy_ams_taxonomy_id": legacy id for label
+
+#### "duration":
 "concept_id": Stable ID for label
-        
-"label": One out of these four "Vanlig anställning", "Sommarjobb / feriejobb", "Arbete utomlands", "Behovsanställning"
-        
-"legacy_ams_taxonomy_id": Legacy id for label
-     
-      
-#### "salary_type": 
-"concept_id": Stable ID for label
 
-"label": "Fast månads- vecko- eller timlön",
-        "legacy_ams_taxonomy_id":Legacy id for label
-      
-#### "duration": 
-"concept_id": Stable ID for label
+"label": duration of the employment
 
-"label": Duration of the employment
+"legacy_ams_taxonomy_id": legacy id for label
 
-"legacy_ams_taxonomy_id": Legacy id for label
-     
 #### "working_hours_type":
-"concept_id": Stable ID for label
+"concept_id": stable ID for label
 
-"label": Full time, part time 
+"label": full time, part time
 
-"legacy_ams_taxonomy_id": Legacy id for label
+"legacy_ams_taxonomy_id": legacy id for label
 
-       
-#### "scope_of_work": {
-"min": Minimum percentage of full time
+#### "scope_of_work":
+"min": minimum percentage of full time
 
-"max": Maximum percentage of full time
-      
-"access": When will the applicant start
+"max": maximum percentage of full time
 
-#### "employer": {
-"phone_number": Phone number of employer
-        
-"email": Email of employer
-        
-"url": Employer website
-        
-"organization_number": The employers swedish organization number typically given by Bolagsverket
-       
-"name": The name of the employer
+"access": when will the applicant start
 
-"workplace": Where the job is, this field makes most sense with larger employer oranisations
-      
-#### "application_details": 
+#### "employer":
+"phone_number": phone number of employer
+
+"email": email of employer
+
+"url": website of employer
+
+"organization_number": the employers Swedish organisation number typically given by Bolagsverket
+
+"name": the name of the employer
+
+"workplace": where the job is, this field makes most sense with larger employer organisations
+
+#### "application_details":
 
 "information": information about how to apply
-        
+
 "reference": reference person with the employer for application
-        
-"email": email adress to apply to
-        
+
+"email": email address to apply to
+
 "via_af": if application should be made through AF
-        
-"url": adress if application should be made via a website
-        
+
+"url": address if application should be made via a website
+
 "other": other information about how to apply
-              
-              
+
+
 #### Top level
 "experience_required": boolean if experience required or not
-      
+
 "access_to_own_car": boolean if applicant need to have a car to apply
-      
+
 "driving_license_required": boolean if you need to hold a drivers license or not
 
-#### "driving_license": 
-        
-"concept_id": Stable ID for label
-          
+#### "driving_license":
+"concept_id": stable ID for label
+
 "label": the label value of the drivers license required b, c, d etc
-        
-##### "occupation": {
-"concept_id": Stable ID for label, recommended to use for long term stability
+
+##### "occupation":
+"concept_id": stable ID for label, recommended to use for long term stability
 
 "label": name of the occupation
 
-"legacy_ams_taxonomy_id": Legacy id for label
+"legacy_ams_taxonomy_id": legacy id for label
 
-#### "occupation_group": {
-"concept_id": Stable ID for label
+#### "occupation_group":
+"concept_id": stable ID for label
 
 "label": what group of jobs does the occupation belong to
-        
-"legacy_ams_taxonomy_id": Legacy id for label
 
-      
-#### "occupation_field": {
-"concept_id": Stable ID for label
-        
-"label": What field of work does the occupation belong to. A field is the closest we get to define a businies as in "the IT business2
-        
-"legacy_ams_taxonomy_id": Legacy id for label
+"legacy_ams_taxonomy_id": legacy id for label
 
-      
+#### "occupation_field":
+"concept_id": stable ID for label
+
+"label": field of work the occupation belong to. A field is the closest we get to define a business as in "the IT business"
+
+"legacy_ams_taxonomy_id": legacy id for label
+
+
 #### "workplace_address": {
 "municipality_code": 4 digit kommun-code as defined by Skatteverket
-"municipality_concept_id":Stable ID for label
-"municipality": Kommun
+"municipality_concept_id": stable ID for label
+"municipality": kommun
 "region_code": 2 digit code for the län
-"region": Län
+"region": län
 "country_code": 1-3 digit country code
-"country": Country
+"country": country
 "street_address": street address for the job
 "postcode": 5 digit post code
-"city": City where the place of work is 
-"coordinates": longitud, latitud if you end up in the indian ocean switch places
-         
+"city": city where the place of work is
+"coordinates": longitud, latitud if you end up in the Indian ocean - switch places
+
 #### "must_have": {
 "skills": []
-"concept_id": Stable ID for label
+"concept_id": stable ID for label
 
-"label": The name of a skill            
+"label": the name of a skill
 
-"weight": Weights for must_have are normally 10
+"weight": weights for must_have are normally 10
 
-"legacy_ams_taxonomy_id": Legacy id for label
+"legacy_ams_taxonomy_id": legacy id for label
 
 "languages": []
-"concept_id": Stable ID for label
+"concept_id": stable ID for label
 
-"label": The name of a language            
+"label": the name of a language            
 
-"weight": Weights for must_have are normally 10
-            
-"legacy_ams_taxonomy_id": Legacy id for label
-        
+"weight": weights for must_have are normally 10
+
+"legacy_ams_taxonomy_id": legacy id for label
+
 "work_experiences": []
- 
-"concept_id": Stable ID for label
 
-"label": The sought after experience            
+"concept_id": stable ID for label
 
-"weight": Weights for must_have are normally 10
+"label": the sought after experience            
 
-"legacy_ams_taxonomy_id": Legacy id for label
+"weight": weights for must_have are normally 10
+
+"legacy_ams_taxonomy_id": legacy id for label
 
 #### "nice_to have":
 "skills": []
-        
-"concept_id": Stable ID for label
 
-"label": The sought after skill            
+"concept_id": stable ID for label
 
-"weight": Weights for must_have are normally 10
+"label": the sought after skill            
 
-"legacy_ams_taxonomy_id": Legacy id for label
+"weight": weights for must_have are normally 10
+
+"legacy_ams_taxonomy_id": legacy id for label
 
 "languages":[]
-        
-"concept_id": Stable ID for label
 
-"label": The sought after language            
+"concept_id": stable ID for label
 
-"weight": Weights for must_have are below 10
-           
-"legacy_ams_taxonomy_id": Legacy id for label
+"label": the sought after language            
+
+"weight": weights for must_have are below 10
+
+"legacy_ams_taxonomy_id": legacy id for label
 
 "work_experiences": []
-        
-"concept_id": Stable ID for label
 
-"label": The name of a experience            
+"concept_id": stable ID for label
 
-"weight": Weights for must_have are normally 10
-            
-"legacy_ams_taxonomy_id": Legacy id for label
-      
-      
-"publication_date": When was the ad published
- 
-"last_publication_date": When the ad will be unpublished
+"label": the name of a experience            
 
-"removed": Boolean if the add unpublished or not which can occur before the last publication date
+"weight": weights for must_have are normally 10
 
-"removed_date": When was the add removed
+"legacy_ams_taxonomy_id": legacy id for label
 
-"source_type": Where did the add come from
-      
-"timestamp": This timestamps is mostly for troubleshooting
- 
+"publication_date": when the ad was published
 
-## Examples 
+"last_publication_date": when the ad will be unpublished
+
+"removed": boolean if the add unpublished or not, which can occur before the last publication date
+
+"removed_date": when was the add removed
+
+"source_type": where did the add come from
+
+"timestamp": this timestamps is mostly for troubleshooting
+
+
+## Examples
 
 #### Searching for a particular job title
 The easiest way to get the adds that contain a specific word like a jobtitle is to use a free text query (q) with the _Open-Search_ endpoint. This will give you ads with the specified word in either headline, ad description or place of work.
 
 Request URL
-
 	/search?q=sous-chef&offset=0&limit=10
 
 
 If you want to be certain that the ad is for a souschef - and not just mentions a souschef - you can use the occupation ID in the field "occupation". If the ad has been registered by the recruiter with the occupation field set to "souschef", the ad will show up in this search. To do this query you use both the _Jobtech-Taxonomy_ endpoint and the _Open-Search_ endpoint. First of all, you need to find the occupation ID for souschef by text searching (q) in _Jobtech Taxonomy_ for the term in the right category (occupation-name).
 
 Request URL
-
 	/search?occupation-name=iugg_Qq9_QHH&offset=0&limit=10
 
 
 Now you can use the ID in _Open-Search_ to fetch the ads registered with the term souschef in the occupation-name field
 
 Request URL
-
 	/open/search?occupation=iugg_Qq9_QHH&offset=0&limit=10
 
-This will give a smaller result set with a higher certainty of actually being for a souschef, however the result set will likely miss a few relevant ads since the occupation-name field isn't always set by employers. You should find that a larger set is more useful since there are multiple sorting factors working to show the most relevant hits first. We're also working to always improve the API in regards to unstructured data. The term Souschef has three popular formats when found out in the wild. "Souschef", "sous chef", "sous-chef" but as the API recognise them as synonyms they will fetch the same number of adds. There are a lot of cases like these that we are constantly adding. Our machine learning model also works in favour of the free query. 
+This will give a smaller result set with a higher certainty of actually being for a souschef, however the result set will likely miss a few relevant ads since the occupation-name field isn't always set by employers. You should find that a larger set is more useful since there are multiple sorting factors working to show the most relevant hits first. We're also working to always improve the API in regards to unstructured data. The term Souschef has three popular formats when found out in the wild. "Souschef", "sous chef", "sous-chef" but as the API recognise them as synonyms they will fetch the same number of adds. There are a lot of cases like these that we are constantly adding. Our machine learning model also works in favour of the free query.
 
 ### Searching only within a specific field of work
 Firstly use the _Jobtech-Taxonomy_ endpoint to get the Id for Data/IT (occupation field). I'll make a free text search on the term "IT" narrowing down the search to occupation-field
 
 Request URL
+	/taxonomy/search?offset=0&limit=10&q=it&type=occupation-field&show-count=false
 
-	https://open-api.dev.services.jtech.se/taxonomy/search?offset=0&limit=10&q=it&type=occupation-field&show-count=false
-
-	
 In the response body you’ll find the conceptId for the term Data/IT. Use this with the search endpoint to define the field in which you want to get all the open-api. So now I want to combine this with my favourite language with out all those pesky zoo keeper jobs ruining my search.
 
 Request URL
-
 	/search?occupation-field=apaJ_2ja_LuF&q=python%20Malm%C3%B6&offset=0&limit=10
 
 
 ### Finding jobs near you
-You can filter your search on geographical terms picked up from the Taxonomy just the same way you can with occupation-titles and occupation-fields. (Concept_id doesn't work everywhere at the time of writing but you can use the numeral id's, they are very official and way less likely to change as skills and occupations sometimes do) 
+You can filter your search on geographical terms picked up from the Taxonomy just the same way you can with occupation-titles and occupation-fields. (Concept_id doesn't work everywhere at the time of writing but you can use the numeral id's, they are very official and way less likely to change as skills and occupations sometimes do)
 If i want to search for jobs in Norway i free text query the taxonomy for "Norge"
 
 Request URL
-	
-	/taxonomy/search?offset=0&limit=10&q=norge&show-count=false
+		/taxonomy/search?offset=0&limit=10&q=norge&show-count=false
 
 And add that parameter id to an empty free text query
-	
-Request URL
 
+Request URL
 	/search?country=155&offset=0&limit=10
-	
+
 If I make a query which includes 2 different geographical filters the most local one will be promoted. As in this case where i'm searching for "lärare" using the municipality code for Haparanda and the region code for Norbottens Län. The jobs that are in Haparanda will be the first ones in the result set.
 
 	/search?municipality=2583&q=l%C3%A4rare&offset=0&limit=10
 
 
-You can also use longitude latitude coordinates and a radius in kilometers if you want. 
+You can also use longitude latitude coordinates and a radius in kilometres if you want.
 
 Request URL
-	
+
 	/search?offset=0&limit=10&position=59.3,17.6&position.radius=10
 
 ### Negative search
@@ -378,28 +362,26 @@ Request URL
 
 	/search?q=unix&offset=0&limit=10
 
-But i find that i get a lot of jobs expecting me to work with which i dont want. All that's needed is to use the minus symbol and the word i want to exclude
+But I find that I get a lot of jobs expecting me to work with which I don't want. All that's needed is to use the minus symbol and the word I want to exclude
 
 Request URL
 
 	/search?q=unix%20-linux&offset=0&limit=10
 
 ### Finding swedish speak jobs abroad
-Some times a filter can work to broadly and then it's easier to use a negative search to remove specific results you don't want. In this case i'm going to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" I'm using the country code and the country field in the search. So first I get the country code for "Sverige" from the taxonomy end point. 
+Some times a filter can work to broadly and then it's easier to use a negative search to remove specific results you don't want. In this case i'm going to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" I'm using the country code and the country field in the search. So first I get the country code for "Sverige" from the taxonomy end point.
 
 Request URL
+	/taxonomy/search?q=Sverige&type=country
 
-	/search?offset=0&limit=10&q=Sverige&type=country&show-count=false
-
-And then I use the ID i got as a  country code prefixed by a minus symbol.
+And then I use the ID I got as a country code prefixed by a minus symbol.
 
 Request URL
+  /search?country=-199&q=swedish
 
-	/search?country=-199&q=swedish&offset=0&limit=10
 
-
-### Getting all the jobs since date and time 
-A very common use case is COLLECT ALL THE ADDS. We don't want you to use the search API for this. It's expensive in terms of band width, CPU cycles and development time and it's not even guaranteed you'll get everything. Instead we'd like you to use our bulk load API. Find out more at jobtechdev.se/doc/api/jobs 
+### Getting all the jobs since date and time
+A very common use case is COLLECT ALL THE ADDS. We don't want you to use the search API for this. It's expensive in terms of band width, CPU cycles and development time and it's not even guaranteed you'll get everything. Instead we'd like you to use our bulk load API. Find out more at https://jobtechdev.se/api/jobs
 
 # TODO in order of importance
 
@@ -407,11 +389,8 @@ Successful queries
 Auto complete - long version?
 Errors
 Contact Information
-Good example of what to use 
+Good example of what to use
 	qfields
 	statistics
 Optional fields
 Null fields
-
-	
-	

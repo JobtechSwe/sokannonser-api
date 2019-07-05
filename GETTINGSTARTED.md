@@ -1,7 +1,10 @@
 # Search API for job adds - getting started
 
 The aim of this text is to walk you through what you're seeing in the Swagger UI at https://open-api.dev.services.jtech.se/ to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk load API] (https://bulk-api.dev.services.jtech.se)
-This API is intended for user search not downloading all the job ads. 
+This API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that dont fit the intended purpose of this API.
+
+A bad practice typically means searching for every job of every region every five minutes.
+A good practice means making lots of varied calls initiated by a real user.
 
 
 
@@ -15,11 +18,11 @@ This API is intended for user search not downloading all the job ads.
 [Examples](#Examples)
 
 ##Short version
-The API is meant for searching, we want you to be able to just build your own customized GUI on top of ourfree text query field q in /search like this...
+The API is meant for searching, we want you to be able to just build your own customized GUI on top of our free text query field q in /search like this...
  
 	/search?q=Flen&offset=0&limit=100
-...and not have to worry about the users finding the most relevant ads.
-If you want to narrow down the search result, use the available search filters. Some of the filters needs id-keys as input for searching structured data. The id-keys can be found at /taxonomy/search these will help you get sharper hits for structured data. We will always work on improving the hits for free queries  hoping you'll see less and less use for filtering.
+...and not have to worry about the users finding the most relevant ads, search engine should do this for you.
+If you want to narrow down the search result, use the available search filters. Some of the filters needs id-keys as input for searching structured data. The id-keys can be found at /taxonomy/search these will help you get sharper hits for structured data. We will always work on improving the hits for free queries hoping you'll see less and less use for filtering.
 
 If you want to help your end users with term suggestions you can use the typeahead function, which will return common terms found in the job ads. This should work great with an auto complete feature in your search box. If i request
 	
@@ -38,7 +41,7 @@ For this API, you will need to register your own API key at www.jobtechdev.se
 This API service is divided into two major sections.
 
 ### 1. Open AF-job ads
-The endpoints in the first section will return job ads from Arbetsförmedlingen that are currently open for applications. The ads published in Arbetsförmedlingen are tagged with some meta data like "id", "logotypurl", "yrkesbenamning" and "yrkesid" and the information in the ads is divided into sections with headlines like "headline", "text", "arbetstidvaraktighet" and "loneform". The ads may have information in all the fields or some of them.
+The endpoints in the first section will return job ads from Arbetsförmedlingen that are currently open for applications. The ads published in Arbetsförmedlingen are tagged with some meta data like "id", "logotypurl" for the ad and "label" and "concept_id" for the occupation. The information in the ads is divided into sections with headlines like "headline", "description", "employer" and "salary_type". The ads may have information in all the fields or some of them.
 
 #### Open-Ad-ID
 /ad/{id} This endpoint is used for fetching specific job ads with all available meta data, by their ad ID number. The ID number can be found by doing a query with the other endpoint within this section, _Open-Search_.
@@ -300,23 +303,7 @@ Then comes the actual ads
 
 "source_type": Where did the add come from
       
-#### "keywords": {
-        "extracted": {
-          "occupation": [
-            "bygg",
-            "anläggning",
-            "murare",
-            "plattsättare"
-          ],
-          "skill": [],
-          "location": [
-            "norrtälje",
-            "sverige",
-            "stockholms län"
-          ],
-          "employer": [
-      "timestamp": 1548757272607,
-      "found_in_enriched": false
+"timestamp": This timestamps is mostly for troubleshooting
  
 
 ## Examples 
@@ -385,11 +372,24 @@ Request URL
 	/search?offset=0&limit=10&position=59.3,17.6&position.radius=10
 
 ### Negative search
+So this is very simple using our qfield. Lets say i want to find Unix jobs
+
+Request URL
+
+	/search?q=unix&offset=0&limit=10
+
+But i find that i get a lot of jobs expecting me to work with which i dont want. All that's needed is to use the minus symbol and the word i want to exclude
+
+Request URL
+
+	/search?q=unix%20-linux&offset=0&limit=10
+
+### Finding swedish speak jobs abroad
 Some times a filter can work to broadly and then it's easier to use a negative search to remove specific results you don't want. In this case i'm going to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" I'm using the country code and the country field in the search. So first I get the country code for "Sverige" from the taxonomy end point. 
 
 Request URL
 
-	https://open-api.dev.services.jtech.se/taxonomy/search?offset=0&limit=10&q=Sverige&type=country&show-count=false
+	/search?offset=0&limit=10&q=Sverige&type=country&show-count=false
 
 And then I use the ID i got as a  country code prefixed by a minus symbol.
 
@@ -402,15 +402,14 @@ Request URL
 A very common use case is COLLECT ALL THE ADDS. We don't want you to use the search API for this. It's expensive in terms of band width, CPU cycles and development time and it's not even guaranteed you'll get everything. Instead we'd like you to use our bulk load API. Find out more at jobtechdev.se/doc/api/jobs 
 
 # TODO in order of importance
-Results
+
 Successful queries
 Auto complete - long version?
 Errors
 Contact Information
 Good example of what to use 
-	qfields for
+	qfields
 	statistics
-Nestled listed variable how to document more clearly
 Optional fields
 Null fields
 

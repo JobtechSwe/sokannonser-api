@@ -1,7 +1,7 @@
 # Search API for job adds - getting started
 
-The aim of this text is to walk you through what you're seeing in the Swagger UI at [open-API](https://open-api.dev.services.jtech.se/) to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk-API](https://bulk-api.dev.services.jtech.se)
-This API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that dont fit the intended purpose of this API.
+The aim of this text is to walk you through what you're seeing in the Swagger UI at [open-API](https://open-api.dev.services.jtech.se/ "open API") to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk-API](https://bulk-api.dev.services.jtech.se "bulk API")
+This API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that don't fit the intended purpose of this API.
 
 A bad practice typically means searching for every job of every region every five minutes.
 A good practice means making lots of varied calls initiated by a real user.
@@ -57,7 +57,7 @@ If you put in more than one word you get the most common terms for that context 
 
 
 ### Jobtech-Taxonomy
-This endpoint provides labour market terms and their corresponding unique ID. The ID's are required in some parameters in the /open/search endpoint.
+This endpoint provides labour market terms and their corresponding unique ID. The ID's are required in some parameters in the /search endpoint.
 
 Taxonomy contains terms within different categories. In the drop down list under "filter by type" all available categories are listed.
 
@@ -91,7 +91,7 @@ Selected result's fields can be shown with a help of X-Fields request header. Fo
 "result_time_in_millis": how long did the total roundtrip take
 
 "stats": {},
- 
+
 "freetext_concepts": {},
 
 "hits": placeholder for zero to * ads

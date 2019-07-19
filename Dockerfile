@@ -24,7 +24,7 @@ COPY . /app
 
 RUN date +"%Y-%m-%dT%H:%M:%S %Z" && \
     mkdir -p /var/run/nginx && \
-    chmod -R 777 /var/run/nginx && \ 
+    chmod -R 777 /var/run/nginx && \
     mkdir -p /var/run/supervisord /var/log/supervisord && \
     chmod -R 777 /var/run/supervisord && \
     chmod -R 775 /app && \
@@ -32,7 +32,7 @@ RUN date +"%Y-%m-%dT%H:%M:%S %Z" && \
     chmod -R 775 /usr/lib/python* && \
     chmod -R 775 /var/lib/nginx && \
     chmod -R 777 /var/log/* && \
-    chmod -R 777 /var/tmp/nginx
+    chmod -R 777 /var/tmp/nginx 2>/dev/null
 
 
 WORKDIR /app

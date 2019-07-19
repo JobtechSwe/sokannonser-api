@@ -32,7 +32,7 @@ RUN date +"%Y-%m-%dT%H:%M:%S %Z" && \
     chmod -R 775 /usr/lib/python* && \
     chmod -R 775 /var/lib/nginx && \
     chmod -R 777 /var/log/* 
-    # chmod -R 777 /var/tmp/nginx
+    chmod -R 777 /var/tmp/*
 
 
 WORKDIR /app

@@ -9,11 +9,11 @@ A good practice means making lots of varied calls initiated by a real user.
 
 
 # Table of Contents
-[Short version](#Short version)
+[Short version](#Short-version)
 
 [Resources](#Resources)
 
-[API Key](#API Key)
+[API Key](#API-Key)
 
 [Examples](#Examples)
 
@@ -76,7 +76,10 @@ Taxonomy contains terms within different categories. In the drop down list under
 ## Results
 
 ### Meta data for your search request
-When making a search request the resulting response will start with some meta-info about your result
+When making a search request the resulting response will start with some meta-info about your result.
+Selected result's fields can be shown with a help of X-Fields request header. For exapmle
+
+      curl "{open_api_url}/search?published-after=60&limit=10" -H "X-Fields: total,hits{id,headline,publication_date}"
 
 #### "total":
 "value": total Number of ads matching your search

@@ -1,6 +1,6 @@
 # Search API for job adds - getting started
 
-The aim of this text is to walk you through what you're seeing in the Swagger UI at https://open-api.dev.services.jtech.se/ to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk load API] https://bulk-api.dev.services.jtech.se
+The aim of this text is to walk you through what you're seeing in the Swagger UI at [open-API](https://open-api.dev.services.jtech.se/) to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk-API](https://bulk-api.dev.services.jtech.se)
 This API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that dont fit the intended purpose of this API.
 
 A bad practice typically means searching for every job of every region every five minutes.
@@ -79,7 +79,7 @@ Taxonomy contains terms within different categories. In the drop down list under
 When making a search request the resulting response will start with some meta-info about your result.
 Selected result's fields can be shown with a help of X-Fields request header. For exapmle
 
-      curl "{open_api_url}/search?published-after=60&limit=10" -H "X-Fields: total,hits{id,headline,publication_date}"
+      curl "[open-API]/search?published-after=60&limit=10" -H "X-Fields: total,hits{id,headline,publication_date}"
 
 #### "total":
 "value": total Number of ads matching your search
@@ -91,7 +91,7 @@ Selected result's fields can be shown with a help of X-Fields request header. Fo
 "result_time_in_millis": how long did the total roundtrip take
 
 "stats": {},
-
+ 
 "freetext_concepts": {},
 
 "hits": placeholder for zero to * ads
@@ -323,7 +323,7 @@ Now you can use the ID in _Open-Search_ to fetch the ads registered with the ter
 
 Request URL
 
-	/open/search?occupation=iugg_Qq9_QHH&offset=0&limit=10
+	/search?occupation=iugg_Qq9_QHH&offset=0&limit=10
 
 This will give a smaller result set with a higher certainty of actually being for a souschef, however the result set will likely miss a few relevant ads since the occupation-name field isn't always set by employers. You should find that a larger set is more useful since there are multiple sorting factors working to show the most relevant hits first. We're also working to always improve the API in regards to unstructured data. The term Souschef has three popular formats when found out in the wild. "Souschef", "sous chef", "sous-chef" but as the API recognise them as synonyms they will fetch the same number of adds. There are a lot of cases like these that we are constantly adding. Our machine learning model also works in favour of the free query.
 
@@ -347,7 +347,7 @@ If i want to search for jobs in Norway i free text query the taxonomy for "Norge
 
 Request URL
 
-		/taxonomy/search?offset=0&limit=10&q=norge&show-count=false
+       /taxonomy/search?offset=0&limit=10&q=norge&show-count=false
 
 And add that parameter id to an empty free text query
 
@@ -390,7 +390,7 @@ And then I use the ID I got as a country code prefixed by a minus symbol.
 
 Request URL
 
-  /search?country=-199&q=swedish
+      /search?country=-199&q=swedish
 
 
 ### Getting all the jobs since date and time

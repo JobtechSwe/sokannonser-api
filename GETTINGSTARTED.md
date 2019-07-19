@@ -17,7 +17,7 @@ A good practice means making lots of varied calls initiated by a real user.
 
 [Examples](#Examples)
 
-##Short version
+## Short version
 The API is meant for searching, we want you to be able to just build your own customised GUI on top of our free text query field q in /search like this...
 
 	/search?q=Flen&offset=0&limit=100

@@ -4,7 +4,7 @@ from flask import request
 from flask_restplus import Resource
 from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
-from sokannonser.rest import ns_platsannons
+from sokannonser.rest import ns_platsannons, apm_user_context
 from sokannonser.rest.model.queries import annons_complete_query, pb_query, load_ad_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
 from sokannonser.repository import platsannonser
@@ -12,12 +12,13 @@ from sokannonser.rest.model.platsannons_results import (open_results, job_ad,
                                                         typeahead_results)
 from sokannonser.repository.querybuilder import QueryBuilder
 
+
 log = logging.getLogger(__name__)
 
 
 @ns_platsannons.route('ad/<id>', endpoint='ad')
 class Proxy(Resource):
-    method_decorators = [check_api_key('pb')]
+    method_decorators = [check_api_key('pb'), apm_user_context()]
 
     @ns_platsannons.doc(
         description='Load a job ad by ID',

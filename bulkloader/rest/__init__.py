@@ -6,8 +6,8 @@ api = Api(version='1.3.0', title='Download job ads',
           default='bulkloader',
           default_label="An API for retrieving job ads.")
 
-ns_bulk = Namespace('Bulk loader', description='Endpoint for downloading all ads in '
-                                               'zip-file format or stream.')
+ns_bulk = Namespace('Bulk loader', description='Endpoint for downloading ads in '
+                                               'stream.')
 
 api.add_namespace(ns_bulk, '/')
 

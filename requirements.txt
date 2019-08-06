@@ -14,3 +14,4 @@ flashtext
 Beaker
 urllib3==1.24.2
 python-simplexml
+pytest_bdd

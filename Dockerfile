@@ -44,7 +44,7 @@ WORKDIR /app
 RUN echo "" && echo $flask_app && echo "module = $flask_app" >> uwsgi.ini && \
     time pip3 install -r requirements.txt && \
     find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \; && \
-    python3 -m pytest -svv -m unit tests/ && \
+    python3 -m pytest -svv -m unit tests/unit_tests && \
     find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
 
 

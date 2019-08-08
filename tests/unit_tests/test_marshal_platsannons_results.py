@@ -207,7 +207,7 @@ def test_values_marshal_mocked_elastic_result():
     assert_has_list_values(keywords['skill'])
 
     # print(test_hit['keywords'].keys())
-    assert 'enriched' not in test_hit['keywords'].keys()
+    # assert 'enriched' not in test_hit['keywords'].keys()
 
     krav = test_hit['must_have']
     assert_has_taxonomy_list_values(krav['skills'])

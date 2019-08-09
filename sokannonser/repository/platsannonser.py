@@ -126,7 +126,6 @@ def _format_ad(result):
             try:
                 source[fields.AD_URL] = "%s%s" % (settings.BASE_PB_URL,
                                                   source[fields.ID])
-                print("Setting url:", source[fields.AD_URL])
                 # Remove personal number
                 org_nr = source['employer']['organization_number']
                 if org_nr and int(org_nr[2]) < 2:

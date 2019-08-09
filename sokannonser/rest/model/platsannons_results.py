@@ -89,6 +89,7 @@ requirements = ns_platsannons.model('Requirements', {
 job_ad = ns_platsannons.model('JobAd', {
     f.ID: fields.String(),
     f.EXTERNAL_ID: fields.String(),
+    f.AD_URL: fields.String(),
     f.HEADLINE: fields.String(),
     'relevance': fields.Float(),
     f.APPLICATION_DEADLINE: fields.DateTime(),

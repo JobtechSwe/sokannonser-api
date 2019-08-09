@@ -1,6 +1,9 @@
 Changelog Application Jobsearch
 ===============================
 
+## 1.4.0
+* New ad url field in job ad 
+
 ## 1.3.0
 * New parameter: relevance-threshold
 * Introduces new field: score

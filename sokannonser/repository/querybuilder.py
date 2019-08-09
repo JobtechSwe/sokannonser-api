@@ -142,7 +142,11 @@ class QueryBuilder(object):
             hitsfields = self._find_hits_subelement(x_fields)
             # Remove lower nestings
             hitsfields = re.sub("[{].*?[}]", "", hitsfields)
-            return hitsfields.split(',')
+            fieldslist = hitsfields.split(',')
+            if f.AD_URL in fieldslist:
+                fieldslist.append('id')
+
+            return fieldslist
         return []
 
     def _find_hits_subelement(self, text):

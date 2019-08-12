@@ -1,7 +1,7 @@
 # Search API for job adds - getting started
 
-The aim of this text is to walk you through what you're seeing in the Swagger UI at [open-API](https://open-api.dev.services.jtech.se/ "open API") to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk-API](https://bulk-api.dev.services.jtech.se "bulk API")
-This API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that don't fit the intended purpose of this API.
+The aim of this text is to walk you through what you're seeing in the Swagger UI at https://open-api.dev.services.jtech.se/ to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk load API] (https://bulk-api.dev.services.jtech.se)
+The search API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that dont fit the intended purpose of this API.
 
 A bad practice typically means searching for every job of every region every five minutes.
 A good practice means making lots of varied calls initiated by a real user.
@@ -17,9 +17,10 @@ A good practice means making lots of varied calls initiated by a real user.
 
 [Examples](#Examples)
 
-## Short version
-The API is meant for searching, we want you to be able to just build your own customised GUI on top of our free text query field q in /search like this...
 
+##Short version
+The API is meant for searching, we want you to be able to just build your own customized GUI on top of our free text query field q in /search like this...
+ 
 	/search?q=Flen&offset=0&limit=100
 ...and not have to worry about the users finding the most relevant ads, search engine should do this for you.
 If you want to narrow down the search result, use the available search filters. Some of the filters needs id-keys as input for searching structured data. The id-keys can be found at /taxonomy/search these will help you get sharper hits for structured data. We will always work on improving the hits for free queries hoping you'll see less and less use for filtering.
@@ -281,28 +282,29 @@ Then comes the actual ads
 
 "work_experiences": []
 
-"concept_id": stable ID for label
-
-"label": the name of a experience            
-
-"weight": weights for must_have are normally 10
-
-"legacy_ams_taxonomy_id": legacy id for label
-
-"publication_date": when the ad was published
-
-"last_publication_date": when the ad will be unpublished
-
-"removed": boolean if the add unpublished or not, which can occur before the last publication date
-
-"removed_date": when was the add removed
-
-"source_type": where did the add come from
-
-"timestamp": this timestamps is mostly for troubleshooting
-
 
 ## Examples
+"label": The name of a experience            
+
+"weight": Weights for must_have are normally 10
+            
+"legacy_ams_taxonomy_id": Legacy id for label
+      
+      
+"publication_date": When was the ad published
+ 
+"last_publication_date": When the ad will be unpublished
+
+"removed": Boolean if the add unpublished or not which can occur before the last publication date
+
+"removed_date": When was the add removed
+
+"source_type": Where did the add come from
+      
+"timestamp": This timestamps is mostly for troubleshooting
+ 
+
+## Examples 
 
 #### Searching for a particular job title
 The easiest way to get the adds that contain a specific word like a jobtitle is to use a free text query (q) with the _Open-Search_ endpoint. This will give you ads with the specified word in either headline, ad description or place of work.
@@ -373,6 +375,19 @@ Request URL
 
 	/search?q=unix&offset=0&limit=10
 
+But i find that i get a lot of jobs expecting me to work with which i dont want. All that's needed is to use the minus symbol and the word i want to exclude
+
+Request URL
+
+	/search?q=unix%20-linux&offset=0&limit=10
+
+### Finding swedish speak jobs abroad
+Some times a filter can work to broadly and then it's easier to use a negative search to remove specific results you don't want. In this case i'm going to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" I'm using the country code and the country field in the search. So first I get the country code for "Sverige" from the taxonomy end point. 
+
+Request URL
+
+	/search?offset=0&limit=10&q=Sverige&type=country&show-count=false
+
 But I find that I get a lot of jobs expecting me to work with which I don't want. All that's needed is to use the minus symbol and the word I want to exclude
 
 Request URL
@@ -402,7 +417,7 @@ Successful queries
 Auto complete - long version?
 Errors
 Contact Information
-Good example of what to use
+Good example of what to use 
 	qfields
 	statistics
 Optional fields

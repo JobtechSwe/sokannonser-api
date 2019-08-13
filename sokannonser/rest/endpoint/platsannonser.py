@@ -11,14 +11,13 @@ from sokannonser.repository import platsannonser
 from sokannonser.rest.model.platsannons_results import (open_results, job_ad,
                                                         typeahead_results)
 from sokannonser.repository.querybuilder import QueryBuilder
-
-
+import elasticapm
 log = logging.getLogger(__name__)
 
 
 @ns_platsannons.route('ad/<id>', endpoint='ad')
 class Proxy(Resource):
-    method_decorators = [check_api_key('pb'), apm_user_context()]
+    method_decorators = [check_api_key('pb')]
 
     @ns_platsannons.doc(
         description='Load a job ad by ID',
@@ -27,7 +26,8 @@ class Proxy(Resource):
     @ns_platsannons.response(404, 'Job ad not found')
     @ns_platsannons.expect(load_ad_query)
     @ns_platsannons.marshal_with(job_ad)
-    def get(self, id):
+    def get(self, id, *args, **kwargs):
+        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         return platsannonser.fetch_platsannons(str(id))
 
 

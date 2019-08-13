@@ -10,6 +10,7 @@ def apm_user_context():
             apikey = request.headers.get(settings.APIKEY)
             if apikey:
                 elasticapm.set_user_context(user_id=apikey)
+            return func(*args, **kwargs)
         return wrapper
     return real_apm_user_context_decorator
 

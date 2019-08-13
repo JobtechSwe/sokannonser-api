@@ -17,9 +17,10 @@ def configure_app(flask_app):
         flask_app.config['ELASTIC_APM'] = {
             'SERVICE_NAME': settings.APM_SERVICE_NAME,
             'SERVER_URL': settings.APM_SERVICE_URL,
-            'SECRET_TOKEN': settings.APM_SECRET
+            'SECRET_TOKEN': settings.APM_SECRET,
+            'COLLECT_LOCAL_VARIABLES': 'off'
         }
-        apm = ElasticAPM(flask_app, logging=logging.INFO)
+        apm = ElasticAPM(flask_app, logging=logging.ERROR)
         log.info("ElasticAPM enabled")
         log.debug("APM details: %s" % str(apm))
     else:

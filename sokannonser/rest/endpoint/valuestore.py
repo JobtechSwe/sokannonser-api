@@ -1,17 +1,18 @@
 from flask import request
 from flask_restplus import Resource, abort
-from jobtech.common.rest.decorators import check_api_key
+from jobtech.common.rest.decorators import check_api_key, check_api_key_and_return_metadata
 from sokannonser.repository import taxonomy
 from sokannonser import settings
 from sokannonser.repository import elastic, platsannonser
 from sokannonser.rest import ns_valuestore
 from sokannonser.rest.model import queries
 from sokannonser.rest.model.queries import taxonomy_query
+import elasticapm
 
 
 @ns_valuestore.route('/search')
 class Valuestore(Resource):
-    method_decorators = [check_api_key('taxonomy')]
+    method_decorators = [check_api_key_and_return_metadata('taxonomy')]
 
     @ns_valuestore.doc(
         params={
@@ -28,7 +29,8 @@ class Valuestore(Resource):
         }
     )
     @ns_valuestore.expect(taxonomy_query)
-    def get(self):
+    def get(self, **kwargs):
+        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         args = taxonomy_query.parse_args()
         q = request.args.get('q', None)
         parent_id = args.get('parent-id') if args.get('parent-id') else []

@@ -2,14 +2,16 @@ import logging
 import json
 import time
 import zipfile
+from flask_restplus import Namespace
 from datetime import date, timedelta
 from io import BytesIO
 from elasticsearch.helpers import scan
 from sokannonser import settings
 from sokannonser.repository import elastic
+from sokannonser.rest.model.platsannons_results import job_ad
 
 log = logging.getLogger(__name__)
-
+marshaller = Namespace('Marhsaller')
 
 def _es_dsl():
     dsl = {
@@ -77,8 +79,8 @@ def zip_ads(day, start_time=0):
     return in_memory
 
 
-def convert_to_timestamp(date):
-    if not date:
+def convert_to_timestamp(day):
+    if not day:
         return None
 
     ts = 0
@@ -87,11 +89,11 @@ def convert_to_timestamp(date):
     ]:
 
         try:
-            ts = time.mktime(time.strptime(date, dateformat)) * 1000
-            log.debug("Converted date %s to %d" % (date, ts))
+            ts = time.mktime(time.strptime(day, dateformat)) * 1000
+            log.debug("Converted date %s to %d" % (day, ts))
             break
         except ValueError as e:
-            log.debug("Failed to convert date %s" % date, e)
+            log.debug("Failed to convert date %s" % day, e)
 
     return int(ts)
 
@@ -120,17 +122,23 @@ def load_all(since):
             yield ','
         source = ad['_source']
         remove_sensitive_data(source)
-        yield json.dumps(source)
+        yield json.dumps(format_ad(source))
+        # yield json.dumps(source)
         counter += 1
     log.debug("Delivered %d ads as stream" % counter)
     yield ']'
 
 
+@marshaller.marshal_with(job_ad)
+def format_ad(ad_data):
+    return ad_data
+
+
 def remove_sensitive_data(source):
-    keyword_node = source['keywords']
     try:
         # Remove enriched
-        del keyword_node['enriched']
+        if 'keyword' in source:
+            del source['keywords']
         # Remove personal number
         org_nr = source['employer']['organization_number']
         if org_nr and int(org_nr[2]) < 2:

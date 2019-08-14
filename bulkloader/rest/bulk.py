@@ -2,17 +2,18 @@ import logging
 import time
 from flask import send_file, Response
 from flask_restplus import Resource
-from jobtech.common.rest.decorators import check_api_key
+from jobtech.common.rest.decorators import check_api_key, check_api_key_and_return_metadata
 from bulkloader.rest import ns_bulk, bulk_zip_query, bulk_stream_query
 from bulkloader import repository
 from sokannonser import settings
+import elasticapm
 
 log = logging.getLogger(__name__)
 
 
 # @ns_bulk.route('zip')
 class BulkZip(Resource):
-    method_decorators = [check_api_key('bulk', 300)]
+    method_decorators = [check_api_key_and_return_metadata('bulk', 300)]
 
     @ns_bulk.doc(
         params={
@@ -28,7 +29,8 @@ class BulkZip(Resource):
         }
     )
     @ns_bulk.expect(bulk_zip_query)
-    def get(self):
+    def get(self, **kwargs):
+        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         start_time = int(time.time()*1000)
         args = bulk_zip_query.parse_args()
         bytes_result = repository.zip_ads(args.get(settings.DATE), start_time)
@@ -41,7 +43,7 @@ class BulkZip(Resource):
 
 @ns_bulk.route('stream')
 class BulkLoad(Resource):
-    method_decorators = [check_api_key('bulk', 60)]
+    method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
 
     @ns_bulk.doc(
         params={
@@ -58,7 +60,8 @@ class BulkLoad(Resource):
         }
     )
     @ns_bulk.expect(bulk_stream_query)
-    def get(self):
+    def get(self, **kwargs):
+        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         args = bulk_stream_query.parse_args()
         return Response(repository.load_all(args.get(settings.DATE)),
                         mimetype='application/json')

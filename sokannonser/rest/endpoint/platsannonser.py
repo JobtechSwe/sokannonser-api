@@ -2,9 +2,9 @@ import logging
 import time
 from flask import request
 from flask_restplus import Resource
-from jobtech.common.rest.decorators import check_api_key
+from jobtech.common.rest.decorators import check_api_key, check_api_key_and_return_metadata
 from sokannonser import settings
-from sokannonser.rest import ns_platsannons, apm_user_context
+from sokannonser.rest import ns_platsannons
 from sokannonser.rest.model.queries import annons_complete_query, pb_query, load_ad_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
 from sokannonser.repository import platsannonser
@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 @ns_platsannons.route('ad/<id>', endpoint='ad')
 class Proxy(Resource):
-    method_decorators = [check_api_key('pb')]
+    method_decorators = [check_api_key_and_return_metadata('pb')]
 
     @ns_platsannons.doc(
         description='Load a job ad by ID',
@@ -33,7 +33,7 @@ class Proxy(Resource):
 
 @ns_platsannons.route('search')
 class PBSearch(Resource):
-    method_decorators = [check_api_key('pb')]
+    method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
@@ -43,7 +43,8 @@ class PBSearch(Resource):
     @ns_platsannons.response(401, 'Invalid API key')
     @ns_platsannons.expect(pb_query)
     @ns_platsannons.marshal_with(open_results)
-    def get(self):
+    def get(self, **kwargs):
+        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         start_time = int(time.time()*1000)
         args = pb_query.parse_args()
         log.debug("Query parsed after %d milliseconds."
@@ -82,7 +83,7 @@ class PBSearch(Resource):
 
 @ns_platsannons.route('complete')
 class PBComplete(Resource):
-    method_decorators = [check_api_key('pb')]
+    method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
@@ -92,7 +93,8 @@ class PBComplete(Resource):
     @ns_platsannons.response(401, 'Invalid API-key')
     @ns_platsannons.expect(annons_complete_query)
     @ns_platsannons.marshal_with(typeahead_results)
-    def get(self):
+    def get(self, **kwargs):
+        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         # This could be prettier

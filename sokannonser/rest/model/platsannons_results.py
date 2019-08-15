@@ -20,9 +20,21 @@ resultat_taxonomi = ns_platsannons.model('TaxonomiEntitet', {
 })
 
 
-class FormattedUrl(fields.Raw):
+class AdUrl(fields.Raw):
     def format(self, value):
-        return "%s/ad/%s" % (settings.BASE_URL, value)
+        if settings.BASE_PB_URL[-1] == '/':
+            return "%s%s" % (settings.BASE_PB_URL, value)
+        else:
+            return "%s/%s" % (settings.BASE_PB_URL, value)
+
+
+class LogoUrl(fields.Raw):
+    def format(self, value):
+        if settings.BASE_URL[-1] == '/':
+            return "%sad/%s/logo" % (settings.BASE_URL, value)
+        else:
+            return "%s/ad/%s/logo" % (settings.BASE_URL, value)
+
 
 
 taxonomy_item = ns_platsannons.model('JobTechTaxonomyItem', {
@@ -89,13 +101,15 @@ requirements = ns_platsannons.model('Requirements', {
 job_ad = ns_platsannons.model('JobAd', {
     f.ID: fields.String(),
     f.EXTERNAL_ID: fields.String(),
+    f.AD_URL: AdUrl(attribute='id'),
+    f.LOGO_URL: LogoUrl(attribute='id'),
     f.HEADLINE: fields.String(),
-    'relevance': fields.Float(),
     f.APPLICATION_DEADLINE: fields.DateTime(),
     f.NUMBER_OF_VACANCIES: fields.Integer(),
     'description': fields.Nested(description),
     'employment_type': fields.Nested(taxonomy_item),
     'salary_type': fields.Nested(taxonomy_item),
+    'salary_description': fields.String(),
     'duration': fields.Nested(taxonomy_item),
     'working_hours_type': fields.Nested(taxonomy_item),
     'scope_of_work': fields.Nested(min_max),
@@ -118,6 +132,10 @@ job_ad = ns_platsannons.model('JobAd', {
     f.REMOVED_DATE: fields.DateTime(),
     f.SOURCE_TYPE: fields.String(),
     'timestamp': fields.Integer(),
+})
+
+job_ad_searchresult = ns_platsannons.inherit('JobAdSearchResult', job_ad, {
+    'relevance': fields.Float(),
 })
 
 stat_item = ns_platsannons.model('StatDetail', {
@@ -154,7 +172,7 @@ open_results = ns_platsannons.model('SearchResults', {
     'result_time_in_millis': fields.Integer(),
     'stats': fields.List(fields.Nested(search_stats, skip_none=True)),
     'freetext_concepts': fields.Nested(freetext_concepts, skip_none=True),
-    'hits': fields.List(fields.Nested(job_ad), attribute='hits', skip_none=True)
+    'hits': fields.List(fields.Nested(job_ad_searchresult), attribute='hits', skip_none=True)
 })
 
 typeahead_item = ns_platsannons.model('TypeaheadItem', {

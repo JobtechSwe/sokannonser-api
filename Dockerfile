@@ -24,15 +24,16 @@ COPY . /app
 
 RUN date +"%Y-%m-%dT%H:%M:%S %Z" && \
     mkdir -p /var/run/nginx && \
-    chmod -R 777 /var/run/nginx && \ 
+    chmod -R 777 /var/run/nginx && \
     mkdir -p /var/run/supervisord /var/log/supervisord && \
     chmod -R 777 /var/run/supervisord && \
     chmod -R 775 /app && \
     chmod -R 777 /usr/sbin && \
     chmod -R 775 /usr/lib/python* && \
-    chmod -R 775 /var/lib/nginx && \
+    chmod -R 777 /var/lib/nginx && \
     chmod -R 777 /var/log/* && \
-    chmod -R 777 /var/tmp/nginx
+    mkdir -p /var/tmp && \
+    chmod -R 777 /var/tmp/
 
 
 WORKDIR /app
@@ -44,7 +45,7 @@ WORKDIR /app
 RUN echo "" && echo $flask_app && echo "module = $flask_app" >> uwsgi.ini && \
     time pip3 install -r requirements.txt && \
     find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \; && \
-    python3 -m pytest -svv -m unit tests/ && \
+    python3 -m pytest -svv -m unit tests/unit_tests && \
     find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \;
 
 

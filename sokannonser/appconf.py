@@ -20,7 +20,7 @@ def configure_app(flask_app):
             'SECRET_TOKEN': settings.APM_SECRET,
             'COLLECT_LOCAL_VARIABLES': 'off'
         }
-        apm = ElasticAPM(flask_app, logging=logging.ERROR)
+        apm = ElasticAPM(flask_app, logging=logging.INFO)
         log.info("ElasticAPM enabled")
         log.debug("APM details: %s" % str(apm))
     else:

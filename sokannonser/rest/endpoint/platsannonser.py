@@ -1,6 +1,6 @@
 import logging
 import time
-from flask import request
+from flask import request, Response
 from flask_restplus import Resource
 from jobtech.common.rest.decorators import check_api_key_and_return_metadata
 from sokannonser import settings
@@ -29,6 +29,16 @@ class Proxy(Resource):
     def get(self, id, *args, **kwargs):
         elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         return platsannonser.fetch_platsannons(str(id))
+
+
+@ns_platsannons.route('ad/<id>/logo', endpoint='ad_logo')
+class AdLogo(Resource):
+    @ns_platsannons.doc(
+        description='Load a logo binary file by ID',
+    )
+    @ns_platsannons.response(404, 'Job ad not found')
+    def get(self, id):
+        return platsannonser.fetch_platsannons_logo(str(id))
 
 
 @ns_platsannons.route('search')

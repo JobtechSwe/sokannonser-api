@@ -3,6 +3,7 @@ Changelog Application Jobsearch
 
 ## 1.4.0
 * New webpage url field in job ad
+* New logo url field in job ad
 * Language added as filter in taxonomy search
 
 ## 1.3.0

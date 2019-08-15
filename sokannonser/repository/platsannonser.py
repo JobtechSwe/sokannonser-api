@@ -88,7 +88,8 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
             max_score_query['track_total_hits'] = False
             del max_score_query['aggs']
             del max_score_query['sort']
-            max_score_result = elastic.search(index=settings.ES_INDEX, body=max_score_query)
+            max_score_result = elastic.search(index=settings.ES_INDEX,
+                                              body=max_score_query)
             max_score = max_score_result.get('hits', {}).get('max_score')
             if max_score:
                 query_dsl['min_score'] = max_score * args.get(settings.MIN_RELEVANCE)
@@ -119,13 +120,10 @@ def _extract_concept_from_concepts(concepts):
     return main_concepts
 
 
-def _format_ad_for_fetch(result):
+def _format_ad(result):
         source = result.get('_source')
         if source:
-            keyword_node = source['keywords']
             try:
-                # Remove enriched
-                del keyword_node['enriched']
                 # Remove personal number
                 org_nr = source['employer']['organization_number']
                 if org_nr and int(org_nr[2]) < 2:
@@ -141,7 +139,7 @@ def fetch_platsannons(ad_id):
     try:
         query_result = elastic.get(index=settings.ES_INDEX, id=ad_id, ignore=404)
         if query_result and '_source' in query_result:
-            return _format_ad_for_fetch(query_result)
+            return _format_ad(query_result)
         else:
             ext_id_query = {
                 'query': {
@@ -153,7 +151,7 @@ def fetch_platsannons(ad_id):
             query_result = elastic.search(index=settings.ES_INDEX, body=ext_id_query)
             hits = query_result.get('hits', {}).get('hits', [])
             if hits:
-                return _format_ad_for_fetch(hits[0])
+                return _format_ad(hits[0])
 
             log.info("Job ad %s not found, returning 404 message" % ad_id)
             abort(404, 'Ad not found')
@@ -194,7 +192,7 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
             })
 
     # create_found_in_enriched(results, query_result)
-    delete_sensitive_values(results)
+    _modify_results(results)
 
     # log.debug(json.dumps(results, indent=2))
     return results
@@ -233,16 +231,10 @@ def create_found_in_enriched(results, query_result):
         hit['_source']['found_in_enriched'] = found_in_enriched
 
 
-def delete_sensitive_values(results):
+def _modify_results(results):
     for hit in results['hits']:
         try:
-            # Remove enriched
-            keyword_node = hit['_source']['keywords']
-            del keyword_node['enriched']
-            # Remove personal number
-            org_nr = hit['_source']['employer']['organization_number']
-            if org_nr and int(org_nr[2]) < 2:
-                hit['_source']['employer']['organization_number'] = None
+            hit['_source'] = _format_ad(hit)
         except KeyError:
             pass
         except ValueError:

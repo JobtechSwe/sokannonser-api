@@ -2,7 +2,8 @@ Changelog Application Jobsearch
 ===============================
 
 ## 1.4.0
-* New ad url field in job ad 
+* New ad url field in job ad
+* Language added as filter in taxonomy search
 
 ## 1.3.0
 * New parameter: relevance-threshold

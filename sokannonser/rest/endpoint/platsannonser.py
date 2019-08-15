@@ -2,7 +2,7 @@ import logging
 import time
 from flask import request
 from flask_restplus import Resource
-from jobtech.common.rest.decorators import check_api_key, check_api_key_and_return_metadata
+from jobtech.common.rest.decorators import check_api_key_and_return_metadata
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons
 from sokannonser.rest.model.queries import annons_complete_query, pb_query, load_ad_query

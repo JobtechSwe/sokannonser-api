@@ -3,7 +3,7 @@ from sokannonser.repository import taxonomy
 # QUERYFIELDS
 ID = 'id'
 EXTERNAL_ID = 'external_id'
-AD_URL = 'ad_url'
+AD_URL = 'webpage_url'
 HEADLINE = 'headline'
 APPLICATION_DEADLINE = 'application_deadline'
 NUMBER_OF_VACANCIES = 'number_of_vacancies'

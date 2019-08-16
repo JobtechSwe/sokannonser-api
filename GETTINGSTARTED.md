@@ -21,17 +21,17 @@ A good practice means making lots of varied calls initiated by a real user.
 ## Short version
 The API is meant for searching, we want you to be able to just build your own customized GUI on top of our free text query field q in /search like this...
  
-	/search?q=Flen&offset=0&limit=100
+	https://jobsearch.api.jobtechdev.se/search?q=Flen&offset=0&limit=100
 ...and not have to worry about the users finding the most relevant ads for Flen, the search engine should do this for you.
 If you want to narrow down the search result in other ways than the free query can, you can use the available search filters. Some of the filters needs id-keys as input for searching structured data. The id-keys can be found at /taxonomy/search these will help you get sharper hits for structured data. We will always work on improving the hits for free queries hoping you'll see less and less use for filtering.
 
 If you want to help your end users with term suggestions you can use the typeahead function, which will return common terms found in the job ads. This should work great with an auto complete feature in your search box. If i request
 
-	/complete?q=stor
+	https://jobsearch.api.jobtechdev.se/complete?q=stor
 I get storkök, storhushåll, storesupport, storage. As they are the most common terms starting with "stor*" in ads.
 If I request
 
-	/complete?q=storage%20s
+	https://jobsearch.api.jobtechdev.se/complete?q=storage%20s
 
 I get sverige, stockholms län, stockholm, svenska, script. Since they are the most common terms beginning with S for ads that contain the word Storage 	
 
@@ -74,25 +74,7 @@ Taxonomy contains terms within different categories. In the drop down list under
 * Sun education _levels_. The three categories describes different levels of formal education in Sweden. _Sun Education Level 1_ is the top category and contains broad descriptions of education levels. The next level is _Sun Education Field 2_ describes more specific levels or generic degrees. _Sun Education Field 3_ contains specific degrees from Swedish formal education. Each concept in level 3 has a "parent" in level 2, and each level 2 concept has a level 1 "parent".
 
 
-## Examples
-"label": The name of a experience            
 
-"weight": Weights for must_have are normally 10
-            
-"legacy_ams_taxonomy_id": Legacy id for label
-      
-      
-"publication_date": When was the ad published
- 
-"last_publication_date": When the ad will be unpublished
-
-"removed": Boolean if the add unpublished or not which can occur before the last publication date
-
-"removed_date": When was the add removed
-
-"source_type": Where did the add come from
-      
-"timestamp": This timestamps is mostly for troubleshooting
  
 
 ## Examples 

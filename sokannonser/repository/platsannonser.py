@@ -1,7 +1,10 @@
 import logging
 import json
 import time
+import io, os
 from flask_restplus import abort
+from flask import send_file
+import requests
 from elasticsearch import exceptions
 from sokannonser import settings
 from sokannonser.repository import elastic, taxonomy
@@ -9,6 +12,8 @@ from sokannonser.rest.model import fields
 from sokannonser.repository.querybuilder import ttc
 
 log = logging.getLogger(__name__)
+
+currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 
 def get_stats_for(taxonomy_type):
@@ -163,6 +168,53 @@ def fetch_platsannons(ad_id):
         logging.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
+
+
+def get_correct_logo_url(ad_id):
+    ad = fetch_platsannons(ad_id)
+
+    logo_url = None
+    if ad and 'employer' in ad:
+        if 'organization_number' in ad['employer'] and ad['employer']['organization_number']:
+            org_number = ad['employer']['organization_number']
+            eventual_logo_url = '%sorganisation/%s/logotyper/logo.png' % (settings.COMPANY_LOGO_BASE_URL, org_number)
+            r = requests.head(eventual_logo_url, timeout=15)
+            if r.status_code == 200:
+                logo_url = eventual_logo_url
+    return logo_url
+
+
+not_found_file = None
+
+def get_not_found_logo_file():
+    global not_found_file
+    if not_found_file is None:
+        not_found_filepath = currentdir + "../resources/1x1-00000000.png"
+        log.debug('Opening global file %s' % not_found_filepath)
+        not_found_file = open(not_found_filepath, 'rb')
+        not_found_file = not_found_file.read()
+    return not_found_file
+
+
+def fetch_platsannons_logo(ad_id):
+    logo_url = get_correct_logo_url(ad_id)
+
+    attachment_filename = 'logo.png'
+    mimetype = 'image/png'
+
+    if logo_url is None:
+        return send_file(
+            io.BytesIO(get_not_found_logo_file()),
+            attachment_filename=attachment_filename,
+            mimetype=mimetype
+        )
+    else:
+        r = requests.get(logo_url, stream=True)
+        return send_file(
+            io.BytesIO(r.raw.read(decode_content=False)),
+            attachment_filename=attachment_filename,
+            mimetype=mimetype
+        )
 
 
 def transform_platsannons_query_result(args, query_result, querybuilder):

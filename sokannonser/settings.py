@@ -31,6 +31,7 @@ BASE_URL = os.getenv('BASE_URL', 'https://jobsearch.api.jobtechdev.se/')
 BASE_PB_URL = os.getenv('BASE_PB_URL',
                         'https://www.arbetsformedlingen.se/For-arbetssokande/Platsbanken/annonser/')
 
+COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL', 'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
 # Header parameters
 APIKEY = 'api-key'
 

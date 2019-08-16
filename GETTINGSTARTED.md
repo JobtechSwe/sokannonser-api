@@ -152,19 +152,6 @@ Request URL
 	/search?q=unix%20-linux&offset=0&limit=10
 
 ### Finding swedish speaking jobs abroad
-Some times a filter can work to broadly and then it's easier to use a negative search to remove specific results you don't want. In this case i'm going to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" I'm using the country code and the country field in the search. So first I get the country code for "Sverige" from the taxonomy end point. 
-
-Request URL
-
-	/search?offset=0&limit=10&q=Sverige&type=country&show-count=false
-
-But I find that I get a lot of jobs expecting me to work with which I don't want. All that's needed is to use the minus symbol and the word I want to exclude
-
-Request URL
-
-	/search?q=unix%20-linux&offset=0&limit=10
-
-### Finding swedish speak jobs abroad
 Some times a filter can work to broadly and then it's easier to use a negative search to remove specific results you don't want. In this case i'm going to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" I'm using the country code and the country field in the search. So first I get the country code for "Sverige" from the taxonomy end point.
 
 Request URL

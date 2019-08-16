@@ -1,7 +1,7 @@
 # Search API for job adds - getting started
 
-The aim of this text is to walk you through what you're seeing in the [Swagger-UI] (https://jobsearch.api.jobtechdev.se) to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk load API] (https://jobstream.api.jobtechdev.se)
-The search API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that dont fit the intended purpose of this API.	The search API is intended for user search, not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that don't fit the intended purpose of this API.
+The aim of this text is to walk you through what you're seeing in the [Swagger-UI](https://jobsearch.api.jobtechdev.se) to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk load API](https://jobstream.api.jobtechdev.se)
+The search API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that don't fit the intended purpose of this API.	The search API is intended for user search, not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that don't fit the intended purpose of this API.
 
 A bad practice typically means searching for every job of every region every five minutes.
 A good practice means making lots of varied calls initiated by a real user.
@@ -11,14 +11,14 @@ A good practice means making lots of varied calls initiated by a real user.
 # Table of Contents
 [Short version](#Short-version)
 
-[Resources](#Resources)
-
 [API Key](#API-Key)
+
+[Resources](#Resources)
 
 [Examples](#Examples)
 
 
-##Short version
+## Short version
 The API is meant for searching, we want you to be able to just build your own customized GUI on top of our free text query field q in /search like this...
  
 	/search?q=Flen&offset=0&limit=100

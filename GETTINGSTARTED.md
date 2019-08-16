@@ -74,9 +74,6 @@ Taxonomy contains terms within different categories. In the drop down list under
 * Sun education _levels_. The three categories describes different levels of formal education in Sweden. _Sun Education Level 1_ is the top category and contains broad descriptions of education levels. The next level is _Sun Education Field 2_ describes more specific levels or generic degrees. _Sun Education Field 3_ contains specific degrees from Swedish formal education. Each concept in level 3 has a "parent" in level 2, and each level 2 concept has a level 1 "parent".
 
 
-
- 
-
 ## Examples 
 
 #### Searching for a particular job title
@@ -188,11 +185,11 @@ In the Swagger GUI its possible to use the X-fields to define what fields to inc
 
  This will create an extra header displayed in the curl example in Swagger. So this example will look like this
 
- 	curl -X GET " /search?q=skogsarbetare&offset=0&limit=10" -H "accept: application/json" -H "api-key: <proper_key>" -H "X-Fields: hits{id, workplace_address{coordinates}}"
+ 	curl "https://jobsearch.api.jobtechdev.se/search?q=skogsarbetare&offset=0&limit=10" -H "accept: application/json" -H "api-key: <proper_key>" -H "X-Fields: hits{id, workplace_address{coordinates}}"
 
 
 
 ### Getting all the jobs since date and time
-A very common use case is COLLECT ALL THE ADDS. We don't want you to use the search API for this. It's expensive in terms of band width, CPU cycles and development time and it's not even guaranteed you'll get everything. Instead we'd like you to use our [bulk load API] (https://jobstream.api.jobtechdev.se)
+A very common use case is COLLECT ALL THE ADDS. We don't want you to use the search API for this. It's expensive in terms of band width, CPU cycles and development time and it's not even guaranteed you'll get everything. Instead we'd like you to use our [bulk load API](https://jobstream.api.jobtechdev.se)
 
 

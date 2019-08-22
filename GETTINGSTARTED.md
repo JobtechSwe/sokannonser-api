@@ -8,15 +8,6 @@ A good practice means making lots of varied calls initiated by a real user.
 
 
 
-# Table of Contents
-[Short version](#Short-version)
-
-[API Key](#API-Key)
-
-[Resources](#Resources)
-
-[Examples](#Examples)
-
 
 ## Short version
 The API is meant for searching, we want you to be able to just build your own customized GUI on top of our free text query field q in /search like this...
@@ -35,8 +26,14 @@ If I request
 
 I get sverige, stockholms län, stockholm, svenska, script. Since they are the most common terms beginning with S for ads that contain the word Storage 	
 
+# Table of Contents
+[API Key](#API-Key)
 
-## API key
+[Resources](#Resources)
+
+[Examples](#Examples)
+
+## Authentication
 For this API, you will need to register your own API key at www.jobtechdev.se
 
 ## Resources
@@ -54,7 +51,7 @@ The endpoints in the first section will return job ads from Arbetsförmedlingen 
 
 #### Complete
 /complete This endpoint is meant to help you create autocomplete functions AKA type aheads. The result set will return the most frequent job market terms starting with the letters you put in. It's most easily understood by trying it out using the free query field q. If input is LÄK you will get "läkarsekreterare","läkare","läkemedel" etc.
-If you put in more than one word you get the most common terms for that context for example "läkare L" and you get "linköping","lund" etc
+If you put in more than one word you get the most common terms for that context, for example "läkare L" and you get "linköping","lund" etc. 
 
 
 ### Jobtech-Taxonomy
@@ -73,8 +70,14 @@ Taxonomy contains terms within different categories. In the drop down list under
 * Sun education _fields_. These three categories describes different fields of education. The top level, _Sun Education Field 1_, contains the broad descriptions of education areas. The next level _Sun Education Field 2_ narrows the fields down a bit. _Sun Education Field 3_ contains specific education programs or trainings. Each concept in level 3 has a "parent" in level 2, and each level 2 concept has a level 1 "parent".
 * Sun education _levels_. The three categories describes different levels of formal education in Sweden. _Sun Education Level 1_ is the top category and contains broad descriptions of education levels. The next level is _Sun Education Field 2_ describes more specific levels or generic degrees. _Sun Education Field 3_ contains specific degrees from Swedish formal education. Each concept in level 3 has a "parent" in level 2, and each level 2 concept has a level 1 "parent".
 
+## Results
+The results of your queries will be in [JSON](https://en.wikipedia.org/wiki/JSON) format. We wont attempt to explain this attribute by attribute in this document. Instead we've decided to try to include this in the data model which you can find in our Swagger GUI.
 
-## Examples 
+Successful queries will have a response code of 200 and give you a result set that consists of 1. Som meta data about your search such as number of hits and the time it took to execute the query and 2. the ads that matched your search. 
+
+## Errors
+
+## Use cases 
 
 #### Searching for a particular job title
 The easiest way to get the adds that contain a specific word like a jobtitle is to use a free text query (q) with the _Open-Search_ endpoint. This will give you ads with the specified word in either headline, ad description or place of work.

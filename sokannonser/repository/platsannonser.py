@@ -209,7 +209,10 @@ def get_not_found_logo_file():
 
 
 def fetch_platsannons_logo(ad_id):
-    logo_url = get_correct_logo_url(ad_id)
+    if settings.COMPANY_LOGO_FETCH_DISABLED:
+        logo_url = None
+    else:
+        logo_url = get_correct_logo_url(ad_id)
 
     attachment_filename = 'logo.png'
     mimetype = 'image/png'

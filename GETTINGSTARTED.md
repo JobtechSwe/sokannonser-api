@@ -27,7 +27,7 @@ If I request
 I get sverige, stockholms län, stockholm, svenska, script. Since they are the most common terms beginning with S for ads that contain the word Storage 	
 
 # Table of Contents
-[API Key](#API-Key)
+[Authentication](#Authentication)
 
 [Resources](#Resources)
 

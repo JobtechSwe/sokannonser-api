@@ -175,10 +175,22 @@ def get_correct_logo_url(ad_id):
 
     logo_url = None
     if ad and 'employer' in ad:
-        if 'organization_number' in ad['employer'] and ad['employer']['organization_number']:
+        if 'workplace_id' in ad['employer'] \
+                and ad['employer']['workplace_id'] \
+                and int(ad['employer']['workplace_id']) > 0:
+            '''
+            Special logo for workplace_id for ads with source_type VIA_AF_FORMULAR eller VIA_PLATSBANKEN_AD or 
+            VIA_ANNONSERA (workplace_id > 0)
+            '''
+            workplace_id = ad['employer']['workplace_id']
+            eventual_logo_url = '%sarbetsplatser/%s/logotyper/logo.png' % (settings.COMPANY_LOGO_BASE_URL, workplace_id)
+            r = requests.head(eventual_logo_url, timeout=10)
+            if r.status_code == 200:
+                logo_url = eventual_logo_url
+        elif 'organization_number' in ad['employer'] and ad['employer']['organization_number']:
             org_number = ad['employer']['organization_number']
             eventual_logo_url = '%sorganisation/%s/logotyper/logo.png' % (settings.COMPANY_LOGO_BASE_URL, org_number)
-            r = requests.head(eventual_logo_url, timeout=15)
+            r = requests.head(eventual_logo_url, timeout=10)
             if r.status_code == 200:
                 logo_url = eventual_logo_url
     return logo_url
@@ -197,7 +209,10 @@ def get_not_found_logo_file():
 
 
 def fetch_platsannons_logo(ad_id):
-    logo_url = get_correct_logo_url(ad_id)
+    if settings.COMPANY_LOGO_FETCH_DISABLED:
+        logo_url = None
+    else:
+        logo_url = get_correct_logo_url(ad_id)
 
     attachment_filename = 'logo.png'
     mimetype = 'image/png'

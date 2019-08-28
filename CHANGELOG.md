@@ -1,6 +1,9 @@
 Changelog Application Jobsearch
 ===============================
 
+## 1.4.1
+* New endpoint for fetching company logo file
+
 ## 1.4.0
 * New webpage url field in job ad
 * New logo url field in job ad

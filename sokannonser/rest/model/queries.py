@@ -92,7 +92,7 @@ annons_complete_query.add_argument(settings.PUBLISHED_BEFORE,
 # annons_complete_query.add_argument(settings.PUBLISHED_AFTER,
 #                                    type=lambda x: datetime.strptime(x,
 #                                                                     '%Y-%m-%dT%H:%M:%S'))
-datetime_or_minutes_regex = r'^(\d\d\d\d-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])T(00|[0-9]|1[0-9]|2[0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9]))|(\d+)$'
+datetime_or_minutes_regex = r'^(\d\d\d\d-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])T(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]))|(\d+)$'
 annons_complete_query.add_argument(settings.PUBLISHED_AFTER,
                                    type=inputs.regex(datetime_or_minutes_regex))
 annons_complete_query.add_argument(taxonomy.OCCUPATION, action='append')

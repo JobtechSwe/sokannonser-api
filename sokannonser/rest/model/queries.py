@@ -143,7 +143,7 @@ taxonomy_query.add_argument(settings.APIKEY, location='headers', required=True)
 taxonomy_query.add_argument(settings.OFFSET,
                             type=inputs.int_range(0, settings.MAX_OFFSET),
                             default=0)
-taxonomy_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_LIMIT),
+taxonomy_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_TAXONOMY_LIMIT),
                             default=10)
 taxonomy_query.add_argument(settings.FREETEXT_QUERY)
 taxonomy_query.add_argument('type', action='append',

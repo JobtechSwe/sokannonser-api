@@ -24,7 +24,7 @@ Easiest way to try out the API is to go to the [swagger page](https://jobsearch.
 But first you need a key which you need to authenticate yourself.
 
 ## Authentication
-For this API, you will need to register your own API key at www.jobtechdev.se
+For this API, you will need to register your own API key at [www.jobtechdev.se](https://www.jobtechdev.se/)
 
 ## Endpoints
 Below we only show the URLs. If you prefer the curl command you type it like:
@@ -35,17 +35,17 @@ Below we only show the URLs. If you prefer the curl command you type it like:
 /search?q={search text}
 
 The search endpoint in the first section will return job ads that are currently open for applications.
-The API is meant for searching, we want you to be able to just build your own customized GUI on top of our free text query field q in /search like this...
+The API is meant for searching, we want offer you the possibility to just build your own customized GUI on top of our free text query field "q" in /search like this ...
 
 	https://jobsearch.api.jobtechdev.se/search?q=Flen&offset=0&limit=10
 	
-...and not have to worry about how to build an advanced logic to help the users finding the most relevant ads for Flen, the search engine should do this for you.
+This means you don't need to worry about how to build an advanced logic to help the users finding the most relevant ads for, let's say, Flen. The search engine will do this for you.
 If you want to narrow down the search result in other ways than the free query offers, you can use the available search filters. Some of the filters need id-keys as input for searching structured data. The id-keys can be found at /taxonomy/search these will help you get sharper hits for structured data. We will always work on improving the hits for free queries hoping you'll have less and less use for filtering.
 
 ### Typeahead
 /complete?q={typed string}
 
-If you want to help your end users with term suggestions you can use the typeahead function, which will return common terms found in the job ads. This should work great with an auto complete feature in your search box. If you request
+If you want to help your end users with term suggestions you can use the typeahead function, which will return common terms found in the job ads. This should work great with an auto complete feature in your search box. If you request ...
 
 	https://jobsearch.api.jobtechdev.se/complete?q=stor
 ... you'll get storkök, storhushåll, storesupport, and storage as they are the most common terms starting with "stor*" in ads.
@@ -64,10 +64,10 @@ This endpoint is used for fetching specific job ads with all available meta data
 
 
 ### Jobtech-Taxonomy
-If you need help finding the official names for occupations, skills, or geografic place check out or API for taxonomy
+If you need help finding the official names for occupations, skills, or geografic place check out or [API for taxonomy](https://www.jobtechdev.se/).
 
 ## Results
-The results of your queries will be in [JSON](https://en.wikipedia.org/wiki/JSON) format. We wont attempt to explain this attribute by attribute in this document. Instead we've decided to try to include this in the data model which you can find in our Swagger GUI.
+The results of your queries will be in [JSON](https://en.wikipedia.org/wiki/JSON) format. We won't attempt to explain this attribute by attribute in this document. Instead we've decided to try to include this in the data model which you can find in our [Swagger GUI](https://jobsearch.api.jobtechdev.se).
 
 Successful queries will have a response code of 200 and give you a result set that consists of:
 1. Some meta data about your search such as number of hits and the time it took to execute the query and 

@@ -198,6 +198,7 @@ def get_correct_logo_url(ad_id):
 
 not_found_file = None
 
+
 def get_not_found_logo_file():
     global not_found_file
     if not_found_file is None:

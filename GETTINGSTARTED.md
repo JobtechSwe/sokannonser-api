@@ -27,8 +27,9 @@ But first you need a key which you need to authenticate yourself.
 For this API, you will need to register your own API key at www.jobtechdev.se
 
 ## Endpoints
-Below we only show the URLs. If you prefer the curl command you type it like 
-	curl "https://jobsearch.api.jobtechdev.se/search?q=Flen&offset=0&limit=10" -H "accept: application/json" -H "api-key: <proper_key>"
+Below we only show the URLs. If you prefer the curl command you type it like:
+
+	curl "{URL}" -H "accept: application/json" -H "api-key: {proper_key}"
 	
 ### Ad search 
 /search?q={search text}
@@ -79,6 +80,8 @@ Unsuccessful queries will have a response code of 400 ...
 To help you find yuor way forward, here are some example of use cases:
 Searching for a particular job titleSearching for a particular job title
 Searching only within a specific field of work
+* [Searching for a particular job title](#Searching-for-a-particular-job-title)
+* [Searching only within a specific field of work](#Searching-only-within-a-specific-field-of-work)
 * [Finding jobs near you](#Finding-jobs-near-you)
 * [Negative search](#Negative-search)
 * [Finding Swedish speaking jobs abroad](#Finding-Swedish-speaking-jobs-abroad)

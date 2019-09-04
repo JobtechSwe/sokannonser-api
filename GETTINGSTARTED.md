@@ -1,81 +1,76 @@
 # Search API for job adds - getting started
 
 The aim of this text is to walk you through what you're seeing in the [Swagger-UI](https://jobsearch.api.jobtechdev.se) to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk load API](https://jobstream.api.jobtechdev.se)
-The search API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that that don't fit the intended purpose of this API.
+The search API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that don't fit the intended purpose of this API.
 
-A bad practice typically means searching for every job of every region every five minutes.
-A good practice means making lots of varied calls initiated by a real user.
-
-
-
-
-## Short version
-The API is meant for searching, we want you to be able to just build your own customized GUI on top of our free text query field q in /search like this...
- 
-	https://jobsearch.api.jobtechdev.se/search?q=Flen&offset=0&limit=100
-...and not have to worry about the users finding the most relevant ads for Flen, the search engine should do this for you.
-If you want to narrow down the search result in other ways than the free query can, you can use the available search filters. Some of the filters needs id-keys as input for searching structured data. The id-keys can be found at /taxonomy/search these will help you get sharper hits for structured data. We will always work on improving the hits for free queries hoping you'll see less and less use for filtering.
-
-If you want to help your end users with term suggestions you can use the typeahead function, which will return common terms found in the job ads. This should work great with an auto complete feature in your search box. If i request
-
-	https://jobsearch.api.jobtechdev.se/complete?q=stor
-I get storkök, storhushåll, storesupport, storage. As they are the most common terms starting with "stor*" in ads.
-If I request
-
-	https://jobsearch.api.jobtechdev.se/complete?q=storage%20s
-
-I get sverige, stockholms län, stockholm, svenska, script. Since they are the most common terms beginning with S for ads that contain the word Storage 	
+A bad practice typically means searching for every job of every region every fifth minute.
+A good practice means making lots of varied calls initiated by real users.
 
 # Table of Contents
 [Authentication](#Authentication)
+[Endpoints](#Endpoints)
+[Results](#Results)
+[Errors](#Errors)
+[Use cases](#Use-cases)
 
-[Resources](#Resources)
 
-[Examples](#Examples)
+## Short introduction
+
+The endpoints for the ads search API are:
+* [search](#Ad-Search) - returning ads matching a search phrase.
+* [complete](#Typeahead) - returning common words matching a search phrase. Useful for auto-complete.
+* [ad](#Ad) - returning the ad matching an id.
+Easiest way to try out the API is to go to the [swagger page](https://jobsearch.api.jobtechdev.se/).
+But first you need a key which you need to authenticate yourself.
 
 ## Authentication
 For this API, you will need to register your own API key at www.jobtechdev.se
 
-## Resources
-This API service is divided into two major sections.
+## Endpoints
+Below we only show the URLs. If you prefer the curl command you type it like 
+	curl "https://jobsearch.api.jobtechdev.se/search?q=Flen&offset=0&limit=10" -H "accept: application/json" -H "api-key: <proper_key>"
+	
+### Ad search 
+/search?q={search text}
+The search endpoint in the first section will return job ads that are currently open for applications.
+The API is meant for searching, we want you to be able to just build your own customized GUI on top of our free text query field q in /search like this...
 
-### 1. Open AF-job ads
-The endpoints in the first section will return job ads from Arbetsförmedlingen that are currently open for applications. The ads published in Arbetsförmedlingen are tagged with some meta data like "id", "logotypurl" for the ad and "label" and "concept_id" for the occupation. The information in the ads is divided into sections with headlines like "headline", "description", "employer" and "salary_type". The ads may have information in all the fields or some of them.
+	https://jobsearch.api.jobtechdev.se/search?q=Flen&offset=0&limit=10
+	
+...and not have to worry about how to build an advanced logic to help the users finding the most relevant ads for Flen, the search engine should do this for you.
+If you want to narrow down the search result in other ways than the free query offers, you can use the available search filters. Some of the filters need id-keys as input for searching structured data. The id-keys can be found at /taxonomy/search these will help you get sharper hits for structured data. We will always work on improving the hits for free queries hoping you'll have less and less use for filtering.
 
-#### Open-Ad-ID
-/ad/{id} This endpoint is used for fetching specific job ads with all available meta data, by their ad ID number. The ID number can be found by doing a query with the other endpoint within this section, _Open-Search_.
+### Typeahead
+/complete?q={typed string}
+If you want to help your end users with term suggestions you can use the typeahead function, which will return common terms found in the job ads. This should work great with an auto complete feature in your search box. If you request
 
-#### Open-Search
-/search finds what you want among all the indexed job ads that are currently open. With the possibility to filter by specific parameters like occupation, location, or required skills. Some are these parameters are set using an ID which you find in _Jobtech-Taxonomy_ (see the second headline on the page).
+	https://jobsearch.api.jobtechdev.se/complete?q=stor
+... you'll get storkök, storhushåll, storesupport, and storage as they are the most common terms starting with "stor*" in ads.
+If you request
 
+	https://jobsearch.api.jobtechdev.se/complete?q=storage%20s
 
-#### Complete
-/complete This endpoint is meant to help you create autocomplete functions AKA type aheads. The result set will return the most frequent job market terms starting with the letters you put in. It's most easily understood by trying it out using the free query field q. If input is LÄK you will get "läkarsekreterare","läkare","läkemedel" etc.
-If you put in more than one word you get the most common terms for that context, for example "läkare L" and you get "linköping","lund" etc. 
+... you'll get sverige, stockholms län, stockholm, svenska, and script since they are the most common terms beginning with "s" for ads that contain the word "storage"
+
+### AD
+/ad/{id} 
+This endpoint is used for fetching specific job ads with all available meta data, by their ad ID number. The ID number can be found by doing a search query.
+
+	https://jobsearch.api.jobtechdev.se/ad/8430129
 
 
 ### Jobtech-Taxonomy
-This endpoint provides labour market terms and their corresponding unique ID. The ID's are required in some parameters in the /search endpoint.
-
-Taxonomy contains terms within different categories. In the drop down list under "filter by type" all available categories are listed.
-
-* Occupations. You can query three levels of occupation terms. The top level is _Occupation Fields_, which are broad areas of labor. The next level is _Occupation Groups_, which narrows the areas down a bit. Each Occupation Group belongs to a specific Occupation Field - its "parent". The third and final level is _Occupation Name_, which is individual occupations. Each Occupation Name also has a "parent" Occupation Group.
-* Skills. These terms are often used in job ads and describes what a person knows or can do related to their job.
-* Language. In this category most human languages (a.k.a. Natural languages) are listed.
-* Geographic places (Country, Region, Municipality). Most languages in the world are listed in the category _Country_. The next level, _Regions_, are regions with unique [NUTS 3 Codes](https://ec.europa.eu/eurostat/web/nuts/background "Eurostats NUTS") in accordance with EU. In Sweden, the regions are similar to "Län". Each Region has a "parent" in the Country level. The third level of geographic places is the _Municipality_ level. This is the Swedish "kommuner". Each Municipality has a "parent" in the Region level.
-* Wage type. This category contains descriptions of different forms of payment, like fixed monthly salary and commission.
-* Employment type. This lists different employment types, like season jobs during the summer, or work on demand.
-* Driving license. This contains all different driver's license categories in Sweden, and their description.
-* Worktime extent. This contains terms like full time job and part time job.
-* Sun education _fields_. These three categories describes different fields of education. The top level, _Sun Education Field 1_, contains the broad descriptions of education areas. The next level _Sun Education Field 2_ narrows the fields down a bit. _Sun Education Field 3_ contains specific education programs or trainings. Each concept in level 3 has a "parent" in level 2, and each level 2 concept has a level 1 "parent".
-* Sun education _levels_. The three categories describes different levels of formal education in Sweden. _Sun Education Level 1_ is the top category and contains broad descriptions of education levels. The next level is _Sun Education Field 2_ describes more specific levels or generic degrees. _Sun Education Field 3_ contains specific degrees from Swedish formal education. Each concept in level 3 has a "parent" in level 2, and each level 2 concept has a level 1 "parent".
+If you need help finding the official names for occupations, skills, or geografic place check out or API for taxonomy
 
 ## Results
 The results of your queries will be in [JSON](https://en.wikipedia.org/wiki/JSON) format. We wont attempt to explain this attribute by attribute in this document. Instead we've decided to try to include this in the data model which you can find in our Swagger GUI.
 
-Successful queries will have a response code of 200 and give you a result set that consists of 1. Som meta data about your search such as number of hits and the time it took to execute the query and 2. the ads that matched your search. 
+Successful queries will have a response code of 200 and give you a result set that consists of:
+1. Some meta data about your search such as number of hits and the time it took to execute the query and 
+2. The ads that matched your search. 
 
 ## Errors
+Unsuccessful queries will have a response code of 400 ...
 
 ## Use cases 
 
@@ -154,7 +149,7 @@ Request URL
 
 	/search?q=unix%20-linux&offset=0&limit=10
 
-### Finding swedish speaking jobs abroad
+### Finding Swedish speaking jobs abroad
 Some times a filter can work to broadly and then it's easier to use a negative search to remove specific results you don't want. In this case i'm going to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" I'm using the country code and the country field in the search. So first I get the country code for "Sverige" from the taxonomy end point.
 
 Request URL
@@ -180,6 +175,6 @@ In the Swagger GUI its possible to use the X-fields to define what fields to inc
 
 
 ### Getting all the jobs since date and time
-A very common use case is COLLECT ALL THE ADDS. We don't want you to use the search API for this. It's expensive in terms of band width, CPU cycles and development time and it's not even guaranteed you'll get everything. Instead we'd like you to use our [bulk load API](https://jobstream.api.jobtechdev.se)
+A very common use case is COLLECT ALL THE ADDS. We don't want you to use the search API for this. It's expensive in terms of band width, CPU cycles and development time and it's not even guaranteed you'll get everything. Instead we'd like you to use our [bulk load API](https://jobstream.api.jobtechdev.se).
 
 

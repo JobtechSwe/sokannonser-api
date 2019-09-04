@@ -50,6 +50,7 @@ If you want to help your end users with term suggestions you can use the typeahe
 
 	https://jobsearch.api.jobtechdev.se/complete?q=stor
 ... you'll get storkök, storhushåll, storesupport, and storage as they are the most common terms starting with "stor*" in ads.
+
 If you request
 
 	https://jobsearch.api.jobtechdev.se/complete?q=storage%20s

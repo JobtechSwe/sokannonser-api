@@ -20,6 +20,7 @@ The endpoints for the ads search API are:
 * [search](#Ad-Search) - returning ads matching a search phrase.
 * [complete](#Typeahead) - returning common words matching a search phrase. Useful for auto-complete.
 * [ad](#Ad) - returning the ad matching an id.
+
 Easiest way to try out the API is to go to the [swagger page](https://jobsearch.api.jobtechdev.se/).
 But first you need a key which you need to authenticate yourself.
 

@@ -60,6 +60,7 @@ EMPLOYER = 'employer'
 
 MAX_OFFSET = 2000
 MAX_LIMIT = 100
+MAX_TAXONOMY_LIMIT=8000
 
 RESULT_MODEL = 'resultmodel'
 DETAILS = 'resdet'

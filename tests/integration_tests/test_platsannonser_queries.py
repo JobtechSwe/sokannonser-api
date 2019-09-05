@@ -80,6 +80,33 @@ def test_freetext_query_with_special_characters():
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
+def test_freetext_query_geo_param():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+
+    #kista: 119 (46)
+    #gärdet: 62 (8)
+    #råsunda: 8 (8)
+    #stockholm: 5826 (1196)
+    #skåne: 2718 (260)
+    #värmland: 103 (47)
+    #örebro: 351 (178)
+    #örebros län: 66 (66)
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        # result = testclient.get('/search', headers=headers, data={'q': 'sjukssköterska noggran javasscript',
+        #                                                           'limit': '1'})
+        result = testclient.get('/search', headers=headers, data={'q': 'skåne',
+                                                                  'limit': '10'})
+        json_response = result.json
+        # pprint(json_response)
+        hits_total = json_response['total']['value']
+        assert int(hits_total) > 0
+
+
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
 def test_too_big_offset():
     print('===================', sys._getframe().f_code.co_name, '================== ')
 

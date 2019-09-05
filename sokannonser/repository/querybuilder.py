@@ -83,7 +83,7 @@ class QueryBuilder(object):
             must_queries.append(
                 {"term": {
                     f.DRIVING_LICENCE_REQUIRED:
-                    args.get(taxonomy.DRIVING_LICENCE_REQUIRED)
+                        args.get(taxonomy.DRIVING_LICENCE_REQUIRED)
                 }}
             )
 
@@ -428,7 +428,7 @@ class QueryBuilder(object):
                     query_dict['bool'][bool_type] = []
 
                 base_field = f.KEYWORDS_EXTRACTED \
-                    if key in ['location', 'employer'] else f.KEYWORDS_ENRICHED
+                    if key in ['employer'] else f.KEYWORDS_ENRICHED
                 field = "%s.%s.raw" % (base_field, key)
                 query_dict['bool'][bool_type].append(
                     {
@@ -440,17 +440,17 @@ class QueryBuilder(object):
                         }
                     }
                 )
-                if key == 'location':
-                    query_dict['bool'][bool_type].append(
-                        {
-                            "match_phrase": {
-                                f.HEADLINE: {
-                                    "query": value,
-                                    "boost": 1
-                                }
-                            }
-                        }
-                    )
+                # if key == 'location':
+                #     query_dict['bool'][bool_type].append(
+                #         {
+                #             "match_phrase": {
+                #                 f.HEADLINE: {
+                #                     "query": value,
+                #                     "boost": 1
+                #                 }
+                #             }
+                #         }
+                #     )
 
         return query_dict
 
@@ -613,7 +613,7 @@ class QueryBuilder(object):
             if 'bool' not in plats_bool_query:
                 plats_bool_query['bool'] = {}
             plats_bool_query['bool']['must_not'] = neg_komm_term_query + \
-                neg_lan_term_query
+                                                   neg_lan_term_query
         return plats_bool_query
 
     # Parses COUNTRY

@@ -110,8 +110,8 @@ class PBComplete(Resource):
         # This could be prettier
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         query_string = args.pop(settings.FREETEXT_QUERY) or ''
-        args[settings.TYPEAHEAD_QUERY] = query_string
-        args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1])
+        args[settings.TYPEAHEAD_QUERY] = query_string.lower()
+        args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1]).lower()
 
         result = platsannonser.find_platsannonser(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."

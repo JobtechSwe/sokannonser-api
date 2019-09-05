@@ -227,7 +227,7 @@ class QueryBuilder(object):
             complete_fields.remove('employer')
 
         if complete_string:
-            complete_string = self._rewrite_word_for_regex(complete_string.lower())
+            complete_string = self._rewrite_word_for_regex(complete_string)
             word_list = complete_string.split(' ')
             complete = word_list[-1]
 
@@ -261,7 +261,6 @@ class QueryBuilder(object):
                             }
                         }
                         x += 1
-
         if args.get(settings.SORT) and args.get(settings.SORT) in f.sort_options.keys():
             query_dsl['sort'] = f.sort_options.get(args.pop(settings.SORT))
         else:

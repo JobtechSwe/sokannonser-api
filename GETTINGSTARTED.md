@@ -48,12 +48,12 @@ If you want to narrow down the search result in other ways than the free query o
 
 If you want to help your end users with term suggestions you can use the typeahead function, which will return common terms found in the job ads. This should work great with an auto complete feature in your search box. If you request ...
 
-	https://jobsearch.api.jobtechdev.se/complete?q=stor
+	/complete?q=stor
 ... you'll get storkök, storhushåll, storesupport, and storage as they are the most common terms starting with "stor*" in ads.
 
 If you request
 
-	https://jobsearch.api.jobtechdev.se/complete?q=storage%20s
+	/complete?q=storage%20s
 
 ... you'll get sverige, stockholms län, stockholm, svenska, and script since they are the most common terms beginning with "s" for ads that contain the word "storage"
 
@@ -62,7 +62,7 @@ If you request
 
 This endpoint is used for fetching specific job ads with all available meta data, by their ad ID number. The ID number can be found by doing a search query.
 
-	https://jobsearch.api.jobtechdev.se/ad/8430129
+	/ad/8430129
 
 
 ### Jobtech-Taxonomy
@@ -95,7 +95,7 @@ The easiest way to get the adds that contain a specific word like a jobtitle is 
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/search?q=sous-chef&offset=0&limit=10
+	/search?q=sous-chef&offset=0&limit=10
 
 
 If you want to be certain that the ad is for a souschef - and not just mentions a souschef - you can use the occupation ID in the field "occupation". If the ad has been registered by the recruiter with the occupation field set to "souschef", the ad will show up in this search. To do this query you use both the _Jobtech-Taxonomy_ endpoint and the _Open-Search_ endpoint. First of all, you need to find the occupation ID for souschef by text searching (q) in _Jobtech Taxonomy_ for the term in the right category (occupation-name).
@@ -109,7 +109,7 @@ Now you can use the ID in _Open-Search_ to fetch the ads registered with the ter
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/search?occupation=iugg_Qq9_QHH&offset=0&limit=10
+	/search?occupation=iugg_Qq9_QHH&offset=0&limit=10
 
 This will give a smaller result set with a higher certainty of actually being for a souschef, however the result set will likely miss a few relevant ads since the occupation-name field isn't always set by employers. You should find that a larger set is more useful since there are multiple sorting factors working to show the most relevant hits first. We're also working to always improve the API in regards to unstructured data. The term Souschef has three popular formats when found out in the wild. "Souschef", "sous chef", "sous-chef" but as the API recognise them as synonyms they will fetch the same number of adds. There are a lot of cases like these that we are constantly adding. Our machine learning model also works in favour of the free query.
 
@@ -124,7 +124,7 @@ In the response body you’ll find the conceptId for the term Data/IT. Use this 
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/search?occupation-field=apaJ_2ja_LuF&q=python%20Malm%C3%B6&offset=0&limit=10
+	/search?occupation-field=apaJ_2ja_LuF&q=python%20Malm%C3%B6&offset=0&limit=10
 
 
 ### Finding jobs near you
@@ -139,31 +139,31 @@ And add that parameter id to an empty free text query
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/search?country=155&offset=0&limit=10
+	/search?country=155&offset=0&limit=10
 
 If I make a query which includes 2 different geographical filters the most local one will be promoted. As in this case where i'm searching for "lärare" using the municipality code for Haparanda and the region code for Norbottens Län. The jobs that are in Haparanda will be the first ones in the result set.
 
-	https://jobsearch.api.jobtechdev.se/search?municipality=2583&q=l%C3%A4rare&offset=0&limit=10
+	/search?municipality=2583&q=l%C3%A4rare&offset=0&limit=10
 
 
 You can also use longitude latitude coordinates and a radius in kilometres if you want.
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/search?offset=0&limit=10&position=59.3,17.6&position.radius=10
+	/search?offset=0&limit=10&position=59.3,17.6&position.radius=10
 
 ### Negative search
 So this is very simple using our qfield. Lets say i want to find Unix jobs
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/search?q=unix&offset=0&limit=10
+	/search?q=unix&offset=0&limit=10
 
 But i find that i get a lot of jobs expecting me to work with which i dont want. All that's needed is to use the minus symbol and the word i want to exclude
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/search?q=unix%20-linux&offset=0&limit=10
+	/search?q=unix%20-linux&offset=0&limit=10
 
 ### Finding Swedish speaking jobs abroad
 Some times a filter can work to broadly and then it's easier to use a negative search to remove specific results you don't want. In this case i'm going to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" I'm using the country code and the country field in the search. So first I get the country code for "Sverige" from the taxonomy end point.
@@ -176,7 +176,7 @@ And then I use the ID I got as a country code prefixed by a minus symbol.
 
 Request URL
 
-      https://jobsearch.api.jobtechdev.se/search?country=-199&q=swedish
+      /search?country=-199&q=swedish
 
 ### Customise the result set
 There's a lot of reasons you might want less fields for your search result set. In this case the idea is a map based job search that plots needles where the jobs can be found based on a user search. Everything needed is the GPS coordinates for the needle and the id for the ad so more info can be fetched once the user clicks on the needle.

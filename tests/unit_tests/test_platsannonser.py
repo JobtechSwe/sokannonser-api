@@ -278,3 +278,13 @@ def test_rewrite_word_for_regex():
     assert pbquery._rewrite_word_for_regex("python3") == "python3"
     assert pbquery._rewrite_word_for_regex("asp.net") == "asp\\.net"
     assert pbquery._rewrite_word_for_regex("c++") == "c\\+\\+"
+
+
+@pytest.mark.unit
+def test_rewrite_querystring():
+    # concepts blob should be handled differently
+    concepts = {'skill': [{'term': 'c++', 'uuid': '1eb1dbeb-e22a-53cb-bb28-c9fbca5ad307', 'concept': 'C++', 'type': 'KOMPETENS', 'term_uuid': '9734cba6-eff8-5cdc-9881-392a4345e57e', 'term_misspelled': False, 'version': 'NARVALONTOLOGI-2.0.0.33', 'operator': ''}, {'term': 'c#', 'uuid': 'af98ee4d-49e7-5274-bc76-a9f119c1514c', 'concept': 'C-sharp', 'type': 'KOMPETENS', 'term_uuid': '37da571a-a958-5b3d-a857-0a0a6bbc88cf', 'term_misspelled': False, 'version': 'NARVALONTOLOGI-2.0.0.33', 'operator': ''}, {'term': 'asp.net', 'uuid': '18d88a83-55d5-527b-a800-3695ed035a0c', 'concept': 'Asp.net', 'type': 'KOMPETENS', 'term_uuid': '280d3fa7-becd-510d-94ac-c67edb0ef4e0', 'term_misspelled': False, 'version': 'NARVALONTOLOGI-2.0.0.33', 'operator': ''}, {'term': 'c++', 'uuid': '1eb1dbeb-e22a-53cb-bb28-c9fbca5ad307', 'concept': 'C++', 'type': 'KOMPETENS', 'term_uuid': '9734cba6-eff8-5cdc-9881-392a4345e57e', 'term_misspelled': False, 'version': 'NARVALONTOLOGI-2.0.0.33', 'operator': ''}], 'occupation': [{'term': 'specialpedagog', 'uuid': '4872acf8-ea61-50fe-8a7e-7af82b37ce9e', 'concept': 'Specialpedagog', 'type': 'YRKE', 'term_uuid': 'c6db8f6e-69f7-5aae-af18-2a1eae084eba', 'term_misspelled': False, 'version': 'NARVALONTOLOGI-2.0.0.33', 'operator': ''}, {'term': 'lärare', 'uuid': 'eadc9f5f-35c0-5324-b215-ea388ca054ff', 'concept': 'Lärare', 'type': 'YRKE', 'term_uuid': '300844f7-77b6-539e-a8d7-1955ce18a00c', 'term_misspelled': False, 'version': 'NARVALONTOLOGI-2.0.0.33', 'operator': ''}, {'term': 'speciallärare', 'uuid': '2708c006-d8d0-5920-b434-a5968aa088e3', 'concept': 'Speciallärare', 'type': 'YRKE', 'term_uuid': 'cd50806f-3c52-5e73-a06e-c7a65f7410a4', 'term_misspelled': False, 'version': 'NARVALONTOLOGI-2.0.0.33', 'operator': ''}], 'trait': [], 'location': [], 'skill_must': [], 'occupation_must': [], 'trait_must': [], 'location_must': [], 'skill_must_not': [], 'occupation_must_not': [], 'trait_must_not': [], 'location_must_not': []}
+    assert pbquery._rewrite_querystring("specialpedagog lärare speciallärare", concepts) == ""
+    assert pbquery._rewrite_querystring("specialpedagog speciallärare lärare", concepts) == ""
+    assert pbquery._rewrite_querystring("lärare speciallärare flärgare", concepts) == "flärgare"
+    assert pbquery._rewrite_querystring("korvprånglare c++ asp.net [python3] flärgare", concepts) == "korvprånglare [python3] flärgare"

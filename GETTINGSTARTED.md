@@ -83,7 +83,16 @@ Successful queries will have a response code of 200 and give you a result set th
 2. The ads that matched your search. 
 
 ## Errors
-Unsuccessful queries will have a response code of 400 ...
+Unsuccessful queries will have a response code of:
+| HTTP Status code | Reason | Explanation |
+| ------------- | ------------- | -------------|
+| 400 | Bad Request | Something wrong in the query |
+| 401 | Unauthorized | You are not using a valid API key |
+| 404 | Missing ad | The ad you requested is not available |
+| 429 | Rate limit exceeded | You requested too much during too short time |
+| 500 | Internal Server Error | Something wrong on the server side |
+
+
 
 ## Use cases 
 To help you find yuor way forward, here are some example of use cases:
@@ -125,13 +134,13 @@ Firstly use the _Jobtech-Taxonomy_ endpoint to get the Id for Data/IT (occupatio
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=it&type=occupation-field&show-count=false
+	To be updated http://jobtech-taxonomy-api.dev.services.jtech.se/v0/taxonomy/public/search?q=IT
 
 In the response body you’ll find the conceptId for the term Data/IT. Use this with the search endpoint to define the field in which you want to get all the open-api. So now I want to combine this with my favourite language without all those pesky zoo keeper jobs ruining my search.
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/search?occupation-field=apaJ_2ja_LuF&q=python%20Malm%C3%B6&offset=0&limit=10
+	To be updated
 
 
 ### Finding jobs near you
@@ -140,7 +149,7 @@ If i want to search for jobs in Norway i free text query the taxonomy for "Norge
 
 Request URL
 
-       https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=norge&show-count=false
+       To be updated https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=norge&show-count=false
 
 And add that parameter id to an empty free text query
 
@@ -177,7 +186,7 @@ Some times a filter can work to broadly and then it's easier to use a negative s
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/taxonomy/search?q=Sverige&type=country
+	To be updated https://jobsearch.api.jobtechdev.se/taxonomy/search?q=Sverige&type=country
 
 And then I use the ID I got as a country code prefixed by a minus symbol.
 

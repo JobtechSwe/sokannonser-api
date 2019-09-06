@@ -84,6 +84,7 @@ Successful queries will have a response code of 200 and give you a result set th
 
 ## Errors
 Unsuccessful queries will have a response code of:
+
 | HTTP Status code | Reason | Explanation |
 | ------------- | ------------- | -------------|
 | 400 | Bad Request | Something wrong in the query |

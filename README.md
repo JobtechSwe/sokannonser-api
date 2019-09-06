@@ -69,7 +69,7 @@ Ger debugmeddelanden vid fel.
 
 ## Köra unittester
 
-    $ python3 -m pytest -svv -ra -m unit tests/
+    $ python3 -m pytest -svv -m unit tests/unit_tests
     
     
 ## Köra integrationstester    
@@ -81,12 +81,12 @@ ES_HOST=<elastic host, utan protokoll och port>
 ES_PORT=9243
 TEST_API_KEY=<api key>
 
-    $ python3 -m pytest -svv -ra -m integration tests/
+    $ python3 -m pytest -svv -ra -m integration tests/integration_tests
 
     
 ### Test coverage
 https://pytest-cov.readthedocs.io/en/latest/
-python3 -m pytest -svv -ra -m unit --cov=. tests/
+python3 -m pytest -svv -ra -m unit --cov=. tests/unit_tests
 
 För att lägga till coverage i IntelliJ, gå till menyn IntelliJ IDEA/Preferences/
 Välj menyn Tools/Python Integrated Tools och för Default test runner, välj py.test.

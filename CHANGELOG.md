@@ -1,5 +1,7 @@
 Changelog Application Jobsearch
 ===============================
+## 1.4.2
+* Buggfixes and documentation updates
 
 ## 1.4.1
 * New endpoint for fetching company logo file

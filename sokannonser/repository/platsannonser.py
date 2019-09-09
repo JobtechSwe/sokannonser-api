@@ -126,18 +126,18 @@ def _extract_concept_from_concepts(concepts):
 
 
 def _format_ad(result):
-        source = result.get('_source')
-        if source:
-            try:
-                # Remove personal number
-                org_nr = source['employer']['organization_number']
-                if org_nr and int(org_nr[2]) < 2:
-                    source['employer']['organization_number'] = None
-            except KeyError:
-                pass
-            except ValueError:
-                pass
-        return source
+    source = result.get('_source')
+    if source:
+        try:
+            # Remove personal number
+            org_nr = source['employer']['organization_number']
+            if org_nr and int(org_nr[2]) < 2:
+                source['employer']['organization_number'] = None
+        except KeyError:
+            pass
+        except ValueError:
+            pass
+    return source
 
 
 def fetch_platsannons(ad_id):
@@ -197,6 +197,7 @@ def get_correct_logo_url(ad_id):
 
 
 not_found_file = None
+
 
 def get_not_found_logo_file():
     global not_found_file
@@ -260,7 +261,6 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
 
     # create_found_in_enriched(results, query_result)
     _modify_results(results)
-
     # log.debug(json.dumps(results, indent=2))
     return results
 

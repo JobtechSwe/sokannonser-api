@@ -227,14 +227,14 @@ class QueryBuilder(object):
             complete_fields.remove('employer')
 
         if complete_string:
-            complete_string = self._rewrite_word_for_regex(complete_string.lower())
+            complete_string = self._rewrite_word_for_regex(complete_string)
             word_list = complete_string.split(' ')
             complete = word_list[-1]
 
             ngrams_complete = []
             for n in list(range(len(word_list)-1)):
                 ngrams_complete.append(' '.join(word_list[n:]))
-
+   
             size = 12/len(complete_fields)
 
             for field in complete_fields:
@@ -261,7 +261,6 @@ class QueryBuilder(object):
                             }
                         }
                         x += 1
-
         if args.get(settings.SORT) and args.get(settings.SORT) in f.sort_options.keys():
             query_dsl['sort'] = f.sort_options.get(args.pop(settings.SORT))
         else:
@@ -300,11 +299,10 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES.copy()
-
         querystring = ' '.join([w.strip(',.!?:; ') for w in querystring.split(' ')])
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
-        querystring = self.__rewrite_querystring(querystring.lower(), concepts)
+        querystring = self._rewrite_querystring(querystring.lower(), concepts)
         ft_query = self.__create_base_ft_query(querystring)
 
         # Make all "musts" concepts "shoulds" as well
@@ -334,7 +332,7 @@ class QueryBuilder(object):
         return ft_query
 
     # Removes identified concepts from querystring
-    def __rewrite_querystring(self, querystring, concepts):
+    def _rewrite_querystring(self, querystring, concepts):
         # Sort all concepts by string length
         all_concepts = sorted(concepts['occupation'] +
                               concepts['occupation_must'] +
@@ -348,16 +346,18 @@ class QueryBuilder(object):
                               key=lambda c: len(c),
                               reverse=True)
         # Remove found concepts from querystring
+        queries = querystring.split()
         for term in [concept['term'] for concept in all_concepts]:
-            term = self._rewrite_word_for_regex(term)
-            p = re.compile(f'(\\s*){term}(\\s*)')
-            querystring = p.sub('\\1\\2', querystring).strip()
+            try:
+                queries.remove(term)
+            except ValueError:
+                pass
 
-        return querystring
+        return ' '.join(queries)
 
-    # Creates a base query dict for "independent" freetext words
-    # (e.g. words not found in text_to_concepts)
     def __create_base_ft_query(self, querystring):
+        # Creates a base query dict for "independent" freetext words
+        # (e.g. words not found in text_to_concepts)
         inc_words = ' '.join([w for w in querystring.split(' ')
                               if w and not w.startswith('+')
                               and not w.startswith('-')])

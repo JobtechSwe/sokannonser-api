@@ -449,7 +449,19 @@ class QueryBuilder(object):
                         }
                     }
                 )
-                # if key == 'location':
+                if key == 'location':
+                    # Include location in extracted as well (for now)
+                    ext_loc = "%s.%s.raw" % (f.KEYWORDS_EXTRACTED, key)
+                    query_dict['bool'][bool_type].append(
+                        {
+                            "term": {
+                                ext_loc: {
+                                    "value": value,
+                                    "boost": 10
+                                }
+                            }
+                        }
+                    )
                 #     query_dict['bool'][bool_type].append(
                 #         {
                 #             "match_phrase": {

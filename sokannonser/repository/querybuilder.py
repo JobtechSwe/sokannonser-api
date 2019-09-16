@@ -347,13 +347,21 @@ class QueryBuilder(object):
                               reverse=True)
         # Remove found concepts from querystring
         queries = querystring.split()
+        # for term in [concept['term'] for concept in all_concepts]:
+        #     try:
+        #         queries.remove(term)
+        #     except ValueError:
+        #         pass
+        #
+        # return ' '.join(queries)
         for term in [concept['term'] for concept in all_concepts]:
-            try:
-                queries.remove(term)
-            except ValueError:
-                pass
+            term = self._rewrite_word_for_regex(term)
+            p = re.compile(f'(^|\\s+){term}(\\s+|$)')
+            querystring = p.sub('\\1\\2', querystring).strip()
+        # Remove duplicate spaces
+        querystring = re.sub('\\s+', ' ', querystring).strip()
 
-        return ' '.join(queries)
+        return querystring
 
     def __create_base_ft_query(self, querystring):
         # Creates a base query dict for "independent" freetext words

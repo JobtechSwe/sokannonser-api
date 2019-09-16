@@ -112,26 +112,26 @@ The easiest way to get the adds that contain a specific word like a jobtitle is 
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/search?q=sous-chef&offset=0&limit=10
+	https://jobsearch.api.jobtechdev.se/search?q=souschef&offset=0&limit=10
 
 
 If you want to be certain that the ad is for a souschef - and not just mentions a souschef - you can use the occupation ID in the field "occupation". If the ad has been registered by the recruiter with the occupation field set to "souschef", the ad will show up in this search. To do this query you use both the _Jobtech-Taxonomy_ endpoint and the _Open-Search_ endpoint. First of all, you need to find the occupation ID for souschef by text searching (q) in _Jobtech Taxonomy_ for the term in the right category (occupation-name).
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/search?occupation-name=iugg_Qq9_QHH&offset=0&limit=10
+	https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=souschef
+	
 
-
-Now you can use the ID in _Open-Search_ to fetch the ads registered with the term souschef in the occupation-name field
+Now you can use the conceptId (iugg_Qq9_QHH) in _Open-Search_ to fetch the ads registered with the term souschef in the occupation-name field
 
 Request URL
-
-	https://jobsearch.api.jobtechdev.se/search?occupation=iugg_Qq9_QHH&offset=0&limit=10
-
-This will give a smaller result set with a higher certainty of actually being for a souschef, however the result set will likely miss a few relevant ads since the occupation-name field isn't always set by employers. You should find that a larger set is more useful since there are multiple sorting factors working to show the most relevant hits first. We're also working to always improve the API in regards to unstructured data. The term Souschef has three popular formats when found out in the wild. "Souschef", "sous chef", "sous-chef" but as the API recognise them as synonyms they will fetch the same number of adds. There are a lot of cases like these that we are constantly adding. Our machine learning model also works in favour of the free query.
+	
+	https://jobsearch.api.jobtechdev.se/search?occupation-name=iugg_Qq9_QHH&offset=0&limit=10
+	
+This will give a smaller result set with a higher certainty of actually being for a souschef, however the result set will likely miss a few relevant ads since the occupation-name field isn't always set by employers. You should find that a larger set is more useful since there are multiple sorting factors working to show the most relevant hits first. We're also working to always improve the API in regards to unstructured data.
 
 ### Searching only within a specific field of work
-Firstly use the _Jobtech-Taxonomy_ endpoint to get the Id for Data/IT (occupation field). I'll make a free text search on the term "IT" narrowing down the search to occupation-field
+Firstly use the _Jobtech-Taxonomy_ endpoint to get the Id for Data/IT (occupation field). You'll then make a free text search on the term "IT" narrowing down the search to occupation-field
 
 Request URL
 
@@ -146,23 +146,21 @@ Request URL
 
 ### Finding jobs near you
 You can filter your search on geographical terms picked up from the Taxonomy just the same way you can with occupation-titles and occupation-fields. (Concept_id doesn't work everywhere at the time of writing but you can use the numeral id's, they are very official and way less likely to change as skills and occupations sometimes do)
-If I want to search for jobs in Norway I free text query the taxonomy for "Norge"
+If you want to search for jobs in Norway you may free text query the taxonomy for "Norge"
 
 Request URL
 
-       To be updated https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=norge&show-count=false
+       https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=norge
 
-And add that parameter conceptId (QJgN_Zge_BzJ) to an empty free text query
-QJgN_Zge_BzJ
+And add that parameter conceptId (QJgN_Zge_BzJ) to the country field
 
 Request URL
 
 	https://jobsearch.api.jobtechdev.se/search?country=QJgN_Zge_BzJ&offset=0&limit=10
-	https://jobsearch.api.jobtechdev.se/search?occupation-field=apaJ_2ja_LuF&country=QJgN_Zge_BzJ&offset=0&limit=10
 
-If I make a query which includes 2 different geographical filters the most local one will be promoted. As in this case where I'm searching for "lärare" using the municipality code for Haparanda and the region code for Norbottens Län. The jobs that are in Haparanda will be the first ones in the result set.
+If I make a query which includes 2 different geographical filters the most local one will be promoted. As in this case where I'm searching for "lärare" using the municipality code for Haparanda (tfRE_hXa_eq7) and the region code for Norrbottens Län (9hXe_F4g_eTG). The jobs that are in Haparanda will be the first ones in the result set.
 
-	https://jobsearch.api.jobtechdev.se/search?municipality=2583&q=l%C3%A4rare&offset=0&limit=10
+	https://jobsearch.api.jobtechdev.se/search?municipality=tfRE_hXa_eq7&region=9hXe_F4g_eTG&q=l%C3%A4rare
 
 
 You can also use longitude latitude coordinates and a radius in kilometres if you want.
@@ -172,30 +170,37 @@ Request URL
 	https://jobsearch.api.jobtechdev.se/search?offset=0&limit=10&position=59.3,17.6&position.radius=10
 
 ### Negative search
-So this is very simple using our qfield. Lets say i want to find Unix jobs
+So this is very simple using our qfield. Lets say you want to find Unix jobs
 
 Request URL
 
 	https://jobsearch.api.jobtechdev.se/search?q=unix&offset=0&limit=10
 
-But i find that i get a lot of jobs expecting me to work with which i dont want. All that's needed is to use the minus symbol and the word i want to exclude
+But you find that you get a lot of jobs expecting you to work with which you dont want. All that's needed is to use the minus symbol and the word you want to exclude.
 
 Request URL
 
 	https://jobsearch.api.jobtechdev.se/search?q=unix%20-linux&offset=0&limit=10
 
 ### Finding Swedish speaking jobs abroad
-Some times a filter can work to broadly and then it's easier to use a negative search to remove specific results you don't want. In this case i'm going to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" I'm using the country code and the country field in the search. So first I get the country code for "Sverige" from the taxonomy end point.
+Some times a filter can work too broadly and then it's easier to use a negative search to remove specific results you don't want. In this case we will show you how to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" you can use the country code and the country field in the search. So first you get the country code for "Sverige" from the taxonomy endpoint.
 
 Request URL
 
-	To be updated https://jobsearch.api.jobtechdev.se/taxonomy/search?q=Sverige&type=country
+	https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=sverige&type=country
+	https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=svenska&type=language
 
-And then I use the ID I got as a country code prefixed by a minus symbol.
+Fortsätt här
+
+"conceptId": "zSLA_vw2_FXN"
+
+And then you use the conceptId (i46j_HmG_v64) you got as a country code prefixed by a minus symbol.
 
 Request URL
 
       	https://jobsearch.api.jobtechdev.se/search?country=-199&q=swedish
+	https://jobsearch.api.jobtechdev.se/search?country=-i46j_HmG_v64&offset=0&limit=10
+
 
 ### Customise the result set
 There's a lot of reasons you might want less fields for your search result set. In this case the idea is a map based job search that plots needles where the jobs can be found based on a user search. Everything needed is the GPS coordinates for the needle and the id for the ad so more info can be fetched once the user clicks on the needle.

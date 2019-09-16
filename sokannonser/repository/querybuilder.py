@@ -346,7 +346,7 @@ class QueryBuilder(object):
                               key=lambda c: len(c),
                               reverse=True)
         # Remove found concepts from querystring
-        queries = querystring.split()
+        # queries = querystring.split()
         # for term in [concept['term'] for concept in all_concepts]:
         #     try:
         #         queries.remove(term)

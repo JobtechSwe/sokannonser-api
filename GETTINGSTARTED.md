@@ -135,30 +135,32 @@ Firstly use the _Jobtech-Taxonomy_ endpoint to get the Id for Data/IT (occupatio
 
 Request URL
 
-	To be updated http://jobtech-taxonomy-api.dev.services.jtech.se/v0/taxonomy/public/search?q=IT
+	https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=IT
 
-In the response body you’ll find the conceptId for the term Data/IT. Use this with the search endpoint to define the field in which you want to get all the open-api. So now I want to combine this with my favourite language without all those pesky zoo keeper jobs ruining my search.
+In the response body you’ll find the conceptId (apaJ_2ja_LuF)for the term Data/IT. Use this with the search endpoint to define the field in which you want to get all the open-api. So now I want to combine this with my favourite language without all those snake related jobs ruining my search.
 
 Request URL
 
-	To be updated
+	https://jobsearch.api.jobtechdev.se/search?occupation-field=apaJ_2ja_LuF&q=python&offset=0&limit=10
 
 
 ### Finding jobs near you
 You can filter your search on geographical terms picked up from the Taxonomy just the same way you can with occupation-titles and occupation-fields. (Concept_id doesn't work everywhere at the time of writing but you can use the numeral id's, they are very official and way less likely to change as skills and occupations sometimes do)
-If i want to search for jobs in Norway i free text query the taxonomy for "Norge"
+If I want to search for jobs in Norway I free text query the taxonomy for "Norge"
 
 Request URL
 
        To be updated https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=norge&show-count=false
 
-And add that parameter id to an empty free text query
+And add that parameter conceptId (QJgN_Zge_BzJ) to an empty free text query
+QJgN_Zge_BzJ
 
 Request URL
 
-	https://jobsearch.api.jobtechdev.se/search?country=155&offset=0&limit=10
+	https://jobsearch.api.jobtechdev.se/search?country=QJgN_Zge_BzJ&offset=0&limit=10
+	https://jobsearch.api.jobtechdev.se/search?occupation-field=apaJ_2ja_LuF&country=QJgN_Zge_BzJ&offset=0&limit=10
 
-If I make a query which includes 2 different geographical filters the most local one will be promoted. As in this case where i'm searching for "lärare" using the municipality code for Haparanda and the region code for Norbottens Län. The jobs that are in Haparanda will be the first ones in the result set.
+If I make a query which includes 2 different geographical filters the most local one will be promoted. As in this case where I'm searching for "lärare" using the municipality code for Haparanda and the region code for Norbottens Län. The jobs that are in Haparanda will be the first ones in the result set.
 
 	https://jobsearch.api.jobtechdev.se/search?municipality=2583&q=l%C3%A4rare&offset=0&limit=10
 

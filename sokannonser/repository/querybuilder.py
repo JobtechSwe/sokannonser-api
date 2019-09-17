@@ -346,14 +346,6 @@ class QueryBuilder(object):
                               key=lambda c: len(c),
                               reverse=True)
         # Remove found concepts from querystring
-        # queries = querystring.split()
-        # for term in [concept['term'] for concept in all_concepts]:
-        #     try:
-        #         queries.remove(term)
-        #     except ValueError:
-        #         pass
-        #
-        # return ' '.join(queries)
         for term in [concept['term'] for concept in all_concepts]:
             term = self._rewrite_word_for_regex(term)
             p = re.compile(f'(^|\\s+){term}(\\s+|$)')

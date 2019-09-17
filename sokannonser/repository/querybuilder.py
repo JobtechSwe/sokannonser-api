@@ -360,8 +360,7 @@ class QueryBuilder(object):
             querystring = p.sub('\\1\\2', querystring).strip()
         # Remove duplicate spaces
         querystring = re.sub('\\s+', ' ', querystring).strip()
-
-        return querystring
+        return ' '.join(queries)
 
     def __create_base_ft_query(self, querystring):
         # Creates a base query dict for "independent" freetext words

@@ -303,7 +303,7 @@ class QueryBuilder(object):
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
         querystring = self._rewrite_querystring(querystring.lower(), concepts)
-        ft_query = self.__create_base_ft_query(querystring)
+        ft_query = self._create_base_ft_query(querystring)
 
         # Make all "musts" concepts "shoulds" as well
         for qf in queryfields:
@@ -327,8 +327,8 @@ class QueryBuilder(object):
                                  queryfields, 'must')
 
         # Add a headline query as well
-        ft_query = self.__freetext_headline(ft_query, original_querystring)
-        ft_query = self.__freetext_headline(ft_query, original_querystring)
+        ft_query = self._freetext_headline(ft_query, original_querystring)
+        ft_query = self._freetext_headline(ft_query, original_querystring)
         return ft_query
 
     # Removes identified concepts from querystring
@@ -362,7 +362,7 @@ class QueryBuilder(object):
         querystring = re.sub('\\s+', ' ', querystring).strip()
         return querystring
 
-    def __create_base_ft_query(self, querystring):
+    def _create_base_ft_query(self, querystring):
         # Creates a base query dict for "independent" freetext words
         # (e.g. words not found in text_to_concepts)
         inc_words = ' '.join([w for w in querystring.split(' ')
@@ -392,7 +392,7 @@ class QueryBuilder(object):
             ft_query['bool']['must_not'] = mustnts
         return ft_query
 
-    def __freetext_headline(self, query_dict, querystring):
+    def _freetext_headline(self, query_dict, querystring):
         # Remove plus and minus from querystring for headline search
         querystring = re.sub(r'(^| )[\\+]{1}', ' ', querystring)
         querystring = ' '.join([word for word in querystring.split(' ')
@@ -448,29 +448,6 @@ class QueryBuilder(object):
                         }
                     }
                 )
-                if key == 'location':
-                    # Include location in extracted as well (for now)
-                    ext_loc = "%s.%s.raw" % (f.KEYWORDS_EXTRACTED, key)
-                    query_dict['bool'][bool_type].append(
-                        {
-                            "term": {
-                                ext_loc: {
-                                    "value": value,
-                                    "boost": 10
-                                }
-                            }
-                        }
-                    )
-                #     query_dict['bool'][bool_type].append(
-                #         {
-                #             "match_phrase": {
-                #                 f.HEADLINE: {
-                #                     "query": value,
-                #                     "boost": 1
-                #                 }
-                #             }
-                #         }
-                #     )
 
         return query_dict
 

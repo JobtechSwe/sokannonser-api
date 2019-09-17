@@ -262,7 +262,6 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
 
     # create_found_in_enriched(results, query_result)
     _modify_results(results)
-
     # log.debug(json.dumps(results, indent=2))
     return results
 

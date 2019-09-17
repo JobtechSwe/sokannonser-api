@@ -185,32 +185,27 @@ Request URL
 ### Finding Swedish speaking jobs abroad
 Some times a filter can work too broadly and then it's easier to use a negative search to remove specific results you don't want. In this case we will show you how to filter out all the jobs in Sweden. Rather than adding a minus Sweden in the q field "-sverige" you can use the country code and the country field in the search. So first you get the country code for "Sverige" from the taxonomy endpoint.
 
-Request URL
+Request URLs to get conceptId for Sweden and Swedish
 
 	https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=sverige&type=country
 	https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=svenska&type=language
 
-Fortsätt här
+As return we get conceptId i46j_HmG_v64 for "Sverige" and conceptId zSLA_vw2_FXN for "Svenska".
 
-"conceptId": "zSLA_vw2_FXN"
+Request URL to get jobs in Swedish ouside Sweden
 
-And then you use the conceptId (i46j_HmG_v64) you got as a country code prefixed by a minus symbol.
-
-Request URL
-
-      	https://jobsearch.api.jobtechdev.se/search?country=-199&q=swedish
-	https://jobsearch.api.jobtechdev.se/search?country=-i46j_HmG_v64&offset=0&limit=10
+      	https://jobsearch.api.jobtechdev.se/search?language=zSLA_vw2_FXN&country=-i46j_HmG_v64&offset=0&limit=10
 
 
 ### Customise the result set
-There's a lot of reasons you might want less fields for your search result set. In this case the idea is a map based job search that plots needles where the jobs can be found based on a user search. Everything needed is the GPS coordinates for the needle and the id for the ad so more info can be fetched once the user clicks on the needle.
-In the Swagger GUI its possible to use the X-fields to define what fields to include in result set. So this mask will look like this
+There's a lot of reasons you might want less fields for your search result set. In this case the idea is a map based job search that plots needles where the jobs can be found based on a user search. Everything needed is the GPS coordinates for the needle and the id, employer, and headline for the ad so more info can be fetched once the user clicks on the needle. Probably, you also like to know total number of ads.
+In the Swagger GUI its possible to use the X-fields to define which fields to include in result set. This mask will look like this
 
- 	hits{id, workplace_address{coordinates}}
+ 	total{value}, hits{id, headline, workplace_address{coordinates}, employer{name}}
 
  This will create an extra header displayed in the curl example in Swagger. So this example will look like this
 
- 	curl "https://jobsearch.api.jobtechdev.se/search?q=skogsarbetare&offset=0&limit=10" -H "accept: application/json" -H "api-key: <proper_key>" -H "X-Fields: hits{id, workplace_address{coordinates}}"
+ 	curl "https://jobsearch.api.jobtechdev.se/search?q=skogsarbetare&offset=0&limit=10" -H "accept: application/json" -H "api-key: <proper_key>" -H "X-Fields: total{value}, hits{id, headline, workplace_address{coordinates}, employer{name}}"
 
 
 

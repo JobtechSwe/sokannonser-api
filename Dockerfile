@@ -42,7 +42,7 @@ WORKDIR /app
 # delete all __pycache__-folders in tests-folder
 # runs unit tests with @pytest.mark.unit annotation only
 
-RUN echo "" && echo $flask_app && echo "module = $flask_app" >> uwsgi.ini && \
+RUN echo "" && echo $flask_app && \
     time pip3 install -r requirements.txt && \
     find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \; && \
     python3 -m pytest -svv -m unit tests/unit_tests && \

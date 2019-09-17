@@ -174,7 +174,7 @@ def test_rewrite_non_concept_words():
 @pytest.mark.integration
 def test_rewrite_must_words():
     concepts = text_to_concept.text_to_concepts(
-        'mållare +målare säljare +key account manager c-sharp +java positiv +noggrann -flexibel')
+        'mållare +målare säljare +key account manager c-sharp +java positiv +noggrann -flexibel stockholm +solna -sundbyberg')
 
     # print(concepts)
 
@@ -185,6 +185,9 @@ def test_rewrite_must_words():
     assert_not_empty(concepts, 'trait')
     assert_not_empty(concepts, 'trait_must')
     assert_not_empty(concepts, 'trait_must_not')
+    assert_not_empty(concepts, 'location')
+    assert_not_empty(concepts, 'location_must')
+    assert_not_empty(concepts, 'location_must_not')
 
 
 
@@ -209,7 +212,7 @@ def test_clean_plus_minus():
 @pytest.mark.integration
 def test_rewrite_must_not_words():
     concepts = text_to_concept.text_to_concepts(
-        'mållare -målare java-utvecklare -key account manager c-sharp -java -noggrann flexibel')
+        'mållare -målare java-utvecklare -key account manager c-sharp -java -noggrann flexibel solna -sundbyberg')
     # print(concepts)
     assert_not_empty(concepts, 'occupation')
     assert_not_empty(concepts, 'occupation_must_not')
@@ -217,6 +220,8 @@ def test_rewrite_must_not_words():
     assert_not_empty(concepts, 'skill_must_not')
     assert_not_empty(concepts, 'trait')
     assert_not_empty(concepts, 'trait_must_not')
+    assert_not_empty(concepts, 'location')
+    assert_not_empty(concepts, 'location_must_not')
 
 
 

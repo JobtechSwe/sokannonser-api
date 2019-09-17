@@ -130,6 +130,7 @@ def _format_ad(result):
     if source:
         try:
             # Remove personal number
+            # TODO: Not needed once loader (where this also happens) is deployed
             org_nr = source['employer']['organization_number']
             if org_nr and int(org_nr[2]) < 2:
                 source['employer']['organization_number'] = None

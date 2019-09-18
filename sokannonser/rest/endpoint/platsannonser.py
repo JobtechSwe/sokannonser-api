@@ -108,11 +108,21 @@ class PBComplete(Resource):
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         # This could be prettier
-        args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
+        contextual_typeahead = args.pop(settings.CONTEXTUAL_TYPEAHEAD) \
+            if settings.CONTEXTUAL_TYPEAHEAD in args else False
         query_string = args.pop(settings.FREETEXT_QUERY) or ''
         args[settings.TYPEAHEAD_QUERY] = query_string.lower()
-        args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1]).lower()
+        args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1])
+        print("ARGS", contextual_typeahead, args)
+        if contextual_typeahead:
+            apikey = args[settings.APIKEY]
+            args = {
+                settings.APIKEY: apikey,
+                settings.TYPEAHEAD_QUERY: query_string.split(' ')[-1].lower()
+            }
 
+        args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
+        print("ARGS2", args)
         result = platsannonser.find_platsannonser(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."
                   % (int(time.time()*1000)-start_time))

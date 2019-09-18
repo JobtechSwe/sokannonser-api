@@ -1,7 +1,10 @@
 Changelog Application Jobsearch
 ===============================
+## 1.5.0
+* Searchcontextual switch for typeahead
+
 ## 1.4.3
-Buggfixes for freetext search and location.
+* Buggfixes for freetext search and location.
 
 ## 1.4.2
 * Buggfixes and documentation updates

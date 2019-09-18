@@ -185,7 +185,8 @@ class QueryBuilder(object):
             query_dsl['_source'] = self._parse_x_fields(x_fields)
 
         # Remove api-key from args to make sure an empty query can occur
-        args.pop(settings.APIKEY)
+        if settings.APIKEY in args:
+            args.pop(settings.APIKEY)
 
         # Make sure to only serve published ads
         offset = self._calculate_utc_offset()

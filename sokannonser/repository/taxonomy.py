@@ -147,7 +147,7 @@ def _build_query(query_string, taxonomy_code, entity_type, offset, limit):
         musts.append({"bool": {"should": [
             {
                 "match_phrase_prefix": {
-                    "label": {
+                    "label.autocomplete": {
                         "query": query_string
                     }
                 }

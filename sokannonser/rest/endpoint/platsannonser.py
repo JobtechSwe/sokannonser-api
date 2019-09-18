@@ -117,7 +117,6 @@ class PBComplete(Resource):
         args[settings.TYPEAHEAD_QUERY] = query_string.lower()
         args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1])
         if not contextual_typeahead:
-            apikey = args[settings.APIKEY]
             args = {
                 settings.TYPEAHEAD_QUERY: query_string.split(' ')[-1].lower()
             }

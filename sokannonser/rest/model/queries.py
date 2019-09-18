@@ -126,7 +126,7 @@ base_annons_query.add_argument(settings.FREETEXT_FIELDS, action='append',
 
 annons_complete_query = base_annons_query.copy()
 annons_complete_query.add_argument(settings.CONTEXTUAL_TYPEAHEAD, type=inputs.boolean,
-                                   default=False)
+                                   default=True)
 
 pb_query = base_annons_query.copy()
 pb_query.add_argument(settings.MIN_RELEVANCE, type=float),

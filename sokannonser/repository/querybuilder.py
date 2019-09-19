@@ -185,7 +185,8 @@ class QueryBuilder(object):
             query_dsl['_source'] = self._parse_x_fields(x_fields)
 
         # Remove api-key from args to make sure an empty query can occur
-        args.pop(settings.APIKEY)
+        if settings.APIKEY in args:
+            args.pop(settings.APIKEY)
 
         # Make sure to only serve published ads
         offset = self._calculate_utc_offset()
@@ -312,19 +313,19 @@ class QueryBuilder(object):
                 concepts[qf] += [c for c in concepts.get(must_key, [])]
         # Add concepts to query
         for concept_type in queryfields:
-            sub_should = self.__freetext_concepts({"bool": {}}, concepts,
-                                                  querystring, [concept_type], "should")
+            sub_should = self._freetext_concepts({"bool": {}}, concepts,
+                                                 querystring, [concept_type], "should")
             if 'should' in sub_should['bool']:
                 if 'must' not in ft_query['bool']:
                     ft_query['bool']['must'] = []
                 ft_query['bool']['must'].append(sub_should)
         # Remove unwanted concepts from query
-        self.__freetext_concepts(ft_query, concepts, querystring,
-                                 queryfields, 'must_not')
+        self._freetext_concepts(ft_query, concepts, querystring,
+                                queryfields, 'must_not')
 
         # Add required concepts to query
-        self.__freetext_concepts(ft_query, concepts, querystring,
-                                 queryfields, 'must')
+        self._freetext_concepts(ft_query, concepts, querystring,
+                                queryfields, 'must')
 
         # Add a headline query as well
         ft_query = self._freetext_headline(ft_query, original_querystring)
@@ -366,9 +367,9 @@ class QueryBuilder(object):
         exc_words = ' '.join([w[1:] for w in querystring.split(' ')
                               if w.startswith('-')
                               and w[1:].strip()])
-        shoulds = self.__freetext_fields(inc_words) if inc_words else []
-        musts = self.__freetext_fields(req_words) if req_words else []
-        mustnts = self.__freetext_fields(exc_words) if exc_words else []
+        shoulds = self._freetext_fields(inc_words) if inc_words else []
+        musts = self._freetext_fields(req_words) if req_words else []
+        mustnts = self._freetext_fields(exc_words) if exc_words else []
 
         ft_query = {"bool": {}}
         # Add "common" words to query
@@ -419,8 +420,8 @@ class QueryBuilder(object):
 
         return query_dict
 
-    def __freetext_concepts(self, query_dict, concepts,
-                            querystring, concept_keys, bool_type):
+    def _freetext_concepts(self, query_dict, concepts,
+                           querystring, concept_keys, bool_type):
         for key in concept_keys:
             dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
             for value in [c['concept'].lower() for c in concepts.get(dict_key, []) if c]:
@@ -428,7 +429,7 @@ class QueryBuilder(object):
                     query_dict['bool'][bool_type] = []
 
                 base_field = f.KEYWORDS_EXTRACTED \
-                    if key in ['employer'] else f.KEYWORDS_ENRICHED
+                    if key in ['location', 'employer'] else f.KEYWORDS_ENRICHED
                 field = "%s.%s.raw" % (base_field, key)
                 query_dict['bool'][bool_type].append(
                     {
@@ -443,7 +444,7 @@ class QueryBuilder(object):
 
         return query_dict
 
-    def __freetext_fields(self, searchword):
+    def _freetext_fields(self, searchword):
         return [
             {
                 "multi_match": {

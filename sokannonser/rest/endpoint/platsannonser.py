@@ -98,7 +98,10 @@ class PBComplete(Resource):
 
     @ns_platsannons.doc(
         description='Typeahead / Suggest next searchword',
-        params=swagger_doc_params
+        params={
+            settings.CONTEXTUAL_TYPEAHEAD: "Set to false to disable contextual typeahead"
+                                           " (default: true)",
+            **swagger_doc_params}
     )
     @ns_platsannons.response(401, 'Invalid API-key')
     @ns_platsannons.expect(annons_complete_query)
@@ -108,11 +111,17 @@ class PBComplete(Resource):
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         # This could be prettier
-        args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
+        contextual_typeahead = args.pop(settings.CONTEXTUAL_TYPEAHEAD) \
+            if settings.CONTEXTUAL_TYPEAHEAD in args else True
         query_string = args.pop(settings.FREETEXT_QUERY) or ''
         args[settings.TYPEAHEAD_QUERY] = query_string.lower()
-        args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1]).lower()
+        args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1])
+        if not contextual_typeahead:
+            args = {
+                settings.TYPEAHEAD_QUERY: query_string.split(' ')[-1].lower()
+            }
 
+        args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         result = platsannonser.find_platsannonser(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."
                   % (int(time.time()*1000)-start_time))

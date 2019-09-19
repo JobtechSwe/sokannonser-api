@@ -84,47 +84,51 @@ swagger_filter_doc_params = {
 load_ad_query = reqparse.RequestParser()
 load_ad_query.add_argument(settings.APIKEY, location='headers', required=True)
 
-annons_complete_query = reqparse.RequestParser()
-annons_complete_query.add_argument(settings.APIKEY, location='headers', required=True)
-annons_complete_query.add_argument(settings.PUBLISHED_BEFORE,
-                                   type=lambda x: datetime.strptime(x,
+base_annons_query = reqparse.RequestParser()
+base_annons_query.add_argument(settings.APIKEY, location='headers', required=True)
+base_annons_query.add_argument(settings.PUBLISHED_BEFORE,
+                               type=lambda x: datetime.strptime(x,
                                                                     '%Y-%m-%dT%H:%M:%S'))
 # annons_complete_query.add_argument(settings.PUBLISHED_AFTER,
 #                                    type=lambda x: datetime.strptime(x,
 #                                                                     '%Y-%m-%dT%H:%M:%S'))
 datetime_or_minutes_regex = r'^(\d\d\d\d-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])T(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]))|(\d+)$'
-annons_complete_query.add_argument(settings.PUBLISHED_AFTER,
-                                   type=inputs.regex(datetime_or_minutes_regex))
-annons_complete_query.add_argument(taxonomy.OCCUPATION, action='append')
-annons_complete_query.add_argument(taxonomy.GROUP, action='append')
-annons_complete_query.add_argument(taxonomy.FIELD, action='append')
-annons_complete_query.add_argument(taxonomy.SKILL, action='append')
-annons_complete_query.add_argument(taxonomy.LANGUAGE, action='append')
-annons_complete_query.add_argument(taxonomy.WORKTIME_EXTENT, action='append')
-annons_complete_query.add_argument(settings.PARTTIME_MIN, type=float)
-annons_complete_query.add_argument(settings.PARTTIME_MAX, type=float)
-annons_complete_query.add_argument(taxonomy.DRIVING_LICENCE_REQUIRED, type=inputs.boolean)
-annons_complete_query.add_argument(taxonomy.DRIVING_LICENCE, action='append')
-annons_complete_query.add_argument(taxonomy.EMPLOYMENT_TYPE, action='append')
-annons_complete_query.add_argument(settings.EXPERIENCE_REQUIRED,
-                                   choices=['true', 'false'])
-annons_complete_query.add_argument(taxonomy.MUNICIPALITY, action='append')
-annons_complete_query.add_argument(taxonomy.REGION, action='append')
-annons_complete_query.add_argument(taxonomy.COUNTRY, action='append')
+base_annons_query.add_argument(settings.PUBLISHED_AFTER,
+                               type=inputs.regex(datetime_or_minutes_regex))
+base_annons_query.add_argument(taxonomy.OCCUPATION, action='append')
+base_annons_query.add_argument(taxonomy.GROUP, action='append')
+base_annons_query.add_argument(taxonomy.FIELD, action='append')
+base_annons_query.add_argument(taxonomy.SKILL, action='append')
+base_annons_query.add_argument(taxonomy.LANGUAGE, action='append')
+base_annons_query.add_argument(taxonomy.WORKTIME_EXTENT, action='append')
+base_annons_query.add_argument(settings.PARTTIME_MIN, type=float)
+base_annons_query.add_argument(settings.PARTTIME_MAX, type=float)
+base_annons_query.add_argument(taxonomy.DRIVING_LICENCE_REQUIRED, type=inputs.boolean)
+base_annons_query.add_argument(taxonomy.DRIVING_LICENCE, action='append')
+base_annons_query.add_argument(taxonomy.EMPLOYMENT_TYPE, action='append')
+base_annons_query.add_argument(settings.EXPERIENCE_REQUIRED,
+                               choices=['true', 'false'])
+base_annons_query.add_argument(taxonomy.MUNICIPALITY, action='append')
+base_annons_query.add_argument(taxonomy.REGION, action='append')
+base_annons_query.add_argument(taxonomy.COUNTRY, action='append')
 # Matches(lat,long) +90.0,-127.554334; 45,180; -90,-180; -90.000,-180.0000; +90,+180
 # r for raw, PEP8
 position_regex = r'^[-+]?([1-8]?\d(\.\d*)?|90(\.0*)?),' \
             r'[-+]?(180(\.0*)?|((1[0-7]\d)|([1-9]?\d))(\.\d*)?)$'
-annons_complete_query.add_argument(settings.POSITION,
-                                   type=inputs.regex(position_regex),
-                                   action='append')
-annons_complete_query.add_argument(settings.POSITION_RADIUS, type=int, action='append')
-annons_complete_query.add_argument(settings.EMPLOYER, action='append')
-annons_complete_query.add_argument(settings.FREETEXT_QUERY)
-annons_complete_query.add_argument(settings.FREETEXT_FIELDS, action='append',
-                                   choices=QF_CHOICES)
+base_annons_query.add_argument(settings.POSITION,
+                               type=inputs.regex(position_regex),
+                               action='append')
+base_annons_query.add_argument(settings.POSITION_RADIUS, type=int, action='append')
+base_annons_query.add_argument(settings.EMPLOYER, action='append')
+base_annons_query.add_argument(settings.FREETEXT_QUERY)
+base_annons_query.add_argument(settings.FREETEXT_FIELDS, action='append',
+                               choices=QF_CHOICES)
 
-pb_query = annons_complete_query.copy()
+annons_complete_query = base_annons_query.copy()
+annons_complete_query.add_argument(settings.CONTEXTUAL_TYPEAHEAD, type=inputs.boolean,
+                                   default=True)
+
+pb_query = base_annons_query.copy()
 pb_query.add_argument(settings.MIN_RELEVANCE, type=float),
 pb_query.add_argument(settings.DETAILS, choices=[OPTIONS_FULL, OPTIONS_BRIEF])
 pb_query.add_argument(settings.OFFSET, type=inputs.int_range(0, settings.MAX_OFFSET),

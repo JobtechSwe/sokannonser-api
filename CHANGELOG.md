@@ -1,7 +1,8 @@
 Changelog Application Jobsearch
 ===============================
 ## 1.5.0
-* Searchcontextual switch for typeahead
+* Search-contextual switch for typeahead
+* Fixes an issue with taxonomy search
 
 ## 1.4.3
 * Buggfixes for freetext search and location.

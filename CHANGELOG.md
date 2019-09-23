@@ -4,6 +4,7 @@ Changelog Application Jobsearch
 * Introduces new lowercase type for request parsing
 * Fixes a bug in context-unaware typeahead
 * Fixes plus/minus-searches in employer
+* Activates search in 'enriched' for location
 
 ## 1.5.0
 * Search-contextual switch for typeahead

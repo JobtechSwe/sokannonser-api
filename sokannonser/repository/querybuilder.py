@@ -22,7 +22,8 @@ class QueryBuilder(object):
         query_dsl = self._bootstrap_query(args, x_fields)
 
         # Check for empty query
-        if not any(v is not None for v in args.values()):
+        if not any(v is not None for v in args.values()) \
+                or not args.get(settings.CONTEXTUAL_TYPEAHEAD, True):
             log.debug("Constructing match-all query")
             query_dsl['query']['bool']['must'].append({'match_all': {}})
             if 'sort' not in query_dsl:

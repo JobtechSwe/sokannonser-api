@@ -110,17 +110,7 @@ class PBComplete(Resource):
         elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
-        # This could be prettier
-        contextual_typeahead = args.pop(settings.CONTEXTUAL_TYPEAHEAD) \
-            if settings.CONTEXTUAL_TYPEAHEAD in args else True
-        query_string = args.pop(settings.FREETEXT_QUERY) or ''
-        args[settings.TYPEAHEAD_QUERY] = query_string
-        args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1])
-        if not contextual_typeahead:
-            args = {
-                settings.TYPEAHEAD_QUERY: query_string.split(' ')[-1]
-            }
-
+        args[settings.TYPEAHEAD_QUERY] = args.get(settings.FREETEXT_QUERY, '')
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         result = platsannonser.find_platsannonser(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."

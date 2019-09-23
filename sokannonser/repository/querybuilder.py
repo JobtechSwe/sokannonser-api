@@ -241,7 +241,7 @@ class QueryBuilder(object):
 
             for field in complete_fields:
                 base_field = f.KEYWORDS_EXTRACTED \
-                    if field in ['location', 'employer'] else f.KEYWORDS_ENRICHED
+                    if field in ['employer'] else f.KEYWORDS_ENRICHED
 
                 if complete:
                     query_dsl['aggs']["complete_00_%s" % field] = {
@@ -430,7 +430,7 @@ class QueryBuilder(object):
                     query_dict['bool'][bool_type] = []
 
                 base_field = f.KEYWORDS_EXTRACTED \
-                    if key in ['location', 'employer'] else f.KEYWORDS_ENRICHED
+                    if key in ['employer'] else f.KEYWORDS_ENRICHED
                 field = "%s.%s.raw" % (base_field, key)
                 query_dict['bool'][bool_type].append(
                     {

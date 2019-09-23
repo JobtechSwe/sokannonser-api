@@ -462,14 +462,20 @@ class QueryBuilder(object):
     # Parses EMPLOYER
     def _build_employer_query(self, employers):
         if employers:
-            bool_segment = {"bool": {"should": []}}
+            bool_segment = {"bool": {"should": [], "must_not": [], "must": []}}
             for employer in employers:
+                negative_search = employer.startswith('-')
+                positive_search = employer.startswith('+')
+                bool_type = 'should'
+                if negative_search or positive_search:
+                    employer = employer[1:]
+                    bool_type = 'must_not' if negative_search else 'must'
                 if employer.isdigit():
-                    bool_segment['bool']['should'].append(
+                    bool_segment['bool'][bool_type].append(
                         {"prefix": {f.EMPLOYER_ORGANIZATION_NUMBER: employer}}
                     )
                 else:
-                    bool_segment['bool']['should'].append(
+                    bool_segment['bool'][bool_type].append(
                         {
                             "multi_match": {
                                 "query": " ".join(employers),

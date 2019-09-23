@@ -195,11 +195,11 @@ Request URLs to get conceptId for Sweden and Swedish
 	https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=sverige&type=country
 	https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=svenska&type=language
 
-As return we get conceptId i46j_HmG_v64 for "Sverige" and conceptId zSLA_vw2_FXN for "Svenska".
+As return we get id 199 for "Sverige" and id 502 for "Svenska".
 
 Request URL to get jobs in Swedish outside Sweden
 
-      	https://jobsearch.api.jobtechdev.se/search?language=zSLA_vw2_FXN&country=-i46j_HmG_v64&offset=0&limit=10
+      	https://jobsearch.api.jobtechdev.se/search?language=502&country=-199&offset=0&limit=10
 
 _Note: The taxonomy endpoint is temporary. Please check [jobtechdev.se](https://www.jobtechdev.se/) for updates._
 

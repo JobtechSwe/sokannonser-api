@@ -1,5 +1,8 @@
 Changelog Application Jobsearch
 ===============================
+## 1.5.1
+* Introduces new lowercase type for request parsing
+
 ## 1.5.0
 * Search-contextual switch for typeahead
 * Fixes an issue with taxonomy search

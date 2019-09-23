@@ -114,11 +114,11 @@ class PBComplete(Resource):
         contextual_typeahead = args.pop(settings.CONTEXTUAL_TYPEAHEAD) \
             if settings.CONTEXTUAL_TYPEAHEAD in args else True
         query_string = args.pop(settings.FREETEXT_QUERY) or ''
-        args[settings.TYPEAHEAD_QUERY] = query_string.lower()
+        args[settings.TYPEAHEAD_QUERY] = query_string
         args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1])
         if not contextual_typeahead:
             args = {
-                settings.TYPEAHEAD_QUERY: query_string.split(' ')[-1].lower()
+                settings.TYPEAHEAD_QUERY: query_string.split(' ')[-1]
             }
 
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead

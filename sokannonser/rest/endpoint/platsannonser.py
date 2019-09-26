@@ -1,6 +1,6 @@
 import logging
 import time
-from flask import request, Response
+from flask import request
 from flask_restplus import Resource
 from jobtech.common.rest.decorators import check_api_key_and_return_metadata
 from sokannonser import settings
@@ -110,7 +110,10 @@ class PBComplete(Resource):
         elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
-        args[settings.TYPEAHEAD_QUERY] = args.get(settings.FREETEXT_QUERY, '')
+        freetext_query = args.get(settings.FREETEXT_QUERY, '')
+        args[settings.TYPEAHEAD_QUERY] = freetext_query
+        args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
+
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         result = platsannonser.find_platsannonser(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."

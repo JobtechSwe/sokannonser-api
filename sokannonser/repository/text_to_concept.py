@@ -18,7 +18,7 @@ class TextToConcept(object):
     COMPETENCE_KEY = 'KOMPETENS'
     OCCUPATION_KEY = 'YRKE'
     TRAIT_KEY = 'FORMAGA'
-    LOCATION_KEY = 'GEO'
+    LOCATION_KEY = 'PLATS'
     REMOVED_TAG = '<removed>'
 
     def __init__(self, ontologyhost='localhost', ontologyport=9200,

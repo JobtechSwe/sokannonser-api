@@ -5,6 +5,7 @@ Changelog Application Jobsearch
 * Fixes a bug in context-unaware typeahead
 * Fixes plus/minus-searches in employer
 * Activates search in 'enriched' for location
+* Disables search in 'extracted' for locations fetched from job ads, to avoid conflicting terms.
 
 ## 1.5.1
 * Bugfix reverting freetextsearch for locations in ad descriptions.

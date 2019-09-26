@@ -1,7 +1,7 @@
 from flask_restplus import Api, Namespace, reqparse, inputs
 from sokannonser import settings
 
-api = Api(version='1.5.1', title='Market Search',
+api = Api(version='1.5.2', title='Market Search',
           description='An API for searching and retrieving job listings from the '
           'entire job market',
           default='market',

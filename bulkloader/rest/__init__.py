@@ -1,7 +1,7 @@
 from flask_restplus import Api, Namespace, reqparse, inputs
 from sokannonser import settings
 
-api = Api(version='1.5.0', title='Download job ads',
+api = Api(version='1.5.1', title='Download job ads',
           description='An API for retrieving job ads',
           default='bulkloader',
           default_label="An API for retrieving job ads.")

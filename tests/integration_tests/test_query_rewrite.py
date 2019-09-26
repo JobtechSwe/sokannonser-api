@@ -176,7 +176,7 @@ def test_rewrite_must_words():
     concepts = text_to_concept.text_to_concepts(
         'mållare +målare säljare +key account manager c-sharp +java positiv +noggrann -flexibel stockholm +solna -sundbyberg')
 
-    # print(concepts)
+    # pprint(concepts)
 
     assert_not_empty(concepts, 'occupation')
     assert_not_empty(concepts, 'occupation_must')

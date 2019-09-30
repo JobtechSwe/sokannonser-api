@@ -330,7 +330,6 @@ class QueryBuilder(object):
 
         # Add a headline query as well
         ft_query = self._freetext_headline(ft_query, original_querystring)
-        ft_query = self._freetext_headline(ft_query, original_querystring)
         return ft_query
 
     # Removes identified concepts from querystring
@@ -425,23 +424,39 @@ class QueryBuilder(object):
                            querystring, concept_keys, bool_type):
         for key in concept_keys:
             dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
-            for value in [c['concept'].lower() for c in concepts.get(dict_key, []) if c]:
+            current_concepts = [c for c in concepts.get(dict_key, []) if c]
+            for concept in current_concepts:
                 if bool_type not in query_dict['bool']:
                     query_dict['bool'][bool_type] = []
 
-                base_field = f.KEYWORDS_EXTRACTED \
-                    if key in ['employer'] else f.KEYWORDS_ENRICHED
-                field = "%s.%s.raw" % (base_field, key)
-                query_dict['bool'][bool_type].append(
-                    {
-                        "term": {
-                            field: {
-                                "value": value,
-                                "boost": 10
+                base_fields = []
+                if key in ['location']:
+                    base_fields.append(f.KEYWORDS_EXTRACTED)
+                    base_fields.append(f.KEYWORDS_ENRICHED)
+                else:
+                    curr_base_field = f.KEYWORDS_EXTRACTED \
+                        if key in ['employer'] else f.KEYWORDS_ENRICHED
+                    base_fields.append(curr_base_field)
+
+                for base_field in base_fields:
+                    if base_field == f.KEYWORDS_EXTRACTED:
+                        value = concept['term'].lower()
+                        boost_value = 10
+                    else:
+                        value = concept['concept'].lower()
+                        boost_value = 9
+
+                    field = "%s.%s.raw" % (base_field, key)
+                    query_dict['bool'][bool_type].append(
+                        {
+                            "term": {
+                                field: {
+                                    "value": value,
+                                    "boost": boost_value
+                                }
                             }
                         }
-                    }
-                )
+                    )
 
         return query_dict
 

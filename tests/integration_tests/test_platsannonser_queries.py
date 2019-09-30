@@ -102,7 +102,7 @@ def test_freetext_query_geo_param():
 
         hits_total = json_response['total']['value']
         print(hits_total)
-        assert int(hits_total) >= 6
+        assert int(hits_total) >= 1
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -123,6 +123,35 @@ def test_bugfix_reset_query_rewrite_location():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/search', headers=headers, data={'q': 'rissne',
+                                                                  'limit': '100'})
+        json_response = result.json
+        # pprint(json_response)
+
+        hits_total = json_response['total']['value']
+        print(hits_total)
+        assert int(hits_total) >= 1
+
+
+
+# # @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_freetext_query_location_extracted_or_enriched():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+
+    # query_location = 'kista kallhäll'
+    # query_location = 'vara'
+    # query_location = 'kallhäll'
+    # query_location = 'rissne'
+    # query_location = 'storlien'
+    # query_location = 'fridhemsplan'
+    #query_location = 'skåne län'
+    query_location = '+trelleborg -stockholm ystad'
+    # query_location = 'skåne'
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        result = testclient.get('/search', headers=headers, data={'q': query_location,
                                                                   'limit': '100'})
         json_response = result.json
         # pprint(json_response)

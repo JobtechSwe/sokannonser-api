@@ -26,7 +26,7 @@ Easiest way to try out the API is to go to the [swagger page](https://jobsearch.
 But first you need a key which you need to authenticate yourself.
 
 ## Authentication
-For this API, you will need to register your own API key at [www.jobtechdev.se](https://www.jobtechdev.se/)
+For this API, you will need to register to get your own API key at [apirequest.jobtechdev.se](https://apirequest.jobtechdev.se)
 
 ## Endpoints
 Below we only show the URLs. If you prefer the curl command, you type it like:
@@ -103,6 +103,7 @@ To help you find your way forward, here are some example of use cases:
 * [Finding jobs near you](#Finding-jobs-near-you)
 * [Negative search](#Negative-search)
 * [Finding Swedish speaking jobs abroad](#Finding-Swedish-speaking-jobs-abroad)
+* [Finding jobs in the public sector](#Finding-jobs-in-the-public-sector)
 * [Customise the result set](#Customise-the-result-set)
 * [Getting all the jobs since date and time](#Getting-all-the-jobs-since-date-and-time)
 
@@ -194,13 +195,21 @@ Request URLs to get conceptId for Sweden and Swedish
 	https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=sverige&type=country
 	https://jobsearch.api.jobtechdev.se/taxonomy/search?offset=0&limit=10&q=svenska&type=language
 
-As return we get conceptId i46j_HmG_v64 for "Sverige" and conceptId zSLA_vw2_FXN for "Svenska".
+As return we get id 199 for "Sverige" and id 502 for "Svenska".
 
 Request URL to get jobs in Swedish outside Sweden
 
-      	https://jobsearch.api.jobtechdev.se/search?language=zSLA_vw2_FXN&country=-i46j_HmG_v64&offset=0&limit=10
+      	https://jobsearch.api.jobtechdev.se/search?language=502&country=-199&offset=0&limit=10
 
 _Note: The taxonomy endpoint is temporary. Please check [jobtechdev.se](https://www.jobtechdev.se/) for updates._
+
+### Finding jobs in the public sector
+In Sweden, organizations number reflect type of organization. For instance is the first figura a two if the organization is a public organization. This could be used in you search.
+
+Request URL to get jobs in Swedish public sector
+
+      	https://jobsearch.api.jobtechdev.se/search?employer=2&offset=0&limit=10
+
 
 ### Customize the result set
 There's a lot of reasons you might want less fields for your search result set. In this case the idea is a map-based job search that plots needles where the jobs can be found based on a user search. Everything needed is the GPS coordinates for the needle and the id, employer, and headline for the ad so more info can be fetched once the user clicks on the needle. Probably, you also like to know total number of ads.

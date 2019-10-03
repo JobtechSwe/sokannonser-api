@@ -26,6 +26,8 @@ The endpoints for the ads search API are:
 Easiest way to try out the API is to go to the [swagger page](https://jobsearch.api.jobtechdev.se/).
 But first you need a key which you need to authenticate yourself.
 
+If you want to get all ads in a bulk, please use our [Stream API](https://jobtechdev.se/devguide/apis/jobstream.html).
+
 ## Authentication
 For this API, you will need to register to get your own API key at [apirequest.jobtechdev.se](https://apirequest.jobtechdev.se)
 

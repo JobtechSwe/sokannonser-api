@@ -26,7 +26,7 @@ Easiest way to try out the API is to go to the [swagger page](https://jobsearch.
 But first you need a key which you need to authenticate yourself.
 
 ## Authentication
-For this API, you will need to register your own API key at [www.jobtechdev.se](https://www.jobtechdev.se/)
+For this API, you will need to register your own API key at [apirequest.jobtechdev.se](https://apirequest.jobtechdev.se)
 
 ## Endpoints
 Below we only show the URLs. If you prefer the curl command, you type it like:

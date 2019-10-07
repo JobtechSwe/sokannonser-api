@@ -110,7 +110,7 @@ class PBComplete(Resource):
         elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
-        freetext_query = args.get(settings.FREETEXT_QUERY, '')
+        freetext_query = args.get(settings.FREETEXT_QUERY) or ''
         args[settings.TYPEAHEAD_QUERY] = freetext_query
         args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
 

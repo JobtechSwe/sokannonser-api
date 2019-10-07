@@ -17,6 +17,7 @@ A good practice means making lots of varied calls initiated by real users.
 ## Short introduction
 
 The endpoints for the ads search API are:
+
 * [search](#Ad-Search) - returning ads matching a search phrase.
 * [complete](#Typeahead) - returning common words matching a search phrase. Useful for autocomplete.
 * [ad](#Ad) - returning the ad matching an id.

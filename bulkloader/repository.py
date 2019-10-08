@@ -11,7 +11,8 @@ from sokannonser.repository import elastic
 from sokannonser.rest.model.platsannons_results import job_ad
 
 log = logging.getLogger(__name__)
-marshaller = Namespace('Marhsaller')
+marshaller = Namespace('Marshaller')
+
 
 def _es_dsl():
     dsl = {
@@ -31,11 +32,6 @@ def _es_dsl():
                                 'gte': 'now/m'
                             }
                         }
-                    },
-                    {
-                        "term": {
-                            "removed": False
-                        }
                     }
                 ]
             }
@@ -49,6 +45,8 @@ def zip_ads(day, start_time=0):
         start_time = int(time.time() * 1000)
 
     dsl = _es_dsl()
+    index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
+        else settings.ES_INDEX
 
     if day == 'all':
         dsl['query']['bool']['must'] = [{"match_all": {}}]
@@ -65,11 +63,11 @@ def zip_ads(day, start_time=0):
             }
         }]
     log.debug('zip_ads, dsl: %s' % dsl)
-    scan_result = scan(elastic, dsl, index=settings.ES_INDEX)
+    scan_result = scan(elastic, dsl, index=index)
     in_memory = BytesIO()
     zf = zipfile.ZipFile(in_memory, "w", zipfile.ZIP_DEFLATED)
 
-    ads = [remove_sensitive_data(ad['_source']) for ad in scan_result]
+    ads = [ad['_source'] for ad in scan_result]
     log.debug("Number of ads: %d" % len(ads))
     zf.writestr(f"ads_{day}.json", json.dumps(ads))
     zf.close()
@@ -77,6 +75,11 @@ def zip_ads(day, start_time=0):
     log.debug("File constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
     return in_memory
+
+
+def _index_exists(idx_name):
+    return elastic.indices.exists_alias(name=[idx_name]) \
+           or elastic.indices.exists(index=[idx_name])
 
 
 def convert_to_timestamp(day):
@@ -104,6 +107,8 @@ def load_all(since):
         since = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
 
     ts = time.mktime(since.timetuple()) * 1000
+    index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
+        else settings.ES_INDEX
 
     dsl = _es_dsl()
     dsl['query']['bool']['must'] = [{
@@ -113,17 +118,18 @@ def load_all(since):
             }
         }
     }]
-    log.debug('load_all, dsl: %s' % dsl)
-    scan_result = scan(elastic, dsl, index=settings.ES_INDEX)
+    log.debug('load_all, dsl: %s' % json.dumps(dsl))
+    scan_result = scan(elastic, dsl, index=index)
     counter = 0
     yield '['
     for ad in scan_result:
         if counter > 0:
             yield ','
         source = ad['_source']
-        remove_sensitive_data(source)
-        yield json.dumps(format_ad(source))
-        # yield json.dumps(source)
+        if source.get('removed', False):
+            yield json.dumps(format_removed_ad(source))
+        else:
+            yield json.dumps(format_ad(source))
         counter += 1
     log.debug("Delivered %d ads as stream" % counter)
     yield ']'
@@ -134,17 +140,9 @@ def format_ad(ad_data):
     return ad_data
 
 
-def remove_sensitive_data(source):
-    try:
-        # Remove enriched
-        if 'keyword' in source:
-            del source['keywords']
-        # Remove personal number
-        org_nr = source['employer']['organization_number']
-        if org_nr and int(org_nr[2]) < 2:
-            source['employer']['organization_number'] = None
-    except KeyError:
-        pass
-    except ValueError:
-        pass
-    return source
+# @marshaller.marshal_with(removed_job_ad)
+def format_removed_ad(ad_data):
+    return {
+        'id': ad_data.get('id'), 'removed': ad_data.get('removed'),
+        'removed_date': ad_data.get('removed_date')
+    }

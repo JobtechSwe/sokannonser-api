@@ -26,6 +26,7 @@ class Ontology(object):
         self.concept_to_term = {}
         self.keyword_processor = KeywordProcessor()
         self.init_keyword_processor(self.keyword_processor)
+        self.extracted_locations = set()
         self.init_ontology(self.keyword_processor)
 
     def __len__(self):
@@ -53,6 +54,20 @@ class Ontology(object):
             if concept_preferred_label not in self.concept_to_term:
                 self.concept_to_term[concept_preferred_label] = []
             self.concept_to_term[concept_preferred_label].append(term_obj)
+
+        self.extracted_locations = self._load_locations_from_extracted()
+
+        for place in self.extracted_locations:
+            # Only complete keyword_processor with locations that are missing
+            # in narvalontology but exists in the ads, to avoid conflicts.
+            if not keyword_processor.get_keyword(place):
+                log.debug('Adding location from job ads to ontology: %s' % place)
+                place_obj = {'term': place, 'concept': place.capitalize(),
+                             'type': ttc.TextToConcept.LOCATION_KEY}
+                keyword_processor.add_keyword(place, place_obj)
+
+
+    def _load_locations_from_extracted(self):
         # Load locations
         query = {
             "aggs": {
@@ -91,18 +106,10 @@ class Ontology(object):
             },
             "size": 0
         }
-
         results = self.client.search(body=query, index=self.annons_index)
         buckets = results.get('aggregations', {}).get('locations', {}).get('buckets', [])
-        places = [p['key'] for p in buckets if not p['key'].isnumeric()]
-        for place in places:
-            if not keyword_processor.get_keyword(place):
-                log.debug('Adding location from job ads to ontology: %s' % place)
-                # Only add loctions that are missing in narvalontology
-                # but exists in the ads, to avoid conflicts.
-                place_obj = {'term': place, 'concept': place.capitalize(),
-                             'type': ttc.TextToConcept.LOCATION_KEY}
-                keyword_processor.add_keyword(place, place_obj)
+        extracted_locations = [p['key'] for p in buckets if not p['key'].isnumeric()]
+        return set(extracted_locations)
 
     @staticmethod
     def init_keyword_processor(keyword_processor):

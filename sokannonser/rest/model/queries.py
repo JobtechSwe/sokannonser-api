@@ -100,8 +100,7 @@ base_annons_query.add_argument(settings.X_FEATURE_FREETEXT_BOOL_METHOD, choices=
                                location='headers', required=False)
 
 base_annons_query.add_argument(settings.PUBLISHED_BEFORE,
-                               type=lambda x: datetime.strptime(x,
-                                                                    '%Y-%m-%dT%H:%M:%S'))
+                               type=lambda x: datetime.strptime(x, '%Y-%m-%dT%H:%M:%S'))
 # annons_complete_query.add_argument(settings.PUBLISHED_AFTER,
 #                                    type=lambda x: datetime.strptime(x,
 #                                                                     '%Y-%m-%dT%H:%M:%S'))

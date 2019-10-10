@@ -37,6 +37,8 @@ COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
 COMPANY_LOGO_FETCH_DISABLED = os.getenv('COMPANY_LOGO_FETCH_DISABLED', 'false').lower() == 'true'
 # Header parameters
 APIKEY = 'api-key'
+# Feature toggles
+X_FEATURE_FREETEXT_BOOL_METHOD = 'X-Feature-Freetext-Bool-Method'
 
 # Query parameters
 OFFSET = 'offset'
@@ -59,6 +61,8 @@ POSITION = 'position'
 POSITION_RADIUS = 'position.radius'
 DEFAULT_POSITION_RADIUS = 5
 EMPLOYER = 'employer'
+
+DEFAULT_FREETEXT_BOOL_METHOD = 'and'
 
 MAX_OFFSET = 2000
 MAX_LIMIT = 100

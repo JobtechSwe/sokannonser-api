@@ -34,7 +34,8 @@ class QueryBuilder(object):
 
         must_queries.append(
             self._build_freetext_query(args.get(settings.FREETEXT_QUERY),
-                                       args.get(settings.FREETEXT_FIELDS))
+                                       args.get(settings.FREETEXT_FIELDS),
+                                       args.get(settings.X_FEATURE_FREETEXT_BOOL_METHOD))
         )
         must_queries.append(self._build_employer_query(args.get(settings.EMPLOYER)))
         must_queries.append(self._build_yrkes_query(args.get(taxonomy.OCCUPATION),
@@ -296,7 +297,7 @@ class QueryBuilder(object):
         return word
 
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
-    def _build_freetext_query(self, querystring, queryfields):
+    def _build_freetext_query(self, querystring, queryfields, freetext_bool_method):
         if not querystring:
             return None
         if not queryfields:
@@ -305,7 +306,7 @@ class QueryBuilder(object):
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
         querystring = self._rewrite_querystring(querystring, concepts)
-        ft_query = self._create_base_ft_query(querystring)
+        ft_query = self._create_base_ft_query(querystring, freetext_bool_method)
 
         # Make all "musts" concepts "shoulds" as well
         for qf in queryfields:
@@ -355,9 +356,10 @@ class QueryBuilder(object):
         querystring = re.sub('\\s+', ' ', querystring).strip()
         return querystring
 
-    def _create_base_ft_query(self, querystring):
+    def _create_base_ft_query(self, querystring, method):
         # Creates a base query dict for "independent" freetext words
         # (e.g. words not found in text_to_concepts)
+        method = 'or' if method == 'or' else 'and'
         inc_words = ' '.join([w for w in querystring.split(' ')
                               if w and not w.startswith('+')
                               and not w.startswith('-')])
@@ -367,9 +369,9 @@ class QueryBuilder(object):
         exc_words = ' '.join([w[1:] for w in querystring.split(' ')
                               if w.startswith('-')
                               and w[1:].strip()])
-        shoulds = self._freetext_fields(inc_words) if inc_words else []
-        musts = self._freetext_fields(req_words) if req_words else []
-        mustnts = self._freetext_fields(exc_words) if exc_words else []
+        shoulds = self._freetext_fields(inc_words, method) if inc_words else []
+        musts = self._freetext_fields(req_words, method) if req_words else []
+        mustnts = self._freetext_fields(exc_words, method) if exc_words else []
 
         ft_query = {"bool": {}}
         # Add "common" words to query
@@ -466,13 +468,13 @@ class QueryBuilder(object):
 
         return query_dict
 
-    def _freetext_fields(self, searchword):
+    def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
         return [
             {
                 "multi_match": {
                     "query": searchword,
                     "type": "cross_fields",
-                    "operator": "and",
+                    "operator": method,
                     "fields": [f.HEADLINE+"^3", f.KEYWORDS_EXTRACTED+".employer^2",
                                f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
                                f.KEYWORDS_EXTRACTED+".location^5"]

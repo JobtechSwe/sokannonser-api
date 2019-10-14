@@ -133,7 +133,7 @@ def test_bugfix_reset_query_rewrite_location():
 
 
 
-# # @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_location_extracted_or_enriched():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -152,7 +152,7 @@ def test_freetext_query_location_extracted_or_enriched():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/search', headers=headers, data={'q': query_location,
-                                                                  'limit': '100'})
+                                                                  'limit': '0'})
         json_response = result.json
         # pprint(json_response)
 
@@ -161,7 +161,7 @@ def test_freetext_query_location_extracted_or_enriched():
         assert int(hits_total) >= 1
 
 
-# # @pytest.mark.skip(reason="Temporarily disabled")
+# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_location_extracted_or_enriched_or_freetext():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -178,7 +178,7 @@ def test_freetext_query_location_extracted_or_enriched_or_freetext():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/search', headers=headers, data={'q': query_location,
-                                                                  'limit': '100'})
+                                                                  'limit': '0'})
         json_response = result.json
         # pprint(json_response)
 
@@ -186,7 +186,7 @@ def test_freetext_query_location_extracted_or_enriched_or_freetext():
         print(hits_total)
         assert int(hits_total) >= 1
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_geo_param2():
     print('==================', sys._getframe().f_code.co_name, '================== ')

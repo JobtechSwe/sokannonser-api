@@ -226,7 +226,7 @@ def fetch_platsannons_logo(ad_id):
             mimetype=mimetype
         )
     else:
-        r = requests.get(logo_url, stream=True)
+        r = requests.get(logo_url, stream=True, timeout=1)
         return send_file(
             io.BytesIO(r.raw.read(decode_content=False)),
             attachment_filename=attachment_filename,

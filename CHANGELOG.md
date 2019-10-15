@@ -6,7 +6,8 @@ Changelog Application Jobsearch
 * Fixes plus/minus-searches in employer
 * Activates search in 'enriched' for location
 * Disables search in 'extracted' for locations fetched from job ads, to avoid conflicting terms.
-* Adds header X-Feature-Freetext-Bool-Method for choosing search method for unclassified freetext words.  
+* Adds header x-feature-freetext-bool-method for choosing search method for unclassified freetext words.  
+* Adds header x-feature-allow-empty-typeahead, enabling empty queries in typeahead. 
 
 ## 1.5.1
 * Bugfix reverting freetextsearch for locations in ad descriptions.

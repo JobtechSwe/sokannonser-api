@@ -111,8 +111,8 @@ class PBComplete(Resource):
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''
-        args[settings.TYPEAHEAD_QUERY] = freetext_query
-        args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
+        args[settings.TYPEAHEAD_QUERY] = freetext_query[0:500]
+        args[settings.FREETEXT_QUERY] = ' '.join(freetext_query[0:500].split(' ')[0:-1])
 
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         result = platsannonser.find_platsannonser(args, self.querybuilder)

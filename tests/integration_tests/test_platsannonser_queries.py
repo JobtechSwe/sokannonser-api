@@ -20,7 +20,7 @@ def test_freetext_query_one_param():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/search', headers=headers, data={'q': 'gymnasielärare',
-                                                                  'limit': '1'})
+                                                                  'limit': '0'})
         json_response = result.json
         # pprint(json_response)
         hits_total = json_response['total']['value']
@@ -29,16 +29,17 @@ def test_freetext_query_one_param():
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
-def test_freetext_query_misspelled_param():
+@pytest.mark.parametrize("typo", ['sjukssköterska', 'javasscript', 'montesori'])
+def test_freetext_query_misspelled_param(typo):
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         # result = testclient.get('/search', headers=headers, data={'q': 'sjukssköterska noggran javasscript',
-        #                                                           'limit': '1'})
-        result = testclient.get('/search', headers=headers, data={'q': 'sjukssköterska',
-                                                                  'limit': '1'})
+        #                                                           'limit': '0'})
+        result = testclient.get('/search', headers=headers, data={'q': typo,
+                                                                  'limit': '0'})
         json_response = result.json
         # pprint(json_response)
         hits_total = json_response['total']['value']
@@ -47,14 +48,15 @@ def test_freetext_query_misspelled_param():
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
-def test_freetext_query_synonym_param():
+@pytest.mark.parametrize("synonym", ['montessori'])
+def test_freetext_query_synonym_param(synonym):
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         # Note: Should get hits enriched with 'montessoripedagogik'.
-        result = testclient.get('/search', headers=headers, data={'q': 'montessori',
+        result = testclient.get('/search', headers=headers, data={'q': synonym,
                                                                   'limit': '1'})
         json_response = result.json
         # pprint(json_response)
@@ -64,14 +66,15 @@ def test_freetext_query_synonym_param():
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
-def test_freetext_query_with_special_characters():
+@pytest.mark.parametrize("special", ['c++', 'c#'])
+def test_freetext_query_with_special_characters(special):
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers, data={'q': 'c++',
-                                                                  'limit': '1'})
+        result = testclient.get('/search', headers=headers, data={'q': special,
+                                                                  'limit': '0'})
         json_response = result.json
         # pprint(json_response)
         hits_total = json_response['total']['value']
@@ -80,7 +83,8 @@ def test_freetext_query_with_special_characters():
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
-def test_freetext_query_geo_param():
+@pytest.mark.parametrize("geo", ['kista', 'gärdet', 'stockholm', 'skåne', 'värmland', 'örebro', 'örebro län', 'rissne'])
+def test_freetext_query_geo_param(geo):
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     #kista: 119 (46)
@@ -95,47 +99,39 @@ def test_freetext_query_geo_param():
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers, data={'q': 'gärdet',
-                                                                  'limit': '10'})
+        result = testclient.get('/search', headers=headers, data={'q': geo,
+                                                                  'limit': '0'})
         json_response = result.json
         # pprint(json_response)
 
         hits_total = json_response['total']['value']
-        print(hits_total)
-        assert int(hits_total) >= 1
+        # print(hits_total)
+        assert int(hits_total) > 0
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_bugfix_reset_query_rewrite_location():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    #kista: 119 (46)
-    #gärdet: 62 (8)
-    #råsunda: 8 (8)
-    #stockholm: 5826 (1196)
-    #skåne: 2718 (260)
-    #värmland: 103 (47)
-    #örebro: 351 (178)
-    #örebros län: 66 (66)
 
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/search', headers=headers, data={'q': 'rissne',
-                                                                  'limit': '100'})
+                                                                  'limit': '0'})
         json_response = result.json
         # pprint(json_response)
 
         hits_total = json_response['total']['value']
-        print(hits_total)
-        assert int(hits_total) >= 1
+        # print(hits_total)
+        assert int(hits_total) > 0
 
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
+# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
-def test_freetext_query_location_extracted_or_enriched():
+@pytest.mark.parametrize("geo", ['+trelleborg -stockholm ystad', 'kista kallhäll'])
+def test_freetext_query_location_extracted_or_enriched(geo):
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     # query_location = 'kista kallhäll'
@@ -144,24 +140,24 @@ def test_freetext_query_location_extracted_or_enriched():
     # query_location = 'rissne'
     # query_location = 'storlien'
     # query_location = 'fridhemsplan'
-    #query_location = 'skåne län'
-    query_location = '+trelleborg -stockholm ystad'
+    # query_location = 'skåne län'
+    # query_location = '+trelleborg -stockholm ystad'
     # query_location = 'skåne'
 
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers, data={'q': query_location,
+        result = testclient.get('/search', headers=headers, data={'q': geo,
                                                                   'limit': '0'})
         json_response = result.json
         # pprint(json_response)
 
         hits_total = json_response['total']['value']
         print(hits_total)
-        assert int(hits_total) >= 1
+        assert int(hits_total) > 0
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_location_extracted_or_enriched_or_freetext():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -183,8 +179,8 @@ def test_freetext_query_location_extracted_or_enriched_or_freetext():
         # pprint(json_response)
 
         hits_total = json_response['total']['value']
-        print(hits_total)
-        assert int(hits_total) >= 1
+        # print(hits_total)
+        assert int(hits_total) > 0
 
 @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration

@@ -229,7 +229,7 @@ class QueryBuilder(object):
             complete_fields = queries.QF_CHOICES.copy()
             complete_fields.remove('employer')
 
-        if complete_string:
+        if complete_string is not None:
             complete_string = self._rewrite_word_for_regex(complete_string)
             word_list = complete_string.split(' ')
             complete = word_list[-1]
@@ -244,7 +244,7 @@ class QueryBuilder(object):
                 base_field = f.KEYWORDS_EXTRACTED \
                     if field in ['employer'] else f.KEYWORDS_ENRICHED
 
-                if complete:
+                if complete is not None:
                     query_dsl['aggs']["complete_00_%s" % field] = {
                         "terms": {
                             "field": "%s.%s.raw" % (base_field, field),

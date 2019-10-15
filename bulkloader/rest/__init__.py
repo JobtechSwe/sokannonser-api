@@ -20,6 +20,5 @@ bulk_zip_query.add_argument(settings.DATE, type=inputs.regex(bulk_regex), requir
 
 bulk_stream_query = reqparse.RequestParser()
 bulk_stream_query.add_argument(settings.APIKEY, location='headers', required=True)
-bulk_stream_query.add_argument(settings.DATE,
-                               type=inputs.datetime_from_iso8601,
+bulk_stream_query.add_argument(settings.DATE, type=inputs.datetime_from_iso8601,
                                required=True)

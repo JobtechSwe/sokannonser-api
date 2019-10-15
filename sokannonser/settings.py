@@ -39,6 +39,7 @@ COMPANY_LOGO_FETCH_DISABLED = os.getenv('COMPANY_LOGO_FETCH_DISABLED', 'false').
 APIKEY = 'api-key'
 # Feature toggles
 X_FEATURE_FREETEXT_BOOL_METHOD = 'x-feature-freetext-bool-method'
+X_FEATURE_ALLOW_EMPTY_TYPEAHEAD = 'x-feature-allow-empty-typeahead'
 
 # Query parameters
 OFFSET = 'offset'

@@ -229,7 +229,7 @@ class QueryBuilder(object):
             complete_fields = queries.QF_CHOICES.copy()
             complete_fields.remove('employer')
 
-        if complete_string is not None:
+        if complete_string or args.get(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD):
             complete_string = self._rewrite_word_for_regex(complete_string)
             word_list = complete_string.split(' ')
             complete = word_list[-1]
@@ -244,7 +244,7 @@ class QueryBuilder(object):
                 base_field = f.KEYWORDS_EXTRACTED \
                     if field in ['employer'] else f.KEYWORDS_ENRICHED
 
-                if complete is not None:
+                if complete or args.get(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD):
                     query_dsl['aggs']["complete_00_%s" % field] = {
                         "terms": {
                             "field": "%s.%s.raw" % (base_field, field),
@@ -285,6 +285,8 @@ class QueryBuilder(object):
         return query_dsl
 
     def _rewrite_word_for_regex(self, word):
+        if word is None:
+            word = ''
         bad_chars = ['+', '.', '[', ']', '{', '}', '(', ')', '^', '$',
                      '*', '\\', '|', '?', '"', '\'', '&', '<', '>']
         if any(c in bad_chars for c in word):

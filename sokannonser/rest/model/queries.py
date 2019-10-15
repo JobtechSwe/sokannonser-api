@@ -99,8 +99,6 @@ base_annons_query.add_argument(settings.APIKEY, location='headers', required=Tru
 base_annons_query.add_argument(settings.X_FEATURE_FREETEXT_BOOL_METHOD, choices=['and', 'or'],
                                default=settings.DEFAULT_FREETEXT_BOOL_METHOD,
                                location='headers', required=False)
-base_annons_query.add_argument(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD,
-                               type=inputs.boolean, location='headers', required=False)
 base_annons_query.add_argument(settings.PUBLISHED_BEFORE,
                                type=lambda x: datetime.strptime(x, '%Y-%m-%dT%H:%M:%S'))
 # annons_complete_query.add_argument(settings.PUBLISHED_AFTER,
@@ -141,6 +139,10 @@ base_annons_query.add_argument(settings.FREETEXT_FIELDS, action='append',
 annons_complete_query = base_annons_query.copy()
 annons_complete_query.add_argument(settings.CONTEXTUAL_TYPEAHEAD, type=inputs.boolean,
                                    default=True)
+annons_complete_query.add_argument(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD,
+                                   type=inputs.boolean, location='headers',
+                                   required=False)
+
 
 pb_query = base_annons_query.copy()
 pb_query.add_argument(settings.MIN_RELEVANCE, type=float),

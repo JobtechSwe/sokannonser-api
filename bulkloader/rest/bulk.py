@@ -1,5 +1,6 @@
 import logging
 import time
+from datetime import datetime, timedelta
 from flask import send_file, Response
 from flask_restplus import Resource
 from jobtech.common.rest.decorators import check_api_key, check_api_key_and_return_metadata
@@ -44,13 +45,13 @@ class BulkZip(Resource):
 @ns_bulk.route('stream')
 class BulkLoad(Resource):
     method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
+    example_date = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M:%S")
 
     @ns_bulk.doc(
         params={
             settings.DATE: "Stream ads updated since datetime. "
             "Accepts datetime as YYYY-MM-DDTHH:MM:SS, "
-            "for example 2019-06-11T10:00:00. "
-            "Rate limit is one request per minute."
+            "for example %s. Rate limit is one request per minute." % example_date
         },
         responses={
             200: 'OK',

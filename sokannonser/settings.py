@@ -6,6 +6,7 @@ ES_PORT = os.getenv("ES_PORT", 9200)
 ES_USER = os.getenv("ES_USER")
 ES_PWD = os.getenv("ES_PWD")
 ES_INDEX = os.getenv("ES_INDEX", "platsannons-read")
+ES_STREAM_INDEX = os.getenv("ES_BULK_INDEX", "platsannons-stream")
 ES_AURANEST = os.getenv("ES_AURANEST", "auranest-read")
 ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy")
 
@@ -36,6 +37,9 @@ COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
 COMPANY_LOGO_FETCH_DISABLED = os.getenv('COMPANY_LOGO_FETCH_DISABLED', 'false').lower() == 'true'
 # Header parameters
 APIKEY = 'api-key'
+# Feature toggles
+X_FEATURE_FREETEXT_BOOL_METHOD = 'x-feature-freetext-bool-method'
+X_FEATURE_ALLOW_EMPTY_TYPEAHEAD = 'x-feature-allow-empty-typeahead'
 
 # Query parameters
 OFFSET = 'offset'
@@ -58,6 +62,8 @@ POSITION = 'position'
 POSITION_RADIUS = 'position.radius'
 DEFAULT_POSITION_RADIUS = 5
 EMPLOYER = 'employer'
+
+DEFAULT_FREETEXT_BOOL_METHOD = 'and'
 
 MAX_OFFSET = 2000
 MAX_LIMIT = 100

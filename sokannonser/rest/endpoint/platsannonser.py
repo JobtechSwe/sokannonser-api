@@ -1,6 +1,6 @@
 import logging
 import time
-from flask import request, Response
+from flask import request
 from flask_restplus import Resource
 from jobtech.common.rest.decorators import check_api_key_and_return_metadata
 from sokannonser import settings
@@ -101,7 +101,9 @@ class PBComplete(Resource):
         params={
             settings.CONTEXTUAL_TYPEAHEAD: "Set to false to disable contextual typeahead"
                                            " (default: true)",
-            **swagger_doc_params}
+            settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD: "Allow empty querystring in typeahead.",
+            **swagger_doc_params
+        }
     )
     @ns_platsannons.response(401, 'Invalid API-key')
     @ns_platsannons.expect(annons_complete_query)
@@ -110,16 +112,9 @@ class PBComplete(Resource):
         elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
-        # This could be prettier
-        contextual_typeahead = args.pop(settings.CONTEXTUAL_TYPEAHEAD) \
-            if settings.CONTEXTUAL_TYPEAHEAD in args else True
-        query_string = args.pop(settings.FREETEXT_QUERY) or ''
-        args[settings.TYPEAHEAD_QUERY] = query_string.lower()
-        args[settings.FREETEXT_QUERY] = ' '.join(query_string.split(' ')[0:-1])
-        if not contextual_typeahead:
-            args = {
-                settings.TYPEAHEAD_QUERY: query_string.split(' ')[-1].lower()
-            }
+        freetext_query = args.get(settings.FREETEXT_QUERY) or ''
+        args[settings.TYPEAHEAD_QUERY] = freetext_query[0:256]
+        args[settings.FREETEXT_QUERY] = ' '.join(freetext_query[0:256].split(' ')[0:-1])
 
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         result = platsannonser.find_platsannonser(args, self.querybuilder)

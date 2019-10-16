@@ -1,4 +1,4 @@
-# Stream API for job adds - getting started
+# Stream API for job ads - getting started
 
 The aim of this text is to walk you through what you're seeing in the [Swagger-UI](https://jobstream.api.jobtechdev.se) to give you can download all of the job ads we have. This is much better than using the search API to download all content.
 
@@ -13,6 +13,7 @@ The aim of this text is to walk you through what you're seeing in the [Swagger-U
 ## Short introduction
 
 The endpoints for the ads search API are:
+
 * [Stream](#Stream) - returning all active ads that have been updated after a given moment.
 
 Easiest way to try out the API is to go to the [swagger page](https://jobstream.api.jobtechdev.se/).

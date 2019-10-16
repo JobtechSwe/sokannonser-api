@@ -22,7 +22,8 @@ class QueryBuilder(object):
         query_dsl = self._bootstrap_query(args, x_fields)
 
         # Check for empty query
-        if not any(v is not None for v in args.values()):
+        if not any(v is not None for v in args.values()) \
+                or not args.get(settings.CONTEXTUAL_TYPEAHEAD, True):
             log.debug("Constructing match-all query")
             query_dsl['query']['bool']['must'].append({'match_all': {}})
             if 'sort' not in query_dsl:
@@ -33,7 +34,8 @@ class QueryBuilder(object):
 
         must_queries.append(
             self._build_freetext_query(args.get(settings.FREETEXT_QUERY),
-                                       args.get(settings.FREETEXT_FIELDS))
+                                       args.get(settings.FREETEXT_FIELDS),
+                                       args.get(settings.X_FEATURE_FREETEXT_BOOL_METHOD))
         )
         must_queries.append(self._build_employer_query(args.get(settings.EMPLOYER)))
         must_queries.append(self._build_yrkes_query(args.get(taxonomy.OCCUPATION),
@@ -227,7 +229,7 @@ class QueryBuilder(object):
             complete_fields = queries.QF_CHOICES.copy()
             complete_fields.remove('employer')
 
-        if complete_string:
+        if complete_string or args.get(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD):
             complete_string = self._rewrite_word_for_regex(complete_string)
             word_list = complete_string.split(' ')
             complete = word_list[-1]
@@ -240,9 +242,9 @@ class QueryBuilder(object):
 
             for field in complete_fields:
                 base_field = f.KEYWORDS_EXTRACTED \
-                    if field in ['location', 'employer'] else f.KEYWORDS_ENRICHED
+                    if field in ['employer'] else f.KEYWORDS_ENRICHED
 
-                if complete:
+                if complete or args.get(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD):
                     query_dsl['aggs']["complete_00_%s" % field] = {
                         "terms": {
                             "field": "%s.%s.raw" % (base_field, field),
@@ -283,6 +285,8 @@ class QueryBuilder(object):
         return query_dsl
 
     def _rewrite_word_for_regex(self, word):
+        if word is None:
+            word = ''
         bad_chars = ['+', '.', '[', ']', '{', '}', '(', ')', '^', '$',
                      '*', '\\', '|', '?', '"', '\'', '&', '<', '>']
         if any(c in bad_chars for c in word):
@@ -295,7 +299,7 @@ class QueryBuilder(object):
         return word
 
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
-    def _build_freetext_query(self, querystring, queryfields):
+    def _build_freetext_query(self, querystring, queryfields, freetext_bool_method):
         if not querystring:
             return None
         if not queryfields:
@@ -303,8 +307,8 @@ class QueryBuilder(object):
         querystring = ' '.join([w.strip(',.!?:; ') for w in querystring.split(' ')])
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
-        querystring = self._rewrite_querystring(querystring.lower(), concepts)
-        ft_query = self._create_base_ft_query(querystring)
+        querystring = self._rewrite_querystring(querystring, concepts)
+        ft_query = self._create_base_ft_query(querystring, freetext_bool_method)
 
         # Make all "musts" concepts "shoulds" as well
         for qf in queryfields:
@@ -328,7 +332,6 @@ class QueryBuilder(object):
                                 queryfields, 'must')
 
         # Add a headline query as well
-        ft_query = self._freetext_headline(ft_query, original_querystring)
         ft_query = self._freetext_headline(ft_query, original_querystring)
         return ft_query
 
@@ -355,9 +358,10 @@ class QueryBuilder(object):
         querystring = re.sub('\\s+', ' ', querystring).strip()
         return querystring
 
-    def _create_base_ft_query(self, querystring):
+    def _create_base_ft_query(self, querystring, method):
         # Creates a base query dict for "independent" freetext words
         # (e.g. words not found in text_to_concepts)
+        method = 'or' if method == 'or' else 'and'
         inc_words = ' '.join([w for w in querystring.split(' ')
                               if w and not w.startswith('+')
                               and not w.startswith('-')])
@@ -367,9 +371,9 @@ class QueryBuilder(object):
         exc_words = ' '.join([w[1:] for w in querystring.split(' ')
                               if w.startswith('-')
                               and w[1:].strip()])
-        shoulds = self._freetext_fields(inc_words) if inc_words else []
-        musts = self._freetext_fields(req_words) if req_words else []
-        mustnts = self._freetext_fields(exc_words) if exc_words else []
+        shoulds = self._freetext_fields(inc_words, method) if inc_words else []
+        musts = self._freetext_fields(req_words, method) if req_words else []
+        mustnts = self._freetext_fields(exc_words, method) if exc_words else []
 
         ft_query = {"bool": {}}
         # Add "common" words to query
@@ -424,33 +428,55 @@ class QueryBuilder(object):
                            querystring, concept_keys, bool_type):
         for key in concept_keys:
             dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
-            for value in [c['concept'].lower() for c in concepts.get(dict_key, []) if c]:
+            current_concepts = [c for c in concepts.get(dict_key, []) if c]
+            for concept in current_concepts:
                 if bool_type not in query_dict['bool']:
                     query_dict['bool'][bool_type] = []
 
-                base_field = f.KEYWORDS_EXTRACTED \
-                    if key in ['location', 'employer'] else f.KEYWORDS_ENRICHED
-                field = "%s.%s.raw" % (base_field, key)
-                query_dict['bool'][bool_type].append(
-                    {
-                        "term": {
-                            field: {
-                                "value": value,
-                                "boost": 10
+                base_fields = []
+                if key in ['location'] and bool_type != 'must':
+                    base_fields.append(f.KEYWORDS_EXTRACTED)
+                    base_fields.append(f.KEYWORDS_ENRICHED)
+                    # Add freetext search for location that does not exist
+                    # in extracted locations, for example 'kallhäll'.
+                    value = concept['term'].lower()
+                    if value not in ttc.ontology.extracted_locations:
+                        geo_ft_query = self._freetext_fields(value)
+                        query_dict['bool'][bool_type].append(geo_ft_query[0])
+                else:
+                    curr_base_field = f.KEYWORDS_EXTRACTED \
+                        if key in ['employer'] else f.KEYWORDS_ENRICHED
+                    base_fields.append(curr_base_field)
+
+                for base_field in base_fields:
+                    if base_field == f.KEYWORDS_EXTRACTED:
+                        value = concept['term'].lower()
+                        boost_value = 10
+                    else:
+                        value = concept['concept'].lower()
+                        boost_value = 9
+
+                    field = "%s.%s.raw" % (base_field, key)
+                    query_dict['bool'][bool_type].append(
+                        {
+                            "term": {
+                                field: {
+                                    "value": value,
+                                    "boost": boost_value
+                                }
                             }
                         }
-                    }
-                )
+                    )
 
         return query_dict
 
-    def _freetext_fields(self, searchword):
+    def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
         return [
             {
                 "multi_match": {
                     "query": searchword,
                     "type": "cross_fields",
-                    "operator": "and",
+                    "operator": method,
                     "fields": [f.HEADLINE+"^3", f.KEYWORDS_EXTRACTED+".employer^2",
                                f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
                                f.KEYWORDS_EXTRACTED+".location^5"]
@@ -461,14 +487,20 @@ class QueryBuilder(object):
     # Parses EMPLOYER
     def _build_employer_query(self, employers):
         if employers:
-            bool_segment = {"bool": {"should": []}}
+            bool_segment = {"bool": {"should": [], "must_not": [], "must": []}}
             for employer in employers:
+                negative_search = employer.startswith('-')
+                positive_search = employer.startswith('+')
+                bool_type = 'should'
+                if negative_search or positive_search:
+                    employer = employer[1:]
+                    bool_type = 'must_not' if negative_search else 'must'
                 if employer.isdigit():
-                    bool_segment['bool']['should'].append(
+                    bool_segment['bool'][bool_type].append(
                         {"prefix": {f.EMPLOYER_ORGANIZATION_NUMBER: employer}}
                     )
                 else:
-                    bool_segment['bool']['should'].append(
+                    bool_segment['bool'][bool_type].append(
                         {
                             "multi_match": {
                                 "query": " ".join(employers),

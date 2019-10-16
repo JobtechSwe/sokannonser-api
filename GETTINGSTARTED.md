@@ -1,4 +1,4 @@
-# Search API for job adds - getting started
+# Search API for job ads - getting started
 
 The aim of this text is to walk you through what you're seeing in the [Swagger-UI](https://jobsearch.api.jobtechdev.se) to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk load API](https://jobstream.api.jobtechdev.se)
 The search API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that don't fit the intended purpose of this API.
@@ -17,6 +17,7 @@ A good practice means making lots of varied calls initiated by real users.
 ## Short introduction
 
 The endpoints for the ads search API are:
+
 * [search](#Ad-Search) - returning ads matching a search phrase.
 * [complete](#Typeahead) - returning common words matching a search phrase. Useful for autocomplete.
 * [ad](#Ad) - returning the ad matching an id.
@@ -24,6 +25,8 @@ The endpoints for the ads search API are:
 
 Easiest way to try out the API is to go to the [swagger page](https://jobsearch.api.jobtechdev.se/).
 But first you need a key which you need to authenticate yourself.
+
+If you want to get all ads in a bulk, please use our [Stream API](https://jobtechdev.se/devguide/apis/jobstream.html).
 
 ## Authentication
 For this API, you will need to register to get your own API key at [apirequest.jobtechdev.se](https://apirequest.jobtechdev.se)
@@ -108,7 +111,7 @@ To help you find your way forward, here are some example of use cases:
 * [Getting all the jobs since date and time](#Getting-all-the-jobs-since-date-and-time)
 
 #### Searching for a particular job title
-The easiest way to get the adds that contain a specific word like a job title is to use a free text query (q) with the _Open-Search_ endpoint. This will give you ads with the specified word in either headline, ad description or place of work.
+The easiest way to get the ads that contain a specific word like a job title is to use a free text query (q) with the _Open-Search_ endpoint. This will give you ads with the specified word in either headline, ad description or place of work.
 
 Request URL
 
@@ -224,6 +227,6 @@ In the Swagger GUI it's possible to use the X-fields to define which fields to i
 
 
 ### Getting all the jobs since date and time
-A very common use case is COLLECT ALL THE ADDS. We don't want you to use the search API for this. It's expensive in terms of band width, CPU cycles and development time and it's not even guaranteed you'll get everything. Instead we'd like you to use our [bulk load API](https://jobstream.api.jobtechdev.se).
+A very common use case is COLLECT ALL THE ADS. We don't want you to use the search API for this. It's expensive in terms of bandwidth, CPU cycles and development time and it's not even guaranteed you'll get everything. Instead we'd like you to use our [Stream API](https://jobtechdev.se/devguide/apis/jobstream.html).
 
 

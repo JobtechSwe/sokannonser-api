@@ -15,6 +15,8 @@ OPTIONS_FULL = 'full'
 
 swagger_doc_params = {
     settings.APIKEY: "Required API key",
+    settings.X_FEATURE_FREETEXT_BOOL_METHOD: "Boolean method to use for unclassified "
+    "freetext words. Defaults to \"" + settings.DEFAULT_FREETEXT_BOOL_METHOD + "\".",
     settings.PUBLISHED_AFTER: "Fetch job ads published after specified date and time."
     "Accepts either datetime (format YYYY-mm-ddTHH:MM:SS) or number of minutes "
     "(e.g 120 means published in the last two hours)",
@@ -81,14 +83,23 @@ swagger_filter_doc_params = {
 }
 
 
+def lowercase(value):
+    if value is None:
+        raise ValueError('string type must be non-null')
+
+    return str(value).lower()
+
+
 load_ad_query = reqparse.RequestParser()
 load_ad_query.add_argument(settings.APIKEY, location='headers', required=True)
 
 base_annons_query = reqparse.RequestParser()
 base_annons_query.add_argument(settings.APIKEY, location='headers', required=True)
+base_annons_query.add_argument(settings.X_FEATURE_FREETEXT_BOOL_METHOD, choices=['and', 'or'],
+                               default=settings.DEFAULT_FREETEXT_BOOL_METHOD,
+                               location='headers', required=False)
 base_annons_query.add_argument(settings.PUBLISHED_BEFORE,
-                               type=lambda x: datetime.strptime(x,
-                                                                    '%Y-%m-%dT%H:%M:%S'))
+                               type=lambda x: datetime.strptime(x, '%Y-%m-%dT%H:%M:%S'))
 # annons_complete_query.add_argument(settings.PUBLISHED_AFTER,
 #                                    type=lambda x: datetime.strptime(x,
 #                                                                     '%Y-%m-%dT%H:%M:%S'))
@@ -120,13 +131,17 @@ base_annons_query.add_argument(settings.POSITION,
                                action='append')
 base_annons_query.add_argument(settings.POSITION_RADIUS, type=int, action='append')
 base_annons_query.add_argument(settings.EMPLOYER, action='append')
-base_annons_query.add_argument(settings.FREETEXT_QUERY)
+base_annons_query.add_argument(settings.FREETEXT_QUERY, type=lowercase)
 base_annons_query.add_argument(settings.FREETEXT_FIELDS, action='append',
                                choices=QF_CHOICES)
 
 annons_complete_query = base_annons_query.copy()
 annons_complete_query.add_argument(settings.CONTEXTUAL_TYPEAHEAD, type=inputs.boolean,
                                    default=True)
+annons_complete_query.add_argument(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD,
+                                   type=inputs.boolean, location='headers',
+                                   required=False)
+
 
 pb_query = base_annons_query.copy()
 pb_query.add_argument(settings.MIN_RELEVANCE, type=float),

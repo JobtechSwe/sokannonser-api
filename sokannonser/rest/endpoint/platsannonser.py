@@ -101,7 +101,9 @@ class PBComplete(Resource):
         params={
             settings.CONTEXTUAL_TYPEAHEAD: "Set to false to disable contextual typeahead"
                                            " (default: true)",
-            **swagger_doc_params}
+            settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD: "Allow empty querystring in typeahead.",
+            **swagger_doc_params
+        }
     )
     @ns_platsannons.response(401, 'Invalid API-key')
     @ns_platsannons.expect(annons_complete_query)

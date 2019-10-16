@@ -4,10 +4,9 @@ Changelog Application Jobsearch
 * Introduces new lowercase type for request parsing
 * Fixes a bug in context-unaware typeahead
 * Fixes plus/minus-searches in employer
-* Activates search in 'enriched' for location
-* Disables search in 'extracted' for locations fetched from job ads, to avoid conflicting terms.
 * Adds header x-feature-freetext-bool-method for choosing search method for unclassified freetext words.  
 * Adds header x-feature-allow-empty-typeahead, enabling empty queries in typeahead. 
+* Adds ML-enriched searches for location
 
 ## 1.5.1
 * Bugfix reverting freetextsearch for locations in ad descriptions.

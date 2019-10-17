@@ -66,7 +66,6 @@ class Ontology(object):
                              'type': ttc.TextToConcept.LOCATION_KEY}
                 keyword_processor.add_keyword(place, place_obj)
 
-
     def _load_locations_from_extracted(self):
         # Load locations
         query = {

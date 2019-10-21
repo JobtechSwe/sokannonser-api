@@ -27,6 +27,7 @@ class Ontology(object):
         self.keyword_processor = KeywordProcessor()
         self.init_keyword_processor(self.keyword_processor)
         self.locations = set()
+        self.extracted_locations = set()
         self.init_ontology(self.keyword_processor)
 
     def __len__(self):
@@ -115,6 +116,7 @@ class Ontology(object):
         ext_buckets = results.get('aggregations', {}).get('ext_locations', {}).get('buckets', [])
         enr_buckets = results.get('aggregations', {}).get('enr_locations', {}).get('buckets', [])
         found_locations = [p['key'] for p in ext_buckets if not p['key'].isnumeric()]
+        self.extracted_locations = set(found_locations)
         found_locations.extend([p['key'] for p in enr_buckets if not p['key'].isnumeric()])
         print("LOCATIONS", found_locations)
         return set(found_locations)

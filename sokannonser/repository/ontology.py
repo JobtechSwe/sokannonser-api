@@ -118,7 +118,6 @@ class Ontology(object):
         found_locations = [p['key'] for p in ext_buckets if not p['key'].isnumeric()]
         self.extracted_locations = set(found_locations)
         found_locations.extend([p['key'] for p in enr_buckets if not p['key'].isnumeric()])
-        print("LOCATIONS", found_locations)
         return set(found_locations)
 
     @staticmethod

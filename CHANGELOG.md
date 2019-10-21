@@ -1,5 +1,8 @@
 Changelog Application Jobsearch
 ===============================
+## 1.6.1
+* Adds ML enriched locations to typeahead
+
 ## 1.6.0
 * Introduces new lowercase type for request parsing
 * Fixes a bug in context-unaware typeahead

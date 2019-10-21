@@ -26,7 +26,7 @@ class Ontology(object):
         self.concept_to_term = {}
         self.keyword_processor = KeywordProcessor()
         self.init_keyword_processor(self.keyword_processor)
-        self.extracted_locations = set()
+        self.locations = set()
         self.init_ontology(self.keyword_processor)
 
     def __len__(self):
@@ -55,9 +55,9 @@ class Ontology(object):
                 self.concept_to_term[concept_preferred_label] = []
             self.concept_to_term[concept_preferred_label].append(term_obj)
 
-        self.extracted_locations = self._load_locations_from_extracted()
+        self.locations = self._load_locations()
 
-        for place in self.extracted_locations:
+        for place in self.locations:
             # Only complete keyword_processor with locations that are missing
             # in narvalontology but exists in the ads, to avoid conflicts.
             if not keyword_processor.get_keyword(place):
@@ -66,16 +66,22 @@ class Ontology(object):
                              'type': ttc.TextToConcept.LOCATION_KEY}
                 keyword_processor.add_keyword(place, place_obj)
 
-    def _load_locations_from_extracted(self):
+    def _load_locations(self):
         # Load locations
         query = {
             "aggs": {
-                "locations": {
+                "ext_locations": {
                     "terms": {
                         "field": "%s.location.raw" % fields.KEYWORDS_EXTRACTED,
                         "size": 20000
                     }
-                }
+                },
+                "enr_locations": {
+                    "terms": {
+                        "field": "%s.location.raw" % fields.KEYWORDS_ENRICHED,
+                        "size": 20000
+                    }
+                },
             },
             "query": {
                 "bool": {
@@ -106,9 +112,12 @@ class Ontology(object):
             "size": 0
         }
         results = self.client.search(body=query, index=self.annons_index)
-        buckets = results.get('aggregations', {}).get('locations', {}).get('buckets', [])
-        extracted_locations = [p['key'] for p in buckets if not p['key'].isnumeric()]
-        return set(extracted_locations)
+        ext_buckets = results.get('aggregations', {}).get('ext_locations', {}).get('buckets', [])
+        enr_buckets = results.get('aggregations', {}).get('enr_locations', {}).get('buckets', [])
+        found_locations = [p['key'] for p in ext_buckets if not p['key'].isnumeric()]
+        found_locations.extend([p['key'] for p in enr_buckets if not p['key'].isnumeric()])
+        print("LOCATIONS", found_locations)
+        return set(found_locations)
 
     @staticmethod
     def init_keyword_processor(keyword_processor):

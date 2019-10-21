@@ -65,7 +65,7 @@ def get_stats_for(taxonomy_type):
         },
         "aggs": {
             "antal_annonser": {
-                "terms": {"field": value_path[taxonomy_type[0]], "size": 50},
+                "terms": {"field": value_path[taxonomy_type[0]], "size": 5000},
             }
         }
     }

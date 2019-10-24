@@ -1,5 +1,11 @@
 Changelog Application Jobsearch
 ===============================
+
+## 1.7.0
+* Adds ML enriched locations to typeahead
+* Fixes a bug that wouldn't display number of ads for municipalities and regions in taxonomy search.
+* Adds header x-feature-include-synonyms-typeahead for choosing if enriched synonyms should be included in typeahead.
+
 ## 1.6.0
 * Introduces new lowercase type for request parsing
 * Fixes a bug in context-unaware typeahead

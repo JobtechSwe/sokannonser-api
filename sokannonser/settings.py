@@ -40,6 +40,7 @@ APIKEY = 'api-key'
 # Feature toggles
 X_FEATURE_FREETEXT_BOOL_METHOD = 'x-feature-freetext-bool-method'
 X_FEATURE_ALLOW_EMPTY_TYPEAHEAD = 'x-feature-allow-empty-typeahead'
+X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD = 'x-feature-include-synonyms-typeahead'
 
 # Query parameters
 OFFSET = 'offset'

@@ -141,6 +141,9 @@ annons_complete_query.add_argument(settings.CONTEXTUAL_TYPEAHEAD, type=inputs.bo
 annons_complete_query.add_argument(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD,
                                    type=inputs.boolean, location='headers',
                                    required=False)
+annons_complete_query.add_argument(settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD,
+                                   type=inputs.boolean, location='headers',
+                                   required=False)
 
 
 pb_query = base_annons_query.copy()

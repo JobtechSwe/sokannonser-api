@@ -102,6 +102,7 @@ class PBComplete(Resource):
             settings.CONTEXTUAL_TYPEAHEAD: "Set to false to disable contextual typeahead"
                                            " (default: true)",
             settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD: "Allow empty querystring in typeahead.",
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: "Include enriched synonyms in typeahead.",
             **swagger_doc_params
         }
     )

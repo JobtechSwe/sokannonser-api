@@ -26,8 +26,8 @@ def get_stats_for(taxonomy_type):
             fields.OCCUPATION_FIELD, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.SKILL: "%s.%s.keyword" % (fields.MUST_HAVE_SKILLS,
                                            fields.LEGACY_AMS_TAXONOMY_ID),
-        taxonomy.MUNICIPALITY: "%s.keyword" % fields.WORKPLACE_ADDRESS_MUNICIPALITY,
-        taxonomy.REGION: "%s.keyword" % fields.WORKPLACE_ADDRESS_REGION
+        taxonomy.MUNICIPALITY: "%s" % fields.WORKPLACE_ADDRESS_MUNICIPALITY_CODE,
+        taxonomy.REGION: "%s" % fields.WORKPLACE_ADDRESS_REGION_CODE
     }
     # Make sure we don't crash if we want to stat on missing type
     for tt in taxonomy_type:
@@ -65,7 +65,7 @@ def get_stats_for(taxonomy_type):
         },
         "aggs": {
             "antal_annonser": {
-                "terms": {"field": value_path[taxonomy_type[0]], "size": 50},
+                "terms": {"field": value_path[taxonomy_type[0]], "size": 5000},
             }
         }
     }

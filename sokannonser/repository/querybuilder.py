@@ -240,9 +240,12 @@ class QueryBuilder(object):
    
             size = 12/len(complete_fields)
 
+            enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+                settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+
             for field in complete_fields:
                 base_field = f.KEYWORDS_EXTRACTED \
-                    if field in ['employer'] else f.KEYWORDS_ENRICHED
+                    if field in ['employer'] else enriched_typeahead_field
 
                 if complete or args.get(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD):
                     query_dsl['aggs']["complete_00_%s" % field] = {

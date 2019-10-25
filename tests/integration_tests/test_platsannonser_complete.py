@@ -1,5 +1,6 @@
 import os
 import sys
+from pprint import pprint
 
 import pytest
 
@@ -9,8 +10,9 @@ from sokannonser import settings
 test_api_key = os.getenv('TEST_API_KEY')
 
 
-@pytest.mark.skip(reason="Temporarily disabled, needs values in field keywords.enriched_synonyms")
+# @pytest.mark.skip(reason="Temporarily disabled, needs values in field keywords.enriched_synonyms")
 @pytest.mark.integration
+@pytest.
 def test_complete_one_param_occupation():
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
@@ -18,7 +20,7 @@ def test_complete_one_param_occupation():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json',
                    settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: 'true'}
-        result = testclient.get('/complete', headers=headers, data={'q': 'servi'})
+        result = testclient.get('/complete', headers=headers, data={'q': 'servit'})
         json_response = result.json
         # pprint(json_response)
         assert 'typeahead' in json_response
@@ -29,7 +31,7 @@ def test_complete_one_param_occupation():
         assert len(complete_values) > 0
         # pprint(complete_values)
         assert 'servitris' in complete_values
-
+        assert 'servitör' in complete_values
 
 @pytest.mark.skip(reason="Temporarily disabled, needs values in field keywords.enriched_synonyms")
 @pytest.mark.integration
@@ -40,8 +42,7 @@ def test_complete_one_param_competence():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json',
                    settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: 'true'}
-        result = testclient.get('/complete', headers=headers, data={'q': 'angu',
-                                                                    'limit': '0'})
+        result = testclient.get('/complete', headers=headers, data={'q': 'angu'})
         json_response = result.json
         # pprint(json_response)
         assert 'typeahead' in json_response
@@ -64,8 +65,7 @@ def test_complete_two_params():
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json',
                    settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: 'true'}
-        result = testclient.get('/complete', headers=headers, data={'q': 'systemutvecklare angu',
-                                                                    'limit': '0'})
+        result = testclient.get('/complete', headers=headers, data={'q': 'systemutvecklare angu'})
         json_response = result.json
         # pprint(json_response)
         assert 'typeahead' in json_response

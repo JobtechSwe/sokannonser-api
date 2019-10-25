@@ -12,15 +12,18 @@ test_api_key = os.getenv('TEST_API_KEY')
 
 # @pytest.mark.skip(reason="Temporarily disabled, needs values in field keywords.enriched_synonyms")
 @pytest.mark.integration
-@pytest.
-def test_complete_one_param_occupation():
+@pytest.mark.parametrize("synonym, expected",
+                         [('servit', ['servitris', 'servitör']),
+                          ('systemutvecklare angu', ['angular', 'angularjs']),
+                          ('angu', ['angular', 'angularjs'])])
+def test_complete_one_param_occupation(synonym, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json',
                    settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: 'true'}
-        result = testclient.get('/complete', headers=headers, data={'q': 'servit'})
+        result = testclient.get('/complete', headers=headers, data={'q': synonym})
         json_response = result.json
         # pprint(json_response)
         assert 'typeahead' in json_response
@@ -30,8 +33,9 @@ def test_complete_one_param_occupation():
 
         assert len(complete_values) > 0
         # pprint(complete_values)
-        assert 'servitris' in complete_values
-        assert 'servitör' in complete_values
+        for exp in expected:
+            assert exp in complete_values
+
 
 @pytest.mark.skip(reason="Temporarily disabled, needs values in field keywords.enriched_synonyms")
 @pytest.mark.integration

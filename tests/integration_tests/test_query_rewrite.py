@@ -77,13 +77,13 @@ def test_rewrite_jobtitle_with_hyphen():
 def test_rewrite_competence_special_characters():
     print('\n==================', sys._getframe().f_code.co_name, '==================')
 
-    concepts = text_to_concept.text_to_concepts('java c++ .net c# c-level')
+    concepts = text_to_concept.text_to_concepts('java c++ .net microsoft visual c++ c-sharp c-level')
     # pprint(concepts)
     assert_not_empty(concepts, 'skill')
     assert 'java' in [c['concept'].lower() for c in concepts['skill']]
     assert 'c++' in [c['concept'].lower() for c in concepts['skill']]
     assert '.net' in [c['concept'].lower() for c in concepts['skill']]
-    assert 'c-sharp' in [c['concept'].lower() for c in concepts['skill']]
+    assert 'visual c++' in [c['concept'].lower() for c in concepts['skill']]
     assert 'c' not in [c['concept'].lower() for c in concepts['skill']]
 
 

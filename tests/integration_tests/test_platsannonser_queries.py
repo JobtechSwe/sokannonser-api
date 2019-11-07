@@ -11,6 +11,21 @@ from sokannonser.rest.model import fields
 test_api_key = os.getenv('TEST_API_KEY')
 
 
+@pytest.mark.skip(reason="Temporarily disabled. Needs fix according to Trello Card #137, Multipla ord i ett yrke")
+@pytest.mark.integration
+def test_freetext_query_ssk():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        result = testclient.get('/search', headers=headers, data={'q': 'stockholm grundutbildad sjuksköterska',
+                                                                  'limit': '0'})
+        json_response = result.json
+        # pprint(json_response)
+        hits_total = json_response['total']['value']
+        assert int(hits_total) > 0
+
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_one_param():

@@ -3,6 +3,7 @@ Changelog Application Jobsearch
 
 ## 1.7.1
 * Fix for terms containing hash/# in typeahead
+* Changed relevance sort order to have descending publication date as secondary
 
 ## 1.7.0
 * Adds ML enriched locations to typeahead

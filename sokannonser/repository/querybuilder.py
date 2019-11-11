@@ -252,7 +252,7 @@ class QueryBuilder(object):
                         "terms": {
                             "field": "%s.%s.raw" % (base_field, field),
                             "size": size,
-                            "include": "%s.*" % complete
+                            "include": "%s.*" % self.escape_special_chars_for_complete(complete)
                         }
                     }
                 x = 1
@@ -263,7 +263,7 @@ class QueryBuilder(object):
                             "terms": {
                                 "field": "%s.%s.raw" % (base_field, field),
                                 "size": size,
-                                "include": "%s.*" % ngram
+                                "include": "%s.*" % self.escape_special_chars_for_complete(ngram)
                             }
                         }
                         x += 1
@@ -272,6 +272,17 @@ class QueryBuilder(object):
         else:
             query_dsl['sort'] = ["_score", {f.ID: "asc"}]
         return query_dsl
+
+    def escape_special_chars_for_complete(self, inputstr):
+        escaped_str = inputstr
+        chars_to_escape = ['#']
+
+        for char in chars_to_escape:
+            if char in inputstr:
+                escaped_str = inputstr.replace(char, '[%s]' % char)
+        return escaped_str
+
+
 
     def _calculate_utc_offset(self):
         is_dst = time.daylight and time.localtime().tm_isdst > 0

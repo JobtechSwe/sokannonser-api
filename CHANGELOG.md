@@ -1,6 +1,10 @@
 Changelog Application Jobsearch
 ===============================
 
+## 1.7.1
+* Fix for terms containing hash/# in typeahead
+* Changed relevance sort order to have descending publication date as secondary
+
 ## 1.7.0
 * Adds ML enriched locations to typeahead
 * Fixes a bug that wouldn't display number of ads for municipalities and regions in taxonomy search.

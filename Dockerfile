@@ -2,9 +2,8 @@ FROM alpine:edge
 
 EXPOSE 8081
 
-RUN apk update && \
+RUN apk update && apk upgrade && \
     apk add --no-cache --update \
-        supervisor \
         uwsgi-python3 \
         python3 \
         nginx \
@@ -38,6 +37,8 @@ RUN date +"%Y-%m-%dT%H:%M:%S %Z" && \
 
 WORKDIR /app
 
+RUN python3 -m pip install --upgrade setuptools
+RUN python3 -m pip install supervisor 
 # RUN pip3 install --no-cache-dir -r requirements.txt
 # delete all __pycache__-folders in tests-folder
 # runs unit tests with @pytest.mark.unit annotation only

@@ -75,7 +75,7 @@ KEYWORDS_ENRICHED_SYNONYMS = 'keywords.enriched_synonyms'
 KEYWORDS_EXTRACTED = 'keywords.extracted'
 
 sort_options = {
-    'relevance': ["_score", {ID: "asc"}],
+    'relevance': ["_score", {PUBLICATION_DATE: "desc"}],
     'pubdate-desc': [{PUBLICATION_DATE: "desc"}, "_score", {ID: "asc"}],
     'pubdate-asc':  [{PUBLICATION_DATE: "asc"}, "_score",  {ID: "asc"}],
     'applydate-desc': [{APPLICATION_DEADLINE: "desc"}, "_score", {ID: "asc"}],

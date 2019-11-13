@@ -1,6 +1,9 @@
 Changelog Application Jobsearch
 ===============================
 
+## 1.7.2
+* Comma treated as delimiter in freetext queries
+
 ## 1.7.1
 * Fix for terms containing hash/# in typeahead
 * Changed relevance sort order to have descending publication date as secondary

@@ -283,7 +283,6 @@ class QueryBuilder(object):
         return escaped_str
 
 
-
     def _calculate_utc_offset(self):
         is_dst = time.daylight and time.localtime().tm_isdst > 0
         utc_offset = - (time.altzone if is_dst else time.timezone)
@@ -318,7 +317,7 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES.copy()
-        querystring = ' '.join([w.strip(',.!?:; ') for w in querystring.split(' ')])
+        querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
         querystring = self._rewrite_querystring(querystring, concepts)

@@ -344,22 +344,28 @@ class QueryBuilder(object):
         self._freetext_concepts(ft_query, concepts, querystring,
                                 queryfields, 'must')
 
-        # Add a headline query as well
-        ft_query = self._freetext_headline(ft_query, original_querystring)
+        location_concepts = {
+            'location': concepts['location'],
+            'location_must': concepts['location_must']
+        }
+        original_querystring_without_location = self._rewrite_querystring(original_querystring,
+                                                                          location_concepts)
+        ft_query = self._freetext_headline_and_employer(ft_query, original_querystring,
+                                                        original_querystring_without_location)
         return ft_query
 
     # Removes identified concepts from querystring
     def _rewrite_querystring(self, querystring, concepts):
         # Sort all concepts by string length
-        all_concepts = sorted(concepts['occupation'] +
-                              concepts['occupation_must'] +
-                              concepts['occupation_must_not'] +
-                              concepts['skill'] +
-                              concepts['skill_must'] +
-                              concepts['skill_must_not'] +
-                              concepts['location'] +
-                              concepts['location_must'] +
-                              concepts['location_must_not'],
+        all_concepts = sorted(concepts.get('occupation', []) +
+                              concepts.get('occupation_must', []) +
+                              concepts.get('occupation_must_not', []) +
+                              concepts.get('skill', []) +
+                              concepts.get('skill_must', []) +
+                              concepts.get('skill_must_not', []) +
+                              concepts.get('location', []) +
+                              concepts.get('location_must', []) +
+                              concepts.get('location_must_not', []),
                               key=lambda c: len(c),
                               reverse=True)
         # Remove found concepts from querystring
@@ -402,7 +408,8 @@ class QueryBuilder(object):
             ft_query['bool']['must_not'] = mustnts
         return ft_query
 
-    def _freetext_headline(self, query_dict, querystring):
+    def _freetext_headline_and_employer(self, query_dict, querystring,
+                                        qs_without_location):
         # Remove plus and minus from querystring for headline search
         querystring = re.sub(r'(^| )[\\+]{1}', ' ', querystring)
         querystring = ' '.join([word for word in querystring.split(' ')
@@ -422,16 +429,17 @@ class QueryBuilder(object):
                             }
                         }
                     })
-                should['bool']['should'].append(
-                    {
-                        "match": {
-                            f.KEYWORDS_EXTRACTED+".employer": {
-                                "query": querystring.strip(),
-                                "operator": "and",
-                                "boost": 1
+                if qs_without_location:
+                    should['bool']['should'].append(
+                        {
+                            "match": {
+                                f.KEYWORDS_EXTRACTED+".employer": {
+                                    "query": qs_without_location.strip(),
+                                    "operator": "and",
+                                    "boost": 1
+                                }
                             }
-                        }
-                    })
+                        })
             except KeyError:
                 log.error("No bool clause for headline query")
 

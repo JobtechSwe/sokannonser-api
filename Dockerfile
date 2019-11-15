@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM alpine:3.10
 
 EXPOSE 8081
 

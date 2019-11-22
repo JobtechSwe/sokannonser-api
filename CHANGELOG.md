@@ -3,6 +3,7 @@ Changelog Application Jobsearch
 
 ## 1.7.2
 * Comma treated as delimiter in freetext queries
+* Fixes a bug that caused the employer field to be queried when it shouldn't
 
 ## 1.7.1
 * Fix for terms containing hash/# in typeahead

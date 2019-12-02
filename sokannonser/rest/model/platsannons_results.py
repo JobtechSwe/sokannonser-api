@@ -36,7 +36,6 @@ class LogoUrl(fields.Raw):
             return "%s/ad/%s/logo" % (settings.BASE_URL, value)
 
 
-
 taxonomy_item = ns_platsannons.model('JobTechTaxonomyItem', {
     'concept_id': fields.String(),
     'label': fields.String(),
@@ -102,7 +101,7 @@ job_ad = ns_platsannons.model('JobAd', {
     f.ID: fields.String(),
     f.EXTERNAL_ID: fields.String(),
     f.AD_URL: AdUrl(attribute='id'),
-    f.LOGO_URL: LogoUrl(attribute='id'),
+    f.LOGO_URL: fields.String(),
     f.HEADLINE: fields.String(),
     f.APPLICATION_DEADLINE: fields.DateTime(),
     f.NUMBER_OF_VACANCIES: fields.Integer(),

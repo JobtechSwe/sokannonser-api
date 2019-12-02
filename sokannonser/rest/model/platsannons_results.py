@@ -28,14 +28,6 @@ class AdUrl(fields.Raw):
             return "%s/%s" % (settings.BASE_PB_URL, value)
 
 
-class LogoUrl(fields.Raw):
-    def format(self, value):
-        if settings.BASE_URL[-1] == '/':
-            return "%sad/%s/logo" % (settings.BASE_URL, value)
-        else:
-            return "%s/ad/%s/logo" % (settings.BASE_URL, value)
-
-
 taxonomy_item = ns_platsannons.model('JobTechTaxonomyItem', {
     'concept_id': fields.String(),
     'label': fields.String(),

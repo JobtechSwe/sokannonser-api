@@ -27,7 +27,7 @@ class Proxy(Resource):
     @ns_platsannons.expect(load_ad_query)
     @ns_platsannons.marshal_with(job_ad)
     def get(self, id, *args, **kwargs):
-        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         return platsannonser.fetch_platsannons(str(id))
 
 
@@ -54,7 +54,7 @@ class Search(Resource):
     @ns_platsannons.expect(pb_query)
     @ns_platsannons.marshal_with(open_results)
     def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         start_time = int(time.time()*1000)
         args = pb_query.parse_args()
         log.debug("Query parsed after %d milliseconds."
@@ -110,7 +110,7 @@ class Complete(Resource):
     @ns_platsannons.expect(annons_complete_query)
     @ns_platsannons.marshal_with(typeahead_results)
     def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''

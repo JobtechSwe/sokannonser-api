@@ -339,17 +339,8 @@ class QueryBuilder(object):
         self._freetext_concepts(ft_query, concepts, querystring,
                                 queryfields, 'must_not')
 
-        # Add required concepts to query
-        # self._freetext_concepts(ft_query, concepts, querystring,
-        #                         queryfields, 'must')
-        #
-        # location_concepts = {
-        #     'location': concepts['location'],
-        #     'location_must': concepts['location_must']
-        # }
-        # original_querystring_without_location = self._rewrite_querystring(original_querystring,
-        #                                                                   location_concepts)
         ft_query = self._freetext_headline(ft_query, original_querystring)
+        print(ft_query)
         return ft_query
 
     # Removes identified concepts from querystring
@@ -379,9 +370,14 @@ class QueryBuilder(object):
         # Creates a base query dict for "independent" freetext words
         # (e.g. words not found in text_to_concepts)
         method = 'or' if method == 'or' else 'and'
+        suffix_words = ' '.join([w[1:] for w in querystring.split(' ')
+                                 if w.startswith('*')])
+        prefix_words = ' '.join([w[:-1] for w in querystring.split(' ')
+                                 if w and w.endswith('*')])
         inc_words = ' '.join([w for w in querystring.split(' ')
                               if w and not w.startswith('+')
-                              and not w.startswith('-')])
+                              and not w.startswith('-') and not w.startswith('*')
+                              and not w.endswith('*')])
         req_words = ' '.join([w[1:] for w in querystring.split(' ')
                               if w.startswith('+')
                               and w[1:].strip()])
@@ -394,23 +390,56 @@ class QueryBuilder(object):
 
         ft_query = {"bool": {}}
         # Add "common" words to query
+        if shoulds or musts or prefix_words or suffix_words:
+            ft_query['bool']['must'] = []
         if shoulds:
             # Include all "must" words in should, to make sure any single "should"-word
             # not becomes exclusive
             if 'must' not in ft_query['bool']:
                 ft_query['bool']['must'] = []
             ft_query['bool']['must'].append({"bool": {"should": shoulds + musts}})
+        # Wildcards after shoulds so they dont end up there
+        if prefix_words:
+            musts.append(self._freetext_wildcard(prefix_words, "prefix", method))
+        if suffix_words:
+            musts.append(self._freetext_wildcard(suffix_words, "suffix", method))
         if musts:
-            ft_query['bool']['must'] = musts
+            ft_query['bool']['must'].append({"bool": {"must": musts}})
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
         return ft_query
+
+    def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
+        return [
+            {
+                "multi_match": {
+                    "query": searchword,
+                    "type": "cross_fields",
+                    "operator": method,
+                    "fields": [f.HEADLINE+"^3", f.KEYWORDS_EXTRACTED+".employer^2",
+                               f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
+                               f.KEYWORDS_EXTRACTED+".location^5"]
+                }
+            }
+        ]
+
+    def _freetext_wildcard(self, searchword, wildcard_side, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
+        return [
+            {
+                "multi_match": {
+                    "query": searchword,
+                    "type": "cross_fields",
+                    "operator": method,
+                    "fields": [f.HEADLINE+"."+wildcard_side, f.DESCRIPTION_TEXT+"."+wildcard_side]
+                }
+            }
+        ]
 
     def _freetext_headline(self, query_dict, querystring):
         # Remove plus and minus from querystring for headline search
         querystring = re.sub(r'(^| )[\\+]{1}', ' ', querystring)
         querystring = ' '.join([word for word in querystring.split(' ')
-                                if not word.startswith('-')])
+                                if not word.startswith('-') and not word.startswith('*') and not word.endswith('*')])
         if 'must' not in query_dict['bool']:
             query_dict['bool']['must'] = []
 
@@ -476,20 +505,6 @@ class QueryBuilder(object):
                     )
 
         return query_dict
-
-    def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
-        return [
-            {
-                "multi_match": {
-                    "query": searchword,
-                    "type": "cross_fields",
-                    "operator": method,
-                    "fields": [f.HEADLINE+"^3", f.KEYWORDS_EXTRACTED+".employer^2",
-                               f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
-                               f.KEYWORDS_EXTRACTED+".location^5"]
-                }
-            }
-        ]
 
     # Parses EMPLOYER
     def _build_employer_query(self, employers):

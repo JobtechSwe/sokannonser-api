@@ -42,7 +42,7 @@ class AdLogo(Resource):
 
 
 @ns_platsannons.route('search')
-class PBSearch(Resource):
+class Search(Resource):
     method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 
@@ -92,7 +92,7 @@ class PBSearch(Resource):
 
 
 @ns_platsannons.route('complete')
-class PBComplete(Resource):
+class Complete(Resource):
     method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 

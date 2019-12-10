@@ -3,7 +3,6 @@ from sokannonser.rest import ns_platsannons
 from sokannonser import settings
 from sokannonser.rest.model import fields as f
 
-# Platsannonser
 resultat_plats = ns_platsannons.model('Plats', {
     'id': fields.String(attribute='id'),
     'namn': fields.String(attribute='label')
@@ -19,6 +18,18 @@ resultat_taxonomi = ns_platsannons.model('TaxonomiEntitet', {
     'term': fields.String()
 })
 
+typeahead_item = ns_platsannons.model('TypeaheadItem', {
+    'value': fields.String(),
+    'found_phrase': fields.String(),
+    'type': fields.String(),
+    'occurrences': fields.Integer()
+})
+
+typeahead_results = ns_platsannons.model('TypeaheadResults', {
+    'time_in_millis': fields.Integer(),
+    'typeahead': fields.List(fields.Nested(typeahead_item))
+})
+
 
 class AdUrl(fields.Raw):
     def format(self, value):
@@ -28,6 +39,7 @@ class AdUrl(fields.Raw):
             return "%s/%s" % (settings.BASE_PB_URL, value)
 
 
+# Result model v1
 taxonomy_item = ns_platsannons.model('JobTechTaxonomyItem', {
     'concept_id': fields.String(),
     'label': fields.String(),
@@ -166,14 +178,4 @@ open_results = ns_platsannons.model('SearchResults', {
     'hits': fields.List(fields.Nested(job_ad_searchresult), attribute='hits', skip_none=True)
 })
 
-typeahead_item = ns_platsannons.model('TypeaheadItem', {
-    'value': fields.String(),
-    'found_phrase': fields.String(),
-    'type': fields.String(),
-    'occurrences': fields.Integer()
-})
-
-typeahead_results = ns_platsannons.model('TypeaheadResults', {
-    'time_in_millis': fields.Integer(),
-    'typeahead': fields.List(fields.Nested(typeahead_item))
-})
+# Resultmodel v2 JobPosting

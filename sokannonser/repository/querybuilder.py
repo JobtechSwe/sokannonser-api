@@ -282,7 +282,6 @@ class QueryBuilder(object):
                 escaped_str = inputstr.replace(char, '[%s]' % char)
         return escaped_str
 
-
     def _calculate_utc_offset(self):
         is_dst = time.daylight and time.localtime().tm_isdst > 0
         utc_offset = - (time.altzone if is_dst else time.timezone)

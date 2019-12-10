@@ -1,94 +1,101 @@
 # Sök Annonser API
-Skapa separat virtual environment för projektet (Virtualenv, Conda)
+This repository contains code for both JobSearch and JobStream APIs.
 
-## Installation och körning (rekommenderar starkt att skapa en virtualenv eller anaconda-env innan).
+## Requirements
+* Python 3.7+
+* Access to a host or server running Elasticsearch
 
-**OBS!** 
-Om du ska utveckla i valuestore-modulen behöver du först checka ut den i sitt eget repo och följa instruktionerna i README.
+## Environment variables
 
-När du står i projektets rot-katalog:
+The application is entirely configured using environment variables. 
 
-    $ pip install -r requirements.txt
-    $ python setup.py develop
-    $ export FLASK_APP=sokannonser
-    $ export FLASK_ENV=development
-    $ flask run
+Default values are provided with the listing.
 
-Gå till http://localhost:5000 för att testa med Swagger-API:et.
-
-## Alternativt
-
-Bygg en docker-image:
-
-    $ sudo docker build -t sokannonser:latest .
-    $ sudo docker run -d -p 80:8081 sokannonser
-
-Gå till http://localhost:80 för att testa med Swagger-API:et.
-
-
-## Miljövariabler
-
-Det finns en rad miljövariabler som kan sättas som kontrollerar både Flask och själva Sök-Annonser-applikationen.
-
-Default-värdena är satta i beskrivningen
-
-### Applikationskonfiguration
-
+### Application configuration
 
     ES_HOST=localhost
 
-Anger vilken Elasticsearch-host som ska användas.
+Specifies which elastic search host to use for searching.
 
     ES_PORT=9200
    
-Väljer vilken port som användas för Elasticsearch
+Port number to use for elastic search
 
-    ES_INDEX=platsannons
+    ES_INDEX=platsannons-read
     
-Elasticsearchindex som innehåller sökbara platsannonser
+Specifies which index to search ads from (JobSearch)
+
+    ES_USER
+    
+Sets username for elastic search (no default value)
+
+    ES_PWD
+    
+Sets password for elastic search (no default value)
+
+    ES_STREAM_INDEX=platsannons-stream
+    
+Specifies which index to stream ads from (JobStream)
 
     ES_TAX_INDEX=taxonomy
     
-Elasticsearchindex som innehåller taxonomins värdeförråd
+Specifies which index contains taxonomy information.
+
+    ES_SYSTEM_INDEX=apikeys
+    
+Specifies which index contains api keys.
 
 ### Flask
 
     FLASK_APP
 
-Namnet på applikationen. Bör sättas till "sokannonser". (Se ovan)
+The name of the application. Set to "sokannonser" for JobSearch or "bulkloader" for JobStream.
 
-    FLASK_ENV=production
+    FLASK_ENV
     
-Kan med fördel sättas till development under utveckling. Ändrar defaultvärdet för nästa parameter (FLASK_DEBUG) till True.
+Set to "development" for development. 
 
-    FLASK_DEBUG=False
-   
-Ger debugmeddelanden vid fel.
+### APM and debug settings
 
-### Test
+In order to use APM, the following environment variables must be set.
 
-## Köra unittester
+    APM_SERVICE_NAME
+    APM_SERVICE_URL
+    APM_SECRET
+    APM_LOG_LEVEL
+    
+## Installation and running
+
+To start up the application, set the appropriate environment variables as described above. 
+Then run the following commands.
+
+    $ pip install -r requirements.txt
+    $ export FLASK_APP=sokannonser
+    $ export FLASK_ENV=development
+    $ flask run
+
+Go to http://localhost:5000 to access the swagger API
+
+## Test
+
+### Run unit test
 
     $ python3 -m pytest -svv -m unit tests/unit_tests
     
-    
-## Köra integrationstester    
-Skapa fil /sokannonser-api/tests/integration_tests/pytest_secrets.env
-...och lägg in följande rader i pytest_secrets.env samt byt ut <värde> till faktiska usernames och password etc:
-ES_USER=<elastic username>
-ES_PWD=<elastic password>
-ES_HOST=<elastic host, utan protokoll och port>
-ES_PORT=9243
-TEST_API_KEY=<api key>
+### Köra integrationstester    
+
+When running integration tests, an actual application is started,
+so you need to specify environment variables for elastic search in order for it to run properly.
 
     $ python3 -m pytest -svv -ra -m integration tests/integration_tests
 
     
 ### Test coverage
+    
 https://pytest-cov.readthedocs.io/en/latest/
-python3 -m pytest -svv -ra -m unit --cov=. tests/unit_tests
 
-För att lägga till coverage i IntelliJ, gå till menyn IntelliJ IDEA/Preferences/
-Välj menyn Tools/Python Integrated Tools och för Default test runner, välj py.test.
-Högerklicka därefter på katalogen sokannonser-api/tests och välj "Run py.test with coverage"
+    $ python3 -m pytest -svv -ra -m unit --cov=. tests/unit_tests
 
+
+## Using Docker
+TBW

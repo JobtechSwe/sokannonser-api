@@ -6,7 +6,7 @@ from operator import itemgetter
 import json
 
 import pytest
-from sokannonser.rest.endpoint.platsannonser import PBSearch
+from sokannonser.rest.endpoint.platsannonser import Search
 from sokannonser import settings
 from sokannonser.repository.querybuilder import QueryBuilder
 from sokannonser.repository.platsannonser import transform_platsannons_query_result
@@ -32,7 +32,7 @@ def test_properties_and_types_marshal_mocked_elastic_result():
 
     args = {settings.FREETEXT_QUERY: False, settings.STATISTICS: False}
 
-    pbsearch = PBSearch()
+    pbsearch = Search()
     querybuilder = QueryBuilder()
 
     query_result = transform_platsannons_query_result(args, esresult, querybuilder)
@@ -108,7 +108,7 @@ def test_values_marshal_mocked_elastic_result():
 
     args = {settings.FREETEXT_QUERY: False, settings.STATISTICS: False}
 
-    pbsearch = PBSearch()
+    pbsearch = Search()
     querybuilder = QueryBuilder()
 
     query_result = transform_platsannons_query_result(args, esresult, querybuilder)

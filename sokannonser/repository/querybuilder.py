@@ -252,7 +252,7 @@ class QueryBuilder(object):
                         "terms": {
                             "field": "%s.%s.raw" % (base_field, field),
                             "size": size,
-                            "include": "%s.*" % self.escape_special_chars_for_complete(complete)
+                            "include": "%s.*" % self._escape_special_chars_for_complete(complete)
                         }
                     }
                 x = 1
@@ -263,7 +263,7 @@ class QueryBuilder(object):
                             "terms": {
                                 "field": "%s.%s.raw" % (base_field, field),
                                 "size": size,
-                                "include": "%s.*" % self.escape_special_chars_for_complete(ngram)
+                                "include": "%s.*" % self._escape_special_chars_for_complete(ngram)
                             }
                         }
                         x += 1
@@ -273,7 +273,7 @@ class QueryBuilder(object):
             query_dsl['sort'] = ["_score", {f.ID: "asc"}]
         return query_dsl
 
-    def escape_special_chars_for_complete(self, inputstr):
+    def _escape_special_chars_for_complete(self, inputstr):
         escaped_str = inputstr
         chars_to_escape = ['#']
 

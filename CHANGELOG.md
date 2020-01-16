@@ -1,6 +1,12 @@
 Changelog Application Jobsearch
 ===============================
 
+## 1.7.2
+* Comma treated as delimiter in freetext queries
+* Fixes a bug that caused the employer field to be queried when it shouldn't
+* Fixes a bug in taxonomy-search where some labels couldn't be searched
+* Only display logo_url if available
+
 ## 1.7.1
 * Fix for terms containing hash/# in typeahead
 * Changed relevance sort order to have descending publication date as secondary

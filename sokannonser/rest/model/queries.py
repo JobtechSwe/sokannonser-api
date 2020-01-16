@@ -83,9 +83,11 @@ swagger_filter_doc_params = {
 }
 
 
-def lowercase(value):
+def lowercase_maxlength(value):
     if value is None:
         raise ValueError('string type must be non-null')
+    if len(value) > 255:
+        raise ValueError('parameter can not be longer than 255 characters')
 
     return str(value).lower()
 
@@ -131,7 +133,7 @@ base_annons_query.add_argument(settings.POSITION,
                                action='append')
 base_annons_query.add_argument(settings.POSITION_RADIUS, type=int, action='append')
 base_annons_query.add_argument(settings.EMPLOYER, action='append')
-base_annons_query.add_argument(settings.FREETEXT_QUERY, type=lowercase)
+base_annons_query.add_argument(settings.FREETEXT_QUERY, type=lowercase_maxlength)
 base_annons_query.add_argument(settings.FREETEXT_FIELDS, action='append',
                                choices=QF_CHOICES)
 

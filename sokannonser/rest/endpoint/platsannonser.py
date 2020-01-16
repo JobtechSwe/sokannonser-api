@@ -42,7 +42,7 @@ class AdLogo(Resource):
 
 
 @ns_platsannons.route('search')
-class PBSearch(Resource):
+class Search(Resource):
     method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 
@@ -92,7 +92,7 @@ class PBSearch(Resource):
 
 
 @ns_platsannons.route('complete')
-class PBComplete(Resource):
+class Complete(Resource):
     method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 
@@ -114,8 +114,8 @@ class PBComplete(Resource):
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''
-        args[settings.TYPEAHEAD_QUERY] = freetext_query[0:256]
-        args[settings.FREETEXT_QUERY] = ' '.join(freetext_query[0:256].split(' ')[0:-1])
+        args[settings.TYPEAHEAD_QUERY] = freetext_query
+        args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
 
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         result = platsannonser.find_platsannonser(args, self.querybuilder)

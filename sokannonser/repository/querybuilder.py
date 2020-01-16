@@ -252,7 +252,7 @@ class QueryBuilder(object):
                         "terms": {
                             "field": "%s.%s.raw" % (base_field, field),
                             "size": size,
-                            "include": "%s.*" % self.escape_special_chars_for_complete(complete)
+                            "include": "%s.*" % self._escape_special_chars_for_complete(complete)
                         }
                     }
                 x = 1
@@ -263,7 +263,7 @@ class QueryBuilder(object):
                             "terms": {
                                 "field": "%s.%s.raw" % (base_field, field),
                                 "size": size,
-                                "include": "%s.*" % self.escape_special_chars_for_complete(ngram)
+                                "include": "%s.*" % self._escape_special_chars_for_complete(ngram)
                             }
                         }
                         x += 1
@@ -273,7 +273,7 @@ class QueryBuilder(object):
             query_dsl['sort'] = ["_score", {f.ID: "asc"}]
         return query_dsl
 
-    def escape_special_chars_for_complete(self, inputstr):
+    def _escape_special_chars_for_complete(self, inputstr):
         escaped_str = inputstr
         chars_to_escape = ['#']
 
@@ -281,8 +281,6 @@ class QueryBuilder(object):
             if char in inputstr:
                 escaped_str = inputstr.replace(char, '[%s]' % char)
         return escaped_str
-
-
 
     def _calculate_utc_offset(self):
         is_dst = time.daylight and time.localtime().tm_isdst > 0
@@ -318,7 +316,7 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES.copy()
-        querystring = ' '.join([w.strip(',.!?:; ') for w in querystring.split(' ')])
+        querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
         original_querystring = querystring
         concepts = ttc.text_to_concepts(querystring)
         querystring = self._rewrite_querystring(querystring, concepts)
@@ -342,25 +340,30 @@ class QueryBuilder(object):
                                 queryfields, 'must_not')
 
         # Add required concepts to query
-        self._freetext_concepts(ft_query, concepts, querystring,
-                                queryfields, 'must')
-
-        # Add a headline query as well
+        # self._freetext_concepts(ft_query, concepts, querystring,
+        #                         queryfields, 'must')
+        #
+        # location_concepts = {
+        #     'location': concepts['location'],
+        #     'location_must': concepts['location_must']
+        # }
+        # original_querystring_without_location = self._rewrite_querystring(original_querystring,
+        #                                                                   location_concepts)
         ft_query = self._freetext_headline(ft_query, original_querystring)
         return ft_query
 
     # Removes identified concepts from querystring
     def _rewrite_querystring(self, querystring, concepts):
         # Sort all concepts by string length
-        all_concepts = sorted(concepts['occupation'] +
-                              concepts['occupation_must'] +
-                              concepts['occupation_must_not'] +
-                              concepts['skill'] +
-                              concepts['skill_must'] +
-                              concepts['skill_must_not'] +
-                              concepts['location'] +
-                              concepts['location_must'] +
-                              concepts['location_must_not'],
+        all_concepts = sorted(concepts.get('occupation', []) +
+                              concepts.get('occupation_must', []) +
+                              concepts.get('occupation_must_not', []) +
+                              concepts.get('skill', []) +
+                              concepts.get('skill_must', []) +
+                              concepts.get('skill_must_not', []) +
+                              concepts.get('location', []) +
+                              concepts.get('location_must', []) +
+                              concepts.get('location_must_not', []),
                               key=lambda c: len(c),
                               reverse=True)
         # Remove found concepts from querystring
@@ -420,16 +423,6 @@ class QueryBuilder(object):
                                 "query": querystring.strip(),
                                 "operator": "and",
                                 "boost": 5
-                            }
-                        }
-                    })
-                should['bool']['should'].append(
-                    {
-                        "match": {
-                            f.KEYWORDS_EXTRACTED+".employer": {
-                                "query": querystring.strip(),
-                                "operator": "and",
-                                "boost": 1
                             }
                         }
                     })

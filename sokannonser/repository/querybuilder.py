@@ -340,7 +340,6 @@ class QueryBuilder(object):
                                 queryfields, 'must_not')
 
         ft_query = self._freetext_headline(ft_query, original_querystring)
-        print(ft_query)
         return ft_query
 
     # Removes identified concepts from querystring

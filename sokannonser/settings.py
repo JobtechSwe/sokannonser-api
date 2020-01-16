@@ -16,10 +16,6 @@ APM_SERVICE_URL = os.getenv("APM_SERVICE_URL")
 APM_SECRET = os.getenv("APM_SECRET")
 APM_LOG_LEVEL = os.getenv("LOG_LEVEL", "WARNING")
 
-# API keys settings
-ES_SYSTEM_INDEX = os.getenv("ES_SYSTEM_INDEX", "system")
-ES_APIKEYS_DOC_ID = os.getenv("ES_APIKEYS_DOC_ID", "apikeys")
-
 # Flask-Restplus settings
 RESTPLUS_SWAGGER_UI_DOC_EXPANSION = 'list'
 RESTPLUS_VALIDATE = False

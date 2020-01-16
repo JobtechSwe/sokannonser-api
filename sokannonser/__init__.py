@@ -5,7 +5,7 @@ from jobtech.common.customlogging import configure_logging
 from sokannonser import appconf
 from sokannonser.rest import api
 # Import all Resources that are to be made visible for the app
-from sokannonser.rest.endpoint.platsannonser import PBSearch, Proxy
+from sokannonser.rest.endpoint.platsannonser import Search, Proxy
 # from sokannonser.rest.endpoint.openapi import OpenSearch
 from sokannonser.rest.endpoint.valuestore import Valuestore
 # from market.rest.endpoint import MarketComplete, MarketSearch

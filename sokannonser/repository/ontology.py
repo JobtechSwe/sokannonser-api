@@ -122,7 +122,7 @@ class Ontology(object):
 
     @staticmethod
     def init_keyword_processor(keyword_processor):
-        [keyword_processor.add_non_word_boundary(token) for token in list('åäöÅÄÖ()-')]
+        [keyword_processor.add_non_word_boundary(token) for token in list('åäöÅÄÖ()-*')]
 
     def get_keyword_processor(self):
         return self.keyword_processor

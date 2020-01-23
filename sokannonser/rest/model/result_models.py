@@ -83,12 +83,15 @@ appl_details = ns_platsannons.model('ApplicationDetails', {
 })
 
 work_address = ns_platsannons.model('WorkplaceAddress', {
-    'municipality_code': fields.String(),
     'municipality': fields.String(),
-    'region_code': fields.String(),
+    'municipality_code': fields.String(),
+    'municipality_concept_id': fields.String(),
     'region': fields.String(),
-    'country_code': fields.String(),
+    'region_code': fields.String(),
+    'region_concept_id': fields.String(),
     'country': fields.String(),
+    'country_code': fields.String(),
+    'country_concept_id': fields.String(),
     'street_address': fields.String(),
     'postcode': fields.String(),
     'city': fields.String(),

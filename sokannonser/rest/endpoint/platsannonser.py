@@ -8,8 +8,8 @@ from sokannonser.rest import ns_platsannons
 from sokannonser.rest.model.queries import annons_complete_query, pb_query, load_ad_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
 from sokannonser.repository import platsannonser
-from sokannonser.rest.model.platsannons_results import (open_results, job_ad,
-                                                        typeahead_results)
+from sokannonser.rest.model.result_models import (open_results, job_ad,
+                                                  typeahead_results)
 from sokannonser.repository.querybuilder import QueryBuilder
 import elasticapm
 log = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ class Proxy(Resource):
     @ns_platsannons.expect(load_ad_query)
     @ns_platsannons.marshal_with(job_ad)
     def get(self, id, *args, **kwargs):
-        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
+        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         return platsannonser.fetch_platsannons(str(id))
 
 
@@ -54,7 +54,7 @@ class Search(Resource):
     @ns_platsannons.expect(pb_query)
     @ns_platsannons.marshal_with(open_results)
     def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
+        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         start_time = int(time.time()*1000)
         args = pb_query.parse_args()
         log.debug("Query parsed after %d milliseconds."
@@ -110,7 +110,7 @@ class Complete(Resource):
     @ns_platsannons.expect(annons_complete_query)
     @ns_platsannons.marshal_with(typeahead_results)
     def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
+        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''

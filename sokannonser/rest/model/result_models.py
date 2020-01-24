@@ -58,6 +58,7 @@ min_max = ns_platsannons.model('ScopeOfWork', {
 
 description = ns_platsannons.model('JobAdDescription', {
     'text': fields.String(),
+    'text_formatted': fields.String(),
     'company_information': fields.String(),
     'needs': fields.String(),
     'requirements': fields.String(),
@@ -98,6 +99,14 @@ work_address = ns_platsannons.model('WorkplaceAddress', {
     'coordinates': fields.List(fields.Float())
 })
 
+application_contact = ns_platsannons.model('ApplicationContact', {
+    'name': fields.String(),
+    'description': fields.String(),
+    'email': fields.String(),
+    'telephone': fields.String(),
+    'contact_type': fields.String(attribute='contactType')
+})
+
 requirements = ns_platsannons.model('Requirements', {
     'skills': fields.List(fields.Nested(weighted_taxonomy_item)),
     'languages': fields.List(fields.Nested(weighted_taxonomy_item)),
@@ -132,6 +141,7 @@ job_ad = ns_platsannons.model('JobAd', {
     'workplace_address': fields.Nested(work_address),
     'must_have': fields.Nested(requirements),
     'nice_to_have': fields.Nested(requirements),
+    'application_contact': fields.Nested(application_contact),
     f.PUBLICATION_DATE: fields.DateTime(),
     f.LAST_PUBLICATION_DATE: fields.DateTime(),
     f.REMOVED: fields.Boolean(),

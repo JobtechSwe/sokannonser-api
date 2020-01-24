@@ -2,6 +2,7 @@ Changelog Application Jobsearch
 ===============================
 ## 1.8.0
 * Adds concept ID for municipality, region and country in workplace_address
+* Adds contact person fields and text_formatted to the result model
 
 ## 1.7.2
 * Comma treated as delimiter in freetext queries

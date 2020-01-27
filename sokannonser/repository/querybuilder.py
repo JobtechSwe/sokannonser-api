@@ -688,7 +688,7 @@ class QueryBuilder(object):
 
         return plats_bool_query
 
-    # Parses COUNTRY
+    # Parses COUNTRY (DEPRECATED)
     def _build_country_query(self, landskoder):
         lander = []
         neg_land = []

@@ -46,8 +46,10 @@ class QueryBuilder(object):
         must_queries.append(self._build_parttime_query(args.get(settings.PARTTIME_MIN),
                                                        args.get(settings.PARTTIME_MAX)))
         must_queries.append(self._build_plats_query(args.get(taxonomy.MUNICIPALITY),
-                                                    args.get(taxonomy.REGION)))
-        must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
+                                                    args.get(taxonomy.REGION),
+                                                    args.get(taxonomy.COUNTRY)))
+        # Replaced by _build_plats_query
+        # must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
         must_queries.append(self._build_generic_query([f.MUST_HAVE_SKILLS + "." +
                                                        f.CONCEPT_ID + ".keyword",
                                                        f.MUST_HAVE_SKILLS + "." +
@@ -606,11 +608,13 @@ class QueryBuilder(object):
             return None
 
     # Parses MUNICIPALITY and REGION
-    def _build_plats_query(self, kommunkoder, lanskoder):
+    def _build_plats_query(self, kommunkoder, lanskoder, landskoder):
         kommuner = []
         neg_komm = []
         lan = []
         neg_lan = []
+        land = []
+        neg_land = []
         for kkod in kommunkoder if kommunkoder else []:
             if kkod.startswith('-'):
                 neg_komm.append(kkod[1:])
@@ -621,6 +625,12 @@ class QueryBuilder(object):
                 neg_lan.append(lkod[1:])
             else:
                 lan.append(lkod)
+        for ckod in landskoder if landskoder else []:
+            if ckod.startswith('-'):
+                neg_land.append(ckod[1:])
+            else:
+                land.append(ckod)
+
         plats_term_query = [{"term": {
             f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
@@ -633,11 +643,19 @@ class QueryBuilder(object):
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID: {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]
+        plats_term_query += [{"term": {
+            f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
+                "value": ckod, "boost": 1.0}}} for ckod in land]
+        plats_term_query += [{"term": {
+            f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+                "value": ckod, "boost": 1.0}}} for ckod in land]
+
         plats_bool_query = {"bool": {
             "should": plats_term_query}
         } if plats_term_query else {}
         neg_komm_term_query = []
         neg_lan_term_query = []
+        neg_land_term_query = []
         if neg_komm:
             neg_komm_term_query = [{"term": {
                 f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
@@ -652,11 +670,22 @@ class QueryBuilder(object):
             neg_lan_term_query += [{"term": {
                 f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID: {
                     "value": lkod}}} for lkod in neg_lan]
-        if neg_komm_term_query or neg_lan_term_query:
+
+        if neg_land:
+            neg_land_term_query = [{"term": {
+                f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
+                    "value": ckod}}} for ckod in neg_land]
+            neg_land_term_query += [{"term": {
+                f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+                    "value": ckod}}} for ckod in neg_land]
+
+        if neg_komm_term_query or neg_lan_term_query or neg_land_term_query:
             if 'bool' not in plats_bool_query:
                 plats_bool_query['bool'] = {}
             plats_bool_query['bool']['must_not'] = neg_komm_term_query + \
-                                                   neg_lan_term_query
+                                                   neg_lan_term_query + \
+                                                   neg_land_term_query
+
         return plats_bool_query
 
     # Parses COUNTRY

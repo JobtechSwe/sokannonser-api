@@ -576,7 +576,7 @@ class QueryBuilder(object):
             "term": {
                 f.OCCUPATION+"."+f.CONCEPT_ID+".keyword": {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
-        neg_yrke_term_query = [{
+        neg_yrke_term_query += [{
             "term": {
                 f.OCCUPATION+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]

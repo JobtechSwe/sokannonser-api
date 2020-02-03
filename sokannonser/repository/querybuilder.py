@@ -312,6 +312,19 @@ class QueryBuilder(object):
             return modded_term
         return word
 
+    def _extract_quoted_phrases(self, text):
+        must_matches = re.findall(r'\+\"(.+?)\"', text)
+        neg_matches = re.findall(r'\-\"(.+?)\"', text)
+        for neg_match in neg_matches:
+            text = re.sub('-"%s"' % neg_match, '', text)
+        for must_match in must_matches:
+            text = re.sub(r'\+"%s"' % must_match, '', text)
+        matches = re.findall(r'\"(.+?)\"', text)
+        for match in matches:
+            text = re.sub('"%s"' % match, '', text)
+        return {"phrases": matches, "querystring": text.strip(),
+                "phrases_must": must_matches, "phrases_must_not": neg_matches}, text
+
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
     def _build_freetext_query(self, querystring, queryfields, freetext_bool_method):
         if not querystring:
@@ -320,6 +333,7 @@ class QueryBuilder(object):
             queryfields = queries.QF_CHOICES.copy()
         querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
         original_querystring = querystring
+        (phrases, querystring) = self._extract_quoted_phrases(querystring)
         concepts = ttc.text_to_concepts(querystring)
         querystring = self._rewrite_querystring(querystring, concepts)
         ft_query = self._create_base_ft_query(querystring, freetext_bool_method)
@@ -338,10 +352,24 @@ class QueryBuilder(object):
                     ft_query['bool']['must'] = []
                 ft_query['bool']['must'].append(sub_should)
         # Remove unwanted concepts from query
-        self._freetext_concepts(ft_query, concepts, querystring,
-                                queryfields, 'must_not')
+        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must_not')
+        # Require musts
+        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must')
+        self._add_phrases_query(ft_query, phrases)
 
         ft_query = self._freetext_headline(ft_query, original_querystring)
+        return ft_query
+
+    # Add phrase queries
+    def _add_phrases_query(self, ft_query, phrases):
+        for bool_type in ['should', 'must', 'must_not']:
+            key = 'phrases' if bool_type == 'should' else "phrases_%s" % bool_type
+
+            for phrase in phrases[key]:
+                if bool_type not in ft_query['bool']:
+                    ft_query['bool'][bool_type] = []
+                ft_query['bool'][bool_type].append({"match_phrase": {"description.text": phrase}})
+
         return ft_query
 
     # Removes identified concepts from querystring
@@ -361,8 +389,8 @@ class QueryBuilder(object):
         # Remove found concepts from querystring
         for term in [concept['term'] for concept in all_concepts]:
             term = self._rewrite_word_for_regex(term)
-            p = re.compile(f'(^|\\s+){term}(\\s+|$)')
-            querystring = p.sub('\\1\\2', querystring).strip()
+            p = re.compile(f'(^|\\s+)(\\+{term}|\\-{term}|{term})(\\s+|$)')
+            querystring = p.sub('\\1\\3', querystring).strip()
         # Remove duplicate spaces
         querystring = re.sub('\\s+', ' ', querystring).strip()
         return querystring

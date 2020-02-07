@@ -35,7 +35,8 @@ class QueryBuilder(object):
         must_queries.append(
             self._build_freetext_query(args.get(settings.FREETEXT_QUERY),
                                        args.get(settings.FREETEXT_FIELDS),
-                                       args.get(settings.X_FEATURE_FREETEXT_BOOL_METHOD))
+                                       args.get(settings.X_FEATURE_FREETEXT_BOOL_METHOD),
+                                       args.get(settings.X_FEATURE_DISABLE_SMART_FREETEXT))
         )
         must_queries.append(self._build_employer_query(args.get(settings.EMPLOYER)))
         must_queries.append(self._build_yrkes_query(args.get(taxonomy.OCCUPATION),
@@ -326,7 +327,8 @@ class QueryBuilder(object):
                 "phrases_must": must_matches, "phrases_must_not": neg_matches}, text
 
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
-    def _build_freetext_query(self, querystring, queryfields, freetext_bool_method):
+    def _build_freetext_query(self, querystring, queryfields, freetext_bool_method,
+                              disable_smart_freetext):
         if not querystring:
             return None
         if not queryfields:
@@ -334,7 +336,7 @@ class QueryBuilder(object):
         querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
         original_querystring = querystring
         (phrases, querystring) = self._extract_quoted_phrases(querystring)
-        concepts = ttc.text_to_concepts(querystring)
+        concepts = {} if disable_smart_freetext else ttc.text_to_concepts(querystring)
         querystring = self._rewrite_querystring(querystring, concepts)
         ft_query = self._create_base_ft_query(querystring, freetext_bool_method)
 
@@ -839,7 +841,7 @@ class QueryBuilder(object):
                     log.info("Bad position-parameter: \"%s\" (%s)" % (position, str(e)))
 
             geo_filter = {}
-            if (not latitude or not longitude or not coordinate_range):
+            if not latitude or not longitude or not coordinate_range:
                 return {}
             elif ((-90 <= latitude <= 90)
                   and (-180 <= longitude <= 180) and (coordinate_range > 0)):

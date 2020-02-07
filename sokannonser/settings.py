@@ -38,6 +38,7 @@ X_FEATURE_FREETEXT_BOOL_METHOD = 'x-feature-freetext-bool-method'
 X_FEATURE_ALLOW_EMPTY_TYPEAHEAD = 'x-feature-allow-empty-typeahead'
 X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD = 'x-feature-include-synonyms-typeahead'
 X_FEATURE_SPELLCHECK_TYPEAHEAD = 'x-feature-spellcheck-typeahead'
+X_FEATURE_DISABLE_SMART_FREETEXT = 'x-feature-disable-smart-freetext'
 
 # Query parameters
 OFFSET = 'offset'

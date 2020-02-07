@@ -107,7 +107,8 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
         abort(500, 'Failed to establish connection to database')
         return
 
-    if args.get(settings.FREETEXT_QUERY):
+    if args.get(settings.FREETEXT_QUERY) \
+            and not args.get(settings.X_FEATURE_DISABLE_SMART_FREETEXT):
         query_result['concepts'] = \
             _extract_concept_from_concepts(
                 ttc.text_to_concepts(args.get(settings.FREETEXT_QUERY))

@@ -873,7 +873,10 @@ class QueryBuilder(object):
                prefix,
                completion={
                    'field': 'keywords.enriched.%s.suggest' % field,
-                   "skip_duplicates": True
+                   "skip_duplicates": True,
+                   "fuzzy": {
+                       "fuzziness": 'AUTO'
+                   }
                }
            )
         return search.to_dict()

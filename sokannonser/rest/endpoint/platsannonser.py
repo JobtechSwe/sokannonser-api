@@ -117,10 +117,10 @@ class Complete(Resource):
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''
         args[settings.TYPEAHEAD_QUERY] = freetext_query
         args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
-
+        print(args[settings.FREETEXT_QUERY])
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
-            result = platsannonser.spellchecked_typeahead(args.get(settings.FREETEXT_QUERY))
+            result = platsannonser.suggest(freetext_query, self.querybuilder)
         else:
             result = platsannonser.find_platsannonser(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."
@@ -135,47 +135,4 @@ class Complete(Resource):
         }
         log.debug("Sending results after %d milliseconds."
                   % (int(time.time()*1000) - start_time))
-        return result
-
-
-@ns_platsannons.route('suggester')
-class Suggester(Resource):
-    #method_decorators = [check_api_key_and_return_metadata('pb')]
-    querybuilder = QueryBuilder()
-
-    @ns_platsannons.doc(
-        description='Typeahead / Suggest next searchword',
-        params={
-            settings.CONTEXTUAL_TYPEAHEAD: "Set to false to disable contextual typeahead"
-                                           " (default: true)",
-            settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD: "Allow empty querystring in typeahead.",
-            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: "Include enriched synonyms in typeahead.",
-            settings.X_FEATURE_SPELLCHECK_TYPEAHEAD: "Use spellchecking in typeahead. Disables contextual typeahead.",
-            **swagger_doc_params
-        }
-    )
-    @ns_platsannons.response(401, 'Invalid API-key')
-    @ns_platsannons.expect(annons_complete_query)
-    @ns_platsannons.marshal_with(suggest_typeahead_results)
-    def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
-        start_time = int(time.time() * 1000)
-        args = annons_complete_query.parse_args()
-        log.debug(args)
-
-        result = platsannonser.suggest(args.get(settings.FREETEXT_QUERY), self.querybuilder)
-
-        log.debug("Query results after %d milliseconds."
-                  % (int(time.time() * 1000) - start_time))
-
-        return self.marshal_results(result, start_time)
-
-    def marshal_results(self, esresult, start_time):
-        log.debug(esresult.get('aggs', []))
-        result = {
-            "time_in_millis": esresult.get('took', 0),
-            "typeahead": esresult.get('aggs', []),
-        }
-        log.debug("Sending results after %d milliseconds."
-                  % (int(time.time() * 1000) - start_time))
         return result

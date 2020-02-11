@@ -118,6 +118,44 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
     return transform_platsannons_query_result(args, query_result, querybuilder)
 
 
+def suggest(args, querybuilder, start_time=0, x_fields=None):
+    if start_time == 0:
+        start_time = int(time.time() * 1000)
+    query_dsl = querybuilder.create_suggester(args)
+    log.debug("Query constructed after %d milliseconds."
+              % (int(time.time() * 1000) - start_time))
+    try:
+        log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
+        log.debug(query_dsl)
+        query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+        log.debug(query_result)
+        log.debug("Elastic results after %d milliseconds."
+                  % (int(time.time() * 1000) - start_time))
+    except exceptions.ConnectionError as e:
+        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        abort(500, 'Failed to establish connection to database')
+        return
+
+    log.debug("Elasticsearch reports: took=%d, timed_out=%s"
+              % (query_result.get('took', 0), query_result.get('timed_out', '')))
+
+    log.debug(query_result.get('suggest', {}))
+    aggs = []
+    suggests = query_result.get('suggest', {})
+    for key in suggests:
+        if suggests[key][0].get('options', []):
+            for ads in suggests[key][0]['options']:
+                aggs.append(
+                    {
+                        'value': ads.get('text', ''),
+                        'type': 'keywords.enriched.%s.suggest' % key.split()[0]
+                    }
+                )
+    query_result['aggs'] = aggs[:5]
+    log.debug(query_result['aggs'])
+    return query_result
+
+
 def _extract_concept_from_concepts(concepts):
     main_concepts = dict()
     for key, value in concepts.items():

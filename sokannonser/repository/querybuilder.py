@@ -2,6 +2,9 @@ import logging
 import re
 import time
 from datetime import datetime, timedelta
+
+import elasticsearch_dsl
+
 from dateutil import parser
 from sokannonser import settings
 from sokannonser.repository import ttc, taxonomy
@@ -851,3 +854,24 @@ class QueryBuilder(object):
             if geo_filter:
                 geo_bool['bool']['should'].append(geo_filter)
         return geo_bool
+
+    def create_suggester(self, args):
+        """"
+        parse args and create suggester
+        """
+        log.debug(args.split())
+        prefix = args.split()[-1]
+        log.debug(prefix)
+        fields = ['skill', 'occupation', 'location', 'trait']
+        search = elasticsearch_dsl.Search()
+        search = search.source('suggest')
+        for field in fields:
+           search = search.suggest(
+               '%s-suggest' % field,
+               prefix,
+               completion={
+                   'field': 'keywords.enriched.%s.suggest' % field,
+                   "skip_duplicates": True
+               }
+           )
+        return search.to_dict()

@@ -30,6 +30,16 @@ typeahead_results = ns_platsannons.model('TypeaheadResults', {
     'typeahead': fields.List(fields.Nested(typeahead_item))
 })
 
+suggest_typeahead_item = ns_platsannons.model('TypeaheadItem', {
+    'value': fields.String(),
+    'type': fields.String(),
+})
+
+suggest_typeahead_results = ns_platsannons.model('TypeaheadResults', {
+    'time_in_millis': fields.Integer(),
+    'typeahead': fields.List(fields.Nested(suggest_typeahead_item))
+})
+
 
 class AdUrl(fields.Raw):
     def format(self, value):

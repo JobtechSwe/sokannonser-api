@@ -346,6 +346,7 @@ def test_rewrite_querystring():
         concepts) == "korvprånglare [python3] flärgare"
 
 
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 @pytest.mark.parametrize("querystring, expected", [
     ("-php", {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),

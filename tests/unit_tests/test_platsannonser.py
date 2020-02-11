@@ -8,6 +8,7 @@ from dateutil import parser
 from sokannonser import settings
 from sokannonser.repository.querybuilder import QueryBuilder
 from sokannonser.repository import taxonomy
+from unittest import TestCase
 
 log = logging.getLogger(__name__)
 pbquery = QueryBuilder()
@@ -343,3 +344,38 @@ def test_rewrite_querystring():
     assert pbquery._rewrite_querystring(
         "korvprånglare c++ asp.net [python3] flärgare",
         concepts) == "korvprånglare [python3] flärgare"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("querystring, expected", [
+    ("-php", {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
+    ("+java", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
+    ("python", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
+    ("systemutvecklare python +java", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
+    ("systemutvecklare python +java", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
+    ("systemutvecklare python +java", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
+])
+def test_freetext_bool_structure(querystring, expected):
+    result = pbquery._build_freetext_query(querystring, None, "and", False)
+    assert _assert_json_structure(result, expected)
+
+
+def _assert_json_structure(result, expected):
+    return _walk_dictionary(result, expected)
+
+
+def _walk_dictionary(result, expected):
+    if isinstance(result, str) and isinstance(expected, str):
+        return result == expected
+    else:
+        for item in expected:
+            if item in result:
+                if isinstance(result[item], list):
+                    for listitem in result[item]:
+                        if _walk_dictionary(listitem, expected[item]):
+                            return True
+                else:
+                    return _walk_dictionary(result[item], expected[item])
+
+        return False
+

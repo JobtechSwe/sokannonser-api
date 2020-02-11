@@ -861,10 +861,8 @@ class QueryBuilder(object):
         """"
         parse args and create suggester
         """
-        log.debug(args.split())
         prefix = args.split()[-1]
-        log.debug(prefix)
-        fields = ['skill', 'occupation', 'location', 'trait']
+        fields = ['skill', 'occupation', 'location']
         search = elasticsearch_dsl.Search()
         search = search.source('suggest')
         for field in fields:

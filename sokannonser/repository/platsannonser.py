@@ -149,7 +149,9 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):
                 aggs.append(
                     {
                         'value': ads.get('text', ''),
-                        'type': key.split('-')[0]
+                        'found_phrase': ads.get('text', ''),
+                        'type': key.split('-')[0],
+                        'occurrences': None
                     }
                 )
     query_result['aggs'] = aggs[:10]

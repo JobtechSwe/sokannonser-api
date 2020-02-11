@@ -12,6 +12,8 @@ pytest-envfiles
 elastic-apm[flask]
 flashtext
 Beaker
-urllib3==1.24.2
+urllib3==1.25.8
 python-simplexml
 pytest_bdd
+Werkzeug==0.16.1
+elasticsearch-dsl

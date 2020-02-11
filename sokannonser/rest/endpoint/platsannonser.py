@@ -117,7 +117,6 @@ class Complete(Resource):
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''
         args[settings.TYPEAHEAD_QUERY] = freetext_query
         args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
-        print(args[settings.FREETEXT_QUERY])
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
             result = platsannonser.suggest(freetext_query, self.querybuilder)

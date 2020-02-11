@@ -140,7 +140,7 @@ class Complete(Resource):
 
 @ns_platsannons.route('suggester')
 class Suggester(Resource):
-    method_decorators = [check_api_key_and_return_metadata('pb')]
+    #method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(

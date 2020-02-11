@@ -17,6 +17,9 @@ swagger_doc_params = {
     settings.APIKEY: "Required API key",
     settings.X_FEATURE_FREETEXT_BOOL_METHOD: "Boolean method to use for unclassified "
     "freetext words. Defaults to \"" + settings.DEFAULT_FREETEXT_BOOL_METHOD + "\".",
+    settings.X_FEATURE_DISABLE_SMART_FREETEXT: "Disables machine learning enriched queries."
+    " Freetext becomes traditional freetext query according to the setting of " 
+    "\"%s\"" % settings.X_FEATURE_FREETEXT_BOOL_METHOD,
     settings.PUBLISHED_AFTER: "Fetch job ads published after specified date and time."
     "Accepts either datetime (format YYYY-mm-ddTHH:MM:SS) or number of minutes "
     "(e.g 120 means published in the last two hours)",
@@ -99,6 +102,8 @@ base_annons_query = reqparse.RequestParser()
 base_annons_query.add_argument(settings.APIKEY, location='headers', required=True)
 base_annons_query.add_argument(settings.X_FEATURE_FREETEXT_BOOL_METHOD, choices=['and', 'or'],
                                default=settings.DEFAULT_FREETEXT_BOOL_METHOD,
+                               location='headers', required=False)
+base_annons_query.add_argument(settings.X_FEATURE_DISABLE_SMART_FREETEXT, type=inputs.boolean,
                                location='headers', required=False)
 base_annons_query.add_argument(settings.PUBLISHED_BEFORE,
                                type=lambda x: datetime.strptime(x, '%Y-%m-%dT%H:%M:%S'))

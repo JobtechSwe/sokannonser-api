@@ -62,7 +62,6 @@ class TextToConcept(object):
 
         return client
 
-
     RE_PLUS_MINUS = re.compile(r"((^| )[+-])", re.UNICODE)
 
     def clean_plus_minus(self, text):

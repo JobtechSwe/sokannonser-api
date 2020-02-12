@@ -437,7 +437,15 @@ def test_rewrite_querystring():
         concepts) == "korvprånglare [python3] flärgare"
 
 
-#@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.unit
+@pytest.mark.parametrize("querystring, expected", [
+    ("python \"grym kodare\"", ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": []}, "python")),
+    ("java \"malmö stad\"", ({"phrases": ["malmö stad"], "phrases_must": [], "phrases_must_not": []}, "java"))
+])
+def test_extract_querystring_phrases(querystring, expected):
+    assert expected == pbquery.extract_quoted_phrases(querystring)
+
+
 @pytest.mark.unit
 @pytest.mark.parametrize("querystring, expected", [
     ("-php", {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),

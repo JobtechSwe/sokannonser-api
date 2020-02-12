@@ -7,7 +7,7 @@ import elasticsearch_dsl
 
 from dateutil import parser
 from sokannonser import settings
-from sokannonser.repository import ttc, taxonomy
+from sokannonser.repository import taxonomy, TextToConcept
 from sokannonser.rest.model import queries
 from sokannonser.rest.model import fields as f
 
@@ -15,6 +15,12 @@ log = logging.getLogger(__name__)
 
 
 class QueryBuilder(object):
+    def __init__(self):
+        self.ttc = TextToConcept(ontologyhost=settings.ES_HOST,
+                                 ontologyport=settings.ES_PORT,
+                                 ontologyuser=settings.ES_USER,
+                                 ontologypwd=settings.ES_PWD)
+
     def parse_args(self, args, x_fields=None):
         """
         Parse arguments for query and return an elastic query dsl
@@ -339,7 +345,7 @@ class QueryBuilder(object):
         querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
         original_querystring = querystring
         (phrases, querystring) = self._extract_quoted_phrases(querystring)
-        concepts = {} if disable_smart_freetext else ttc.text_to_concepts(querystring)
+        concepts = {} if disable_smart_freetext else self.ttc.text_to_concepts(querystring)
         querystring = self._rewrite_querystring(querystring, concepts)
         ft_query = self._create_base_ft_query(querystring, freetext_bool_method)
 
@@ -510,7 +516,7 @@ class QueryBuilder(object):
                     # Add freetext search for location that does not exist
                     # in extracted locations, for example 'kallhäll'.
                     value = concept['term'].lower()
-                    if value not in ttc.ontology.extracted_locations:
+                    if value not in self.ttc.ontology.extracted_locations:
                         geo_ft_query = self._freetext_fields(value)
                         query_dict['bool'][bool_type].append(geo_ft_query[0])
                 else:

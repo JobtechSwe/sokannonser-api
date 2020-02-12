@@ -440,7 +440,8 @@ def test_rewrite_querystring():
 @pytest.mark.unit
 @pytest.mark.parametrize("querystring, expected", [
     ("python \"grym kodare\"", ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": []}, "python")),
-    ("java \"malmö stad\"", ({"phrases": ["malmö stad"], "phrases_must": [], "phrases_must_not": []}, "java"))
+    ("java \"malmö stad\"", ({"phrases": ["malmö stad"], "phrases_must": [], "phrases_must_not": []}, "java")),
+    ("python -\"grym kodare\" +\"i am lazy\"", ({"phrases": [], "phrases_must": ["i am lazy"], "phrases_must_not": ["grym kodare"]}, "python")),
 ])
 def test_extract_querystring_phrases(querystring, expected):
     assert expected == pbquery.extract_quoted_phrases(querystring)
@@ -450,6 +451,8 @@ def test_extract_querystring_phrases(querystring, expected):
 @pytest.mark.parametrize("querystring, expected", [
     ("\"i am lazy", ({"phrases": ["i am lazy"], "phrases_must": [], "phrases_must_not": []}, "")),
     ("python \"grym kodare\" \"i am lazy java", ({"phrases": ["grym kodare", "i am lazy java"], "phrases_must": [], "phrases_must_not": []}, "python")),
+    ("python \"grym kodare\" +\"i am lazy", ({"phrases": ["grym kodare"], "phrases_must": ["i am lazy"], "phrases_must_not": []}, "python")),
+    ("python \"grym kodare\" -\"i am lazy", ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": ["i am lazy"]}, "python")),
 ])
 def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expected):
     assert expected == pbquery.extract_quoted_phrases(querystring)

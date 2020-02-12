@@ -15,11 +15,11 @@ log = logging.getLogger(__name__)
 
 
 class QueryBuilder(object):
-    def __init__(self):
-        self.ttc = TextToConcept(ontologyhost=settings.ES_HOST,
-                                 ontologyport=settings.ES_PORT,
-                                 ontologyuser=settings.ES_USER,
-                                 ontologypwd=settings.ES_PWD)
+    def __init__(self, text_to_concept=TextToConcept(ontologyhost=settings.ES_HOST,
+                                                     ontologyport=settings.ES_PORT,
+                                                     ontologyuser=settings.ES_USER,
+                                                     ontologypwd=settings.ES_PWD)):
+        self.ttc = text_to_concept
 
     def parse_args(self, args, x_fields=None):
         """
@@ -346,6 +346,8 @@ class QueryBuilder(object):
         original_querystring = querystring
         (phrases, querystring) = self._extract_quoted_phrases(querystring)
         concepts = {} if disable_smart_freetext else self.ttc.text_to_concepts(querystring)
+        import json
+        print(json.dumps(concepts, indent=2))
         querystring = self._rewrite_querystring(querystring, concepts)
         ft_query = self._create_base_ft_query(querystring, freetext_bool_method)
 

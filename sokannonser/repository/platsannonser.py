@@ -108,10 +108,12 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
 
     if args.get(settings.FREETEXT_QUERY) \
             and not args.get(settings.X_FEATURE_DISABLE_SMART_FREETEXT):
+        # First remove any phrases
+        (phrases, qs) = querybuilder.extract_quoted_phrases(args.get(settings.FREETEXT_QUERY))
         query_result['concepts'] = \
             _extract_concept_from_concepts(
-                querybuilder.ttc.text_to_concepts(args.get(settings.FREETEXT_QUERY))
-            )
+                querybuilder.ttc.text_to_concepts(qs)
+        )
 
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))

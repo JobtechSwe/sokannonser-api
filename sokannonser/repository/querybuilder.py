@@ -322,7 +322,7 @@ class QueryBuilder(object):
             return modded_term
         return word
 
-    def _extract_quoted_phrases(self, text):
+    def extract_quoted_phrases(self, text):
         must_matches = re.findall(r'\+\"(.+?)\"', text)
         neg_matches = re.findall(r'\-\"(.+?)\"', text)
         for neg_match in neg_matches:
@@ -332,8 +332,8 @@ class QueryBuilder(object):
         matches = re.findall(r'\"(.+?)\"', text)
         for match in matches:
             text = re.sub('"%s"' % match, '', text)
-        return {"phrases": matches, "querystring": text.strip(),
-                "phrases_must": must_matches, "phrases_must_not": neg_matches}, text
+        return {"phrases": matches, "phrases_must": must_matches,
+                "phrases_must_not": neg_matches}, text.strip()
 
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
     def _build_freetext_query(self, querystring, queryfields, freetext_bool_method,
@@ -344,10 +344,8 @@ class QueryBuilder(object):
             queryfields = queries.QF_CHOICES.copy()
         querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
         original_querystring = querystring
-        (phrases, querystring) = self._extract_quoted_phrases(querystring)
+        (phrases, querystring) = self.extract_quoted_phrases(querystring)
         concepts = {} if disable_smart_freetext else self.ttc.text_to_concepts(querystring)
-        import json
-        print(json.dumps(concepts, indent=2))
         querystring = self._rewrite_querystring(querystring, concepts)
         ft_query = self._create_base_ft_query(querystring, freetext_bool_method)
 

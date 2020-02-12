@@ -9,7 +9,6 @@ from elasticsearch import exceptions
 from sokannonser import settings
 from sokannonser.repository import elastic, taxonomy
 from sokannonser.rest.model import fields
-from sokannonser.repository.querybuilder import ttc
 
 log = logging.getLogger(__name__)
 
@@ -111,7 +110,7 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
             and not args.get(settings.X_FEATURE_DISABLE_SMART_FREETEXT):
         query_result['concepts'] = \
             _extract_concept_from_concepts(
-                ttc.text_to_concepts(args.get(settings.FREETEXT_QUERY))
+                querybuilder.ttc.text_to_concepts(args.get(settings.FREETEXT_QUERY))
             )
 
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"

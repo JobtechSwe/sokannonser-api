@@ -442,7 +442,7 @@ def test_rewrite_querystring():
     ("python \"grym kodare\"", ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": []}, "python")),
     ("java \"malmö stad\"", ({"phrases": ["malmö stad"], "phrases_must": [], "phrases_must_not": []}, "java")),
     ("python -\"grym kodare\" +\"i am lazy\"", ({"phrases": [], "phrases_must": ["i am lazy"], "phrases_must_not": ["grym kodare"]}, "python")),
-    ("\"python på riktigt\" -\"grym kodare\" +\"i am lazy\"", ({"phrases": ["python på riktigt"], "phrases_must": ["i am lazy"], "phrases_must_not": ["grym kodare"]}, "python")),
+    ("\"python på riktigt\" -\"grym kodare\" +\"i am lazy\"", ({"phrases": ["python på riktigt"], "phrases_must": ["i am lazy"], "phrases_must_not": ["grym kodare"]}, "")),
 ])
 def test_extract_querystring_phrases(querystring, expected):
     assert expected == pbquery.extract_quoted_phrases(querystring)

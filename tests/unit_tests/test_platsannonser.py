@@ -448,6 +448,15 @@ def test_extract_querystring_phrases(querystring, expected):
 
 @pytest.mark.unit
 @pytest.mark.parametrize("querystring, expected", [
+    ("\"i am lazy", ({"phrases": ["i am lazy"], "phrases_must": [], "phrases_must_not": []}, "")),
+    ("python \"grym kodare\" \"i am lazy java", ({"phrases": ["grym kodare", "i am lazy java"], "phrases_must": [], "phrases_must_not": []}, "python")),
+])
+def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expected):
+    assert expected == pbquery.extract_quoted_phrases(querystring)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("querystring, expected", [
     ("-php", {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
     ("+java", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
     ("python", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),

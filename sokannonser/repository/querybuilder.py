@@ -323,6 +323,9 @@ class QueryBuilder(object):
         return word
 
     def extract_quoted_phrases(self, text):
+        # Append quote to end of string if unbalanced
+        if text.count('"') % 2 != 0:
+            text += '"'
         must_matches = re.findall(r'\+\"(.+?)\"', text)
         neg_matches = re.findall(r'\-\"(.+?)\"', text)
         for neg_match in neg_matches:

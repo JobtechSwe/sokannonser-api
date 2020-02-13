@@ -1,7 +1,7 @@
 import logging
 import time
 from flask import request
-from flask_restplus import Resource
+from flask_restx import Resource
 from jobtech.common.rest.decorators import check_api_key_and_return_metadata
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons

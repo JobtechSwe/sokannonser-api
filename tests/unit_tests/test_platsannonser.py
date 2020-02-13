@@ -469,7 +469,7 @@ def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expecte
     ("systemutvecklare python +java", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
     ("systemutvecklare python +java -php", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
     ("systemutvecklare python +java -php", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
-    ("systemutvecklare python +java -php", {"bool": { "must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
+    ("systemutvecklare python +java -php", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
     ("systemutvecklare python +java -php", {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
 ])
 def test_freetext_bool_structure(querystring, expected):

@@ -1,4 +1,4 @@
-from flask_restplus import fields
+from flask_restx import fields
 from sokannonser.rest import ns_platsannons
 from sokannonser import settings
 from sokannonser.rest.model import fields as f

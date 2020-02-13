@@ -1,4 +1,4 @@
-from flask_restplus import Api, Namespace
+from flask_restx import Api, Namespace
 
 api = Api(version='1.8.0', title='Search job ads',
           description='An API for searching and retrieving job ads and for finding '

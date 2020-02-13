@@ -2,7 +2,7 @@ git+https://github.com/JobtechSwe/jobtech-common.git
 Werkzeug==0.16.1
 elasticsearch
 flask
-flask-restplus
+flask-restx
 flask-cors
 requests
 certifi

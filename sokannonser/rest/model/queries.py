@@ -1,4 +1,4 @@
-from flask_restplus import reqparse, inputs
+from flask_restx import reqparse, inputs
 from datetime import datetime
 from sokannonser import settings
 from sokannonser.repository import taxonomy

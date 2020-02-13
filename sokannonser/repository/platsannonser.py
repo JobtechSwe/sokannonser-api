@@ -2,7 +2,7 @@ import logging
 import json
 import time
 import io, os
-from flask_restplus import abort
+from flask_restx import abort
 from flask import send_file
 import requests
 from elasticsearch import exceptions

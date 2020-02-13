@@ -1,6 +1,6 @@
 import logging
 import json
-from flask_restplus import abort
+from flask_restx import abort
 from elasticsearch import exceptions
 from sokannonser import settings
 from sokannonser.repository import elastic

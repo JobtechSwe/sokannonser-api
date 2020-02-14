@@ -151,7 +151,8 @@ job_ad = ns_platsannons.model('JobAd', {
     'workplace_address': fields.Nested(work_address),
     'must_have': fields.Nested(requirements),
     'nice_to_have': fields.Nested(requirements),
-    'application_contact': fields.Nested(application_contact),
+    # Awaiting decision from legal
+    # 'application_contact': fields.Nested(application_contact),
     f.PUBLICATION_DATE: fields.DateTime(),
     f.LAST_PUBLICATION_DATE: fields.DateTime(),
     f.REMOVED: fields.Boolean(),

@@ -1,11 +1,13 @@
 Changelog Application Jobsearch
 ===============================
 ## 1.8.0
+* Bug fixes
 * Adds concept ID for municipality, region and country in workplace_address
 * Adds contact person fields and text_formatted to the result model
 * Changes behaviour in search for locations. Any locations are now treated as boolean OR query.
 * Adds "phrase searching". Use quotes to search the ad text for specific phrases.
 * Adds feature toggle to disable query analysis in favour of simpler freetext search.
+* Adds spellchecking typeahead feature toggle.
 
 ## 1.7.2
 * Comma treated as delimiter in freetext queries

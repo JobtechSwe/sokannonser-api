@@ -2,13 +2,13 @@ import logging
 import json
 import time
 import zipfile
-from flask_restplus import Namespace
+from flask_restx import Namespace
 from datetime import date, timedelta
 from io import BytesIO
 from elasticsearch.helpers import scan
 from sokannonser import settings
 from sokannonser.repository import elastic
-from sokannonser.rest.model.platsannons_results import job_ad
+from sokannonser.rest.model.result_models import job_ad
 
 log = logging.getLogger(__name__)
 marshaller = Namespace('Marshaller')

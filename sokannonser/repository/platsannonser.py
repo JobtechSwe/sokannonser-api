@@ -2,14 +2,13 @@ import logging
 import json
 import time
 import io, os
-from flask_restplus import abort
+from flask_restx import abort
 from flask import send_file
 import requests
 from elasticsearch import exceptions
 from sokannonser import settings
 from sokannonser.repository import elastic, taxonomy
 from sokannonser.rest.model import fields
-from sokannonser.repository.querybuilder import ttc
 
 log = logging.getLogger(__name__)
 
@@ -107,15 +106,58 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
         abort(500, 'Failed to establish connection to database')
         return
 
-    if args.get(settings.FREETEXT_QUERY):
+    if args.get(settings.FREETEXT_QUERY) \
+            and not args.get(settings.X_FEATURE_DISABLE_SMART_FREETEXT):
+        # First remove any phrases
+        (phrases, qs) = querybuilder.extract_quoted_phrases(args.get(settings.FREETEXT_QUERY))
         query_result['concepts'] = \
             _extract_concept_from_concepts(
-                ttc.text_to_concepts(args.get(settings.FREETEXT_QUERY))
-            )
+                querybuilder.ttc.text_to_concepts(qs)
+        )
 
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
     return transform_platsannons_query_result(args, query_result, querybuilder)
+
+
+def suggest(args, querybuilder, start_time=0, x_fields=None):
+    if start_time == 0:
+        start_time = int(time.time() * 1000)
+    query_dsl = querybuilder.create_suggester(args)
+    log.debug("Query constructed after %d milliseconds."
+              % (int(time.time() * 1000) - start_time))
+    try:
+        log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
+        log.debug(query_dsl)
+        query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+        log.debug(query_result)
+        log.debug("Elastic results after %d milliseconds."
+                  % (int(time.time() * 1000) - start_time))
+    except exceptions.ConnectionError as e:
+        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        abort(500, 'Failed to establish connection to database')
+        return
+
+    log.debug("Elasticsearch reports: took=%d, timed_out=%s"
+              % (query_result.get('took', 0), query_result.get('timed_out', '')))
+
+    log.debug(query_result.get('suggest', {}))
+    aggs = []
+    suggests = query_result.get('suggest', {})
+    for key in suggests:
+        if suggests[key][0].get('options', []):
+            for ads in suggests[key][0]['options']:
+                aggs.append(
+                    {
+                        'value': ads.get('text', ''),
+                        'found_phrase': ads.get('text', ''),
+                        'type': key.split('-')[0],
+                        'occurrences': None
+                    }
+                )
+    query_result['aggs'] = aggs[:10]
+    log.debug(query_result['aggs'])
+    return query_result
 
 
 def _extract_concept_from_concepts(concepts):
@@ -130,7 +172,7 @@ def _format_ad(result):
     if source:
         try:
             # Remove personal number
-            # TODO: Not needed once loader (where this also happens) is deployed
+            # TODO: Not needed once loader (where this also happens) is deployed :
             org_nr = source['employer']['organization_number']
             if org_nr and int(org_nr[2]) < 2:
                 source['employer']['organization_number'] = None

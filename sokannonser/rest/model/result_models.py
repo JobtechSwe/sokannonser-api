@@ -1,4 +1,4 @@
-from flask_restplus import fields
+from flask_restx import fields
 from sokannonser.rest import ns_platsannons
 from sokannonser import settings
 from sokannonser.rest.model import fields as f
@@ -30,6 +30,16 @@ typeahead_results = ns_platsannons.model('TypeaheadResults', {
     'typeahead': fields.List(fields.Nested(typeahead_item))
 })
 
+suggest_typeahead_item = ns_platsannons.model('TypeaheadItem', {
+    'value': fields.String(),
+    'type': fields.String(),
+})
+
+suggest_typeahead_results = ns_platsannons.model('TypeaheadResults', {
+    'time_in_millis': fields.Integer(),
+    'typeahead': fields.List(fields.Nested(suggest_typeahead_item))
+})
+
 
 class AdUrl(fields.Raw):
     def format(self, value):
@@ -58,6 +68,7 @@ min_max = ns_platsannons.model('ScopeOfWork', {
 
 description = ns_platsannons.model('JobAdDescription', {
     'text': fields.String(),
+    'text_formatted': fields.String(),
     'company_information': fields.String(),
     'needs': fields.String(),
     'requirements': fields.String(),
@@ -83,16 +94,27 @@ appl_details = ns_platsannons.model('ApplicationDetails', {
 })
 
 work_address = ns_platsannons.model('WorkplaceAddress', {
-    'municipality_code': fields.String(),
     'municipality': fields.String(),
-    'region_code': fields.String(),
+    'municipality_code': fields.String(),
+    'municipality_concept_id': fields.String(),
     'region': fields.String(),
-    'country_code': fields.String(),
+    'region_code': fields.String(),
+    'region_concept_id': fields.String(),
     'country': fields.String(),
+    'country_code': fields.String(),
+    'country_concept_id': fields.String(),
     'street_address': fields.String(),
     'postcode': fields.String(),
     'city': fields.String(),
     'coordinates': fields.List(fields.Float())
+})
+
+application_contact = ns_platsannons.model('ApplicationContact', {
+    'name': fields.String(),
+    'description': fields.String(),
+    'email': fields.String(),
+    'telephone': fields.String(),
+    'contact_type': fields.String(attribute='contactType')
 })
 
 requirements = ns_platsannons.model('Requirements', {
@@ -129,6 +151,8 @@ job_ad = ns_platsannons.model('JobAd', {
     'workplace_address': fields.Nested(work_address),
     'must_have': fields.Nested(requirements),
     'nice_to_have': fields.Nested(requirements),
+    # Awaiting decision from legal
+    # 'application_contact': fields.Nested(application_contact),
     f.PUBLICATION_DATE: fields.DateTime(),
     f.LAST_PUBLICATION_DATE: fields.DateTime(),
     f.REMOVED: fields.Boolean(),

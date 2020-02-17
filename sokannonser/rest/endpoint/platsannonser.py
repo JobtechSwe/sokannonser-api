@@ -1,15 +1,15 @@
 import logging
 import time
 from flask import request
-from flask_restplus import Resource
+from flask_restx import Resource
 from jobtech.common.rest.decorators import check_api_key_and_return_metadata
 from sokannonser import settings
 from sokannonser.rest import ns_platsannons
 from sokannonser.rest.model.queries import annons_complete_query, pb_query, load_ad_query
 from sokannonser.rest.model.queries import swagger_doc_params, swagger_filter_doc_params
 from sokannonser.repository import platsannonser
-from sokannonser.rest.model.platsannons_results import (open_results, job_ad,
-                                                        typeahead_results)
+from sokannonser.rest.model.result_models import (open_results, job_ad,
+                                                  typeahead_results, suggest_typeahead_results)
 from sokannonser.repository.querybuilder import QueryBuilder
 import elasticapm
 log = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class Search(Resource):
     @ns_platsannons.expect(pb_query)
     @ns_platsannons.marshal_with(open_results)
     def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         start_time = int(time.time()*1000)
         args = pb_query.parse_args()
         log.debug("Query parsed after %d milliseconds."
@@ -103,6 +103,7 @@ class Complete(Resource):
                                            " (default: true)",
             settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD: "Allow empty querystring in typeahead.",
             settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: "Include enriched synonyms in typeahead.",
+            settings.X_FEATURE_SPELLCHECK_TYPEAHEAD: "Use spellchecking in typeahead. Disables contextual typeahead.",
             **swagger_doc_params
         }
     )
@@ -110,15 +111,17 @@ class Complete(Resource):
     @ns_platsannons.expect(annons_complete_query)
     @ns_platsannons.marshal_with(typeahead_results)
     def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''
         args[settings.TYPEAHEAD_QUERY] = freetext_query
         args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
-
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
-        result = platsannonser.find_platsannonser(args, self.querybuilder)
+        if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
+            result = platsannonser.suggest(freetext_query, self.querybuilder)
+        else:
+            result = platsannonser.find_platsannonser(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."
                   % (int(time.time()*1000)-start_time))
 

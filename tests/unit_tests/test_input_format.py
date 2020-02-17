@@ -1,7 +1,7 @@
 import pytest
 import sys
 
-from flask_restplus import inputs
+from flask_restx import inputs
 
 @pytest.mark.unit
 def test_regex_input_bulk_zip():

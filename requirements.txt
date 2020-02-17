@@ -1,7 +1,7 @@
 git+https://github.com/JobtechSwe/jobtech-common.git
 elasticsearch
 flask
-flask-restplus
+flask-restx
 flask-cors
 requests
 certifi
@@ -11,7 +11,8 @@ pytest-cov
 pytest-envfiles
 elastic-apm[flask]
 flashtext
-Beaker
-urllib3==1.24.2
+urllib3
 python-simplexml
 pytest_bdd
+elasticsearch-dsl
+Werkzeug==0.16.1

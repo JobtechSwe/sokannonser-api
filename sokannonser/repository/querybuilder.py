@@ -2,9 +2,12 @@ import logging
 import re
 import time
 from datetime import datetime, timedelta
+
+import elasticsearch_dsl
+
 from dateutil import parser
 from sokannonser import settings
-from sokannonser.repository import ttc, taxonomy
+from sokannonser.repository import taxonomy, TextToConcept
 from sokannonser.rest.model import queries
 from sokannonser.rest.model import fields as f
 
@@ -12,6 +15,12 @@ log = logging.getLogger(__name__)
 
 
 class QueryBuilder(object):
+    def __init__(self, text_to_concept=TextToConcept(ontologyhost=settings.ES_HOST,
+                                                     ontologyport=settings.ES_PORT,
+                                                     ontologyuser=settings.ES_USER,
+                                                     ontologypwd=settings.ES_PWD)):
+        self.ttc = text_to_concept
+
     def parse_args(self, args, x_fields=None):
         """
         Parse arguments for query and return an elastic query dsl
@@ -35,7 +44,8 @@ class QueryBuilder(object):
         must_queries.append(
             self._build_freetext_query(args.get(settings.FREETEXT_QUERY),
                                        args.get(settings.FREETEXT_FIELDS),
-                                       args.get(settings.X_FEATURE_FREETEXT_BOOL_METHOD))
+                                       args.get(settings.X_FEATURE_FREETEXT_BOOL_METHOD),
+                                       args.get(settings.X_FEATURE_DISABLE_SMART_FREETEXT))
         )
         must_queries.append(self._build_employer_query(args.get(settings.EMPLOYER)))
         must_queries.append(self._build_yrkes_query(args.get(taxonomy.OCCUPATION),
@@ -46,8 +56,10 @@ class QueryBuilder(object):
         must_queries.append(self._build_parttime_query(args.get(settings.PARTTIME_MIN),
                                                        args.get(settings.PARTTIME_MAX)))
         must_queries.append(self._build_plats_query(args.get(taxonomy.MUNICIPALITY),
-                                                    args.get(taxonomy.REGION)))
-        must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
+                                                    args.get(taxonomy.REGION),
+                                                    args.get(taxonomy.COUNTRY)))
+        # Replaced by _build_plats_query
+        # must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
         must_queries.append(self._build_generic_query([f.MUST_HAVE_SKILLS + "." +
                                                        f.CONCEPT_ID + ".keyword",
                                                        f.MUST_HAVE_SKILLS + "." +
@@ -270,7 +282,7 @@ class QueryBuilder(object):
         if args.get(settings.SORT) and args.get(settings.SORT) in f.sort_options.keys():
             query_dsl['sort'] = f.sort_options.get(args.pop(settings.SORT))
         else:
-            query_dsl['sort'] = ["_score", {f.ID: "asc"}]
+            query_dsl['sort'] = f.sort_options.get('relevance')
         return query_dsl
 
     def _escape_special_chars_for_complete(self, inputstr):
@@ -310,15 +322,33 @@ class QueryBuilder(object):
             return modded_term
         return word
 
+    def extract_quoted_phrases(self, text):
+        # Append quote to end of string if unbalanced
+        if text.count('"') % 2 != 0:
+            text += '"'
+        must_matches = re.findall(r'\+\"(.+?)\"', text)
+        neg_matches = re.findall(r'\-\"(.+?)\"', text)
+        for neg_match in neg_matches:
+            text = re.sub('-"%s"' % neg_match, '', text)
+        for must_match in must_matches:
+            text = re.sub(r'\+"%s"' % must_match, '', text)
+        matches = re.findall(r'\"(.+?)\"', text)
+        for match in matches:
+            text = re.sub('"%s"' % match, '', text)
+        return {"phrases": matches, "phrases_must": must_matches,
+                "phrases_must_not": neg_matches}, text.strip()
+
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
-    def _build_freetext_query(self, querystring, queryfields, freetext_bool_method):
+    def _build_freetext_query(self, querystring, queryfields, freetext_bool_method,
+                              disable_smart_freetext):
         if not querystring:
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES.copy()
         querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
         original_querystring = querystring
-        concepts = ttc.text_to_concepts(querystring)
+        (phrases, querystring) = self.extract_quoted_phrases(querystring)
+        concepts = {} if disable_smart_freetext else self.ttc.text_to_concepts(querystring)
         querystring = self._rewrite_querystring(querystring, concepts)
         ft_query = self._create_base_ft_query(querystring, freetext_bool_method)
 
@@ -336,20 +366,24 @@ class QueryBuilder(object):
                     ft_query['bool']['must'] = []
                 ft_query['bool']['must'].append(sub_should)
         # Remove unwanted concepts from query
-        self._freetext_concepts(ft_query, concepts, querystring,
-                                queryfields, 'must_not')
+        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must_not')
+        # Require musts
+        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must')
+        self._add_phrases_query(ft_query, phrases)
 
-        # Add required concepts to query
-        # self._freetext_concepts(ft_query, concepts, querystring,
-        #                         queryfields, 'must')
-        #
-        # location_concepts = {
-        #     'location': concepts['location'],
-        #     'location_must': concepts['location_must']
-        # }
-        # original_querystring_without_location = self._rewrite_querystring(original_querystring,
-        #                                                                   location_concepts)
         ft_query = self._freetext_headline(ft_query, original_querystring)
+        return ft_query
+
+    # Add phrase queries
+    def _add_phrases_query(self, ft_query, phrases):
+        for bool_type in ['should', 'must', 'must_not']:
+            key = 'phrases' if bool_type == 'should' else "phrases_%s" % bool_type
+
+            for phrase in phrases[key]:
+                if bool_type not in ft_query['bool']:
+                    ft_query['bool'][bool_type] = []
+                ft_query['bool'][bool_type].append({"match_phrase": {"description.text": phrase}})
+
         return ft_query
 
     # Removes identified concepts from querystring
@@ -369,8 +403,8 @@ class QueryBuilder(object):
         # Remove found concepts from querystring
         for term in [concept['term'] for concept in all_concepts]:
             term = self._rewrite_word_for_regex(term)
-            p = re.compile(f'(^|\\s+){term}(\\s+|$)')
-            querystring = p.sub('\\1\\2', querystring).strip()
+            p = re.compile(f'(^|\\s+)(\\+{term}|\\-{term}|{term})(\\s+|$)')
+            querystring = p.sub('\\1\\3', querystring).strip()
         # Remove duplicate spaces
         querystring = re.sub('\\s+', ' ', querystring).strip()
         return querystring
@@ -379,9 +413,14 @@ class QueryBuilder(object):
         # Creates a base query dict for "independent" freetext words
         # (e.g. words not found in text_to_concepts)
         method = 'or' if method == 'or' else 'and'
+        suffix_words = ' '.join([w[1:] for w in querystring.split(' ')
+                                 if w.startswith('*')])
+        prefix_words = ' '.join([w[:-1] for w in querystring.split(' ')
+                                 if w and w.endswith('*')])
         inc_words = ' '.join([w for w in querystring.split(' ')
                               if w and not w.startswith('+')
-                              and not w.startswith('-')])
+                              and not w.startswith('-') and not w.startswith('*')
+                              and not w.endswith('*')])
         req_words = ' '.join([w[1:] for w in querystring.split(' ')
                               if w.startswith('+')
                               and w[1:].strip()])
@@ -394,23 +433,56 @@ class QueryBuilder(object):
 
         ft_query = {"bool": {}}
         # Add "common" words to query
+        if shoulds or musts or prefix_words or suffix_words:
+            ft_query['bool']['must'] = []
         if shoulds:
             # Include all "must" words in should, to make sure any single "should"-word
             # not becomes exclusive
             if 'must' not in ft_query['bool']:
                 ft_query['bool']['must'] = []
             ft_query['bool']['must'].append({"bool": {"should": shoulds + musts}})
+        # Wildcards after shoulds so they dont end up there
+        if prefix_words:
+            musts.append(self._freetext_wildcard(prefix_words, "prefix", method))
+        if suffix_words:
+            musts.append(self._freetext_wildcard(suffix_words, "suffix", method))
         if musts:
-            ft_query['bool']['must'] = musts
+            ft_query['bool']['must'].append({"bool": {"must": musts}})
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
         return ft_query
+
+    def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
+        return [
+            {
+                "multi_match": {
+                    "query": searchword,
+                    "type": "cross_fields",
+                    "operator": method,
+                    "fields": [f.HEADLINE+"^3", f.KEYWORDS_EXTRACTED+".employer^2",
+                               f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
+                               f.KEYWORDS_EXTRACTED+".location^5"]
+                }
+            }
+        ]
+
+    def _freetext_wildcard(self, searchword, wildcard_side, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
+        return [
+            {
+                "multi_match": {
+                    "query": searchword,
+                    "type": "cross_fields",
+                    "operator": method,
+                    "fields": [f.HEADLINE+"."+wildcard_side, f.DESCRIPTION_TEXT+"."+wildcard_side]
+                }
+            }
+        ]
 
     def _freetext_headline(self, query_dict, querystring):
         # Remove plus and minus from querystring for headline search
         querystring = re.sub(r'(^| )[\\+]{1}', ' ', querystring)
         querystring = ' '.join([word for word in querystring.split(' ')
-                                if not word.startswith('-')])
+                                if not word.startswith('-') and not word.startswith('*') and not word.endswith('*')])
         if 'must' not in query_dict['bool']:
             query_dict['bool']['must'] = []
 
@@ -441,13 +513,13 @@ class QueryBuilder(object):
                     query_dict['bool'][bool_type] = []
 
                 base_fields = []
-                if key in ['location'] and bool_type != 'must':
+                if key in ['location', 'location'] and bool_type != 'must':
                     base_fields.append(f.KEYWORDS_EXTRACTED)
                     base_fields.append(f.KEYWORDS_ENRICHED)
                     # Add freetext search for location that does not exist
                     # in extracted locations, for example 'kallhäll'.
                     value = concept['term'].lower()
-                    if value not in ttc.ontology.extracted_locations:
+                    if value not in self.ttc.ontology.extracted_locations:
                         geo_ft_query = self._freetext_fields(value)
                         query_dict['bool'][bool_type].append(geo_ft_query[0])
                 else:
@@ -476,20 +548,6 @@ class QueryBuilder(object):
                     )
 
         return query_dict
-
-    def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
-        return [
-            {
-                "multi_match": {
-                    "query": searchword,
-                    "type": "cross_fields",
-                    "operator": method,
-                    "fields": [f.HEADLINE+"^3", f.KEYWORDS_EXTRACTED+".employer^2",
-                               f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
-                               f.KEYWORDS_EXTRACTED+".location^5"]
-                }
-            }
-        ]
 
     # Parses EMPLOYER
     def _build_employer_query(self, employers):
@@ -560,7 +618,7 @@ class QueryBuilder(object):
             "term": {
                 f.OCCUPATION+"."+f.CONCEPT_ID+".keyword": {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
-        neg_yrke_term_query = [{
+        neg_yrke_term_query += [{
             "term": {
                 f.OCCUPATION+"."+f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
@@ -592,11 +650,13 @@ class QueryBuilder(object):
             return None
 
     # Parses MUNICIPALITY and REGION
-    def _build_plats_query(self, kommunkoder, lanskoder):
+    def _build_plats_query(self, kommunkoder, lanskoder, landskoder):
         kommuner = []
         neg_komm = []
         lan = []
         neg_lan = []
+        land = []
+        neg_land = []
         for kkod in kommunkoder if kommunkoder else []:
             if kkod.startswith('-'):
                 neg_komm.append(kkod[1:])
@@ -607,6 +667,12 @@ class QueryBuilder(object):
                 neg_lan.append(lkod[1:])
             else:
                 lan.append(lkod)
+        for ckod in landskoder if landskoder else []:
+            if ckod.startswith('-'):
+                neg_land.append(ckod[1:])
+            else:
+                land.append(ckod)
+
         plats_term_query = [{"term": {
             f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
@@ -619,11 +685,19 @@ class QueryBuilder(object):
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID: {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]
+        plats_term_query += [{"term": {
+            f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
+                "value": ckod, "boost": 1.0}}} for ckod in land]
+        plats_term_query += [{"term": {
+            f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+                "value": ckod, "boost": 1.0}}} for ckod in land]
+
         plats_bool_query = {"bool": {
             "should": plats_term_query}
         } if plats_term_query else {}
         neg_komm_term_query = []
         neg_lan_term_query = []
+        neg_land_term_query = []
         if neg_komm:
             neg_komm_term_query = [{"term": {
                 f.WORKPLACE_ADDRESS_MUNICIPALITY_CODE: {
@@ -638,14 +712,25 @@ class QueryBuilder(object):
             neg_lan_term_query += [{"term": {
                 f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID: {
                     "value": lkod}}} for lkod in neg_lan]
-        if neg_komm_term_query or neg_lan_term_query:
+
+        if neg_land:
+            neg_land_term_query = [{"term": {
+                f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
+                    "value": ckod}}} for ckod in neg_land]
+            neg_land_term_query += [{"term": {
+                f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+                    "value": ckod}}} for ckod in neg_land]
+
+        if neg_komm_term_query or neg_lan_term_query or neg_land_term_query:
             if 'bool' not in plats_bool_query:
                 plats_bool_query['bool'] = {}
             plats_bool_query['bool']['must_not'] = neg_komm_term_query + \
-                                                   neg_lan_term_query
+                                                   neg_lan_term_query + \
+                                                   neg_land_term_query
+
         return plats_bool_query
 
-    # Parses COUNTRY
+    # Parses COUNTRY (DEPRECATED)
     def _build_country_query(self, landskoder):
         lander = []
         neg_land = []
@@ -768,7 +853,7 @@ class QueryBuilder(object):
                     log.info("Bad position-parameter: \"%s\" (%s)" % (position, str(e)))
 
             geo_filter = {}
-            if (not latitude or not longitude or not coordinate_range):
+            if not latitude or not longitude or not coordinate_range:
                 return {}
             elif ((-90 <= latitude <= 90)
                   and (-180 <= longitude <= 180) and (coordinate_range > 0)):
@@ -780,3 +865,25 @@ class QueryBuilder(object):
             if geo_filter:
                 geo_bool['bool']['should'].append(geo_filter)
         return geo_bool
+
+    def create_suggester(self, args):
+        """"
+        parse args and create suggester
+        """
+        prefix = args.split()[-1]
+        fields = ['skill', 'occupation', 'location']
+        search = elasticsearch_dsl.Search()
+        search = search.source('suggest')
+        for field in fields:
+           search = search.suggest(
+               '%s-suggest' % field,
+               prefix,
+               completion={
+                   'field': 'keywords.enriched.%s.suggest' % field,
+                   "skip_duplicates": True,
+                   "fuzzy": {
+                       "fuzziness": 'AUTO'
+                   }
+               }
+           )
+        return search.to_dict()

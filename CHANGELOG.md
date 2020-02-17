@@ -8,6 +8,7 @@ Changelog Application Jobsearch
 * Adds "phrase searching". Use quotes to search the ad text for specific phrases.
 * Adds feature toggle to disable query analysis in favour of simpler freetext search.
 * Adds spellchecking typeahead feature toggle.
+* Add prefix and postfix wildcard ('*') to search for partial words in ad text.
 
 ## 1.7.2
 * Comma treated as delimiter in freetext queries

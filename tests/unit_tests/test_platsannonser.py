@@ -12,7 +12,15 @@ from sokannonser.repository import taxonomy
 log = logging.getLogger(__name__)
 
 
+class MockOntology():
+    def __init__(self):
+        self.extracted_locations = set()
+
+
 class MockTextToConcept:
+    def __init__(self):
+        self.ontology = MockOntology()
+
     def text_to_concepts(self, text):
         skills = {
             "python": {

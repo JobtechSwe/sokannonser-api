@@ -513,7 +513,7 @@ class QueryBuilder(object):
                     query_dict['bool'][bool_type] = []
 
                 base_fields = []
-                if key in ['location', 'location'] and bool_type != 'must':
+                if key in ['location', 'occupation'] and bool_type != 'must':
                     base_fields.append(f.KEYWORDS_EXTRACTED)
                     base_fields.append(f.KEYWORDS_ENRICHED)
                     # Add freetext search for location that does not exist

@@ -345,7 +345,7 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES.copy()
-        querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('/|\\s|\\,', querystring)])
+        querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
         original_querystring = querystring
         (phrases, querystring) = self.extract_quoted_phrases(querystring)
         concepts = {} if disable_smart_freetext else self.ttc.text_to_concepts(querystring)

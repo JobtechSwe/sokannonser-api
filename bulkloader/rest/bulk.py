@@ -2,7 +2,7 @@ import logging
 import time
 from datetime import datetime, timedelta
 from flask import send_file, Response
-from flask_restplus import Resource
+from flask_restx import Resource
 from jobtech.common.rest.decorators import check_api_key, check_api_key_and_return_metadata
 from bulkloader.rest import ns_bulk, bulk_zip_query, bulk_stream_query
 from bulkloader import repository

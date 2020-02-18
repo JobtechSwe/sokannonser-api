@@ -10,7 +10,107 @@ from sokannonser.repository.querybuilder import QueryBuilder
 from sokannonser.repository import taxonomy
 
 log = logging.getLogger(__name__)
-pbquery = QueryBuilder()
+
+
+class MockOntology():
+    def __init__(self):
+        self.extracted_locations = set()
+
+
+class MockTextToConcept:
+    def __init__(self):
+        self.ontology = MockOntology()
+
+    def text_to_concepts(self, text):
+        skills = {
+            "python": {
+                "term": "python",
+                "uuid": "0b6d3a08-3cc3-546d-b8ed-f2de299bafdb",
+                "concept": "Python",
+                "type": "KOMPETENS",
+                "term_uuid": "f60fa7fd-00f7-5803-acd7-1a3eda170397",
+                "term_misspelled": False,
+                "plural_occupation": False,
+                "definite_occupation": False,
+                "version": "SYNONYM-DIC-2.0.1.25",
+                "operator": ""
+            },
+            "java": {
+                "term": "java",
+                "uuid": "c965e8aa-751a-5923-97bd-b8bd6d5e813a",
+                "concept": "Java",
+                "type": "KOMPETENS",
+                "term_uuid": "e3d2a75a-5717-56d2-ad8a-ee4b5baf8530",
+                "term_misspelled": False,
+                "plural_occupation": False,
+                "definite_occupation": False,
+                "version": "SYNONYM-DIC-2.0.1.25",
+                "operator": "+"
+            },
+            "php": {
+                "term": "php",
+                "uuid": "3e3629d1-95f6-5b0e-8f5c-d6a709fd94e2",
+                "concept": "Php",
+                "type": "KOMPETENS",
+                "term_uuid": "216af07e-d210-572f-8885-b13d79b80acc",
+                "term_misspelled": False,
+                "plural_occupation": False,
+                "definite_occupation": False,
+                "version": "SYNONYM-DIC-2.0.1.25",
+                "operator": "-"
+            }
+        }
+        occupations = {
+            "systemutvecklare": {
+                "term": "systemutvecklare",
+                "uuid": "df9e7a73-2cc3-5b32-a84e-7e68a527e80e",
+                "concept": "Systemutvecklare",
+                "type": "YRKE",
+                "term_uuid": "7296755c-acf2-5eed-9d4b-e4cd845cd05a",
+                "term_misspelled": False,
+                "plural_occupation": False,
+                "definite_occupation": False,
+                "version": "SYNONYM-DIC-2.0.1.25",
+                "operator": ""
+            }
+        }
+        response = {
+            "skill": [],
+            "occupation": [],
+            "trait": [],
+            "location": [],
+            "skill_must": [],
+            "occupation_must": [],
+            "trait_must": [],
+            "location_must": [],
+            "skill_must_not": [],
+            "occupation_must_not": [],
+            "trait_must_not": [],
+            "location_must_not": []
+        }
+        for word in text.split():
+            if word.startswith("+"):
+                word = word[1:]
+                if word in skills:
+                    response['skill_must'].append(skills[word])
+                if word in occupations:
+                    response['occupation_must'].append(occupations[word])
+            elif word.startswith("-"):
+                word = word[1:]
+                if word in skills:
+                    response['skill_must_not'].append(skills[word])
+                if word in occupations:
+                    response['occupation_must_not'].append(occupations[word])
+            else:
+                if word in skills:
+                    response['skill'].append(skills[word])
+                if word in occupations:
+                    response['occupation'].append(occupations[word])
+
+        return response
+
+
+pbquery = QueryBuilder(MockTextToConcept())
 
 
 @pytest.mark.parametrize("from_datetime", ["2018-09-28T00:00:00",
@@ -343,3 +443,64 @@ def test_rewrite_querystring():
     assert pbquery._rewrite_querystring(
         "korvprånglare c++ asp.net [python3] flärgare",
         concepts) == "korvprånglare [python3] flärgare"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("querystring, expected", [
+    ("python \"grym kodare\"", ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": []}, "python")),
+    ("java \"malmö stad\"", ({"phrases": ["malmö stad"], "phrases_must": [], "phrases_must_not": []}, "java")),
+    ("python -\"grym kodare\" +\"i am lazy\"", ({"phrases": [], "phrases_must": ["i am lazy"], "phrases_must_not": ["grym kodare"]}, "python")),
+    ("\"python på riktigt\" -\"grym kodare\" +\"i am lazy\"", ({"phrases": ["python på riktigt"], "phrases_must": ["i am lazy"], "phrases_must_not": ["grym kodare"]}, "")),
+])
+def test_extract_querystring_phrases(querystring, expected):
+    assert expected == pbquery.extract_quoted_phrases(querystring)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("querystring, expected", [
+    ("\"i am lazy", ({"phrases": ["i am lazy"], "phrases_must": [], "phrases_must_not": []}, "")),
+    ("python \"grym kodare\" \"i am lazy java", ({"phrases": ["grym kodare", "i am lazy java"], "phrases_must": [], "phrases_must_not": []}, "python")),
+    ("python \"grym kodare\" +\"i am lazy", ({"phrases": ["grym kodare"], "phrases_must": ["i am lazy"], "phrases_must_not": []}, "python")),
+    ("python \"grym kodare\" -\"i am lazy", ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": ["i am lazy"]}, "python")),
+])
+def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expected):
+    assert expected == pbquery.extract_quoted_phrases(querystring)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("querystring, expected", [
+    ("-php", {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
+    ("+java", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
+    ("python", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
+    ("systemutvecklare python +java", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
+    ("systemutvecklare python +java", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
+    ("systemutvecklare python +java", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
+    ("systemutvecklare python +java -php", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
+    ("systemutvecklare python +java -php", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
+    ("systemutvecklare python +java -php", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
+    ("systemutvecklare python +java -php", {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
+])
+def test_freetext_bool_structure(querystring, expected):
+    result = pbquery._build_freetext_query(querystring, None, "and", False)
+    assert _assert_json_structure(result, expected)
+
+
+def _assert_json_structure(result, expected):
+    return _walk_dictionary(result, expected)
+
+
+def _walk_dictionary(result, expected):
+    if isinstance(result, str) and isinstance(expected, str):
+        return result == expected
+    else:
+        for item in expected:
+            if item in result:
+                if isinstance(result[item], list):
+                    for listitem in result[item]:
+                        if _walk_dictionary(listitem, expected[item]):
+                            return True
+                else:
+                    return _walk_dictionary(result[item], expected[item])
+
+        return False
+

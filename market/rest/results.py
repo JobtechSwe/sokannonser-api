@@ -1,5 +1,5 @@
 import re
-from flask_restplus import fields
+from flask_restx import fields
 from market.rest import ns_market as api
 
 

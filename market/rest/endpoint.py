@@ -1,4 +1,4 @@
-from flask_restplus import Resource
+from flask_restx import Resource
 from jobtech.common.rest.decorators import check_api_key
 from sokannonser import settings
 from market.rest import ns_market, market_query, market_typeahead

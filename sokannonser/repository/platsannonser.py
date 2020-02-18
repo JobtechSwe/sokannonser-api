@@ -123,7 +123,7 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
 def suggest(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)
-    query_dsl = querybuilder.create_suggester(args)
+    query_dsl = querybuilder.create_auto_complete_suggester(args)
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
     try:

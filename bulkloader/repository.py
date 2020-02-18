@@ -2,7 +2,7 @@ import logging
 import json
 import time
 import zipfile
-from flask_restplus import Namespace
+from flask_restx import Namespace
 from datetime import date, timedelta
 from io import BytesIO
 from elasticsearch.helpers import scan

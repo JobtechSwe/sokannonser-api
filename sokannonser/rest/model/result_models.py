@@ -1,4 +1,4 @@
-from flask_restplus import fields
+from flask_restx import fields
 from sokannonser.rest import ns_platsannons
 from sokannonser import settings
 from sokannonser.rest.model import fields as f
@@ -151,7 +151,8 @@ job_ad = ns_platsannons.model('JobAd', {
     'workplace_address': fields.Nested(work_address),
     'must_have': fields.Nested(requirements),
     'nice_to_have': fields.Nested(requirements),
-    'application_contact': fields.Nested(application_contact),
+    # Awaiting decision from legal
+    # 'application_contact': fields.Nested(application_contact),
     f.PUBLICATION_DATE: fields.DateTime(),
     f.LAST_PUBLICATION_DATE: fields.DateTime(),
     f.REMOVED: fields.Boolean(),

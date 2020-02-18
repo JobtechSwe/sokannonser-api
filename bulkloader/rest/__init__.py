@@ -1,4 +1,4 @@
-from flask_restplus import Api, Namespace, reqparse, inputs
+from flask_restx import Api, Namespace, reqparse, inputs
 from sokannonser import settings
 
 api = Api(version='1.8.0', title='Download job ads',

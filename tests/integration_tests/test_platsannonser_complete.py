@@ -98,6 +98,10 @@ def test_complete_one_param_competence_special_char():
 
         complete_values = [item['value'] for item in json_typeahead]
 
+        assert len(complete_values) > 0
+        # pprint(complete_values)	# This test case is for test complete endpoint with auto complete suggest
+        assert 'c#' in complete_values
+
 
 # This test case is for test complete endpoint with auto complete suggest
 @pytest.mark.integration

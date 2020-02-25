@@ -44,7 +44,7 @@ class BulkZip(Resource):
 
 @ns_bulk.route('stream')
 class BulkLoad(Resource):
-    method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
+    #method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
     example_date = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M:%S")
 
     @ns_bulk.doc(
@@ -62,7 +62,7 @@ class BulkLoad(Resource):
     )
     @ns_bulk.expect(bulk_stream_query)
     def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         args = bulk_stream_query.parse_args()
         return Response(repository.load_all(args.get(settings.DATE)),
                         mimetype='application/json')

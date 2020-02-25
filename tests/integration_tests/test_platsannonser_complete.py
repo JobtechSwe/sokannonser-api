@@ -98,9 +98,22 @@ def test_complete_one_param_competence_special_char():
 
         complete_values = [item['value'] for item in json_typeahead]
 
-        assert len(complete_values) > 0
-        # pprint(complete_values)
-        assert 'c#' in complete_values
+
+# This test case is for test complete endpoint with auto complete suggest
+@pytest.mark.integration
+def test_complete_endpoint_with_auto_complete_suggest():
+    app.testing = True
+    with app.test_client() as testclient:
+
+        headers = {'api-key': test_api_key, 'accept': 'application/json',
+                   settings.X_FEATURE_SPELLCHECK_TYPEAHEAD: 'true'}
+        result = testclient.get('/complete', headers=headers, data={'q': 'pyt'})
+        json_response = result.json
+
+        assert 'typeahead' in json_response
+
+        suggest_value = [suggest.get('value') for suggest in json_response.get('typeahead')]
+        assert 'python' in suggest_value
 
 
 if __name__ == '__main__':

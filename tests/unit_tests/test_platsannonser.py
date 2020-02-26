@@ -411,6 +411,11 @@ def test_rewrite_querystring():
          'concept': 'C++', 'type': 'KOMPETENS',
          'term_uuid': '9734cba6-eff8-5cdc-9881-392a4345e57e',
          'term_misspelled': False,
+         'version': 'NARVALONTOLOGI-2.0.0.33', 'operator': ''},
+        {'term': 'tcp/ip', 'uuid': '09df5ef2-357f-5cfc-9333-dec2e220638a',
+         'concept': 'Tcp/ip', 'type': 'KOMPETENS',
+         'term_uuid': 'a18b2945-779f-5032-bbaa-c7945a63055f',
+         'term_misspelled': False,
          'version': 'NARVALONTOLOGI-2.0.0.33', 'operator': ''}], 'occupation': [
         {'term': 'specialpedagog',
          'uuid': '4872acf8-ea61-50fe-8a7e-7af82b37ce9e',
@@ -443,6 +448,7 @@ def test_rewrite_querystring():
     assert pbquery._rewrite_querystring(
         "korvprånglare c++ asp.net [python3] flärgare",
         concepts) == "korvprånglare [python3] flärgare"
+    assert pbquery._rewrite_querystring("tcp/ip", concepts) == ""
 
 
 @pytest.mark.unit
@@ -475,6 +481,7 @@ def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expecte
     ("systemutvecklare python +java", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
     ("systemutvecklare python +java", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
     ("systemutvecklare python +java", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
+    ("systemutvecklare python +java", {"bool": {"must": {"bool": {"should": {"term": {"keywords.extracted.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
     ("systemutvecklare python +java -php", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
     ("systemutvecklare python +java -php", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
     ("systemutvecklare python +java -php", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),

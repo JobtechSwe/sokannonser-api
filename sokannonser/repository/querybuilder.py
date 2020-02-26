@@ -907,3 +907,30 @@ class QueryBuilder(object):
                }
            )
         return search.to_dict()
+
+    def create_phrase_suggester(self, args):
+        """"
+        parse args and create auto complete suggester
+        """
+        fields = ['headline', 'description.text']
+        search = elasticsearch_dsl.Search()
+        search = search.source('suggest')
+        for field in fields:
+            search = search.suggest(
+                '%s_simple_phrase' % field,
+                args,
+                phrase={
+                   'field': '%s.trigram' % field,
+                   'size': 5,
+                   'direct_generator': [{
+                        'field': '%s.trigram' % field,
+                        'suggest_mode': 'always'
+                   }, {
+                        'field': '%s.reverse' % field,
+                        'suggest_mode': 'always',
+                        'pre_filter': 'reverse',
+                        'post_filter': 'reverse'
+                   }]
+                }
+            )
+        return search.to_dict()

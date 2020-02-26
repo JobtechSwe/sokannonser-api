@@ -93,7 +93,7 @@ class Search(Resource):
 
 @ns_platsannons.route('complete')
 class Complete(Resource):
-    method_decorators = [check_api_key_and_return_metadata('pb')]
+    #method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
@@ -119,7 +119,7 @@ class Complete(Resource):
         args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
-            result = platsannonser.suggest(freetext_query, self.querybuilder)
+            result = platsannonser.complete_suggest(freetext_query, self.querybuilder)
         else:
             result = platsannonser.find_platsannonser(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."

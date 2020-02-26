@@ -882,9 +882,9 @@ class QueryBuilder(object):
                    'field': 'keywords.enriched.%s.suggest' % field,
                    "skip_duplicates": True,
                    "fuzzy": {
-                       "fuzziness": 'AUTO'
-                   },
-                   "prefix_length": 0
+                       "fuzziness": 'AUTO',
+                       "prefix_length": 0
+                   }
                }
            )
         return search.to_dict()

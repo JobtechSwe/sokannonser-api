@@ -513,7 +513,7 @@ class QueryBuilder(object):
                     query_dict['bool'][bool_type] = []
 
                 base_fields = []
-                if key in ['location', 'occupation'] and bool_type != 'must':
+                if key == 'location' and bool_type != 'must':
                     base_fields.append(f.KEYWORDS_EXTRACTED)
                     base_fields.append(f.KEYWORDS_ENRICHED)
                     # Add freetext search for location that does not exist
@@ -522,6 +522,9 @@ class QueryBuilder(object):
                     if value not in self.ttc.ontology.extracted_locations:
                         geo_ft_query = self._freetext_fields(value)
                         query_dict['bool'][bool_type].append(geo_ft_query[0])
+                elif key == 'occupation' and bool_type != 'must':
+                    base_fields.append(f.KEYWORDS_EXTRACTED)
+                    base_fields.append(f.KEYWORDS_ENRICHED)
                 else:
                     curr_base_field = f.KEYWORDS_EXTRACTED \
                         if key in ['employer'] else f.KEYWORDS_ENRICHED

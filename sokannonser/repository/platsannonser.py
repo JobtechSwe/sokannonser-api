@@ -198,7 +198,7 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
                     {
                         'value': ads.get('text', ''),
                         'found_phrase': ads.get('text', ''),
-                        'type': key.split('-')[0],
+                        'type': key.split('.')[0],
                         'occurrences': None
                     }
                 )

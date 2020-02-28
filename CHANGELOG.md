@@ -1,5 +1,8 @@
 Changelog Application Jobsearch
 ===============================
+## 1.8.1
+* Fixes bug that searched several fields for identified occupations.
+
 ## 1.8.0
 * Bug fixes
 * Adds concept ID for municipality, region and country in workplace_address

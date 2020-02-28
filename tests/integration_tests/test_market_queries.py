@@ -7,7 +7,7 @@ from market import app
 test_api_key = os.getenv('TEST_API_KEY')
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_passed_deadline():
     print('==================', sys._getframe().f_code.co_name, '================== ')

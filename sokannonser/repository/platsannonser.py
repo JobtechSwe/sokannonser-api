@@ -120,6 +120,13 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
     return transform_platsannons_query_result(args, query_result, querybuilder)
 
 
+def suggest(args, querybuilder, start_time=0, x_fields=None):
+    result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
+    if not result['aggs']:
+        result = phrase_suggest(args, querybuilder, start_time=0, x_fields=None)
+    return result
+
+
 def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)

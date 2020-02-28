@@ -121,9 +121,9 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
 
 
 def suggest(args, querybuilder, start_time=0, x_fields=None):
-    result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
-    if not result['aggs']:
-        result = phrase_suggest(args, querybuilder, start_time=0, x_fields=None)
+    #result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
+    #if not result['aggs']:
+    result = phrase_suggest(args, querybuilder, start_time=0, x_fields=None)
     return result
 
 

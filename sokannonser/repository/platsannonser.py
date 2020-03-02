@@ -168,7 +168,7 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
                     {
                         'value': value,
                         'found_phrase': value,
-                        'type': key.split('-')[0].split('.')[-1],
+                        'type': key.split('-')[0],
                         'occurrences': None
                     }
                 )

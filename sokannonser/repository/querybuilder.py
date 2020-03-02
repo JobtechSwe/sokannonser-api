@@ -869,23 +869,22 @@ class QueryBuilder(object):
                 geo_bool['bool']['should'].append(geo_filter)
         return geo_bool
 
-    def create_auto_complete_suggester(self, args):
+    def create_auto_complete_suggester(self, word):
         """"
         parse args and create auto complete suggester
         """
-        prefix = args.split()[-1]
         fields = ['skill', 'occupation', 'location']
         search = elasticsearch_dsl.Search()
         search = search.source('suggest')
         for field in fields:
            search = search.suggest(
                '%s-suggest' % field,
-               prefix,
+               word,
                completion={
                    'field': 'keywords.enriched.%s.suggest' % field,
                    "skip_duplicates": True,
                    "fuzzy": {
-                       "fuzziness": 'AUTO',
+                       "min_length": 5,
                        "prefix_length": 0
                    }
                }
@@ -894,27 +893,27 @@ class QueryBuilder(object):
 
     def create_phrase_suggester(self, args):
         """"
-        parse args and create auto complete suggester
+        parse args and create phrase suggester
         """
-        fields = ['headline', 'description.text']
+        field = 'keywords.enriched_typeahead_terms.compound'
         search = elasticsearch_dsl.Search()
         search = search.source('suggest')
-        for field in fields:
-            search = search.suggest(
-                '%s_simple_phrase' % field,
-                args,
-                phrase={
-                   'field': '%s.trigram' % field,
-                   'size': 5,
-                   'direct_generator': [{
-                        'field': '%s.trigram' % field,
-                        'suggest_mode': 'always'
-                   }, {
-                        'field': '%s.reverse' % field,
-                        'suggest_mode': 'always',
-                        'pre_filter': 'reverse',
-                        'post_filter': 'reverse'
-                   }]
-                }
-            )
+        search = search.suggest(
+            '%s_simple_phrase' % field,
+            args,
+            phrase={
+               'field': '%s.trigram' % field,
+               'size': 10,
+               'max_errors': 2,
+               'direct_generator': [{
+                    'field': '%s.trigram' % field,
+                    'suggest_mode': 'always'
+               }, {
+                    'field': '%s.reverse' % field,
+                    'suggest_mode': 'always',
+                    'pre_filter': 'reverse',
+                    'post_filter': 'reverse'
+               }]
+            }
+        )
         return search.to_dict()

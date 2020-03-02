@@ -105,6 +105,7 @@ def test_complete_one_param_competence_special_char():
 
 # This test case is for test complete endpoint with auto complete suggest
 # This test case is not good, will fix in future
+@pytest.mark.skip(reason="We currently don't have values in field keywords.enriched_synonyms")
 @pytest.mark.integration
 def test_complete_endpoint_with_auto_complete_suggest():
     app.testing = True

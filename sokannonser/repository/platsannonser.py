@@ -130,7 +130,15 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):
 def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)
-    query_dsl = querybuilder.create_auto_complete_suggester(args)
+
+    word = args.split()[-1]
+    if args.split()[:-1]:
+        prefix = ' '.join(args.split()[:-1])
+    else:
+        prefix = ''
+
+    query_dsl = querybuilder.create_auto_complete_suggester(word)
+
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
     try:
@@ -147,17 +155,19 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
 
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
-
     log.debug(query_result.get('suggest', {}))
+
     aggs = []
     suggests = query_result.get('suggest', {})
+
     for key in suggests:
         if suggests[key][0].get('options', []):
             for ads in suggests[key][0]['options']:
+                value = prefix + ' ' + ads.get('text', '') if prefix else ads.get('text', '')
                 aggs.append(
                     {
-                        'value': ads.get('text', ''),
-                        'found_phrase': ads.get('text', ''),
+                        'value': value,
+                        'found_phrase': value,
                         'type': key.split('-')[0],
                         'occurrences': None
                     }
@@ -198,7 +208,7 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
                     {
                         'value': ads.get('text', ''),
                         'found_phrase': ads.get('text', ''),
-                        'type': key.split('.')[0],
+                        'type': key.split('.')[-1].split('_')[0],
                         'occurrences': None
                     }
                 )

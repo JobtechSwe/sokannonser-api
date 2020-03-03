@@ -123,7 +123,7 @@ class Complete(Resource):
             result = platsannonser.suggest(freetext_query, self.querybuilder)
 
         else:
-            result = platsannonser.find_platsannonser(args, self.querybuilder)
+            result = platsannonser.old_suggest(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."
                   % (int(time.time()*1000)-start_time))
 

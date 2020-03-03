@@ -77,6 +77,18 @@ def get_stats_for(taxonomy_type):
     return code_count
 
 
+def old_suggest(args, querybuilder, start_time=0, x_fields=None):
+    result = find_platsannonser(args, querybuilder, start_time=0, x_fields=None)
+    log.debug(result.get('aggs'))
+    if result.get('aggs'):
+        for item in result.get('aggs'):
+            item['value'] = args[settings.FREETEXT_QUERY] + ' ' + item['value']
+            item['found_phrase'] = args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']
+    else:
+        result = suggest(args.get(settings.TYPEAHEAD_QUERY), querybuilder)
+    return result
+
+
 def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)

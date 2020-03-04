@@ -120,10 +120,10 @@ class Complete(Resource):
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
 
         if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
-            result = platsannonser.suggest(freetext_query, self.querybuilder)
+            result = platsannonser.old_suggest(args, self.querybuilder)
 
         else:
-            result = platsannonser.old_suggest(args, self.querybuilder)
+            result = platsannonser.find_platsannonser(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."
                   % (int(time.time()*1000)-start_time))
 

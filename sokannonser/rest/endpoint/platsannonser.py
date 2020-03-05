@@ -43,7 +43,7 @@ class AdLogo(Resource):
 
 @ns_platsannons.route('search')
 class Search(Resource):
-    method_decorators = [check_api_key_and_return_metadata('pb')]
+    #method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
@@ -120,8 +120,7 @@ class Complete(Resource):
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
 
         if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
-            result = platsannonser.old_suggest(args, self.querybuilder)
-
+            result = platsannonser.suggest(args, self.querybuilder)
         else:
             result = platsannonser.find_platsannonser(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."

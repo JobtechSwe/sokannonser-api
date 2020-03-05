@@ -253,7 +253,7 @@ class QueryBuilder(object):
             size = 12/len(complete_fields)
 
             enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
-                settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+                settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED_TYPEAHEAD_TERMS
 
             for field in complete_fields:
                 base_field = f.KEYWORDS_EXTRACTED \
@@ -884,7 +884,7 @@ class QueryBuilder(object):
                    'field': 'keywords.enriched_typeahead_terms.%s.suggest' % field,
                    "skip_duplicates": True,
                    "fuzzy": {
-                       "min_length": 5,
+                       "min_length": 3,
                        "prefix_length": 0
                    }
                }
@@ -907,12 +907,14 @@ class QueryBuilder(object):
                'max_errors': 2,
                'direct_generator': [{
                     'field': '%s.trigram' % field,
-                    'suggest_mode': 'always'
+                    'suggest_mode': 'always',
+                    'min_word_length': 1
                }, {
                     'field': '%s.reverse' % field,
                     'suggest_mode': 'always',
                     'pre_filter': 'reverse',
-                    'post_filter': 'reverse'
+                    'post_filter': 'reverse',
+                    'min_word_length': 1
                }]
             }
         )

@@ -77,7 +77,7 @@ def get_stats_for(taxonomy_type):
     return code_count
 
 
-def old_suggest(args, querybuilder, start_time=0, x_fields=None):
+def suggest(args, querybuilder, start_time=0, x_fields=None):
     result = find_platsannonser(args, querybuilder, start_time=0, x_fields=None)
     log.debug(result.get('aggs'))
     if result.get('aggs'):
@@ -85,7 +85,9 @@ def old_suggest(args, querybuilder, start_time=0, x_fields=None):
             item['value'] = args[settings.FREETEXT_QUERY] + ' ' + item['value']
             item['found_phrase'] = args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']
     else:
-        result = suggest(args.get(settings.TYPEAHEAD_QUERY), querybuilder)
+        result = complete_suggest(args.get(settings.TYPEAHEAD_QUERY), querybuilder, start_time=0, x_fields=None)
+        if not result['aggs']:
+            result = phrase_suggest(args.get(settings.TYPEAHEAD_QUERY), querybuilder, start_time=0, x_fields=None)
     return result
 
 
@@ -130,13 +132,6 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
     return transform_platsannons_query_result(args, query_result, querybuilder)
-
-
-def suggest(args, querybuilder, start_time=0, x_fields=None):
-    result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
-    if not result['aggs']:
-        result = phrase_suggest(args, querybuilder, start_time=0, x_fields=None)
-    return result
 
 
 def complete_suggest(args, querybuilder, start_time=0, x_fields=None):

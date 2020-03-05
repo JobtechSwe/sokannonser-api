@@ -682,12 +682,37 @@ class QueryBuilder(object):
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_MUNICIPALITY_CONCEPT_ID: {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
+
+        # Change region = 90 or region = null for a short time
+        # For unspecified area
+        # After future change data struction this part will be deleted
+        if 'null' in lan:
+            plats_term_query += [
+                {
+                    "bool": {
+                        "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CODE: {"value": '199'}}},
+                        "must_not": {"exists": {"field": f.WORKPLACE_ADDRESS_REGION_CODE}},
+                        "boost": 1.0
+                    }
+                },
+            ]
+            plats_term_query += [
+                {
+                    "bool": {
+                        "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {"value": 'i46j_HmG_v64'}}},
+                        "must_not": {"exists": {"field": f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID}},
+                        "boost": 1.0
+                    }
+                },
+            ]
+
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_REGION_CODE: {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID: {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]
+
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
                 "value": ckod, "boost": 1.0}}} for ckod in land]

@@ -10,6 +10,8 @@ from sokannonser import settings
 from sokannonser.repository import elastic, taxonomy
 from sokannonser.rest.model import fields
 
+from operator import itemgetter
+
 log = logging.getLogger(__name__)
 
 currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
@@ -176,11 +178,14 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
                         'value': value,
                         'found_phrase': value,
                         'type': key.split('-')[0],
-                        'occurrences': None
+                        'occurrences': 0
                     }
                 )
-    query_result['aggs'] = aggs[:10]
+
+    # check occurrences even i think it will take some trouble and stupid
+    query_result['aggs'] = suggest_check_occurence(aggs[:10], querybuilder)
     log.debug(query_result['aggs'])
+
     return query_result
 
 
@@ -216,12 +221,35 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
                         'value': ads.get('text', ''),
                         'found_phrase': ads.get('text', ''),
                         'type': key.split('.')[-1].split('_')[0],
-                        'occurrences': None
+                        'occurrences': 0
                     }
                 )
     query_result['aggs'] = aggs[:10]
     log.debug(query_result['aggs'])
+
+    # check occurrences even i think it will take some trouble and stupid
+    query_result['aggs'] = suggest_check_occurence(aggs[:10], querybuilder)
+    log.debug(query_result['aggs'])
+
     return query_result
+
+
+def suggest_check_occurence(aggs, querybuilder):
+    remove_list = []
+    for agg in aggs:
+        query_dsl = querybuilder.create_suggest_search(agg['value'])
+        query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+        occurrences = query_result.get('hits').get('total').get('value')
+        if occurrences:
+            agg['occurrences'] = occurrences
+        else:
+            remove_list.append(agg)
+
+    for rem in remove_list:
+        aggs.remove(rem)
+
+    aggs = sorted(aggs, key=itemgetter('occurrences'), reverse=True)
+    return aggs
 
 
 def _extract_concept_from_concepts(concepts):

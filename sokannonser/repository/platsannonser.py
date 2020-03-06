@@ -173,7 +173,6 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
         if suggests[key][0].get('options', []):
             for ads in suggests[key][0]['options']:
                 value = prefix + ' ' + ads.get('text', '') if prefix else ads.get('text', '')
-                value = ' '.join([word.capitalize() for word in value])
                 aggs.append(
                     {
                         'value': value,
@@ -218,7 +217,6 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
         if suggests[key][0].get('options', []):
             for ads in suggests[key][0]['options']:
                 value = ads.get('text', '')
-                value = ' '.join([word.capitalize() for word in value])
                 aggs.append(
                     {
                         'value': value,
@@ -243,6 +241,8 @@ def suggest_check_occurence(aggs, querybuilder):
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         occurrences = query_result.get('hits').get('total').get('value')
         agg['occurrences'] = occurrences
+        agg['value'] = ' '.join([word.capitalize() for word in agg['value'].split(' ')])
+        agg['found_phrase'] = agg['value']
 
     aggs = sorted(aggs, key=itemgetter('occurrences'), reverse=True)
     return aggs

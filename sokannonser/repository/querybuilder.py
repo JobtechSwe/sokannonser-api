@@ -1,6 +1,8 @@
+import json
 import logging
 import re
 import time
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 import elasticsearch_dsl
@@ -944,3 +946,17 @@ class QueryBuilder(object):
             }
         )
         return search.to_dict()
+
+    def create_suggest_search(self, suggest):
+        field = 'keywords.enriched_typeahead_terms.compound'
+        search = defaultdict(dict)
+        query = search.setdefault('query', {})
+        match = query.setdefault('match', {})
+        field = match.setdefault(field, {})
+        field['query'] = suggest
+        field['operator'] = 'and'
+
+        return json.dumps(search)
+
+
+

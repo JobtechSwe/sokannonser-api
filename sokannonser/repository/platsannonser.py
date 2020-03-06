@@ -173,6 +173,7 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
         if suggests[key][0].get('options', []):
             for ads in suggests[key][0]['options']:
                 value = prefix + ' ' + ads.get('text', '') if prefix else ads.get('text', '')
+                value = ' '.join([word.capitalize() for word in value])
                 aggs.append(
                     {
                         'value': value,
@@ -216,10 +217,12 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
     for key in suggests:
         if suggests[key][0].get('options', []):
             for ads in suggests[key][0]['options']:
+                value = ads.get('text', '')
+                value = ' '.join([word.capitalize() for word in value])
                 aggs.append(
                     {
-                        'value': ads.get('text', ''),
-                        'found_phrase': ads.get('text', ''),
+                        'value': value,
+                        'found_phrase': value,
                         'type': key.split('.')[-1].split('_')[0],
                         'occurrences': 0
                     }

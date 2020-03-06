@@ -235,18 +235,11 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
 
 
 def suggest_check_occurence(aggs, querybuilder):
-    remove_list = []
     for agg in aggs:
         query_dsl = querybuilder.create_suggest_search(agg['value'])
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         occurrences = query_result.get('hits').get('total').get('value')
-        if occurrences:
-            agg['occurrences'] = occurrences
-        else:
-            remove_list.append(agg)
-
-    for rem in remove_list:
-        aggs.remove(rem)
+        agg['occurrences'] = occurrences
 
     aggs = sorted(aggs, key=itemgetter('occurrences'), reverse=True)
     return aggs

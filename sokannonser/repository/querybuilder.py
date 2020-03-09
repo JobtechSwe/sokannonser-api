@@ -900,7 +900,7 @@ class QueryBuilder(object):
         """"
         parse args and create auto complete suggester
         """
-        fields = ['skill', 'occupation', 'location']
+        fields = ['compound', ]
         search = elasticsearch_dsl.Search()
         search = search.source('suggest')
         for field in fields:
@@ -910,6 +910,7 @@ class QueryBuilder(object):
                completion={
                    'field': 'keywords.enriched_typeahead_terms.%s.suggest' % field,
                    "skip_duplicates": True,
+                   "size": 12,
                    "fuzzy": {
                        "min_length": 3,
                        "prefix_length": 0

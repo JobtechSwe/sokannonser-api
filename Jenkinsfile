@@ -35,16 +35,16 @@ pipeline {
                 openshiftTag(namespace:'${openshiftProject}', srcStream: 'bulk-api', srcTag: 'latest', destStream: 'bulk-api', destTag:'${buildTag}')
             }
         }
-        stage('Deploy to I1 Staging'){
-            when{
-                environment name: 'GIT_BRANCH', value: 'origin/master'
-            }
-            steps{
-                sh "oc set image dc/open-api open-api=docker-registry.default.svc:5000/${openshiftProject}/open-api:${buildTag} -n ${openshiftI1Project}"
-                openshiftDeploy(depCfg: 'open-api', namespace: '${openshiftI1Project}', verbose: 'false', waitTime: '', waitUnit: 'sec')
-                openshiftVerifyDeployment(depCfg: 'open-api', namespace: '${openshiftI1Project}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
-            }
-        }
+        // stage('Deploy to I1 Staging'){
+        //     when{
+        //         environment name: 'GIT_BRANCH', value: 'origin/master'
+        //     }
+        //     steps{
+        //         sh "oc set image dc/open-api open-api=docker-registry.default.svc:5000/${openshiftProject}/open-api:${buildTag} -n ${openshiftI1Project}"
+        //         openshiftDeploy(depCfg: 'open-api', namespace: '${openshiftI1Project}', verbose: 'false', waitTime: '', waitUnit: 'sec')
+        //         openshiftVerifyDeployment(depCfg: 'open-api', namespace: '${openshiftI1Project}', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '15', waitUnit: 'sec')
+        //     }
+        // }
         stage('Deploy to Staging'){
             when{
                 environment name: 'GIT_BRANCH', value: 'origin/master'

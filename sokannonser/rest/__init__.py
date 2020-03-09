@@ -1,6 +1,7 @@
 from flask_restx import Api, Namespace
+from sokannonser import settings
 
-api = Api(version='1.8.1', title='Search job ads',
+api = Api(version=settings.API_VERSION, title='Search job ads',
           description='An API for searching and retrieving job ads and for finding '
           'concepts in the Jobtech Taxonomy.',
           default='sokannonser',

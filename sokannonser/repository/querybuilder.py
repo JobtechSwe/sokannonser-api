@@ -690,15 +690,6 @@ class QueryBuilder(object):
             plats_term_query += [
                 {
                     "bool": {
-                        "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CODE: {"value": '199'}}},
-                        "must_not": {"exists": {"field": f.WORKPLACE_ADDRESS_REGION_CODE}},
-                        "boost": 1.0
-                    }
-                },
-            ]
-            plats_term_query += [
-                {
-                    "bool": {
                         "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {"value": 'i46j_HmG_v64'}}},
                         "must_not": {"exists": {"field": f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID}},
                         "boost": 1.0

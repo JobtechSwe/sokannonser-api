@@ -183,7 +183,7 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
                 )
 
     # check occurrences even i think it will take some trouble and stupid
-    query_result['aggs'] = suggest_check_occurence(aggs[:12], querybuilder)
+    query_result['aggs'] = suggest_check_occurence(aggs[:30], querybuilder)
     log.debug(query_result['aggs'])
 
     return query_result
@@ -241,8 +241,6 @@ def suggest_check_occurence(aggs, querybuilder):
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         occurrences = query_result.get('hits').get('total').get('value')
         agg['occurrences'] = occurrences
-        agg['value'] = ' '.join([word.capitalize() for word in agg['value'].split(' ')])
-        agg['found_phrase'] = agg['value']
 
     aggs = sorted(aggs, key=itemgetter('occurrences'), reverse=True)
     return aggs

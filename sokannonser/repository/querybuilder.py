@@ -910,7 +910,7 @@ class QueryBuilder(object):
                completion={
                    'field': 'keywords.enriched_typeahead_terms.%s.suggest' % field,
                    "skip_duplicates": True,
-                   "size": 12,
+                   "size": 30,
                    "fuzzy": {
                        "min_length": 3,
                        "prefix_length": 0

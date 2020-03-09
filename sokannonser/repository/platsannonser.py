@@ -183,7 +183,7 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
                 )
 
     # check occurrences even i think it will take some trouble and stupid
-    query_result['aggs'] = suggest_check_occurence(aggs[:30], querybuilder)
+    query_result['aggs'] = suggest_check_occurence(aggs[:50], querybuilder)
     log.debug(query_result['aggs'])
 
     return query_result

@@ -11,7 +11,7 @@ ns_platsannons = Namespace('Open AF-job ads',
                            'job ads. Used for online operations.')
 
 ns_valuestore = Namespace('Jobtech Taxonomy',
-                          description='Find concepts in the Jobtech Taxonomy.')
+                          description='DEPRECATED, use https://taxonomy.api.jobtechdev.se/v1/taxonomy/swagger-ui/index.html instead')
 
 api.add_namespace(ns_platsannons, '/')
 api.add_namespace(ns_valuestore, '/taxonomy')

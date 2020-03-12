@@ -100,3 +100,21 @@ auranest_stats_options = {
     'sites': 'source.site.name.keyword',
     'locations': 'location.translations.sv-SE.keyword'
 }
+
+
+# Slack integration
+SLACK_TOKEN = 'SLACK'
+SLACK_CHANNEL = 'test-result'
+SLACK_USERNAME = 'lina-test'
+SLACK_ENABLED = True
+SLACK_REDIRECT_CHANNEL: str = None
+PRINT_SLACK_MESSAGE = False
+SLACK_SERVER_STATISTICS = False
+SLACK_DEFAULT_TEMPLATE = 'slack/base_message.slack'
+SLACK_STORE_MESSAGE = False
+TEST_RESULT_CHANNEL = 'test-result'
+
+# URL
+URL_DEV = 'https://dev-jobsearch.test.services.jtech.se/'
+URL_STAGE = 'https://staging-jobsearch.test.services.jtech.se/'
+URL_PROD = 'https://jobsearch.api.jobtechdev.se/'

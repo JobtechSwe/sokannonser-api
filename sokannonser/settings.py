@@ -101,3 +101,6 @@ auranest_stats_options = {
     'sites': 'source.site.name.keyword',
     'locations': 'location.translations.sv-SE.keyword'
 }
+
+
+API_VERSION = '1.8.1'

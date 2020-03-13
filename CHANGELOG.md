@@ -1,5 +1,8 @@
 Changelog Application Jobsearch
 ===============================
+## 1.9.0
+* Add one field called unspecified sweden workplace
+
 ## 1.8.1
 * Fixes bug that searched several fields for identified occupations.
 

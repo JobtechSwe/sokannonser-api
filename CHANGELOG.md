@@ -1,8 +1,5 @@
 Changelog Application Jobsearch
 ===============================
-## 1.8.2
-* Add region_concept_id equals to null
-
 ## 1.8.1
 * Fixes bug that searched several fields for identified occupations.
 

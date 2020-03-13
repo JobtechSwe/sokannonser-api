@@ -102,4 +102,4 @@ auranest_stats_options = {
 }
 
 
-API_VERSION = '1.8.2'
+API_VERSION = '1.8.1'

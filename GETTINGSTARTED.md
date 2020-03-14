@@ -1,6 +1,6 @@
 # Search API for job ads - getting started
 
-The aim of this text is to walk you through what you're seeing in the [Swagger-UI](https://jobsearch.api.jobtechdev.se) to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [bulk load API](https://jobstream.api.jobtechdev.se)
+The aim of this text is to walk you through what you're seeing in the [Swagger-UI](https://jobsearch.api.jobtechdev.se) to give you a bit of orientation on what can be done with the Job Search API. If you are just looking for a way to fetch all the ads please use our [Stream API](https://jobstream.api.jobtechdev.se)
 The search API is intended for user search not downloading all the job ads. We may invalidate your API Keys if you make excessive amounts of calls that don't fit the intended purpose of this API.
 
 A bad practice typically means searching for every job of every region every fifth minute.
@@ -26,7 +26,7 @@ The endpoints for the ads search API are:
 Easiest way to try out the API is to go to the [swagger page](https://jobsearch.api.jobtechdev.se/).
 But first you need a key which you need to authenticate yourself.
 
-If you want to get all ads in a bulk, please use our [Stream API](https://jobtechdev.se/devguide/apis/jobstream.html).
+If you want to get all ads in a bulk, please use our [Stream API](https://jobtechdev.se/docs/jobstream/getting-started/).
 
 ## Authentication
 For this API, you will need to register to get your own API key at [apirequest.jobtechdev.se](https://apirequest.jobtechdev.se)
@@ -76,7 +76,7 @@ This endpoint returns the logo for a given ad's id number.
 	https://jobsearch.api.jobtechdev.se/ad/8430129/logo
 
 ### Jobtech-Taxonomy
-If you need help finding the official names for occupations, skills, or geographic place we have temporarily built an endpoint which you will find at https://jobsearch.api.jobtechdev.se/. The real version will be launched during fall 2019. Check out [jobtechdev.se](https://www.jobtechdev.se/) for updates.
+If you need help finding the official names for occupations, skills, or geographic place we have temporarily built an endpoint which you will find at https://jobsearch.api.jobtechdev.se/. The real version will be launched during fall 2019. Check out [jobtechdev.se](https://jobtechdev.se/) for updates.
 
 ## Results
 The results of your queries will be in [JSON](https://en.wikipedia.org/wiki/JSON) format. We won't attempt to explain this attribute by attribute in this document. Instead we've decided to try to include this in the data model which you can find in our [Swagger GUI](https://jobsearch.api.jobtechdev.se).
@@ -133,7 +133,7 @@ Request URL
 	
 This will give a smaller result set with a higher certainty of actually being for a "souschef", however the result set will likely miss a few relevant ads since the occupation-name field isn't always set by employers. You should find that a larger set is more useful since there are multiple sorting factors working to show the most relevant hits first. We're also working to always improve the API in regards to unstructured data.
 
-_Note: The taxonomy endpoint is temporary. Please check [jobtechdev.se](https://www.jobtechdev.se/) for updates._
+_Note: The taxonomy endpoint is temporary. Please check [jobtechdev.se](https://jobtechdev.se/) for updates._
 
 ### Searching only within a specific field of work
 Firstly, use the _Jobtech-Taxonomy_ endpoint to get the Id for Data/IT (occupation field). You'll then make a free text search on the term "IT" narrowing down the search to occupation-field
@@ -148,7 +148,7 @@ Request URL
 
 	https://jobsearch.api.jobtechdev.se/search?occupation-field=apaJ_2ja_LuF&q=python&offset=0&limit=10
 
-_Note: The taxonomy endpoint is temporary. Please check [jobtechdev.se](https://www.jobtechdev.se/) for updates._
+_Note: The taxonomy endpoint is temporary. Please check [jobtechdev.se](https://jobtechdev.se/) for updates._
 
 ### Finding jobs near you
 You can filter your search on geographical terms picked up from the Taxonomy just the same way you can with occupation-titles and occupation-fields. (Concept_id doesn't work everywhere at the time of writing but you can use the numeral id's, they are very official and way less likely to change as skills and occupations sometimes do)
@@ -175,7 +175,7 @@ Request URL
 
 	https://jobsearch.api.jobtechdev.se/search?offset=0&limit=10&position=59.3,17.6&position.radius=10
 
-_Note: The taxonomy endpoint is temporary. Please check [jobtechdev.se](https://www.jobtechdev.se/) for updates._
+_Note: The taxonomy endpoint is temporary. Please check [jobtechdev.se](https://jobtechdev.se/) for updates._
 
 ### Negative search
 So, this is very simple using our q-field. Let's say you want to find Unix jobs
@@ -204,7 +204,7 @@ Request URL to get jobs in Swedish outside Sweden
 
       	https://jobsearch.api.jobtechdev.se/search?language=502&country=-199&offset=0&limit=10
 
-_Note: The taxonomy endpoint is temporary. Please check [jobtechdev.se](https://www.jobtechdev.se/) for updates._
+_Note: The taxonomy endpoint is temporary. Please check [jobtechdev.se](https://jobtechdev.se/) for updates._
 
 ### Finding jobs in the public sector
 In Sweden, organizations number reflect type of organization. For instance is the first figura a two if the organization is a public organization. This could be used in you search.
@@ -227,6 +227,6 @@ In the Swagger GUI it's possible to use the X-fields to define which fields to i
 
 
 ### Getting all the jobs since date and time
-A very common use case is COLLECT ALL THE ADS. We don't want you to use the search API for this. It's expensive in terms of bandwidth, CPU cycles and development time and it's not even guaranteed you'll get everything. Instead we'd like you to use our [Stream API](https://jobtechdev.se/devguide/apis/jobstream.html).
+A very common use case is COLLECT ALL THE ADS. We don't want you to use the search API for this. It's expensive in terms of bandwidth, CPU cycles and development time and it's not even guaranteed you'll get everything. Instead we'd like you to use our [Stream API](https://jobtechdev.se/docs/jobstream/getting-started/).
 
 

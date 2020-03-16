@@ -14,7 +14,7 @@ ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy")
 APM_SERVICE_NAME = os.getenv("APM_SERVICE_NAME")
 APM_SERVICE_URL = os.getenv("APM_SERVICE_URL")
 APM_SECRET = os.getenv("APM_SECRET")
-APM_LOG_LEVEL = os.getenv("LOG_LEVEL", "WARNING")
+APM_LOG_LEVEL = os.getenv("APM_LOG_LEVEL", "WARNING")
 
 # Flask-Restplus settings
 RESTPLUS_SWAGGER_UI_DOC_EXPANSION = 'list'
@@ -46,7 +46,7 @@ LIMIT = 'limit'
 FREETEXT_QUERY = 'q'
 TYPEAHEAD_QUERY = 'typehead'
 CONTEXTUAL_TYPEAHEAD = 'contextual'
-UNSPECIFIED_SWEDEN_WORKPLACE = 'unspecified sweden workplace'
+UNSPECIFIED_SWEDEN_WORKPLACE = 'unspecified-sweden-workplace'
 FREETEXT_FIELDS = 'qfields'
 SORT = 'sort'
 PUBLISHED_BEFORE = 'published-before'

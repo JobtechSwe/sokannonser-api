@@ -207,7 +207,7 @@ Request URL to get jobs in Swedish outside Sweden
 _Note: The taxonomy endpoint is temporary. Please check [jobtechdev.se](https://jobtechdev.se/) for updates._
 
 ### Finding jobs in the public sector
-In Sweden, organizations number reflect type of organization. For instance is the first figura a two if the organization is a public organization. This could be used in you search.
+In Sweden, organizations number reflect type of organization. For instance, the first number is 2 if the organisation is a public. This could be used in you search.
 
 Request URL to get jobs in Swedish public sector
 

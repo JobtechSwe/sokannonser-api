@@ -73,7 +73,6 @@ SOURCE_TYPE = 'source_type'
 KEYWORDS_ENRICHED = 'keywords.enriched'
 KEYWORDS_ENRICHED_SYNONYMS = 'keywords.enriched_typeahead_terms'
 KEYWORDS_EXTRACTED = 'keywords.extracted'
-KEYWORDS_ENRICHED_TYPEAHEAD_TERMS = 'keywords.enriched_typeahead_terms'
 
 sort_options = {
     'relevance': ["_score", {PUBLICATION_DATE: "desc"}],

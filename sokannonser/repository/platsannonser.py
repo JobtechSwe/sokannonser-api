@@ -86,7 +86,7 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):
         for item in result.get('aggs'):
             item['value'] = args[settings.FREETEXT_QUERY] + ' ' + item['value']
             item['found_phrase'] = args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']
-    else:
+    elif args.get(settings.TYPEAHEAD_QUERY):
         result = complete_suggest(args.get(settings.TYPEAHEAD_QUERY), querybuilder, start_time=0, x_fields=None)
         if not result['aggs']:
             result = phrase_suggest(args.get(settings.TYPEAHEAD_QUERY), querybuilder, start_time=0, x_fields=None)

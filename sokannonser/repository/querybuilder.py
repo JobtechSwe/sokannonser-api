@@ -256,7 +256,7 @@ class QueryBuilder(object):
             size = 12/len(complete_fields)
 
             enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
-                settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED_TYPEAHEAD_TERMS
+                settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
 
             for field in complete_fields:
                 base_field = f.KEYWORDS_EXTRACTED \

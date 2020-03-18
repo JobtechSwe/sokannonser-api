@@ -40,7 +40,7 @@ swagger_doc_params = {
     taxonomy.FIELD: "One or more occupational area codes according to the taxonomy",
     taxonomy.SKILL: "One or more competency codes according to the taxonomy",
     taxonomy.LANGUAGE: "One or more language codes according to the taxonomy",
-    taxonomy.DRIVING_LICENCE_REQUIRED: "Set to true if driving license required"
+    taxonomy.DRIVING_LICENCE_REQUIRED: "Set to true if driving licence required"
     ", false if not",
     taxonomy.DRIVING_LICENCE: "One or more types of demanded driving licenses, code "
     "according to the taxonomy",
@@ -57,7 +57,7 @@ swagger_doc_params = {
     "the taxonomy",
     taxonomy.REGION: "One or more region codes, code according to the taxonomy",
     taxonomy.COUNTRY: "One or more country codes, code according to the taxonomy",
-    settings.UNSPECIFIED_SWEDEN_WORKPLACE: "True will return all unspecified adds in Sweden",
+    settings.UNSPECIFIED_SWEDEN_WORKPLACE: "True will return all unspecified ads in Sweden",
     settings.POSITION: "Latitude and longitude in the format \"59.329,18.068\" "
     "(latitude,longitude)",
     settings.POSITION_RADIUS: "Radius from the specified " + settings.POSITION +

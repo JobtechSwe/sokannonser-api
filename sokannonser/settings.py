@@ -102,5 +102,7 @@ auranest_stats_options = {
     'locations': 'location.translations.sv-SE.keyword'
 }
 
+# sweden country concept id
+SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
 API_VERSION = '1.9.0'

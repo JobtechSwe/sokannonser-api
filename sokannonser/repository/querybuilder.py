@@ -691,7 +691,8 @@ class QueryBuilder(object):
             plats_term_query += [
                 {
                     "bool": {
-                        "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {"value": 'i46j_HmG_v64'}}},
+                        "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+                            "value": settings.SWEDEN_CONCEPT_ID}}},
                         "must_not": {"exists": {"field": f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID}},
                         "boost": 1.0
                     }

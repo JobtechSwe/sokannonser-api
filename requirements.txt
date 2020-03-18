@@ -11,7 +11,7 @@ pytest-cov
 pytest-envfiles
 elastic-apm[flask]
 flashtext
-urllib3
+urllib3==1.25.8
 python-simplexml
 pytest_bdd
 elasticsearch-dsl

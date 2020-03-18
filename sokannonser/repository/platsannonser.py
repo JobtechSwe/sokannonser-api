@@ -80,16 +80,17 @@ def get_stats_for(taxonomy_type):
 
 
 def suggest(args, querybuilder, start_time=0, x_fields=None):
+    # old auto complete part, PB want to keep this first
     result = find_platsannonser(args, querybuilder, start_time=0, x_fields=None)
-    log.debug(result.get('aggs'))
     if result.get('aggs'):
+        # before only return one word, add prefix word here, I know it is stupid, hard to change in Marcus code
         for item in result.get('aggs'):
             item['value'] = args[settings.FREETEXT_QUERY] + ' ' + item['value']
             item['found_phrase'] = args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']
-    else:
-        result = complete_suggest(args.get(settings.TYPEAHEAD_QUERY), querybuilder, start_time=0, x_fields=None)
+    elif args.get(settings.TYPEAHEAD_QUERY):
+        result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
         if not result['aggs']:
-            result = phrase_suggest(args.get(settings.TYPEAHEAD_QUERY), querybuilder, start_time=0, x_fields=None)
+            result = phrase_suggest(args, querybuilder, start_time=0, x_fields=None)
     return result
 
 
@@ -140,13 +141,14 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)
 
-    word = args.split()[-1]
-    if args.split()[:-1]:
-        prefix = ' '.join(args.split()[:-1])
+    input = args.get(settings.TYPEAHEAD_QUERY)
+    word = input.split()[-1]
+    if input.split()[:-1]:
+        prefix = ' '.join(input.split()[:-1])
     else:
         prefix = ''
 
-    query_dsl = querybuilder.create_auto_complete_suggester(word)
+    query_dsl = querybuilder.create_auto_complete_suggester(word, args)
 
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
@@ -183,8 +185,7 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
                 )
 
     # check occurrences even i think it will take some trouble and stupid
-
-    query_result['aggs'] = suggest_check_occurence(aggs[:50], querybuilder)
+    query_result['aggs'] = suggest_check_occurence(aggs[:50], args, querybuilder)
     log.debug(query_result['aggs'])
 
     return query_result
@@ -193,7 +194,9 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
 def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)
-    query_dsl = querybuilder.create_phrase_suggester(args)
+
+    input = args.get(settings.TYPEAHEAD_QUERY)
+    query_dsl = querybuilder.create_phrase_suggester(input, args)
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
     try:
@@ -230,20 +233,18 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
     log.debug(query_result['aggs'])
 
     # check occurrences even i think it will take some trouble and stupid
-    query_result['aggs'] = suggest_check_occurence(aggs[:10], querybuilder)
+    query_result['aggs'] = suggest_check_occurence(aggs[:20], args, querybuilder)
     log.debug(query_result['aggs'])
 
     return query_result
 
 
-def suggest_check_occurence(aggs, querybuilder):
+def suggest_check_occurence(aggs, args, querybuilder):
     for agg in aggs:
-        query_dsl = querybuilder.create_suggest_search(agg['value'])
+        query_dsl = querybuilder.create_suggest_search(agg['value'], args)
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         occurrences = query_result.get('hits').get('total').get('value')
         agg['occurrences'] = occurrences
-        agg['value'] = ' '.join([word.capitalize() for word in agg['value'].split(' ')])
-        agg['found_phrase'] = agg['value']
 
     aggs = sorted(aggs, key=itemgetter('occurrences'), reverse=True)
     return aggs

@@ -27,7 +27,7 @@ class Proxy(Resource):
     @ns_platsannons.expect(load_ad_query)
     @ns_platsannons.marshal_with(job_ad)
     def get(self, id, *args, **kwargs):
-        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         return platsannonser.fetch_platsannons(str(id))
 
 

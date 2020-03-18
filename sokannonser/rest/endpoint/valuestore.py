@@ -32,7 +32,7 @@ class Valuestore(Resource):
     )
     @ns_valuestore.expect(taxonomy_query)
     def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         args = taxonomy_query.parse_args()
         q = request.args.get('q', None)
         parent_id = args.get('parent-id') if args.get('parent-id') else []

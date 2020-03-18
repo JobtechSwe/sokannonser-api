@@ -1,7 +1,7 @@
 Changelog Application Jobsearch
 ===============================
 ## 1.10.0
-* Spell check
+* Auto complete & spell check
 
 ## 1.9.0
 * Add one field called unspecified sweden workplace

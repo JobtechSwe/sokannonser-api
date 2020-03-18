@@ -57,7 +57,8 @@ class QueryBuilder(object):
                                                        args.get(settings.PARTTIME_MAX)))
         must_queries.append(self._build_plats_query(args.get(taxonomy.MUNICIPALITY),
                                                     args.get(taxonomy.REGION),
-                                                    args.get(taxonomy.COUNTRY)))
+                                                    args.get(taxonomy.COUNTRY),
+                                                    args.get(settings.UNSPECIFIED_SWEDEN_WORKPLACE)))
         # Replaced by _build_plats_query
         # must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
         must_queries.append(self._build_generic_query([f.MUST_HAVE_SKILLS + "." +
@@ -653,7 +654,7 @@ class QueryBuilder(object):
             return None
 
     # Parses MUNICIPALITY and REGION
-    def _build_plats_query(self, kommunkoder, lanskoder, landskoder):
+    def _build_plats_query(self, kommunkoder, lanskoder, landskoder, unspecify):
         kommuner = []
         neg_komm = []
         lan = []
@@ -682,12 +683,27 @@ class QueryBuilder(object):
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_MUNICIPALITY_CONCEPT_ID: {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
+
+        # Add unspecified field, when it is true, system will return all adds with unspecified in sweden.
+        if unspecify:
+            plats_term_query += [
+                {
+                    "bool": {
+                        "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+                            "value": settings.SWEDEN_CONCEPT_ID}}},
+                        "must_not": {"exists": {"field": f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID}},
+                        "boost": 1.0
+                    }
+                },
+            ]
+
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_REGION_CODE: {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID: {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]
+
         plats_term_query += [{"term": {
             f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
                 "value": ckod, "boost": 1.0}}} for ckod in land]

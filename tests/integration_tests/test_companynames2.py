@@ -10,7 +10,6 @@ from_file = True
 
 currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 filepath = currentdir + '../../tests/integration_tests/test_resources/test_companynames.txt'
-
 companynames = CompanynamesMapper(companynames_from_file=from_file, companynames_filepath=filepath)
 
 

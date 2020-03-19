@@ -26,6 +26,7 @@ def test_freetext_query_ssk():
         hits_total = json_response['total']['value']
         assert int(hits_total) > 0
 
+
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_one_param():
@@ -142,7 +143,6 @@ def test_bugfix_reset_query_rewrite_location():
         assert int(hits_total) > 0
 
 
-
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 @pytest.mark.parametrize("geo", ['+trelleborg -stockholm ystad', 'kista kallhäll'])
@@ -196,6 +196,7 @@ def test_freetext_query_location_extracted_or_enriched_or_freetext():
         hits_total = json_response['total']['value']
         # print(hits_total)
         assert int(hits_total) > 0
+
 
 @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration

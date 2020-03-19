@@ -71,7 +71,6 @@ def test_rewrite_jobtitle_with_hyphen():
     assert 'hr-specialist' in [c['concept'].lower() for c in concepts['occupation']]
 
 
-
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_rewrite_competence_special_characters():
@@ -98,6 +97,7 @@ def test_rewrite_unigram_misspelled_input():
     # pprint(concepts)
     assert 'sjuksköterska' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'noggrann' in [c['concept'].lower() for c in concepts['trait']]
+
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
@@ -189,8 +189,6 @@ def test_rewrite_must_words():
     assert_not_empty(concepts, 'location_must')
     assert_not_empty(concepts, 'location_must_not')
 
-
-
     assert 'säljare' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'målare' in [c['concept'].lower() for c in concepts['occupation_must']]
     assert 'key account manager' in [c['concept'].lower() for c in concepts['occupation_must']]
@@ -199,6 +197,7 @@ def test_rewrite_must_words():
     assert 'positiv' in [c['concept'].lower() for c in concepts['trait']]
     assert 'noggrann' in [c['concept'].lower() for c in concepts['trait_must']]
     assert 'flexibel' in [c['concept'].lower() for c in concepts['trait_must_not']]
+
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
@@ -222,8 +221,6 @@ def test_rewrite_must_not_words():
     assert_not_empty(concepts, 'trait_must_not')
     assert_not_empty(concepts, 'location')
     assert_not_empty(concepts, 'location_must_not')
-
-
 
     assert 'javautvecklare' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'målare' in [c['concept'].lower() for c in concepts['occupation_must_not']]

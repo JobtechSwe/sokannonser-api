@@ -1,6 +1,8 @@
+import json
 import logging
 import re
 import time
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 import elasticsearch_dsl
@@ -885,24 +887,77 @@ class QueryBuilder(object):
                 geo_bool['bool']['should'].append(geo_filter)
         return geo_bool
 
-    def create_suggester(self, args):
+    def create_auto_complete_suggester(self, word, args):
         """"
-        parse args and create suggester
+        parse args and create auto complete suggester
         """
-        prefix = args.split()[-1]
-        fields = ['skill', 'occupation', 'location']
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+
+        fields = ['compound', ]
         search = elasticsearch_dsl.Search()
         search = search.source('suggest')
         for field in fields:
            search = search.suggest(
                '%s-suggest' % field,
-               prefix,
+               word,
                completion={
-                   'field': 'keywords.enriched.%s.suggest' % field,
+                   'field': '%s.%s.suggest' % (enriched_typeahead_field, field),
                    "skip_duplicates": True,
+                   "size": 50,
                    "fuzzy": {
-                       "fuzziness": 'AUTO'
+                       "min_length": 3,
+                       "prefix_length": 0
                    }
                }
            )
         return search.to_dict()
+
+    def create_phrase_suggester(self, input, args):
+        """"
+        parse args and create phrase suggester
+        """
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+
+        field = '%s.compound' % enriched_typeahead_field
+        search = elasticsearch_dsl.Search()
+        search = search.source('suggest')
+        search = search.suggest(
+            '%s_simple_phrase' % field,
+            input,
+            phrase={
+               'field': '%s.trigram' % field,
+               'size': 10,
+               'max_errors': 2,
+               'direct_generator': [{
+                    'field': '%s.trigram' % field,
+                    'suggest_mode': 'always',
+                    'min_word_length': 1
+               }, {
+                    'field': '%s.reverse' % field,
+                    'suggest_mode': 'always',
+                    'pre_filter': 'reverse',
+                    'post_filter': 'reverse',
+                    'min_word_length': 1
+               }]
+            }
+        )
+        return search.to_dict()
+
+    def create_suggest_search(self, suggest, args):
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+
+        field = '%s.compound' % enriched_typeahead_field
+        search = defaultdict(dict)
+        query = search.setdefault('query', {})
+        match = query.setdefault('match', {})
+        field = match.setdefault(field, {})
+        field['query'] = suggest
+        field['operator'] = 'and'
+
+        return json.dumps(search)
+
+
+

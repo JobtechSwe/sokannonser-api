@@ -114,7 +114,8 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
             max_score = max_score_result.get('hits', {}).get('max_score')
             if max_score:
                 query_dsl['min_score'] = max_score * args.get(settings.MIN_RELEVANCE)
-        log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
+        log.debug("ARGS: %s" % args)
+        log.debug("QUERY: %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         log.debug("Elastic results after %d milliseconds."
                   % (int(time.time() * 1000) - start_time))
@@ -153,10 +154,9 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
     try:
-        log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
-        log.debug(query_dsl)
+        log.debug("ARGS: %s" % args)
+        log.debug("QUERY: %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
-        log.debug(query_result)
         log.debug("Elastic results after %d milliseconds."
                   % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
@@ -186,7 +186,6 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
 
     # check occurrences even i think it will take some trouble and stupid
     query_result['aggs'] = suggest_check_occurence(aggs[:50], args, querybuilder)
-    log.debug(query_result['aggs'])
 
     return query_result
 
@@ -200,10 +199,9 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
     try:
-        log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
-        log.debug(query_dsl)
+        log.debug("ARGS: %s" % args)
+        log.debug("QUERY: %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
-        log.debug(query_result)
         log.debug("Elastic results after %d milliseconds."
                   % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
@@ -214,7 +212,6 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
 
-    log.debug(query_result.get('suggest', {}))
     aggs = []
     suggests = query_result.get('suggest', {})
     for key in suggests:
@@ -230,11 +227,9 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
                     }
                 )
     query_result['aggs'] = aggs[:10]
-    log.debug(query_result['aggs'])
 
     # check occurrences even i think it will take some trouble and stupid
     query_result['aggs'] = suggest_check_occurence(aggs[:20], args, querybuilder)
-    log.debug(query_result['aggs'])
 
     return query_result
 

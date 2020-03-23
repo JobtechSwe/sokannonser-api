@@ -75,6 +75,7 @@ MIN_RELEVANCE = 'relevance-threshold'
 
 # For taxonomy
 SHOW_COUNT = 'show-count'
+TAX_DESCRIPTION = 'DEPRECATED, use https://taxonomy.api.jobtechdev.se/v1/taxonomy/swagger-ui/index.html instead'
 
 # For auranest
 PLACE = 'place'

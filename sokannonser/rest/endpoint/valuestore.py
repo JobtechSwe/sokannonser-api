@@ -15,7 +15,7 @@ class Valuestore(Resource):
     method_decorators = [check_api_key_and_return_metadata('taxonomy')]
 
     @ns_valuestore.doc(
-        description='DEPRECATED, use https://taxonomy.api.jobtechdev.se/v1/taxonomy/swagger-ui/index.html instead',
+        description=settings.TAX_DESCRIPTION,
         deprecated=True,
         params={
             settings.OFFSET: "The offset parameter defines the offset from the first "

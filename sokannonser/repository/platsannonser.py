@@ -98,30 +98,27 @@ def suggest_extra_word(args, original_word, querybuilder):
     # PB want it input one word and suggest extra word
     search_text = original_word['value'].strip()
     search_text_type = _check_search_word_type(args, search_text, querybuilder)
+    new_suggest_list = []
     if search_text_type:
         if search_text_type == 'location':
             second_suggest_type = 'occupation'
         else:
             second_suggest_type = 'location'
-        new_suggest = {}
         query_dsl = querybuilder.create_suggest_extra_word_query(
             search_text, search_text_type, second_suggest_type, args)
         log.debug('QUERY: %s' % query_dsl)
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
-        result = query_result.get('aggregations').get('first_word').get('second_word').get('buckets')
-        if result:
-            if result[0].get('key') != 'sverige':
-                new_suggest['value'] = search_text + ' ' + result[0].get('key')
-                new_suggest['found_phrase'] = search_text + ' ' + result[0].get('key')
+        results = query_result.get('aggregations').get('first_word').get('second_word').get('buckets')
+        for result in results:
+            if result.get('key') != 'sverige':
+                new_suggest = {}
+                new_suggest['value'] = search_text + ' ' + result.get('key')
+                new_suggest['found_phrase'] = search_text + ' ' + result.get('key')
                 new_suggest['type'] = search_text_type + '_' + second_suggest_type
-                new_suggest['occurrences'] = result[0].get('doc_count')
-            else:
-                new_suggest['value'] = search_text + ' ' + result[1].get('key')
-                new_suggest['found_phrase'] = search_text + ' ' + result[1].get('key')
-                new_suggest['type'] = search_text_type + '_' + second_suggest_type
-                new_suggest['occurrences'] = result[1].get('doc_count')
-            return new_suggest
-    return None
+                new_suggest['occurrences'] = result.get('doc_count')
+                new_suggest_list.append(new_suggest)
+    log.debug(new_suggest_list)
+    return new_suggest_list
 
 
 def _check_search_word_type(args, search_text, querybuilder):

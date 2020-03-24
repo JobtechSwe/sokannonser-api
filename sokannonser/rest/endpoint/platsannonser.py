@@ -128,9 +128,8 @@ class Complete(Resource):
                   % (int(time.time()*1000)-start_time))
 
         if args[settings.X_FEATURE_SUGGEST_EXTRA_WORD] and len(result.get('aggs')) == 1:
-            extra_word = platsannonser.suggest_extra_word(args, result.get('aggs')[0], self.querybuilder)
-            if extra_word:
-                result['aggs'].append(extra_word)
+            extra_words = platsannonser.suggest_extra_word(args, result.get('aggs')[0], self.querybuilder)
+            result['aggs'] += extra_words
 
         return self.marshal_results(result, start_time)
 

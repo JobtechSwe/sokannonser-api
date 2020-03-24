@@ -94,6 +94,48 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):
     return result
 
 
+def suggest_extra_word(args, original_word, querybuilder):
+    # PB want it input one word and suggest extra word
+    search_text = original_word['value'].strip()
+    search_text_type = _check_search_word_type(args, search_text, querybuilder)
+    if search_text_type:
+        if search_text_type == 'location':
+            second_suggest_type = 'occupation'
+        else:
+            second_suggest_type = 'location'
+        new_suggest = {}
+        query_dsl = querybuilder.create_suggest_extra_word_query(
+            search_text, search_text_type, second_suggest_type, args)
+        log.debug('QUERY: %s' % query_dsl)
+        query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+        result = query_result.get('aggregations').get('first_word').get('second_word').get('buckets')
+        if result:
+            if result[0].get('key') != 'sverige':
+                new_suggest['value'] = search_text + ' ' + result[0].get('key')
+                new_suggest['found_phrase'] = search_text + ' ' + result[0].get('key')
+                new_suggest['type'] = search_text_type + '_' + second_suggest_type
+                new_suggest['occurrences'] = result[0].get('doc_count')
+            else:
+                new_suggest['value'] = search_text + ' ' + result[1].get('key')
+                new_suggest['found_phrase'] = search_text + ' ' + result[1].get('key')
+                new_suggest['type'] = search_text_type + '_' + second_suggest_type
+                new_suggest['occurrences'] = result[1].get('doc_count')
+            return new_suggest
+    return None
+
+
+def _check_search_word_type(args, search_text, querybuilder):
+    # this function is used for checking input words type, return type location/skill/occupation
+    query_dsl = querybuilder.create_check_search_word_type_query(search_text, args)
+    log.debug('QUERY: %s' % query_dsl)
+    query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+    result = query_result['aggregations']
+    for key in result.keys():
+        if result[key]['buckets']:
+            return key.split('_')[-1]
+    return None
+
+
 def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)

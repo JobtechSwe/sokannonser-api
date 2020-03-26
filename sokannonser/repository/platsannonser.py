@@ -85,8 +85,12 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):
     if result.get('aggs'):
         # before only return one word, add prefix word here, I know it is stupid, hard to change in Marcus code
         for item in result.get('aggs'):
-            item['value'] = args[settings.FREETEXT_QUERY] + ' ' + item['value']
-            item['found_phrase'] = args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']
+            if args[settings.FREETEXT_QUERY]:
+                item['value'] = args[settings.FREETEXT_QUERY] + ' ' + item['value']
+                item['found_phrase'] = args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']
+            else:
+                item['value'] = item['value']
+                item['found_phrase'] = item['found_phrase']
     elif args.get(settings.TYPEAHEAD_QUERY):
         result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
         if not result['aggs']:
@@ -216,8 +220,8 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
                 value = prefix + ' ' + ads.get('text', '') if prefix else ads.get('text', '')
                 aggs.append(
                     {
-                        'value': value,
-                        'found_phrase': value,
+                        'value': value.strip(),
+                        'found_phrase': value.strip(),
                         'type': key.split('-')[0],
                         'occurrences': 0
                     }

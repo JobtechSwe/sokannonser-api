@@ -233,8 +233,8 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)
 
-    input = args.get(settings.TYPEAHEAD_QUERY)
-    query_dsl = querybuilder.create_phrase_suggester(input, args)
+    input_words = args.get(settings.TYPEAHEAD_QUERY)
+    query_dsl = querybuilder.create_phrase_suggester(input_words, args)
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
     try:

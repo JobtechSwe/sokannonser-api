@@ -80,18 +80,57 @@ def get_stats_for(taxonomy_type):
 
 
 def suggest(args, querybuilder, start_time=0, x_fields=None):
-    # old auto complete part, PB want to keep this first
+    # old auto complete part, keep this first
     result = find_platsannonser(args, querybuilder, start_time=0, x_fields=None)
     if result.get('aggs'):
-        # before only return one word, add prefix word here, I know it is stupid, hard to change in Marcus code
+        # before only return one word, add prefix word here, will change the logic in future
         for item in result.get('aggs'):
-            item['value'] = args[settings.FREETEXT_QUERY] + ' ' + item['value']
-            item['found_phrase'] = args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']
+            item['value'] = (args[settings.FREETEXT_QUERY] + ' ' + item['value']).strip()
+            item['found_phrase'] = (args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']).strip()
     elif args.get(settings.TYPEAHEAD_QUERY):
         result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
         if not result['aggs']:
             result = phrase_suggest(args, querybuilder, start_time=0, x_fields=None)
     return result
+
+
+def suggest_extra_word(args, original_word, querybuilder):
+    # input one word and suggest extra word
+    search_text = original_word['value'].strip()
+    search_text_type = _check_search_word_type(args, search_text, querybuilder)
+    new_suggest_list = []
+    if search_text_type:
+        if search_text_type == 'location':
+            second_suggest_type = 'occupation'
+        else:
+            second_suggest_type = 'location'
+        query_dsl = querybuilder.create_suggest_extra_word_query(
+            search_text, search_text_type, second_suggest_type, args)
+        log.debug('QUERY suggest: %s' % query_dsl)
+        query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+        results = query_result.get('aggregations').get('first_word').get('second_word').get('buckets')
+        for result in results:
+            if result.get('key') != 'sverige':
+                new_suggest = {}
+                new_suggest['value'] = search_text + ' ' + result.get('key')
+                new_suggest['found_phrase'] = search_text + ' ' + result.get('key')
+                new_suggest['type'] = search_text_type + '_' + second_suggest_type
+                new_suggest['occurrences'] = result.get('doc_count')
+                new_suggest_list.append(new_suggest)
+    log.debug('List suggest: %s' % new_suggest_list)
+    return new_suggest_list
+
+
+def _check_search_word_type(args, search_text, querybuilder):
+    # this function is used for checking input words type, return type location/skill/occupation
+    query_dsl = querybuilder.create_check_search_word_type_query(search_text, args)
+    log.debug('QUERY word_type: %s' % query_dsl)
+    query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+    result = query_result['aggregations']
+    for key in result.keys():
+        if result[key]['buckets']:
+            return key.split('_')[-1]
+    return None
 
 
 def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
@@ -114,12 +153,13 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
             max_score = max_score_result.get('hits', {}).get('max_score')
             if max_score:
                 query_dsl['min_score'] = max_score * args.get(settings.MIN_RELEVANCE)
-        log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
+        log.debug("ARGS: %s" % args)
+        log.debug("QUERY: %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         log.debug("Elastic results after %d milliseconds."
                   % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
-        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
 
@@ -153,20 +193,19 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
     try:
-        log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
-        log.debug(query_dsl)
+        log.debug("ARGS: %s" % args)
+        log.debug("QUERY: %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
-        log.debug(query_result)
         log.debug("Elastic results after %d milliseconds."
                   % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
-        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
 
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
-    log.debug(query_result.get('suggest', {}))
+    log.debug('QUERY result: %s' % query_result.get('suggest', {}))
 
     aggs = []
     suggests = query_result.get('suggest', {})
@@ -177,8 +216,8 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
                 value = prefix + ' ' + ads.get('text', '') if prefix else ads.get('text', '')
                 aggs.append(
                     {
-                        'value': value,
-                        'found_phrase': value,
+                        'value': value.strip(),
+                        'found_phrase': value.strip(),
                         'type': key.split('-')[0],
                         'occurrences': 0
                     }
@@ -186,7 +225,6 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
 
     # check occurrences even i think it will take some trouble and stupid
     query_result['aggs'] = suggest_check_occurence(aggs[:50], args, querybuilder)
-    log.debug(query_result['aggs'])
 
     return query_result
 
@@ -200,21 +238,19 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
     try:
-        log.debug("ARGS %s => QUERY: %s" % (args, json.dumps(query_dsl)))
-        log.debug(query_dsl)
+        log.debug("ARGS: %s" % args)
+        log.debug("QUERY: %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
-        log.debug(query_result)
         log.debug("Elastic results after %d milliseconds."
                   % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
-        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
 
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
 
-    log.debug(query_result.get('suggest', {}))
     aggs = []
     suggests = query_result.get('suggest', {})
     for key in suggests:
@@ -230,16 +266,15 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
                     }
                 )
     query_result['aggs'] = aggs[:10]
-    log.debug(query_result['aggs'])
 
     # check occurrences even i think it will take some trouble and stupid
     query_result['aggs'] = suggest_check_occurence(aggs[:20], args, querybuilder)
-    log.debug(query_result['aggs'])
 
     return query_result
 
 
 def suggest_check_occurence(aggs, args, querybuilder):
+    # check the frequence one by one, future will change it
     for agg in aggs:
         query_dsl = querybuilder.create_suggest_search(agg['value'], args)
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
@@ -294,11 +329,11 @@ def fetch_platsannons(ad_id):
             log.info("Job ad %s not found, returning 404 message" % ad_id)
             abort(404, 'Ad not found')
     except exceptions.NotFoundError:
-        logging.exception('Failed to find id: %s' % ad_id)
+        log.exception('Failed to find id: %s' % ad_id)
         abort(404, 'Ad not found')
         return
     except exceptions.ConnectionError as e:
-        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
 

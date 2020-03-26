@@ -959,5 +959,43 @@ class QueryBuilder(object):
 
         return json.dumps(search)
 
+    def create_check_search_word_type_query(self, word, args):
+        """"
+            Create check search word type query
+        """
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+        search = defaultdict(dict)
+        aggs = search.setdefault('aggs', {})
+        for field in ('location', 'skill', 'occupation'):
+            aggs['search_type_%s' % field] = {
+                'terms': {
+                    'field': '%s.%s.raw' % (enriched_typeahead_field, field),
+                    'include': word
+                }
+            }
+        return json.dumps(search)
 
-
+    def create_suggest_extra_word_query(self, word, first_word_type, second_word_type, args):
+        """"
+           Create suggest extra word query
+        """
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+        search = defaultdict(dict)
+        aggs = search.setdefault('aggs', {})
+        first_word = aggs.setdefault('first_word', {})
+        first_word['filter'] = {
+            'term': {
+                '%s.%s.raw' % (enriched_typeahead_field, first_word_type): word,
+            }
+        }
+        first_word['aggs'] = {
+            'second_word': {
+                'terms': {
+                    'field': '%s.%s.raw' % (enriched_typeahead_field, second_word_type),
+                    'size': 5
+                }
+            }
+        }
+        return json.dumps(search)

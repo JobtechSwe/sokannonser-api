@@ -27,7 +27,7 @@ class Proxy(Resource):
     @ns_platsannons.expect(load_ad_query)
     @ns_platsannons.marshal_with(job_ad)
     def get(self, id, *args, **kwargs):
-        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         return platsannonser.fetch_platsannons(str(id))
 
 
@@ -104,6 +104,7 @@ class Complete(Resource):
             settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD: "Allow empty querystring in typeahead.",
             settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: "Include enriched synonyms in typeahead.",
             settings.X_FEATURE_SPELLCHECK_TYPEAHEAD: "Use spellchecking in typeahead. Disables contextual typeahead.",
+            settings.X_FEATURE_SUGGEST_EXTRA_WORD: "Suggest extra word in autocomplete",
             **swagger_doc_params
         }
     )
@@ -125,6 +126,10 @@ class Complete(Resource):
             result = platsannonser.find_platsannonser(args, self.querybuilder)
         log.debug("Query results after %d milliseconds."
                   % (int(time.time()*1000)-start_time))
+
+        if args[settings.X_FEATURE_SUGGEST_EXTRA_WORD] and len(result.get('aggs')) == 1:
+            extra_words = platsannonser.suggest_extra_word(args, result.get('aggs')[0], self.querybuilder)
+            result['aggs'] += extra_words
 
         return self.marshal_results(result, start_time)
 

@@ -157,6 +157,10 @@ annons_complete_query.add_argument(settings.X_FEATURE_SPELLCHECK_TYPEAHEAD,
                                    type=inputs.boolean, location='headers',
                                    required=False)
 
+annons_complete_query.add_argument(settings.X_FEATURE_SUGGEST_EXTRA_WORD,
+                                   type=inputs.boolean, location='headers',
+                                   required=False)
+
 
 pb_query = base_annons_query.copy()
 pb_query.add_argument(settings.MIN_RELEVANCE, type=float),

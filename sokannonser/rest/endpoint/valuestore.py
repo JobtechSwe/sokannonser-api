@@ -15,6 +15,8 @@ class Valuestore(Resource):
     method_decorators = [check_api_key_and_return_metadata('taxonomy')]
 
     @ns_valuestore.doc(
+        description=settings.TAX_DESCRIPTION,
+        deprecated=True,
         params={
             settings.OFFSET: "The offset parameter defines the offset from the first "
             "result you want to fetch",
@@ -30,7 +32,7 @@ class Valuestore(Resource):
     )
     @ns_valuestore.expect(taxonomy_query)
     def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         args = taxonomy_query.parse_args()
         q = request.args.get('q', None)
         parent_id = args.get('parent-id') if args.get('parent-id') else []

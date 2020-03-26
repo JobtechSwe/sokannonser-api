@@ -412,17 +412,20 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
                                                    args.get(settings.FREETEXT_QUERY))
 
         for stat in args.get(settings.STATISTICS) or []:
+            stat_result = query_result.get('aggregations', {}).get(stat, {}).get('buckets', [])
+            stat_result = sorted(stat_result, key=lambda a: a['doc_count'], reverse=True)[:5]
+            log.debug(stat)
             if 'stats' not in results:
                 results['stats'] = []
             results['stats'].append({
                 "type": stat,
                 "values": [
                     {
-                        "term": taxonomy.get_term(elastic, stat, b['key']),
-                        "code": b['key'],
+                        "term": taxonomy.get_term(elastic, stat, b['key']['legacy']),
+                        "concept_id": b['key']['concept'],
+                        "code": b['key']['legacy'],
                         "count": b['doc_count']}
-                    for b in query_result.get('aggregations',
-                                              {}).get(stat, {}).get('buckets', [])
+                    for b in stat_result
                 ]
 
             })

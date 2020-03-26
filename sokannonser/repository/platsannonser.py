@@ -83,14 +83,10 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):
     # old auto complete part, keep this first
     result = find_platsannonser(args, querybuilder, start_time=0, x_fields=None)
     if result.get('aggs'):
-        # before only return one word, add prefix word here, I know it is stupid, hard to change in Marcus code
+        # before only return one word, add prefix word here, will change the logic in future
         for item in result.get('aggs'):
-            if args[settings.FREETEXT_QUERY]:
-                item['value'] = args[settings.FREETEXT_QUERY] + ' ' + item['value']
-                item['found_phrase'] = args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']
-            else:
-                item['value'] = item['value']
-                item['found_phrase'] = item['found_phrase']
+            item['value'] = (args[settings.FREETEXT_QUERY] + ' ' + item['value']).strip()
+            item['found_phrase'] = (args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']).strip()
     elif args.get(settings.TYPEAHEAD_QUERY):
         result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
         if not result['aggs']:

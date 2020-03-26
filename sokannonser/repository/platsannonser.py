@@ -274,6 +274,7 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
 
 
 def suggest_check_occurence(aggs, args, querybuilder):
+    # check the frequence one by one, future will change it
     for agg in aggs:
         query_dsl = querybuilder.create_suggest_search(agg['value'], args)
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)

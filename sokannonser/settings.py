@@ -39,6 +39,7 @@ X_FEATURE_ALLOW_EMPTY_TYPEAHEAD = 'x-feature-allow-empty-typeahead'
 X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD = 'x-feature-include-synonyms-typeahead'
 X_FEATURE_SPELLCHECK_TYPEAHEAD = 'x-feature-spellcheck-typeahead'
 X_FEATURE_DISABLE_SMART_FREETEXT = 'x-feature-disable-smart-freetext'
+X_FEATURE_SUGGEST_EXTRA_WORD = 'x-feature-suggest-extra-word'
 
 # Query parameters
 OFFSET = 'offset'
@@ -75,6 +76,7 @@ MIN_RELEVANCE = 'relevance-threshold'
 
 # For taxonomy
 SHOW_COUNT = 'show-count'
+TAX_DESCRIPTION = 'DEPRECATED, use https://taxonomy.api.jobtechdev.se/v1/taxonomy/swagger-ui/index.html instead'
 
 # For auranest
 PLACE = 'place'
@@ -105,4 +107,4 @@ auranest_stats_options = {
 # sweden country concept id: /v1/taxonomy/main/concepts?id=i46j_HmG_v64'
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
-API_VERSION = '1.10.0'
+API_VERSION = '1.11.0'

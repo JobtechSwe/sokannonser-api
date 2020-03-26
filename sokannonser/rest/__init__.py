@@ -12,7 +12,7 @@ ns_platsannons = Namespace('Open AF-job ads',
                            'job ads. Used for online operations.')
 
 ns_valuestore = Namespace('Jobtech Taxonomy',
-                          description='Find concepts in the Jobtech Taxonomy.')
+                          description=settings.TAX_DESCRIPTION)
 
 api.add_namespace(ns_platsannons, '/')
 api.add_namespace(ns_valuestore, '/taxonomy')

@@ -31,7 +31,7 @@ class BulkZip(Resource):
     )
     @ns_bulk.expect(bulk_zip_query)
     def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs['key_app'], user_id=kwargs['key_id'])
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         start_time = int(time.time()*1000)
         args = bulk_zip_query.parse_args()
         bytes_result = repository.zip_ads(args.get(settings.DATE), start_time)

@@ -80,7 +80,7 @@ def get_stats_for(taxonomy_type):
 
 
 def suggest(args, querybuilder, start_time=0, x_fields=None):
-    # old auto complete part, PB want to keep this first
+    # old auto complete part, keep this first
     result = find_platsannonser(args, querybuilder, start_time=0, x_fields=None)
     if result.get('aggs'):
         # before only return one word, add prefix word here, I know it is stupid, hard to change in Marcus code
@@ -99,7 +99,7 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):
 
 
 def suggest_extra_word(args, original_word, querybuilder):
-    # PB want it input one word and suggest extra word
+    # input one word and suggest extra word
     search_text = original_word['value'].strip()
     search_text_type = _check_search_word_type(args, search_text, querybuilder)
     new_suggest_list = []

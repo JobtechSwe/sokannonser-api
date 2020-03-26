@@ -110,7 +110,7 @@ def suggest_extra_word(args, original_word, querybuilder):
             second_suggest_type = 'location'
         query_dsl = querybuilder.create_suggest_extra_word_query(
             search_text, search_text_type, second_suggest_type, args)
-        log.debug('QUERY: %s' % query_dsl)
+        log.debug('QUERY suggest: %s' % query_dsl)
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         results = query_result.get('aggregations').get('first_word').get('second_word').get('buckets')
         for result in results:
@@ -121,14 +121,14 @@ def suggest_extra_word(args, original_word, querybuilder):
                 new_suggest['type'] = search_text_type + '_' + second_suggest_type
                 new_suggest['occurrences'] = result.get('doc_count')
                 new_suggest_list.append(new_suggest)
-    log.debug(new_suggest_list)
+    log.debug('List suggest: %s' % new_suggest_list)
     return new_suggest_list
 
 
 def _check_search_word_type(args, search_text, querybuilder):
     # this function is used for checking input words type, return type location/skill/occupation
     query_dsl = querybuilder.create_check_search_word_type_query(search_text, args)
-    log.debug('QUERY: %s' % query_dsl)
+    log.debug('QUERY word_type: %s' % query_dsl)
     query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
     result = query_result['aggregations']
     for key in result.keys():
@@ -163,7 +163,7 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
         log.debug("Elastic results after %d milliseconds."
                   % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
-        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
 
@@ -203,13 +203,13 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
         log.debug("Elastic results after %d milliseconds."
                   % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
-        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
 
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
-    log.debug(query_result.get('suggest', {}))
+    log.debug('QUERY result: %s' % query_result.get('suggest', {}))
 
     aggs = []
     suggests = query_result.get('suggest', {})
@@ -248,7 +248,7 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
         log.debug("Elastic results after %d milliseconds."
                   % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
-        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
 
@@ -332,11 +332,11 @@ def fetch_platsannons(ad_id):
             log.info("Job ad %s not found, returning 404 message" % ad_id)
             abort(404, 'Ad not found')
     except exceptions.NotFoundError:
-        logging.exception('Failed to find id: %s' % ad_id)
+        log.exception('Failed to find id: %s' % ad_id)
         abort(404, 'Ad not found')
         return
     except exceptions.ConnectionError as e:
-        logging.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
         return
 

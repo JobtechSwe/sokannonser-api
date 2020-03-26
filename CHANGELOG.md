@@ -1,5 +1,10 @@
 Changelog Application Jobsearch
 ===============================
+## 1.11.0
+* Suggest extra word
+* Add taxonomy description
+* Fix spell check extra space problem
+
 ## 1.10.0
 * Auto complete & spell check
 

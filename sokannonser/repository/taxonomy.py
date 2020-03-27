@@ -224,6 +224,12 @@ def get_term(elastic_client, taxtype, taxid):
     return label
 
 
+def get_concept_id(elastic_client, taxtype, taxid):
+    taxonomy_entity = find_concept_by_legacy_ams_taxonomy_id(elastic_client,
+                                                             taxtype, taxid, {})
+    return taxonomy_entity['concept_id']
+
+
 def get_entity(elastic_client, taxtype, taxid, not_found_response=None):
 
     # old version doc_id = "%s-%s" % (taxtype_legend.get(taxtype, ''), taxid)

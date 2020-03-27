@@ -132,10 +132,12 @@ class Complete(Resource):
         if args[settings.X_FEATURE_SUGGEST_EXTRA_WORD] and len(result.get('aggs')) == 1:
             extra_words = platsannonser.suggest_extra_word(args, result.get('aggs')[0], self.querybuilder)
             result['aggs'] += extra_words
+            log.debug('Extra words: %s' % result['aggs'])
 
         if args[settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD] and args[settings.FREETEXT_LAST_WORD_SPACE]:
             remove_item = platsannonser.find_item(freetext_query.strip().split(' ')[0], result['aggs'])
             result['aggs'].remove(remove_item)
+            log.debug('Empty typeahead. Removed item: %s Aggs after removal: %s' % (remove_item, result['aggs']))
 
         return self.marshal_results(result, start_time)
 

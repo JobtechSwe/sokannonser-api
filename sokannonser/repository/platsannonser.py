@@ -413,7 +413,7 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
 
         for stat in args.get(settings.STATISTICS) or []:
             stat_result = query_result.get('aggregations', {}).get(stat, {}).get('buckets', [])
-            stat_result = sorted(stat_result, key=lambda a: a['doc_count'], reverse=True)[:5]
+            stat_result = sorted(stat_result, key=lambda a: a['doc_count'], reverse=True)
             log.debug('Statistic for field: %s' % stat)
             if 'stats' not in results:
                 results['stats'] = []
@@ -425,7 +425,7 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
                         "concept_id": b['key']['concept'],
                         "code": b['key']['legacy'],
                         "count": b['doc_count']}
-                    for b in stat_result
+                    for b in stat_result[:5]
                 ]
 
             })

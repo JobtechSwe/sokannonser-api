@@ -474,3 +474,10 @@ def _modify_results(results):
             pass
         except ValueError:
             pass
+
+
+def find_item(value, aggs):
+    # use to find item from aggs result
+    for agg in aggs:
+        if agg['value'] == value:
+            return agg

@@ -116,8 +116,10 @@ class Complete(Resource):
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''
-        args[settings.TYPEAHEAD_QUERY] = freetext_query
-        args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
+        args[settings.TYPEAHEAD_QUERY] = freetext_query.strip()
+        args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.strip().split(' ')[0:-1])
+        args[settings.FREETEXT_LAST_WORD_SPACE] = True if not freetext_query.split(' ')[-1] else False
+
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
 
         if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
@@ -130,6 +132,10 @@ class Complete(Resource):
         if args[settings.X_FEATURE_SUGGEST_EXTRA_WORD] and len(result.get('aggs')) == 1:
             extra_words = platsannonser.suggest_extra_word(args, result.get('aggs')[0], self.querybuilder)
             result['aggs'] += extra_words
+
+        if args[settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD] and args[settings.FREETEXT_LAST_WORD_SPACE]:
+            remove_item = platsannonser.find_item(freetext_query.strip().split(' ')[0], result['aggs'])
+            result['aggs'].remove(remove_item)
 
         return self.marshal_results(result, start_time)
 

@@ -312,6 +312,7 @@ def fetch_platsannons(ad_id):
     try:
         query_result = elastic.get(index=settings.ES_INDEX, id=ad_id, ignore=404)
         if query_result and '_source' in query_result:
+            log.debug('Ad found by la id: %s' % ad_id)
             return _format_ad(query_result)
         else:
             ext_id_query = {
@@ -324,9 +325,10 @@ def fetch_platsannons(ad_id):
             query_result = elastic.search(index=settings.ES_INDEX, body=ext_id_query)
             hits = query_result.get('hits', {}).get('hits', [])
             if hits:
+                log.debug('Ad found by external id: %s' % ad_id)
                 return _format_ad(hits[0])
 
-            log.info("Job ad %s not found, returning 404 message" % ad_id)
+            log.info("Ad %s not found, returning 404 message" % ad_id)
             abort(404, 'Ad not found')
     except exceptions.NotFoundError:
         log.exception('Failed to find id: %s' % ad_id)

@@ -119,12 +119,10 @@ class QueryBuilder(object):
 
         for stat in args.get(settings.STATISTICS) or []:
             query_dsl['aggs'][stat] = {
-                "composite": {
-                    "sources": [
-                        {"legacy": {"terms": {"field": f.stats_options[stat]}}},
-                        {"concept": {"terms": {"field": f.stats_options_concept[stat]}}}
-                    ]
-                }
+                 "terms": {
+                     "field": f.stats_options[stat],
+                     "size": args.get(settings.STAT_LMT) or 5
+                 }
             }
         return query_dsl
 

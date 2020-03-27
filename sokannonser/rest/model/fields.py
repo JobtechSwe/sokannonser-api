@@ -88,10 +88,3 @@ stats_options = {
     taxonomy.FIELD: "%s.%s.keyword" % (OCCUPATION_FIELD, LEGACY_AMS_TAXONOMY_ID),
     taxonomy.SKILL: "%s.%s.keyword" % (MUST_HAVE_SKILLS, LEGACY_AMS_TAXONOMY_ID),
 }
-
-stats_options_concept = {
-    taxonomy.OCCUPATION: "%s.%s.keyword" % (OCCUPATION, CONCEPT_ID),
-    taxonomy.GROUP: "%s.%s.keyword" % (OCCUPATION_GROUP, CONCEPT_ID),
-    taxonomy.FIELD: "%s.%s.keyword" % (OCCUPATION_FIELD, CONCEPT_ID),
-    taxonomy.SKILL: "%s.%s.keyword" % (MUST_HAVE_SKILLS, CONCEPT_ID),
-}

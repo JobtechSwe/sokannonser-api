@@ -412,6 +412,7 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
                                                    args.get(settings.FREETEXT_QUERY))
 
         for stat in args.get(settings.STATISTICS) or []:
+            log.debug("Statisticfor field: %s" % stat)
             if 'stats' not in results:
                 results['stats'] = []
             results['stats'].append({

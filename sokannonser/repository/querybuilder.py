@@ -993,7 +993,7 @@ class QueryBuilder(object):
             'second_word': {
                 'terms': {
                     'field': '%s.%s.raw' % (enriched_typeahead_field, second_word_type),
-                    'size': 5
+                    'size': 6
                 }
             }
         }

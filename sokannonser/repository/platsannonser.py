@@ -1,7 +1,8 @@
 import logging
 import json
 import time
-import io, os
+import io
+import os
 from flask_restx import abort
 from flask import send_file
 import requests
@@ -355,12 +356,14 @@ def get_correct_logo_url(ad_id):
             workplace_id = ad['employer']['workplace_id']
             eventual_logo_url = '%sarbetsplatser/%s/logotyper/logo.png' % (settings.COMPANY_LOGO_BASE_URL, workplace_id)
             r = requests.head(eventual_logo_url, timeout=10)
+            r.raise_for_status()
             if r.status_code == 200:
                 logo_url = eventual_logo_url
         elif 'organization_number' in ad['employer'] and ad['employer']['organization_number']:
             org_number = ad['employer']['organization_number']
             eventual_logo_url = '%sorganisation/%s/logotyper/logo.png' % (settings.COMPANY_LOGO_BASE_URL, org_number)
             r = requests.head(eventual_logo_url, timeout=10)
+            r.raise_for_status()
             if r.status_code == 200:
                 logo_url = eventual_logo_url
     return logo_url
@@ -396,6 +399,7 @@ def fetch_platsannons_logo(ad_id):
         )
     else:
         r = requests.get(logo_url, stream=True, timeout=5)
+        r.raise_for_status()
         return send_file(
             io.BytesIO(r.raw.read(decode_content=False)),
             attachment_filename=attachment_filename,

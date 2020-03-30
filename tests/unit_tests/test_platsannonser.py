@@ -12,7 +12,7 @@ from sokannonser.repository import taxonomy
 log = logging.getLogger(__name__)
 
 
-class MockOntology():
+class MockOntology:
     def __init__(self):
         self.extracted_locations = set()
 
@@ -124,20 +124,16 @@ def test_filter_timeframe(from_datetime, to_datetime):
     if from_datetime and to_datetime:
         d = pbquery._filter_timeframe(from_datetime,
                                       parser.parse(to_datetime))
-        assert d['range']['publication_date']['gte'] == \
-               parser.parse(from_datetime).isoformat()
-        assert d['range']['publication_date']['lte'] == \
-               parser.parse(to_datetime).isoformat()
+        assert d['range']['publication_date']['gte'] == parser.parse(from_datetime).isoformat()
+        assert d['range']['publication_date']['lte'] == parser.parse(to_datetime).isoformat()
         return
     if from_datetime:
         d = pbquery._filter_timeframe(from_datetime, to_datetime)
-        assert d['range']['publication_date']['gte'] == \
-               parser.parse(from_datetime).isoformat()
+        assert d['range']['publication_date']['gte'] == parser.parse(from_datetime).isoformat()
         return
     if to_datetime:
         d = pbquery._filter_timeframe(from_datetime, parser.parse(to_datetime))
-        assert d['range']['publication_date']['lte'] == \
-               parser.parse(to_datetime).isoformat()
+        assert d['range']['publication_date']['lte'] == parser.parse(to_datetime).isoformat()
 
 
 @pytest.mark.unit
@@ -254,42 +250,30 @@ def test_geo_distance_filter(args, exist, expected):
                          [({settings.APIKEY: "",
                             taxonomy.REGION: ["01", "02"]},
                            [
-                               {"term": {"workplace_address.region_code":
-                                             {"value": "01", "boost": 1.0}}},
-                               {"term": {"workplace_address.region_code":
-                                             {"value": "02", "boost": 1.0}}},
-                               {"term": {"workplace_address.region_concept_id":
-                                             {"value": "01", "boost": 1.0}}},
-                               {"term": {"workplace_address.region_concept_id":
-                                             {"value": "02", "boost": 1.0}}}
+                               {"term": {"workplace_address.region_code": {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_code": {"value": "02", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_concept_id": {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_concept_id": {"value": "02", "boost": 1.0}}}
                            ],
                            []),
                           ({settings.APIKEY: "",
                             taxonomy.MUNICIPALITY: ["0111"]},
                            [
-                               {"term": {"workplace_address.municipality_code":
-                                             {"value": "0111", "boost": 2.0}}},
+                               {"term": {"workplace_address.municipality_code": {"value": "0111", "boost": 2.0}}},
                                {"term": {
-                                   "workplace_address.municipality_concept_id":
-                                       {"value": "0111", "boost": 2.0}}}
+                                   "workplace_address.municipality_concept_id": {"value": "0111", "boost": 2.0}}}
                            ],
                            []),
                           ({settings.APIKEY: "",
                             taxonomy.REGION: ["01", "02"],
                             taxonomy.MUNICIPALITY: ["1111", "2222"]},
                            [
-                               {"term": {"workplace_address.region_code":
-                                             {"value": "01", "boost": 1.0}}},
-                               {"term": {"workplace_address.region_code":
-                                             {"value": "02", "boost": 1.0}}},
-                               {"term": {"workplace_address.region_concept_id":
-                                             {"value": "01", "boost": 1.0}}},
-                               {"term": {"workplace_address.region_concept_id":
-                                             {"value": "02", "boost": 1.0}}},
-                               {"term": {"workplace_address.municipality_code":
-                                             {"value": "1111", "boost": 2.0}}},
-                               {"term": {"workplace_address.municipality_code":
-                                             {"value": "2222", "boost": 2.0}}},
+                               {"term": {"workplace_address.region_code": {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_code": {"value": "02", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_concept_id": {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_concept_id": {"value": "02", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_code": {"value": "1111", "boost": 2.0}}},
+                               {"term": {"workplace_address.municipality_code": {"value": "2222", "boost": 2.0}}},
                                {"term": {
                                    "workplace_address.municipality_concept_id":
                                        {"value": "1111", "boost": 2.0}}},
@@ -302,66 +286,45 @@ def test_geo_distance_filter(args, exist, expected):
                             taxonomy.REGION: ["01", "-02"],
                             taxonomy.MUNICIPALITY: ["1111", "-2222"]},
                            [
-                               {"term": {"workplace_address.region_code":
-                                             {"value": "01", "boost": 1.0}}},
-                               {"term": {"workplace_address.municipality_code":
-                                             {"value": "1111", "boost": 2.0}}},
-                               {"term": {"workplace_address.region_code":
-                                             {"value": "01", "boost": 1.0}}},
-                               {"term": {"workplace_address.municipality_code":
-                                             {"value": "1111", "boost": 2.0}}}
+                               {"term": {"workplace_address.region_code": {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_code": {"value": "1111", "boost": 2.0}}},
+                               {"term": {"workplace_address.region_code": {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_code": {"value": "1111", "boost": 2.0}}}
                            ],
                            [
-                               {"term": {"workplace_address.region_code":
-                                             {"value": "02"}}},
-                               {"term": {"workplace_address.municipality_code":
-                                             {"value": "2222"}}},
-                               {"term": {"workplace_address.region_concept_id":
-                                             {"value": "02"}}},
+                               {"term": {"workplace_address.region_code": {"value": "02"}}},
+                               {"term": {"workplace_address.municipality_code": {"value": "2222"}}},
+                               {"term": {"workplace_address.region_concept_id": {"value": "02"}}},
                                {"term": {
-                                   "workplace_address.municipality_concept_id":
-                                       {"value": "2222"}}}
+                                   "workplace_address.municipality_concept_id": {"value": "2222"}}}
                            ]),
                           ({settings.APIKEY: "",
                             taxonomy.REGION: ["01", "-02"],
                             taxonomy.MUNICIPALITY: ["1111"]},
                            [
-                               {"term": {"workplace_address.region_code":
-                                             {"value": "01", "boost": 1.0}}},
-                               {"term": {"workplace_address.municipality_code":
-                                             {"value": "1111", "boost": 2.0}}},
-                               {"term": {"workplace_address.region_concept_id":
-                                             {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_code": {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_code": {"value": "1111", "boost": 2.0}}},
+                               {"term": {"workplace_address.region_concept_id": {"value": "01", "boost": 1.0}}},
                                {"term": {
-                                   "workplace_address.municipality_concept_id":
-                                       {"value": "1111", "boost": 2.0}}},
+                                   "workplace_address.municipality_concept_id": {"value": "1111", "boost": 2.0}}},
                            ],
                            [
-                               {"term": {"workplace_address.region_code":
-                                             {"value": "02"}}},
-                               {"term": {"workplace_address.region_concept_id":
-                                             {"value": "02"}}}
+                               {"term": {"workplace_address.region_code": {"value": "02"}}},
+                               {"term": {"workplace_address.region_concept_id": {"value": "02"}}}
                            ]),
                           ({settings.APIKEY: "",
                             taxonomy.REGION: ["01"],
                             taxonomy.MUNICIPALITY: ["1111", "-2222"]},
                            [
-                               {"term": {"workplace_address.region_code":
-                                             {"value": "01", "boost": 1.0}}},
-                               {"term": {"workplace_address.municipality_code":
-                                             {"value": "1111", "boost": 2.0}}},
-                               {"term": {"workplace_address.region_concept_id":
-                                             {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.region_code": {"value": "01", "boost": 1.0}}},
+                               {"term": {"workplace_address.municipality_code": {"value": "1111", "boost": 2.0}}},
+                               {"term": {"workplace_address.region_concept_id": {"value": "01", "boost": 1.0}}},
                                {"term": {
-                                   "workplace_address.municipality_concept_id":
-                                       {"value": "1111", "boost": 2.0}}},
+                                   "workplace_address.municipality_concept_id": {"value": "1111", "boost": 2.0}}},
                            ],
                            [
-                               {"term": {"workplace_address.municipality_code":
-                                             {"value": "2222"}}},
-                               {"term": {
-                                   "workplace_address.municipality_concept_id":
-                                       {"value": "2222"}}}
+                               {"term": {"workplace_address.municipality_code": {"value": "2222"}}},
+                               {"term": {"workplace_address.municipality_concept_id": {"value": "2222"}}}
                            ])])
 def test_region_municipality_query(args, expected_pos, expected_neg):
     query_dsl = pbquery.parse_args(args)
@@ -375,8 +338,7 @@ def test_region_municipality_query(args, expected_pos, expected_neg):
         assert (len(neg_query) == len(expected_neg))
         for e in expected_neg:
             assert (e in neg_query)
-    print('====================', sys._getframe().f_code.co_name,
-          '==================== ')
+    print('====================', sys._getframe().f_code.co_name, '==================== ')
 
 
 # Querybuilder tests
@@ -439,15 +401,11 @@ def test_rewrite_querystring():
         'skill_must_not': [],
         'occupation_must_not': [], 'trait_must_not': [],
         'location_must_not': []}
-    assert pbquery._rewrite_querystring("specialpedagog lärare speciallärare",
-                                        concepts) == ""
-    assert pbquery._rewrite_querystring("specialpedagog speciallärare lärare",
-                                        concepts) == ""
-    assert pbquery._rewrite_querystring("lärare speciallärare flärgare",
-                                        concepts) == "flärgare"
-    assert pbquery._rewrite_querystring(
-        "korvprånglare c++ asp.net [python3] flärgare",
-        concepts) == "korvprånglare [python3] flärgare"
+    assert pbquery._rewrite_querystring("specialpedagog lärare speciallärare", concepts) == ""
+    assert pbquery._rewrite_querystring("specialpedagog speciallärare lärare", concepts) == ""
+    assert pbquery._rewrite_querystring("lärare speciallärare flärgare", concepts) == "flärgare"
+    assert pbquery._rewrite_querystring("korvprånglare c++ asp.net [python3] flärgare",
+                                        concepts) == "korvprånglare [python3] flärgare"
     assert pbquery._rewrite_querystring("tcp/ip", concepts) == ""
 
 
@@ -455,8 +413,10 @@ def test_rewrite_querystring():
 @pytest.mark.parametrize("querystring, expected", [
     ("python \"grym kodare\"", ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": []}, "python")),
     ("java \"malmö stad\"", ({"phrases": ["malmö stad"], "phrases_must": [], "phrases_must_not": []}, "java")),
-    ("python -\"grym kodare\" +\"i am lazy\"", ({"phrases": [], "phrases_must": ["i am lazy"], "phrases_must_not": ["grym kodare"]}, "python")),
-    ("\"python på riktigt\" -\"grym kodare\" +\"i am lazy\"", ({"phrases": ["python på riktigt"], "phrases_must": ["i am lazy"], "phrases_must_not": ["grym kodare"]}, "")),
+    ("python -\"grym kodare\" +\"i am lazy\"",
+     ({"phrases": [], "phrases_must": ["i am lazy"], "phrases_must_not": ["grym kodare"]}, "python")),
+    ("\"python på riktigt\" -\"grym kodare\" +\"i am lazy\"",
+     ({"phrases": ["python på riktigt"], "phrases_must": ["i am lazy"], "phrases_must_not": ["grym kodare"]}, "")),
 ])
 def test_extract_querystring_phrases(querystring, expected):
     assert expected == pbquery.extract_quoted_phrases(querystring)
@@ -465,27 +425,40 @@ def test_extract_querystring_phrases(querystring, expected):
 @pytest.mark.unit
 @pytest.mark.parametrize("querystring, expected", [
     ("\"i am lazy", ({"phrases": ["i am lazy"], "phrases_must": [], "phrases_must_not": []}, "")),
-    ("python \"grym kodare\" \"i am lazy java", ({"phrases": ["grym kodare", "i am lazy java"], "phrases_must": [], "phrases_must_not": []}, "python")),
-    ("python \"grym kodare\" +\"i am lazy", ({"phrases": ["grym kodare"], "phrases_must": ["i am lazy"], "phrases_must_not": []}, "python")),
-    ("python \"grym kodare\" -\"i am lazy", ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": ["i am lazy"]}, "python")),
+    ("python \"grym kodare\" \"i am lazy java",
+     ({"phrases": ["grym kodare", "i am lazy java"], "phrases_must": [], "phrases_must_not": []}, "python")),
+    ("python \"grym kodare\" +\"i am lazy",
+     ({"phrases": ["grym kodare"], "phrases_must": ["i am lazy"], "phrases_must_not": []}, "python")),
+    ("python \"grym kodare\" -\"i am lazy",
+     ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": ["i am lazy"]}, "python")),
 ])
 def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expected):
     assert expected == pbquery.extract_quoted_phrases(querystring)
+
 
 
 @pytest.mark.unit
 @pytest.mark.parametrize("querystring, expected", [
     ("-php", {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
     ("+java", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
-    ("python", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
-    ("systemutvecklare python +java", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
+    (
+            "python",
+            {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
+    ("systemutvecklare python +java",
+     {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
     ("systemutvecklare python +java", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
-    ("systemutvecklare python +java", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
-    ("systemutvecklare python +java", {"bool": {"must": {"bool": {"should": {"term": {"keywords.extracted.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
-    ("systemutvecklare python +java -php", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
-    ("systemutvecklare python +java -php", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
-    ("systemutvecklare python +java -php", {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
-    ("systemutvecklare python +java -php", {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
+    ("systemutvecklare python +java", {"bool": {
+        "must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
+    ("systemutvecklare python +java", {"bool": {
+        "must": {"bool": {"should": {"term": {"keywords.extracted.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
+    ("systemutvecklare python +java -php",
+     {"bool": {"must": {"bool": {"should": {"term": {"keywords.enriched.skill.raw": {"value": "python"}}}}}}}),
+    ("systemutvecklare python +java -php",
+     {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
+    ("systemutvecklare python +java -php", {"bool": {
+        "must": {"bool": {"should": {"term": {"keywords.enriched.occupation.raw": {"value": "systemutvecklare"}}}}}}}),
+    ("systemutvecklare python +java -php",
+     {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
 ])
 def test_freetext_bool_structure(querystring, expected):
     result = pbquery._build_freetext_query(querystring, None, "and", False)
@@ -510,4 +483,3 @@ def _walk_dictionary(result, expected):
                     return _walk_dictionary(result[item], expected[item])
 
         return False
-

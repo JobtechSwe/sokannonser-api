@@ -119,10 +119,10 @@ class QueryBuilder(object):
 
         for stat in args.get(settings.STATISTICS) or []:
             query_dsl['aggs'][stat] = {
-                "terms": {
-                    "field": f.stats_options[stat],
-                    "size": args.get(settings.STAT_LMT) or 5
-                }
+                 "terms": {
+                     "field": f.stats_options[stat],
+                     "size": args.get(settings.STAT_LMT) or 5
+                 }
             }
         return query_dsl
 

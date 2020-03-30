@@ -5,8 +5,8 @@ this isn't valid JSON anymore. This scripts reads a JSON file line by line and
 outputs a valid JSON with correct quote usage.
 """
 
-def convert(input_filename, output_filename):
 
+def convert(input_filename, output_filename):
     multiline = False
     buff = ''
     target = open(output_filename, 'w')
@@ -69,17 +69,16 @@ def convert(input_filename, output_filename):
                 else:
                     buff += line
 
-    except:
+    finally:
         target.close()
-        raise
 
-    target.close()
 
 if __name__ == '__main__':
     # INFO: To run
     # cd tests/unit_tests/test_resources/
     # python convert_elastic_json.py elastic_results.json platsannons_results.json
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument('input_filename')
     parser.add_argument('output_filename')

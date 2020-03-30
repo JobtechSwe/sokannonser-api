@@ -279,8 +279,7 @@ def find_concept_by_legacy_ams_taxonomy_id(elastic_client, taxonomy_type,
     return hits[0]['_source']
 
 
-def find_concepts(elastic_client, query_string=None, taxonomy_code=[], entity_type=[],
-                  offset=0, limit=10):
+def find_concepts(elastic_client, query_string=None, taxonomy_code=[], entity_type=[], offset=0, limit=10):
     query_dsl = _build_query(query_string, taxonomy_code, entity_type, offset, limit)
     log.debug("Query: %s" % json.dumps(query_dsl))
     try:

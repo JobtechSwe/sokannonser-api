@@ -746,9 +746,7 @@ class QueryBuilder(object):
         if neg_komm_term_query or neg_lan_term_query or neg_land_term_query:
             if 'bool' not in plats_bool_query:
                 plats_bool_query['bool'] = {}
-            plats_bool_query['bool']['must_not'] = neg_komm_term_query + \
-                                                   neg_lan_term_query + \
-                                                   neg_land_term_query
+            plats_bool_query['bool']['must_not'] = neg_komm_term_query + neg_lan_term_query + neg_land_term_query
 
         return plats_bool_query
 

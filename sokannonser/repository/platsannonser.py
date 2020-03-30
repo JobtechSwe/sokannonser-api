@@ -412,6 +412,7 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
                                                    args.get(settings.FREETEXT_QUERY))
 
         for stat in args.get(settings.STATISTICS) or []:
+            log.debug("Statistic for field: %s" % stat)
             if 'stats' not in results:
                 results['stats'] = []
             results['stats'].append({
@@ -419,12 +420,11 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
                 "values": [
                     {
                         "term": taxonomy.get_term(elastic, stat, b['key']),
+                        "concept_id": taxonomy.get_concept_id(elastic, stat, b['key']),
                         "code": b['key'],
                         "count": b['doc_count']}
-                    for b in query_result.get('aggregations',
-                                              {}).get(stat, {}).get('buckets', [])
+                    for b in query_result.get('aggregations', {}).get(stat, {}).get('buckets', [])
                 ]
-
             })
 
     # create_found_in_enriched(results, query_result)

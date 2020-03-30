@@ -1,5 +1,8 @@
 Changelog Application Jobsearch
 ===============================
+# 1.11.1
+* Add concept Id to aggregation
+
 ## 1.11.0
 * Suggest extra word
 * Add taxonomy description

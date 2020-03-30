@@ -167,6 +167,7 @@ job_ad_searchresult = ns_platsannons.inherit('JobAdSearchResult', job_ad, {
 
 stat_item = ns_platsannons.model('StatDetail', {
     'term': fields.String(),
+    'concept_id': fields.String(),
     'code': fields.String(),
     'count': fields.Integer()
 })

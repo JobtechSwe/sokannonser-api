@@ -86,8 +86,9 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):
     if result.get('aggs'):
         # before only return one word, add prefix word here, will change the logic in future
         for item in result.get('aggs'):
-            item['value'] = (args[settings.FREETEXT_QUERY] + ' ' + item['value']).strip()
-            item['found_phrase'] = (args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']).strip()
+            value = item['value']
+            item['value'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
+            item['found_phrase'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
     elif args.get(settings.TYPEAHEAD_QUERY):
         result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
         if not result['aggs']:
@@ -482,8 +483,14 @@ def _modify_results(results):
             pass
 
 
-def find_item(value, aggs):
+def find_agg_and_delete(value, aggs):
     # use to find item from aggs result
+    remove_agg = ''
     for agg in aggs:
         if agg['value'] == value:
-            return agg
+            remove_agg = value
+            break
+
+    if remove_agg:
+        aggs.remove(remove_agg)
+    return aggs

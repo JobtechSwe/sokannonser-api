@@ -128,24 +128,26 @@ class QueryBuilder(object):
 
     def filter_aggs(self, aggs, freetext):
         #will not use in future
-        #fwords = freetext.split(' ') if freetext else []
+        fwords = freetext.split(' ') if freetext else []
         value_dicts = []
         for agg in aggs:
             if agg.startswith('complete_'):
                 value_dicts += [{"type": agg[12:], **bucket}
                                 for bucket in aggs[agg]['buckets']]
         filtered_aggs = []
+        value_list = []
         for kv in sorted(value_dicts, key=lambda k: k['doc_count'], reverse=True):
-            # found_words = kv['key'].split(' ')
-            # value = ' '.join([w for w in found_words if w not in fwords])
-            # if kv['key'] not in fwords:
-            ac_hit = {
-                "value": kv['key'],
-                "found_phrase": kv['key'],
-                "type": kv['type'],
-                "occurrences": kv['doc_count']
-            }
-            filtered_aggs.append(ac_hit)
+            found_words = kv['key'].split(' ')
+            value = ' '.join([w for w in found_words if w not in fwords])
+            if kv['key'] not in fwords and value not in value_list:
+                ac_hit = {
+                    "value": value,
+                    "found_phrase": kv['key'],
+                    "type": kv['type'],
+                    "occurrences": kv['doc_count']
+                }
+                value_list.append(value)
+                filtered_aggs.append(ac_hit)
 
         if len(filtered_aggs) > 10:
             return filtered_aggs[0:10]
@@ -247,7 +249,7 @@ class QueryBuilder(object):
         if complete_string or args.get(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD):
             complete_string = self._rewrite_word_for_regex(complete_string)
             log.debug("Complete string after rewrite: %s|" % complete_string)
-            word_list = complete_string.strip().split(' ')
+            word_list = complete_string.split(' ')
             complete = word_list[-1]
 
             ngrams_complete = []

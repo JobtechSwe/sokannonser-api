@@ -5,11 +5,9 @@ import pytest
 from sokannonser import app
 from sokannonser import settings
 from tests.integration_tests.test_resources.check_response import check_response_return_json
+from tests.integration_tests.test_resources.settings import test_api_key
 
-test_api_key = os.getenv('TEST_API_KEY')
 
-
-@pytest.mark.skip(reason="We currently don't have values in field keywords.enriched_synonyms")  # Missing test data?
 @pytest.mark.integration
 @pytest.mark.parametrize("synonym, expected",
                          [('servit', ['servitris', 'servitör']),
@@ -34,7 +32,6 @@ def test_complete_one_param_occupation(synonym, expected):
             assert exp in complete_values
 
 
-@pytest.mark.skip(reason="We currently don't have values in field keywords.enriched_synonyms")  # Missing test data?
 @pytest.mark.integration
 def test_complete_one_param_competence():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -56,7 +53,6 @@ def test_complete_one_param_competence():
         assert 'angularjs' in complete_values
 
 
-@pytest.mark.skip(reason="We currently don't have values in field keywords.enriched_synonyms")  # Missing test data?
 @pytest.mark.integration
 def test_complete_two_params():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -78,7 +74,6 @@ def test_complete_two_params():
         assert 'angularjs' in complete_values
 
 
-@pytest.mark.skip(reason="We currently don't have values in field keywords.enriched_synonyms")  # Missing test data?
 @pytest.mark.integration
 def test_complete_one_param_competence_special_char():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -102,7 +97,6 @@ def test_complete_one_param_competence_special_char():
 
 # This test case is for test complete endpoint with auto complete suggest
 # This test case is not good, will fix in future
-@pytest.mark.skip(reason="We currently don't have values in field keywords.enriched_synonyms")  # Missing test data?
 @pytest.mark.integration
 def test_complete_endpoint_with_auto_complete_suggest():
     app.testing = True

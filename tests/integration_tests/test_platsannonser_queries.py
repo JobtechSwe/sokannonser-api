@@ -7,10 +7,8 @@ from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
 from tests.integration_tests.test_resources.check_response import check_response_return_json
-from sokannonser.settings import number_of_ads
+from sokannonser.settings import number_of_ads, headers
 
-test_api_key = os.getenv('TEST_API_KEY')
-headers = {'api-key': test_api_key, 'accept': 'application/json'}
 
 
 @pytest.mark.skip(
@@ -117,45 +115,13 @@ def test_bugfix_reset_query_rewrite_location():
 ])
 def test_freetext_query_location_extracted_or_enriched_or_freetext(query_location, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    # query_location = 'kista kallhäll'
-    # query_location = 'vara'
-    # query_location = 'kallhäll'
-    # query_location = 'rissne'
-    # query_location = 'storlien'
-    # query_location = 'fridhemsplan'
-    # query_location = 'skåne län'
-    # query_location = '+trelleborg -stockholm ystad'
-    # query_location = 'skåne'
-
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': geo, 'limit': '0'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        print(hits_total)
-        assert int(hits_total) > 0, f"no hit for '{geo}' "
-
-
-@pytest.mark.skip(" Missing test data?")
-@pytest.mark.integration
-def test_freetext_query_location_extracted_or_enriched_or_freetext():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    # query_location = 'kista kallhäll'
-    # query_location = 'vara'
-    query_location = 'kallhäll'
-    # query_location = 'kallhäll introduktion'
-    # query_location = 'kallhäll ystad'
-    # query_location = 'stockholm malmö'
-    # query_location = 'väjern' #saknas i narvalontology men finns i annonserna.
-
     app.testing = True
     with app.test_client() as testclient:
         result = testclient.get('/search', headers=headers, data={'q': query_location, 'limit': '0'})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
-        assert int(hits_total) > 0, f"no hit for '{query_location}' "
+        assert int(
+            hits_total) == expected, f"Expected {expected} hits for query '{query_location}' but got {hits_total}"
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")

@@ -488,7 +488,7 @@ def find_agg_and_delete(value, aggs):
     remove_agg = ''
     for agg in aggs:
         if agg['value'] == value:
-            remove_agg = value
+            remove_agg = agg
             break
 
     if remove_agg:

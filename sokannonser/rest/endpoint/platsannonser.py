@@ -93,7 +93,7 @@ class Search(Resource):
 
 @ns_platsannons.route('complete')
 class Complete(Resource):
-    #method_decorators = [check_api_key_and_return_metadata('pb')]
+    method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
@@ -123,7 +123,6 @@ class Complete(Resource):
         # check suggest without space
         if not freetext_query.split(' ')[-1] and args[settings.X_FEATURE_SUGGEST_EXTRA_WORD] \
                 and args[settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD]:
-            log.debug('woshalelslslls')
             args[settings.TYPEAHEAD_QUERY] = freetext_query.strip()
             args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.strip().split(' ')[0:-1])
 
@@ -134,7 +133,6 @@ class Complete(Resource):
 
         # have not get result or suggest have not get one suggest
         if not result or len(result.get('aggs')) != 1:
-            log.debug('zhengquede')
             args[settings.TYPEAHEAD_QUERY] = freetext_query
             args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
             if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:

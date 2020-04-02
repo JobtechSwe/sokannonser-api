@@ -77,7 +77,7 @@ def test_freetext_query_with_special_characters(special, expected):
 ])
 def test_freetext_query_geo_param(geo, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    # todo check this test and remove the comment below
+# todo check this test and remove the comment below
     # kista: 119 (46)
     # gärdet: 62 (8)
     # råsunda: 8 (8)
@@ -117,13 +117,50 @@ def test_bugfix_reset_query_rewrite_location():
 ])
 def test_freetext_query_location_extracted_or_enriched_or_freetext(query_location, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
+
+    # query_location = 'kista kallhäll'
+    # query_location = 'vara'
+    # query_location = 'kallhäll'
+    # query_location = 'rissne'
+    # query_location = 'storlien'
+    # query_location = 'fridhemsplan'
+    # query_location = 'skåne län'
+    # query_location = '+trelleborg -stockholm ystad'
+    # query_location = 'skåne'
+
     app.testing = True
     with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': query_location, 'limit': '0'})
+        result = testclient.get('/search', headers=headers, data={'q': geo, 'limit': '0'})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
-        assert int(
-            hits_total) == expected, f"Expected {expected} hits for query '{query_location}' but got {hits_total}"
+        print(hits_total)
+        assert int(hits_total) > 0, f"no hit for '{geo}' "
+
+
+@pytest.mark.skip(" Missing test data?")
+@pytest.mark.integration
+def test_freetext_query_location_extracted_or_enriched_or_freetext():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+
+    # query_location = 'kista kallhäll'
+    # query_location = 'vara'
+    query_location = 'kallhäll'
+    # query_location = 'kallhäll introduktion'
+    # query_location = 'kallhäll ystad'
+    # query_location = 'stockholm malmö'
+    # query_location = 'väjern' #saknas i narvalontology men finns i annonserna.
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        result = testclient.get('/search', headers=headers, data={'q': query_location,
+                                                                  'limit': '0'})
+        json_response = check_response_return_json(result)
+        # pprint(json_response)
+
+        hits_total = json_response['total']['value']
+        # print(hits_total)
+        assert int(hits_total) > 0, f"no hit for '{query_location}' "
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -220,11 +257,7 @@ def test_removed_ads_should_not_be_in_result():
             result = testclient.get('/search', headers=headers, data={'offset': offset, 'limit': '100'})
             json_response = check_response_return_json(result)
             hits = json_response['hits']
-            # todo check this
-            # removed the code below since there are not enough ads in the test data
-            # the point of the test is to check all ads and see that 'removed' is False
-            # new test created that will verify that all ads can be collected 100 at the time
-            # assert len(hits) == 100, f"wrong number of hits, actual number: {len(hits)} "
+            assert len(hits) == 100, f"to few hits, actual number: {len(hits)} "
             for hit in hits:
                 assert hit['removed'] is False
 
@@ -244,6 +277,7 @@ def test_find_all_ads():
             else:
                 expected = number_of_ads % limit
             assert len(hits) == expected, f"wrong number of hits, actual number: {len(hits)} "
+
 
 
 @pytest.mark.integration
@@ -271,6 +305,7 @@ def test_freetext_query_two_params():
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
         assert int(hits_total) == 18, f"Expected 18 hits for query '{query}' but got {hits_total}"
+
 
 
 @pytest.mark.integration

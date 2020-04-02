@@ -200,7 +200,6 @@ def test_too_big_offset():
     with app.test_client() as testclient:
         result = testclient.get('/search', headers=headers, data={'offset': '2001', 'limit': '0'})
         json_response = result.json
-        # pprint(json_response)
         assert result.status == '400 BAD REQUEST'
         assert json_response['errors'] == {
             'offset': 'Invalid argument: 2001. argument must be within the range 0 - 2000'}

@@ -6,6 +6,7 @@ from sokannonser import app
 test_api_key = os.getenv("TEST_API_KEY")
 
 
+# @pytest.mark.skip(reason="missing test data?")
 @pytest.mark.parametrize("query, expected_number", [
     ('murar*', 0),
     ('systemutvecklar*', 10),
@@ -24,14 +25,8 @@ test_api_key = os.getenv("TEST_API_KEY")
     ('Kundtjänstmedarbetar*', 6),
     ('*undtjänstmedarbetare', 6),
     ('Kundtjänst*', 37),
-    ('sjukskö*', 100),  # max 100 hits returned
-    ('*sköterska', 100),  # max 100 hits returned
-    ('sköterska*', 2),
-    ('skötersk*', 6),
-    ('sjukvårds*tion', 0),
-    ('sj', 0),  # minimum 3 characters
-    ('sj*', 0),  # minimum 3 characters
-    ('sju*', 100)  # max 100 hits returned
+    ('sjukskö*', 100),
+    ('*sköterska', 100)
 ])
 @pytest.mark.integration
 def test_wildcard_search(query, expected_number):
@@ -41,14 +36,6 @@ def test_wildcard_search(query, expected_number):
         results = testclient.get('/search', headers=headers, data={'q': query, "limit": 100})
         assert 'hits' in results.json
         actual_number = len(results.json['hits'])
-
-        print(f"number of hits for {query}: {actual_number} ")
-        for hit in results.json['hits']:
-            info = f'{hit["headline"]} '
-            print(info)
-
         assert actual_number == expected_number, f"wrong number of hits for query '{query}'"
 
 # min 3 chars
-        assert len(results.json['hits']) > 0, f"no hits for query '{query}'"
-        # print(results.json)

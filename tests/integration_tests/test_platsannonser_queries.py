@@ -510,7 +510,6 @@ def test_worktime_extent():
                                ['947z_JGS_Uk2'])
 
 
-@pytest.mark.skip(" Missing test data?")
 @pytest.mark.integration
 def test_scope_of_work():
     app.testing = True

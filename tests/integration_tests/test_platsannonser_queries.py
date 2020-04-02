@@ -7,27 +7,29 @@ from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
 from tests.integration_tests.test_resources.check_response import check_response_return_json
+from tests.integration_tests.test_resources.settings import number_of_ads
 
 test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
 
 
-@pytest.mark.skip(
-    reason="Temporarily disabled. Needs fix according to Trello Card #137, Multipla ord i ett yrke")  # Missing test data?
+# todo check this
+#@pytest.mark.skip(
+#    reason="Temporarily disabled. Needs fix according to Trello Card #137, Multipla ord i ett yrke")  # Missing test data?
 @pytest.mark.integration
 def test_freetext_query_ssk():
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     app.testing = True
     with app.test_client() as testclient:
-        query = 'stockholm grundutbildad sjuksköterska'
+        #query = 'stockholm grundutbildad sjuksköterska'
+        query = 'sundsvall grundutbildad sjuksköterska'  # updated to match an ad in the test data
         result = testclient.get('/search', headers=headers, data={'q': query, 'limit': '0'})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
         assert int(hits_total) > 0, f"no hits for query '{query}'"
 
 
-@pytest.mark.skip(" Missing test data?")
 @pytest.mark.integration
 def test_freetext_query_one_param():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -42,7 +44,7 @@ def test_freetext_query_one_param():
         assert int(hits_total) > 0, f"no hits for query '{query}'"
 
 
-@pytest.mark.skip(" Missing test data?")
+@pytest.mark.skip(" Missing test data?")  # what is the point of the test? find misspelled ads?
 @pytest.mark.integration
 @pytest.mark.parametrize("typo", ['sjukssköterska', 'javasscript', 'montesori'])
 def test_freetext_query_misspelled_param(typo):
@@ -57,43 +59,32 @@ def test_freetext_query_misspelled_param(typo):
         assert int(hits_total) > 0, f"no hits for query '{typo}'"
 
 
-@pytest.mark.skip(" Missing test data?")
 @pytest.mark.integration
-@pytest.mark.parametrize("synonym", ['montessori'])
-def test_freetext_query_synonym_param(synonym):
+@pytest.mark.parametrize("special, expected", [('c++', 7), ('c#', 15)])
+def test_freetext_query_with_special_characters(special, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    app.testing = True
-    with app.test_client() as testclient:
-        # Note: Should get hits enriched with 'montessoripedagogik'.
-        result = testclient.get('/search', headers=headers, data={'q': synonym,
-                                                                  'limit': '1'})
-        json_response = check_response_return_json(result)
-
-        hits_total = json_response['total']['value']
-        assert int(hits_total) > 0, f"no synonyms for query '{synonym}'"
-
-
-@pytest.mark.skip(" Missing test data?")
-@pytest.mark.integration
-@pytest.mark.parametrize("special", ['c++', 'c#'])
-def test_freetext_query_with_special_characters(special):
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
     app.testing = True
     with app.test_client() as testclient:
         result = testclient.get('/search', headers=headers, data={'q': special, 'limit': '0'})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
-        assert int(hits_total) > 0, f"no hits for query '{special}'"
+        assert int(hits_total) == expected, f"Expected {expected} hits for query '{special}' but got {hits_total}"
 
 
-@pytest.mark.skip(" Missing test data?")
 @pytest.mark.integration
-@pytest.mark.parametrize("geo", ['kista', 'gärdet', 'stockholm', 'skåne', 'värmland', 'örebro', 'örebro län', 'rissne'])
-def test_freetext_query_geo_param(geo):
+@pytest.mark.parametrize("geo, expected", [
+    ('kista', 6),
+    ('gärdet', 1),
+    ('stockholm', 205),
+    ('skåne', 130),
+    ('värmland', 18),
+    ('örebro', 23),
+    ('örebro län', 28),
+    ('rissne', 1)
+])
+def test_freetext_query_geo_param(geo, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
+# todo check this test and remove the comment below
     # kista: 119 (46)
     # gärdet: 62 (8)
     # råsunda: 8 (8)
@@ -108,75 +99,38 @@ def test_freetext_query_geo_param(geo):
         result = testclient.get('/search', headers=headers, data={'q': geo, 'limit': '0'})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
-        assert int(hits_total) > 0, f"no hits for query '{geo}'"
+        assert int(hits_total) == expected, f"Expected {expected} hits for query '{geo}' but got {hits_total}"
 
 
-@pytest.mark.skip(reason="missing test data?")
 @pytest.mark.integration
 def test_bugfix_reset_query_rewrite_location():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
     app.testing = True
     with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
         result = testclient.get('/search', headers=headers, data={'q': 'rissne', 'limit': '0'})
         json_response = check_response_return_json(result)
-        # pprint(json_response)
-
         hits_total = json_response['total']['value']
-        # print(hits_total)
         assert int(hits_total) > 0, f"no hits for query 'rissne'"
 
 
-@pytest.mark.skip(" Missing test data?")
 @pytest.mark.integration
-@pytest.mark.parametrize("geo", ['+trelleborg -stockholm ystad', 'kista kallhäll'])
-def test_freetext_query_location_extracted_or_enriched(geo):
+@pytest.mark.parametrize("query_location, expected", [
+    ('kista kallhäll', 7),
+    ('vara', 1),
+    ('kallhäll', 1),
+    ('kallhäll introduktion', 0),  # Todo: what is expected here?
+    ('kallhäll ystad', 5),
+    ('stockholm malmö', 240)
+])
+def test_freetext_query_location_extracted_or_enriched_or_freetext(query_location, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    # query_location = 'kista kallhäll'
-    # query_location = 'vara'
-    # query_location = 'kallhäll'
-    # query_location = 'rissne'
-    # query_location = 'storlien'
-    # query_location = 'fridhemsplan'
-    # query_location = 'skåne län'
-    # query_location = '+trelleborg -stockholm ystad'
-    # query_location = 'skåne'
-
     app.testing = True
     with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': geo, 'limit': '0'})
+        result = testclient.get('/search', headers=headers, data={'q': query_location, 'limit': '0'})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
-        print(hits_total)
-        assert int(hits_total) > 0, f"no hit for '{geo}' "
-
-
-@pytest.mark.skip(" Missing test data?")
-@pytest.mark.integration
-def test_freetext_query_location_extracted_or_enriched_or_freetext():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    # query_location = 'kista kallhäll'
-    # query_location = 'vara'
-    query_location = 'kallhäll'
-    # query_location = 'kallhäll introduktion'
-    # query_location = 'kallhäll ystad'
-    # query_location = 'stockholm malmö'
-    # query_location = 'väjern' #saknas i narvalontology men finns i annonserna.
-
-    app.testing = True
-    with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers, data={'q': query_location,
-                                                                  'limit': '0'})
-        json_response = check_response_return_json(result)
-        # pprint(json_response)
-
-        hits_total = json_response['total']['value']
-        # print(hits_total)
-        assert int(hits_total) > 0, f"no hit for '{query_location}' "
+        assert int(
+            hits_total) == expected, f"Expected {expected} hits for query '{query_location}' but got {hits_total}"
 
 
 # @pytest.mark.skip(reason="Temporarily disabled")
@@ -253,7 +207,6 @@ def test_too_big_offset():
         assert json_response['message'] == 'Input payload validation failed'
 
 
-@pytest.mark.skip(" Missing test data?")
 @pytest.mark.integration
 def test_total_hits():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -263,24 +216,43 @@ def test_total_hits():
         result = testclient.get('/search', headers=headers, data={'offset': '0', 'limit': '0'})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
-        assert int(hits_total) > 10000, f"to few hits, actual number: {hits_total} "
+        assert int(hits_total) == 1065, f"to few hits, actual number: {hits_total} "
 
 
-@pytest.mark.skip(" Missing test data?")
 @pytest.mark.integration
-def test_deprecated_ads_should_not_be_in_result():
+def test_removed_ads_should_not_be_in_result():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
     app.testing = True
     with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        for offset in range(0, 2000, 100):
+        for offset in range(0, 1100, 100):
             result = testclient.get('/search', headers=headers, data={'offset': offset, 'limit': '100'})
             json_response = check_response_return_json(result)
             hits = json_response['hits']
-            assert len(hits) == 100, f"to few hits, actual number: {len(hits)} "
+            # todo check this
+            # removed the code below since there are not enough ads in the test data
+            # the point of the test is to check all ads and see that 'removed' is False
+            # new test created that will verify that all ads can be collected 100 at the time
+            #assert len(hits) == 100, f"wrong number of hits, actual number: {len(hits)} "
             for hit in hits:
                 assert hit['removed'] is False
+
+
+@pytest.mark.integration
+def test_find_all_ads():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    app.testing = True
+    with app.test_client() as testclient:
+        limit = 100
+        for offset in range(0, number_of_ads, limit):
+            result = testclient.get('/search', headers=headers, data={'offset': offset, 'limit': limit})
+            json_response = check_response_return_json(result)
+            hits = json_response['hits']
+            if number_of_ads - offset > limit:
+                expected = limit
+            else:
+                expected = number_of_ads % limit
+            assert len(hits) == expected, f"wrong number of hits, actual number: {len(hits)} "
+
 
 
 @pytest.mark.integration
@@ -297,82 +269,18 @@ def test_freetext_query_job_title_with_hyphen():
         assert occupation_val == 'hr-specialist'
 
 
-@pytest.mark.skip(reason="To be removed.")
-@pytest.mark.integration
-def test_freetext_query_one_param_deleted_enriched():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    app.testing = True
-    with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers, data={'q': 'gymnasielärare',
-                                                                  'limit': '10'})
-        json_response = check_response_return_json(result)
-        # pprint(json_response)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) > 0
-        hits = json_response['hits']
-        assert len(hits) <= 10
-        # pprint(hits[0])
-
-        assert 'extracted' in hits[0]['keywords']
-        assert 'enriched' not in hits[0]['keywords']
-
-
-@pytest.mark.skip(reason="To be removed")
-@pytest.mark.integration
-def test_freetext_query_one_param_found_in_enriched_pos():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    app.testing = True
-    with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers, data={'q': 'diskare',
-                                                                  'limit': '100'})
-        json_response = check_response_return_json(result)
-        # pprint(json_response)
-        # hits_total = json_response['total']
-        # assert int(hits_total) > 0
-        hits = json_response['hits']
-        # assert len(hits) > 0
-        # pprint(hits[0])
-        assert 'found_in_enriched' in hits[0]
-
-
-@pytest.mark.skip(reason="To be removed")
-@pytest.mark.integration
-def test_freetext_query_one_param_found_in_enriched_neg():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    app.testing = True
-    with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers, data={'q': 'ninja',
-                                                                  'limit': '100'})
-        json_response = check_response_return_json(result)
-        # pprint(json_response)
-        # hits_total = json_response['total']
-        # assert int(hits_total) > 0
-        hits = json_response['hits']
-        # assert len(hits) > 0
-        # pprint(hits[0])
-        for hit in hits:
-            assert 'found_in_enriched' in hit
-            assert hit['found_in_enriched'] is False
-
-
-@pytest.mark.skip(" Missing test data?")
 @pytest.mark.integration
 def test_freetext_query_two_params():
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     app.testing = True
     with app.test_client() as testclient:
-        query = 'gymnasielärare lokförare'
+        query = 'gymnasielärare lokförare'  # todo: is this an OR search? In that case it makes sens
         result = testclient.get('/search', headers=headers, data={'q': query, 'limit': '0'})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
-        assert int(hits_total) > 0, f"no hits for '{query}'"
+        assert int(hits_total) == 18, f"Expected 18 hits for query '{query}' but got {hits_total}"
+
 
 
 @pytest.mark.integration

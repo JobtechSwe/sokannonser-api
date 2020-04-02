@@ -40,4 +40,5 @@ def test_wildcard_search(query, expected_number):
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         results = testclient.get('/search', headers=headers, data={'q': query, "limit": 100})
         assert 'hits' in results.json
-        assert len(results.json['hits']) > 0, f"no hits for query '{query}'"
+        actual_number = len(results.json['hits'])
+        assert actual_number == expected_number, f"wrong number of hits for query '{query}'"

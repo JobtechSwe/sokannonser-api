@@ -3,7 +3,7 @@ import os
 import pytest
 from sokannonser import app
 from sokannonser.repository import platsannonser
-from sokannonser.settings import headers
+from tests.integration_tests.test_resources.settings import test_api_key, headers
 
 
 @pytest.mark.integration
@@ -51,9 +51,9 @@ def test_fetch_ad_logo_by_id():
         assert result.stream is not None
 
 
-@pytest.mark.skip(reason="no test data with workplace id")
+@pytest.mark.skip(reason="missing test data?")
 @pytest.mark.integration
-def test_fetch_workplace_logo_url_by_ad_id():
+def test_fetch_wp_logo_url_by_ad_id():
     app.testing = True
     with app.test_client():
         ad_with_workplace_id = 23478773
@@ -64,7 +64,7 @@ def test_fetch_workplace_logo_url_by_ad_id():
         assert found_logo_url
 
 
-@pytest.mark.skip(reason="no test data with workplace id")
+@pytest.mark.skip(reason="missing test data?")
 @pytest.mark.integration
 def test_fetch_wp_logo_url_only_org_logo_by_ad_id():
     app.testing = True
@@ -77,7 +77,7 @@ def test_fetch_wp_logo_url_only_org_logo_by_ad_id():
         assert found_logo_url
 
 
-@pytest.mark.skip(reason="no test data with workplace id")
+@pytest.mark.skip(reason="missing test data?")
 @pytest.mark.integration
 def test_fetch_missing_logo_url_by_id():
     logo_url = platsannonser.get_correct_logo_url('10526669')

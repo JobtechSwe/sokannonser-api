@@ -51,7 +51,7 @@ def test_fetch_ad_logo_by_id():
         assert result.stream is not None
 
 
-@pytest.mark.skip(reason="no test data with workplace id")
+@pytest.mark.skip(reason="missing test data?")
 @pytest.mark.integration
 def test_fetch_workplace_logo_url_by_ad_id():
     app.testing = True

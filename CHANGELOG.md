@@ -1,5 +1,8 @@
 Changelog Application Jobsearch
 ===============================
+# 1.11.2
+* Phrase search searches in both description.text and headline
+
 # 1.11.1
 * Add concept Id to aggregation
 

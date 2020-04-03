@@ -48,4 +48,3 @@ def test_wildcard_search(query, expected_number):
             print(info)
 
         assert actual_number == expected_number, f"wrong number of hits for query '{query}'"
-

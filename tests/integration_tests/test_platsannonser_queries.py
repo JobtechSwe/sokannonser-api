@@ -39,7 +39,7 @@ def test_freetext_query_one_param():
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("typo", ['sjukssköterska', 'javasscript' ])  # todo: no match for 'montesori'
+@pytest.mark.parametrize("typo", ['sjukssköterska', 'javasscript'])  # todo: no match for 'montesori'
 def test_freetext_query_misspelled_param(typo):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     app.testing = True
@@ -75,7 +75,7 @@ def test_freetext_query_with_special_characters(special, expected):
 ])
 def test_freetext_query_geo_param(geo, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-# todo check this test and remove the comment below
+    # todo check this test and remove the comment below
     # kista: 119 (46)
     # gärdet: 62 (8)
     # råsunda: 8 (8)
@@ -222,7 +222,7 @@ def test_removed_ads_should_not_be_in_result():
             # removed the code below since there are not enough ads in the test data
             # the point of the test is to check all ads and see that 'removed' is False
             # new test created that will verify that all ads can be collected 100 at the time
-            #assert len(hits) == 100, f"wrong number of hits, actual number: {len(hits)} "
+            # assert len(hits) == 100, f"wrong number of hits, actual number: {len(hits)} "
             for hit in hits:
                 assert hit['removed'] is False
 
@@ -242,7 +242,6 @@ def test_find_all_ads():
             else:
                 expected = number_of_ads % limit
             assert len(hits) == expected, f"wrong number of hits, actual number: {len(hits)} "
-
 
 
 @pytest.mark.integration
@@ -270,7 +269,6 @@ def test_freetext_query_two_params():
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
         assert int(hits_total) == 18, f"Expected 18 hits for query '{query}' but got {hits_total}"
-
 
 
 @pytest.mark.integration

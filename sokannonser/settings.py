@@ -87,6 +87,8 @@ DATE = 'date'
 # For all ads
 SHOW_EXPIRED = 'show-expired'
 
+
+
 result_models = [
     'pbapi', 'simple'
 ]
@@ -108,3 +110,9 @@ auranest_stats_options = {
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
 API_VERSION = '1.11.1'
+
+
+# for tests:
+number_of_ads = 1065
+test_api_key = os.getenv('TEST_API_KEY')
+headers = {'api-key': test_api_key, 'accept': 'application/json'}

@@ -184,8 +184,9 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
         start_time = int(time.time() * 1000)
 
     input_words = args.get(settings.TYPEAHEAD_QUERY)
-    word = input_words.split()[-1]
-    if input_words.split()[:-1]:
+    word_list = input_words.split()
+    word = word_list[-1] if word_list else ''
+    if word_list and word_list[:-1]:
         prefix = ' '.join(input_words.split()[:-1])
     else:
         prefix = ''

@@ -45,6 +45,7 @@ OFFSET = 'offset'
 LIMIT = 'limit'
 FREETEXT_QUERY = 'q'
 TYPEAHEAD_QUERY = 'typehead'
+FREETEXT_LAST_WORD_SPACE = 'space'
 CONTEXTUAL_TYPEAHEAD = 'contextual'
 UNSPECIFIED_SWEDEN_WORKPLACE = 'unspecified-sweden-workplace'
 FREETEXT_FIELDS = 'qfields'
@@ -86,6 +87,8 @@ DATE = 'date'
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'
+
+
 
 result_models = [
     'pbapi', 'simple'

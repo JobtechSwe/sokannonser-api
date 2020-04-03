@@ -7,7 +7,7 @@ from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
 from tests.integration_tests.test_resources.check_response import check_response_return_json
-from tests.integration_tests.test_resources.settings import number_of_ads
+from sokannonser.settings import number_of_ads
 
 test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
@@ -49,12 +49,10 @@ def test_freetext_query_one_param():
 @pytest.mark.parametrize("typo", ['sjukssköterska', 'javasscript', 'montesori'])
 def test_freetext_query_misspelled_param(typo):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
     app.testing = True
     with app.test_client() as testclient:
         result = testclient.get('/search', headers=headers, data={'q': typo, 'limit': '0'})
         json_response = check_response_return_json(result)
-
         hits_total = json_response['total']['value']
         assert int(hits_total) > 0, f"no hits for query '{typo}'"
 

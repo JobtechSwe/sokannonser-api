@@ -7,7 +7,7 @@ from tests.integration_tests.test_platsannonser_queries import headers
 from tests.integration_tests.test_resources.check_response import check_response_return_json
 
 
-@pytest.mark.skip(" Missing test data?")
+@pytest.mark.skip("Test does not find expected ad")
 @pytest.mark.integration
 @pytest.mark.parametrize("synonym", ['montessori'])
 def test_freetext_query_synonym_param(synonym):
@@ -15,11 +15,9 @@ def test_freetext_query_synonym_param(synonym):
 
     app.testing = True
     with app.test_client() as testclient:
-        # Note: Should get hits enriched with 'montessoripedagogik'.
-        result = testclient.get('/search', headers=headers, data={'q': synonym,
-                                                                  'limit': '1'})
+        # todo: Should get hits enriched with 'montessoripedagogik'. ad 23891324 in testdata should match
+        result = testclient.get('/search', headers=headers, data={'q': synonym, 'limit': '1'})
         json_response = check_response_return_json(result)
-
         hits_total = json_response['total']['value']
         assert int(hits_total) > 0, f"no synonyms for query '{synonym}'"
 

@@ -13,17 +13,15 @@ test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
 
 
-# todo check this
-#@pytest.mark.skip(
-#    reason="Temporarily disabled. Needs fix according to Trello Card #137, Multipla ord i ett yrke")  # Missing test data?
+@pytest.mark.skip(
+    reason="Temporarily disabled. Needs fix according to Trello Card #137, Multipla ord i ett yrke")  # Missing test data?
 @pytest.mark.integration
 def test_freetext_query_ssk():
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     app.testing = True
     with app.test_client() as testclient:
-        #query = 'stockholm grundutbildad sjuksköterska'
-        query = 'sundsvall grundutbildad sjuksköterska'  # updated to match an ad in the test data
+        query = 'stockholm grundutbildad sjuksköterska'
         result = testclient.get('/search', headers=headers, data={'q': query, 'limit': '0'})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']

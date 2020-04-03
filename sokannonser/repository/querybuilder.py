@@ -388,8 +388,10 @@ class QueryBuilder(object):
             for phrase in phrases[key]:
                 if bool_type not in ft_query['bool']:
                     ft_query['bool'][bool_type] = []
-                ft_query['bool'][bool_type].append({"match_phrase": {"description.text": phrase}})
-                ft_query['bool'][bool_type].append({"match_phrase": {"headline": phrase}})
+                ft_query['bool'][bool_type].append({"multi_match":
+                                                    {"query": phrase,
+                                                     "fields": ["headline", "description.text"],
+                                                     "type": "phrase"}})
 
         return ft_query
 

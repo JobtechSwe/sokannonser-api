@@ -389,6 +389,7 @@ class QueryBuilder(object):
                 if bool_type not in ft_query['bool']:
                     ft_query['bool'][bool_type] = []
                 ft_query['bool'][bool_type].append({"match_phrase": {"description.text": phrase}})
+                ft_query['bool'][bool_type].append({"match_phrase": {"headline": phrase}})
 
         return ft_query
 

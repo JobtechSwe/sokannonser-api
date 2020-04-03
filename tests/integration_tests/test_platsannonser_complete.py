@@ -5,7 +5,7 @@ import pytest
 from sokannonser import app
 from sokannonser import settings
 from tests.integration_tests.test_resources.check_response import check_response_return_json
-from tests.integration_tests.test_resources.settings import test_api_key
+from sokannonser.settings import test_api_key
 
 
 @pytest.mark.integration

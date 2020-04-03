@@ -21,7 +21,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 def get_stats_for(taxonomy_type):
     value_path = {
         taxonomy.OCCUPATION: "%s.%s.keyword" %
-        (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
+                             (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.GROUP: "%s.%s.keyword" % (
             fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.FIELD: "%s.%s.keyword" % (
@@ -171,7 +171,7 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
         query_result['concepts'] = \
             _extract_concept_from_concepts(
                 querybuilder.ttc.text_to_concepts(qs)
-        )
+            )
 
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
@@ -345,10 +345,10 @@ def get_correct_logo_url(ad_id):
     ad = fetch_platsannons(ad_id)
 
     logo_url = None
+
     if ad and 'employer' in ad:
-        if 'workplace_id' in ad['employer'] \
-                and ad['employer']['workplace_id'] \
-                and int(ad['employer']['workplace_id']) > 0:
+        if 'workplace_id' in ad['employer'] and ad['employer']['workplace_id'] and int(
+                ad['employer']['workplace_id']) > 0:
             '''
             Special logo for workplace_id for ads with source_type VIA_AF_FORMULAR eller VIA_PLATSBANKEN_AD or 
             VIA_ANNONSERA (workplace_id > 0)

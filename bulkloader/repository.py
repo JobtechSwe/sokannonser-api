@@ -134,20 +134,21 @@ def load_all(args):
     log.debug("Delivered %d ads as stream" % counter)
     yield ']'
 
-    occupation = args.get(settings.OCCUPATION)
-    if occupation:
-        occupation_query = filter_occupation(occupation)
-        dsl['query']['bool']['filter'].append(occupation_query)
+    occupation_concept_id = args.get(settings.OCCUPATION_CONCEPT_ID)
+    if occupation_concept_id:
+        dsl['query']['bool']['should'] = []
+        dsl = add_filter_occupation_query(dsl, occupation_concept_id)
     log.debug('load_all, dsl: %s' % json.dumps(dsl))
 
 
-def filter_occupation(occupation):
-    # add occupation filter
-    occupation_query = {"term": {
-                                "keywords.enriched.occupation.raw": occupation
-                            }
-                        }
-    return occupation_query
+def add_filter_occupation_query(dsl, occupation_concept_id):
+    # add occupation concept id
+    occupation_list = ['occupation', 'occupation_field', 'occupation_group']
+    for occupation in occupation_list:
+        dsl['query']['bool']['should'].append({"term": {
+                                "%s.concept_id.keyword" % occupation: occupation_concept_id
+                            }})
+    return dsl
 
 
 @marshaller.marshal_with(job_ad)

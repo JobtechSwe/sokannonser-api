@@ -82,6 +82,7 @@ PLACE = 'place'
 
 # For Batch
 DATE = 'date'
+OCCUPATION = 'occupation'
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'

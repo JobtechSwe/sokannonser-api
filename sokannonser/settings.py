@@ -69,7 +69,6 @@ DEFAULT_FREETEXT_BOOL_METHOD = 'and'
 MAX_OFFSET = 2000
 MAX_LIMIT = 100
 MAX_TAXONOMY_LIMIT = 8000
-MAX_COMPLETE_LIMIT = 50
 
 RESULT_MODEL = 'resultmodel'
 DETAILS = 'resdet'
@@ -87,8 +86,6 @@ DATE = 'date'
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'
-
-
 
 result_models = [
     'pbapi', 'simple'
@@ -110,9 +107,11 @@ auranest_stats_options = {
 # sweden country concept id: /v1/taxonomy/main/concepts?id=i46j_HmG_v64'
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
+
 # for tests:
 number_of_ads = 1065
 test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
 
 API_VERSION = '1.13.1'
+

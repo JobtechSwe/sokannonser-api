@@ -127,24 +127,26 @@ class QueryBuilder(object):
         return query_dsl
 
     def filter_aggs(self, aggs, freetext):
+        #will not use in future
         fwords = freetext.split(' ') if freetext else []
         value_dicts = []
         for agg in aggs:
             if agg.startswith('complete_'):
                 value_dicts += [{"type": agg[12:], **bucket}
                                 for bucket in aggs[agg]['buckets']]
-
         filtered_aggs = []
+        value_list = []
         for kv in sorted(value_dicts, key=lambda k: k['doc_count'], reverse=True):
             found_words = kv['key'].split(' ')
             value = ' '.join([w for w in found_words if w not in fwords])
-            if kv['key'] not in fwords:
+            if kv['key'] not in fwords and value not in value_list:
                 ac_hit = {
                     "value": value,
                     "found_phrase": kv['key'],
                     "type": kv['type'],
                     "occurrences": kv['doc_count']
                 }
+                value_list.append(value)
                 filtered_aggs.append(ac_hit)
 
         if len(filtered_aggs) > 10:
@@ -178,8 +180,8 @@ class QueryBuilder(object):
                     bracket_positions[istart.pop()] = i
                 except IndexError:
                     pass
-        idx = text.find('hits{')+4
-        r = text[idx+1:bracket_positions[idx]]
+        idx = text.find('hits{') + 4
+        r = text[idx + 1:bracket_positions[idx]]
         return r
 
     def _bootstrap_query(self, args, x_fields):
@@ -193,8 +195,8 @@ class QueryBuilder(object):
 
         if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
             query_dsl['_source'] = [f.ID, f.HEADLINE, f.APPLICATION_DEADLINE,
-                                    f.EMPLOYMENT_TYPE+"."+f.LABEL,
-                                    f.WORKING_HOURS_TYPE+"."+f.LABEL,
+                                    f.EMPLOYMENT_TYPE + "." + f.LABEL,
+                                    f.WORKING_HOURS_TYPE + "." + f.LABEL,
                                     f.EMPLOYER_NAME,
                                     f.PUBLICATION_DATE]
 
@@ -243,17 +245,18 @@ class QueryBuilder(object):
         if not complete_fields:
             complete_fields = queries.QF_CHOICES.copy()
             complete_fields.remove('employer')
-
+        log.debug("Complete string: %s|" % complete_string)
         if complete_string or args.get(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD):
             complete_string = self._rewrite_word_for_regex(complete_string)
+            log.debug("Complete string after rewrite: %s|" % complete_string)
             word_list = complete_string.split(' ')
             complete = word_list[-1]
 
             ngrams_complete = []
-            for n in list(range(len(word_list)-1)):
+            for n in list(range(len(word_list) - 1)):
                 ngrams_complete.append(' '.join(word_list[n:]))
-   
-            size = 12/len(complete_fields)
+
+            size = 12 / len(complete_fields)
 
             enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
                 settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
@@ -300,7 +303,7 @@ class QueryBuilder(object):
     def _calculate_utc_offset(self):
         is_dst = time.daylight and time.localtime().tm_isdst > 0
         utc_offset = - (time.altzone if is_dst else time.timezone)
-        return int(utc_offset/3600) if utc_offset > 0 else 0
+        return int(utc_offset / 3600) if utc_offset > 0 else 0
 
     def _assemble_queries(self, query_dsl, additional_queries, additional_filters):
         for query in additional_queries:
@@ -385,7 +388,10 @@ class QueryBuilder(object):
             for phrase in phrases[key]:
                 if bool_type not in ft_query['bool']:
                     ft_query['bool'][bool_type] = []
-                ft_query['bool'][bool_type].append({"match_phrase": {"description.text": phrase}})
+                ft_query['bool'][bool_type].append({"multi_match":
+                                                    {"query": phrase,
+                                                     "fields": ["headline", "description.text"],
+                                                     "type": "phrase"}})
 
         return ft_query
 
@@ -462,9 +468,9 @@ class QueryBuilder(object):
                     "query": searchword,
                     "type": "cross_fields",
                     "operator": method,
-                    "fields": [f.HEADLINE+"^3", f.KEYWORDS_EXTRACTED+".employer^2",
+                    "fields": [f.HEADLINE + "^3", f.KEYWORDS_EXTRACTED + ".employer^2",
                                f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
-                               f.KEYWORDS_EXTRACTED+".location^5"]
+                               f.KEYWORDS_EXTRACTED + ".location^5"]
                 }
             }
         ]
@@ -476,7 +482,7 @@ class QueryBuilder(object):
                     "query": searchword,
                     "type": "cross_fields",
                     "operator": method,
-                    "fields": [f.HEADLINE+"."+wildcard_side, f.DESCRIPTION_TEXT+"."+wildcard_side]
+                    "fields": [f.HEADLINE + "." + wildcard_side, f.DESCRIPTION_TEXT + "." + wildcard_side]
                 }
             }
         ]
@@ -592,57 +598,57 @@ class QueryBuilder(object):
 
         yrke_term_query = [{
             "term": {
-                f.OCCUPATION+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y,
                     "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION_GROUP+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_GROUP + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION_GROUP+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_GROUP + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION_FIELD+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_FIELD + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION_FIELD+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_FIELD + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
         neg_yrke_term_query = [{
             "term": {
-                f.OCCUPATION+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION_GROUP+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_GROUP + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION_GROUP+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_GROUP + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION_FIELD+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_FIELD + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION_FIELD+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_FIELD + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
 
         if yrke_term_query or neg_yrke_term_query:
@@ -745,9 +751,7 @@ class QueryBuilder(object):
         if neg_komm_term_query or neg_lan_term_query or neg_land_term_query:
             if 'bool' not in plats_bool_query:
                 plats_bool_query['bool'] = {}
-            plats_bool_query['bool']['must_not'] = neg_komm_term_query + \
-                                                   neg_lan_term_query + \
-                                                   neg_land_term_query
+            plats_bool_query['bool']['must_not'] = neg_komm_term_query + neg_lan_term_query + neg_land_term_query
 
         return plats_bool_query
 
@@ -898,19 +902,19 @@ class QueryBuilder(object):
         search = elasticsearch_dsl.Search()
         search = search.source('suggest')
         for field in fields:
-           search = search.suggest(
-               '%s-suggest' % field,
-               word,
-               completion={
-                   'field': '%s.%s.suggest' % (enriched_typeahead_field, field),
-                   "skip_duplicates": True,
-                   "size": 50,
-                   "fuzzy": {
-                       "min_length": 3,
-                       "prefix_length": 0
-                   }
-               }
-           )
+            search = search.suggest(
+                '%s-suggest' % field,
+                word,
+                completion={
+                    'field': '%s.%s.suggest' % (enriched_typeahead_field, field),
+                    "skip_duplicates": True,
+                    "size": 50,
+                    "fuzzy": {
+                        "min_length": 3,
+                        "prefix_length": 0
+                    }
+                }
+            )
         return search.to_dict()
 
     def create_phrase_suggester(self, input, args):
@@ -927,20 +931,20 @@ class QueryBuilder(object):
             '%s_simple_phrase' % field,
             input,
             phrase={
-               'field': '%s.trigram' % field,
-               'size': 10,
-               'max_errors': 2,
-               'direct_generator': [{
+                'field': '%s.trigram' % field,
+                'size': 10,
+                'max_errors': 2,
+                'direct_generator': [{
                     'field': '%s.trigram' % field,
                     'suggest_mode': 'always',
                     'min_word_length': 1
-               }, {
+                }, {
                     'field': '%s.reverse' % field,
                     'suggest_mode': 'always',
                     'pre_filter': 'reverse',
                     'post_filter': 'reverse',
                     'min_word_length': 1
-               }]
+                }]
             }
         )
         return search.to_dict()
@@ -994,7 +998,7 @@ class QueryBuilder(object):
             'second_word': {
                 'terms': {
                     'field': '%s.%s.raw' % (enriched_typeahead_field, second_word_type),
-                    'size': 5
+                    'size': 6
                 }
             }
         }

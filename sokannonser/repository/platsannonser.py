@@ -1,7 +1,8 @@
 import logging
 import json
 import time
-import io, os
+import io
+import os
 from flask_restx import abort
 from flask import send_file
 import requests
@@ -85,8 +86,9 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):
     if result.get('aggs'):
         # before only return one word, add prefix word here, will change the logic in future
         for item in result.get('aggs'):
-            item['value'] = (args[settings.FREETEXT_QUERY] + ' ' + item['value']).strip()
-            item['found_phrase'] = (args[settings.FREETEXT_QUERY] + ' ' + item['found_phrase']).strip()
+            value = item['value']
+            item['value'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
+            item['found_phrase'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
     elif args.get(settings.TYPEAHEAD_QUERY):
         result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
         if not result['aggs']:
@@ -182,8 +184,9 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
         start_time = int(time.time() * 1000)
 
     input_words = args.get(settings.TYPEAHEAD_QUERY)
-    word = input_words.split()[-1]
-    if input_words.split()[:-1]:
+    word_list = input_words.split()
+    word = word_list[-1] if word_list else ''
+    if word_list and word_list[:-1]:
         prefix = ' '.join(input_words.split()[:-1])
     else:
         prefix = ''
@@ -312,6 +315,7 @@ def fetch_platsannons(ad_id):
     try:
         query_result = elastic.get(index=settings.ES_INDEX, id=ad_id, ignore=404)
         if query_result and '_source' in query_result:
+            log.debug('Ad found by la id: %s' % ad_id)
             return _format_ad(query_result)
         else:
             ext_id_query = {
@@ -324,9 +328,10 @@ def fetch_platsannons(ad_id):
             query_result = elastic.search(index=settings.ES_INDEX, body=ext_id_query)
             hits = query_result.get('hits', {}).get('hits', [])
             if hits:
+                log.debug('Ad found by external id: %s' % ad_id)
                 return _format_ad(hits[0])
 
-            log.info("Job ad %s not found, returning 404 message" % ad_id)
+            log.info("Ad %s not found, returning 404 message" % ad_id)
             abort(404, 'Ad not found')
     except exceptions.NotFoundError:
         log.exception('Failed to find id: %s' % ad_id)
@@ -353,12 +358,14 @@ def get_correct_logo_url(ad_id):
             workplace_id = ad['employer']['workplace_id']
             eventual_logo_url = '%sarbetsplatser/%s/logotyper/logo.png' % (settings.COMPANY_LOGO_BASE_URL, workplace_id)
             r = requests.head(eventual_logo_url, timeout=10)
+            r.raise_for_status()
             if r.status_code == 200:
                 logo_url = eventual_logo_url
         elif 'organization_number' in ad['employer'] and ad['employer']['organization_number']:
             org_number = ad['employer']['organization_number']
             eventual_logo_url = '%sorganisation/%s/logotyper/logo.png' % (settings.COMPANY_LOGO_BASE_URL, org_number)
             r = requests.head(eventual_logo_url, timeout=10)
+            r.raise_for_status()
             if r.status_code == 200:
                 logo_url = eventual_logo_url
     return logo_url
@@ -394,6 +401,7 @@ def fetch_platsannons_logo(ad_id):
         )
     else:
         r = requests.get(logo_url, stream=True, timeout=5)
+        r.raise_for_status()
         return send_file(
             io.BytesIO(r.raw.read(decode_content=False)),
             attachment_filename=attachment_filename,
@@ -474,3 +482,16 @@ def _modify_results(results):
             pass
         except ValueError:
             pass
+
+
+def find_agg_and_delete(value, aggs):
+    # use to find item from aggs result
+    remove_agg = ''
+    for agg in aggs:
+        if agg['value'] == value:
+            remove_agg = agg
+            break
+
+    if remove_agg:
+        aggs.remove(remove_agg)
+    return aggs

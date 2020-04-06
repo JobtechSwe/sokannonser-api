@@ -6,7 +6,7 @@ from sokannonser import app
 test_api_key = os.getenv("TEST_API_KEY")
 
 
-@pytest.mark.skip(reason="Disabled until changes in index mapping have taken hold")
+@pytest.mark.skip(reason="missing test data?")
 @pytest.mark.parametrize("query", [
     'murar*',
     'sjukskö*',
@@ -31,4 +31,5 @@ def test_wildcard_search(query):
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
         results = testclient.get('/search', headers=headers, data={'q': query})
         assert 'hits' in results.json
-        assert len(results.json['hits']) > 0
+        assert len(results.json['hits']) > 0, f"no hits for query '{query}'"
+        # print(results.json)

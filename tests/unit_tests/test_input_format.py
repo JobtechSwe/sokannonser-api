@@ -3,6 +3,7 @@ import sys
 
 from flask_restx import inputs
 
+
 @pytest.mark.unit
 def test_regex_input_bulk_zip():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -23,6 +24,8 @@ def test_regex_input_bulk_zip():
     input = '2019-04-42'
 
     try:
-        val = input_regex(input)
+        input_regex(input)
     except ValueError as ve:
         assert ve is not None
+    else:
+        pytest.fail("expected a ValueError, but no ValueError was raised")

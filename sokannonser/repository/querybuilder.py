@@ -245,10 +245,8 @@ class QueryBuilder(object):
         if not complete_fields:
             complete_fields = queries.QF_CHOICES.copy()
             complete_fields.remove('employer')
-        log.debug("Complete string: %s|" % complete_string)
         if complete_string or args.get(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD):
             complete_string = self._rewrite_word_for_regex(complete_string)
-            log.debug("Complete string after rewrite: %s|" % complete_string)
             word_list = complete_string.split(' ')
             complete = word_list[-1]
 

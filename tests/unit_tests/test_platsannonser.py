@@ -327,6 +327,7 @@ def test_geo_distance_filter(args, exist, expected):
                                {"term": {"workplace_address.municipality_concept_id": {"value": "2222"}}}
                            ])])
 def test_region_municipality_query(args, expected_pos, expected_neg):
+    print('================', sys._getframe().f_code.co_name, '===============')
     query_dsl = pbquery.parse_args(args)
     if expected_pos:
         pos_query = query_dsl["query"]["bool"]["must"][0]["bool"]["should"]
@@ -338,7 +339,6 @@ def test_region_municipality_query(args, expected_pos, expected_neg):
         assert (len(neg_query) == len(expected_neg))
         for e in expected_neg:
             assert (e in neg_query)
-    print('====================', sys._getframe().f_code.co_name, '==================== ')
 
 
 # Querybuilder tests

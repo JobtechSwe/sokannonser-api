@@ -64,16 +64,13 @@ def test_filter_with_date_and_occupation_field(session, url, date, occupation_fi
     test of filtering in /stream
     should return results based on both date and occupation_field
     :param session:
-    :param url: 
+    :param url:
     :param date:
     :param occupation_field:
     :param expected_number:
     :return:
     """
-    filter_param = {'date': date, 'occupation': occupation_field}
-    response = session.get(f"{url}/stream", params=filter_param)
-    response.raise_for_status()
-    list_of_ads = json.loads(response.content.decode('utf8'))
+    list_of_ads = _get_stream(session, url, param={'date': date, 'occupation': occupation_field})
     assert expected_number == len(list_of_ads), f'expected {expected_number} but got {len(list_of_ads)} ads'
     print(f'{len(list_of_ads)} for occupation {occupation_field}')
 
@@ -89,8 +86,12 @@ def test_filter_with_date_and_occupation_field(session, url, date, occupation_fi
     ('2020-03-25T07:29:41', 273),
     ('2020-04-25T07:29:41', 0)])
 def test_filter_date(session, url, date, expected_number):
-    date_param = {'date': date}
-    response = session.get(f"{url}/stream", params=date_param)
-    response.raise_for_status()
-    list_of_ads = json.loads(response.content.decode('utf8'))
+    list_of_ads = _get_stream(session, url, param={'date': date})
     assert expected_number == len(list_of_ads), f'expected {expected_number} but got {len(list_of_ads)} ads'
+
+
+def _get_stream(session, url, param):
+    response = session.get(f"{url}/stream", params=param)
+    response.raise_for_status()
+    assert response.content is not None
+    return json.loads(response.content.decode('utf8'))

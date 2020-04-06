@@ -17,13 +17,11 @@ def test_passed_deadline():
     with app.test_client() as testclient:
         # https://jobtechjobs-api.dev.services.jtech.se/market/search?show-expired=false&q=ekonomi&place=jokkmokk&place=ume%C3%A5&offset=0&limit=5
         headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers,
-                                data={'show-expired': 'false',
-                                      'q': 'ekonomi',
-                                      'place': 'stockholm',
-                                      # 'place': 'umeå',
-                                      'offset': 0,
-                                      'limit': '100'})
+        result = testclient.get('/search', headers=headers, data={'show-expired': 'false',
+                                                                  'q': 'ekonomi',
+                                                                  'place': 'stockholm',
+                                                                  'offset': 0,
+                                                                  'limit': '100'})
         json_response = check_response_return_json(result)
         deadlines = [hit['application']['deadline'] for hit in json_response['hits']]
         dt_now = datetime.now()

@@ -109,3 +109,9 @@ auranest_stats_options = {
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
 API_VERSION = '1.12.0'
+
+
+# for tests:
+number_of_ads = 1065
+test_api_key = os.getenv('TEST_API_KEY')
+headers = {'api-key': test_api_key, 'accept': 'application/json'}

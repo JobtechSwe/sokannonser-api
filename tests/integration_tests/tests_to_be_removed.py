@@ -69,3 +69,4 @@ def test_freetext_query_one_param_found_in_enriched_neg():
         for hit in hits:
             assert 'found_in_enriched' in hit
             assert hit['found_in_enriched'] is False
+            

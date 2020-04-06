@@ -2,7 +2,7 @@ Changelog Application Jobsearch
 ===============================
 
 # 1.12.0
-* Change allow empty for suggest extra word
+* Allow empty space for autocomplete endpoint
 * Phrase search searches in both description.text and headline
 
 # 1.11.1

@@ -102,7 +102,8 @@ def convert_to_timestamp(day):
 
 
 # Generator function
-def load_all(since):
+def load_all(args):
+    since = args.get(settings.DATE)
     if since == 'yesterday':
         since = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
 
@@ -118,7 +119,6 @@ def load_all(since):
             }
         }
     }]
-    log.debug('load_all, dsl: %s' % json.dumps(dsl))
     scan_result = scan(elastic, dsl, index=index)
     counter = 0
     yield '['
@@ -133,6 +133,21 @@ def load_all(since):
         counter += 1
     log.debug("Delivered %d ads as stream" % counter)
     yield ']'
+
+    occupation = args.get(settings.OCCUPATION)
+    if occupation:
+        occupation_query = filter_occupation(occupation)
+        dsl['query']['bool']['filter'].append(occupation_query)
+    log.debug('load_all, dsl: %s' % json.dumps(dsl))
+
+
+def filter_occupation(occupation):
+    # add occupation filter
+    occupation_query = {"term": {
+                                "keywords.enriched.occupation.raw": occupation
+                            }
+                        }
+    return occupation_query
 
 
 @marshaller.marshal_with(job_ad)

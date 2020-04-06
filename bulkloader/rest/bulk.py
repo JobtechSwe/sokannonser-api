@@ -51,7 +51,8 @@ class BulkLoad(Resource):
         params={
             settings.DATE: "Stream ads updated since datetime. "
             "Accepts datetime as YYYY-MM-DDTHH:MM:SS, "
-            "for example %s. Rate limit is one request per minute." % example_date
+            "for example %s. Rate limit is one request per minute." % example_date,
+            settings.OCCUPATION: "Filter Stream ads by occupations"
         },
         responses={
             200: 'OK',
@@ -64,5 +65,5 @@ class BulkLoad(Resource):
     def get(self, **kwargs):
         elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         args = bulk_stream_query.parse_args()
-        return Response(repository.load_all(args.get(settings.DATE)),
+        return Response(repository.load_all(args),
                         mimetype='application/json')

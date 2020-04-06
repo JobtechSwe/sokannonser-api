@@ -28,7 +28,12 @@ Below we only show the URLs. If you prefer the curl command, you type it like:
 	curl "{URL}" -H "accept: application/json" -H "api-key: {proper_key}"
 	
 ### Stream 
-/stream?{search text}
+
+/stream?{date and occupation}
+e.g.:
+/stream?date=2020-04-06T15%3A12%3A15&occupation=kock
+
+
 
 The stream endpoint in the first section will return job ads that are currently open for applications. Great if you like to rebase your data.
 

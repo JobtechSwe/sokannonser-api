@@ -116,7 +116,6 @@ class Complete(Resource):
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''
-        #args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
         limit = args[settings.LIMIT] if args[settings.LIMIT] <= 50 else 50
         result = {}
         # if last input is space, and suggest extra word feature allow empty feature both are true,

@@ -22,7 +22,6 @@ RESTPLUS_VALIDATE = False
 RESTPLUS_MASK_SWAGGER = False
 RESTPLUS_ERROR_404_HELP = False
 
-
 # Base API URL
 BASE_URL = os.getenv('BASE_URL', 'https://jobsearch.api.jobtechdev.se/')
 BASE_PB_URL = os.getenv('BASE_PB_URL',
@@ -68,7 +67,7 @@ DEFAULT_FREETEXT_BOOL_METHOD = 'and'
 
 MAX_OFFSET = 2000
 MAX_LIMIT = 100
-MAX_TAXONOMY_LIMIT=8000
+MAX_TAXONOMY_LIMIT = 8000
 
 RESULT_MODEL = 'resultmodel'
 DETAILS = 'resdet'
@@ -93,9 +92,9 @@ result_models = [
 auranest_sort_options = {
     'relevance': "_score",
     'pubdate-desc': {"source.firstSeenAt": "desc"},
-    'pubdate-asc':  {"source.firstSeenAt": "asc"},
-    'applydate-desc':  {"application.deadline": "desc"},
-    'applydate-asc':  {"application.deadline": "asc"},
+    'pubdate-asc': {"source.firstSeenAt": "asc"},
+    'applydate-desc': {"application.deadline": "desc"},
+    'applydate-asc': {"application.deadline": "asc"},
 }
 
 auranest_stats_options = {
@@ -107,4 +106,4 @@ auranest_stats_options = {
 # sweden country concept id: /v1/taxonomy/main/concepts?id=i46j_HmG_v64'
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
-API_VERSION = '1.11.1'
+API_VERSION = '1.12.0'

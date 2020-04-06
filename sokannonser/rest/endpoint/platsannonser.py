@@ -116,20 +116,43 @@ class Complete(Resource):
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''
-        args[settings.TYPEAHEAD_QUERY] = freetext_query
-        args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
         args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
 
-        if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
-            result = platsannonser.suggest(args, self.querybuilder)
-        else:
-            result = platsannonser.find_platsannonser(args, self.querybuilder)
-        log.debug("Query results after %d milliseconds."
-                  % (int(time.time()*1000)-start_time))
+        result = {}
+        # if last input is space, and suggest extra word feature allow empty feature both are true,
+        # check suggest without space
+        if not freetext_query.split(' ')[-1] and args[settings.X_FEATURE_SUGGEST_EXTRA_WORD] \
+                and args[settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD]:
+            args[settings.TYPEAHEAD_QUERY] = freetext_query.strip()
+            args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.strip().split(' ')[0:-1])
 
+            if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
+                result = platsannonser.suggest(args, self.querybuilder)
+            else:
+                result = platsannonser.find_platsannonser(args, self.querybuilder)
+
+        # have not get result or suggest have not get one suggest
+        if not result or len(result.get('aggs')) != 1:
+            args[settings.TYPEAHEAD_QUERY] = freetext_query
+            args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
+            if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
+                result = platsannonser.suggest(args, self.querybuilder)
+            else:
+                result = platsannonser.find_platsannonser(args, self.querybuilder)
+
+        # only get one suggestion
         if args[settings.X_FEATURE_SUGGEST_EXTRA_WORD] and len(result.get('aggs')) == 1:
             extra_words = platsannonser.suggest_extra_word(args, result.get('aggs')[0], self.querybuilder)
             result['aggs'] += extra_words
+            log.debug('Extra words: %s' % result['aggs'])
+
+        # If there is space delete the same word with with input word
+        if args[settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD] and not freetext_query.split(' ')[-1]:
+            result['aggs'] = platsannonser.find_agg_and_delete(freetext_query.strip().split(' ')[0], result['aggs'])
+            log.debug('Empty typeahead. Removed item: %s Aggs after removal: %s' % (result['aggs'], result['aggs']))
+
+        log.debug("Query results after %d milliseconds."
+                  % (int(time.time()*1000)-start_time))
 
         return self.marshal_results(result, start_time)
 

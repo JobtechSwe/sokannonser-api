@@ -145,6 +145,8 @@ base_annons_query.add_argument(settings.FREETEXT_FIELDS, action='append',
                                choices=QF_CHOICES)
 
 annons_complete_query = base_annons_query.copy()
+annons_complete_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_COMPLETE_LIMIT),
+                                   default=10)
 annons_complete_query.add_argument(settings.CONTEXTUAL_TYPEAHEAD, type=inputs.boolean,
                                    default=True)
 annons_complete_query.add_argument(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD,

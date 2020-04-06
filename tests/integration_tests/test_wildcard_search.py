@@ -32,4 +32,4 @@ def test_wildcard_search(query):
         results = testclient.get('/search', headers=headers, data={'q': query})
         assert 'hits' in results.json
         assert len(results.json['hits']) > 0, f"no hits for query '{query}'"
-        print(results.json)
+        # print(results.json)

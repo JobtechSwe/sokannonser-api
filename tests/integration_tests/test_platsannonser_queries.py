@@ -38,6 +38,43 @@ def test_freetext_query_one_param():
 
 
 @pytest.mark.integration
+@pytest.mark.parametrize("query, expected", [('python', 8),
+                                             ('python php', 7),
+                                             ('+python php', 7),
+                                             ('+python -php', 7),
+                                             ('-python -php', 1058),  # of 1056
+                                             ('php', 0),  # ?
+                                             ('systemutvecklare +python java linux mac', 2),
+                                             ('systemutvecklare +python -java linux mac', 0),
+                                             ('systemutvecklare python java php', 12),
+                                             ('systemutvecklare -python java php', 10),
+                                             ('systemutvecklare python java -php', 12),
+                                             ('lärarexamen', 6),
+                                             ('lärarexamen -lärare', 1),
+                                             ('sjuksköterska', 83),
+                                             ('sjuksköterska -stockholm', 75),
+                                             ('sjuksköterska -malmö', 80),
+                                             ('sjuksköterska -stockholm -malmö', 72),
+                                             ('sjuksköterska -stockholm -malmö -göteborg -eskilstuna', 65),
+                                             ('sjuksköterska Helsingborg -stockholm -malmö -göteborg -eskilstuna', 1)  # 3 ads with work_place.municipality Helsingborg
+                                             ])
+def test_freetext_plus_minus(query, expected):
+    """
+    Tests query with plus and minus modifiers
+    :param query: Which terms to search for, icluding + - modifiers
+    :param expected:  How many hits are expected from the test data
+    :return: None if expected number of hits are found, AssertionError if not
+    """
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    app.testing = True
+    with app.test_client() as testclient:
+        result = testclient.get('/search', headers=headers, data={'q': query, 'limit': '100'})
+        json_response = check_response_return_json(result)
+        hits_total = json_response['total']['value']
+        assert int(hits_total) == expected, f"expected {expected} hits but got {hits_total} for query '{query}'"
+
+
+@pytest.mark.integration
 @pytest.mark.parametrize("typo", ['sjukssköterska', 'javasscript'])  # todo: no match for 'montesori'
 def test_freetext_query_misspelled_param(typo):
     print('==================', sys._getframe().f_code.co_name, '================== ')

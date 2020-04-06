@@ -17,7 +17,6 @@ tax_other = [[t.MUNICIPALITY], [t.REGION]]
 tax_noexist = [['  ', 'blabla', '']]
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 @pytest.mark.parametrize("taxonomy_type", tax_stat + tax_other + tax_noexist)
 def test_get_stats_for(taxonomy_type):

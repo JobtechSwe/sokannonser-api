@@ -1,14 +1,13 @@
 import sys
 import os
 import pytest
-from pprint import pprint
 from sokannonser import app
 from sokannonser.repository import platsannonser
 
 test_api_key = os.getenv('TEST_API_KEY')
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="missing test data?")
 @pytest.mark.integration
 def test_fetch_org_logo_url_by_ad_id():
     app.testing = True
@@ -17,13 +16,11 @@ def test_fetch_org_logo_url_by_ad_id():
         # First do a search and use that ad:s ID to test fetch
         found_ads = testclient.get('/search', headers=headers, data={'limit': '100'})
         hits = found_ads.json.get("hits")
-        # print(hits)
         assert len(hits) > 0
 
         found_logo_url = False
         for hit in hits:
             ad_id = hit.get("id")
-            # print(ad_id)
             logo_url = platsannonser.get_correct_logo_url(ad_id)
             if logo_url:
                 found_logo_url = True
@@ -33,7 +30,7 @@ def test_fetch_org_logo_url_by_ad_id():
         assert found_logo_url
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="missing test data?")
 @pytest.mark.integration
 def test_fetch_wp_logo_url_by_ad_id():
     app.testing = True
@@ -46,7 +43,7 @@ def test_fetch_wp_logo_url_by_ad_id():
         assert found_logo_url
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="missing test data?")
 @pytest.mark.integration
 def test_fetch_wp_logo_url_only_org_logo_by_ad_id():
     app.testing = True
@@ -59,14 +56,14 @@ def test_fetch_wp_logo_url_only_org_logo_by_ad_id():
         assert found_logo_url
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="missing test data?")
 @pytest.mark.integration
 def test_fetch_missing_logo_url_by_id():
     logo_url = platsannonser.get_correct_logo_url('10526669')
     assert logo_url is None
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="missing test data?")
 @pytest.mark.integration
 def test_fetch_ad_logo_by_id():
     print('==================', sys._getframe().f_code.co_name, '================== ')

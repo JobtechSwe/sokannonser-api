@@ -1,13 +1,13 @@
 import sys
 import os
 import pytest
-from pprint import pprint
 from market import app
+from tests.integration_tests.test_resources.check_response import check_response_return_json
 
 test_api_key = os.getenv('TEST_API_KEY')
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason=" http 401 error")
 @pytest.mark.integration
 def test_passed_deadline():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -24,14 +24,12 @@ def test_passed_deadline():
                                       # 'place': 'umeå',
                                       'offset': 0,
                                       'limit': '100'})
-        json_response = result.json
-        # pprint(json_response)
+        json_response = check_response_return_json(result)
         deadlines = [hit['application']['deadline'] for hit in json_response['hits']]
         dt_now = datetime.now()
 
         for deadline in deadlines:
             dt_deadline = datetime.strptime(deadline, '%Y-%m-%dT%H:%M:%S+00:00')
-            # print(dt_now, dt_deadline)
             assert dt_deadline >= dt_now
 
 

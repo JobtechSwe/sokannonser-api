@@ -1,5 +1,10 @@
 Changelog Application Jobsearch
 ===============================
+
+# 1.12.0
+* Change allow empty for suggest extra word
+* Phrase search searches in both description.text and headline
+
 # 1.11.1
 * Add concept Id to aggregation
 

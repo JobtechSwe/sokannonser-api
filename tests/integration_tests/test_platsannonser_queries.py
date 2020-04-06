@@ -68,7 +68,7 @@ def test_freetext_plus_minus(query, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     app.testing = True
     with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': query, 'limit': '100'})
+        result = testclient.get('/search', headers=headers, data={'q': query, 'limit': '0'})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
         assert int(hits_total) == expected, f"expected {expected} hits but got {hits_total} for query '{query}'"
@@ -184,7 +184,7 @@ def test_freetext_query_geo_param2():
         # pprint(json_response)
 
         hits_total = json_response['total']['value']
-        print(hits_total)
+        # print(hits_total)
 
         ids_freetext = [hit['id'] for hit in json_response['hits']]
         result_freetext2 = testclient.get('/search', headers=headers, data={'q': 'restaurangbiträde stockholm',
@@ -200,7 +200,7 @@ def test_freetext_query_geo_param2():
         # pprint(json_response)
 
         hits_total_tax = json_response_tax['total']['value']
-        print(hits_total_tax)
+        # print(hits_total_tax)
 
         ids_tax = [hit['id'] for hit in json_response_tax['hits']]
 
@@ -212,7 +212,7 @@ def test_freetext_query_geo_param2():
         # pprint(sorted(ids_tax))
 
         result_ids_tax_minus_freetext = sorted(list(set(ids_tax) - set(ids_freetext)))
-        print('tax - free', result_ids_tax_minus_freetext)
+        # print('tax - free', result_ids_tax_minus_freetext)
         # All hits in structured search should be covered when doing an equivalent freetext search.
         assert len(result_ids_tax_minus_freetext) == 0
         # print('free - tax', sorted(list(set(ids_freetext) - set(ids_tax))))
@@ -247,6 +247,7 @@ def test_total_hits():
 @pytest.mark.integration
 def test_removed_ads_should_not_be_in_result():
     print('==================', sys._getframe().f_code.co_name, '================== ')
+    
     app.testing = True
     with app.test_client() as testclient:
         for offset in range(0, 1100, 100):
@@ -308,6 +309,7 @@ def test_freetext_query_two_params():
 
 @pytest.mark.integration
 def test_publication_range():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
     app.testing = True
     with app.test_client() as testclient:
         date_from = "2019-02-01T00:00:00"
@@ -352,6 +354,8 @@ def _fetch_and_validate_result(query, resultfield, expected, non_negative=True):
 
 @pytest.mark.integration
 def test_driving_license_required():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    
     _fetch_and_validate_result({taxonomy.DRIVING_LICENCE_REQUIRED: 'true'},
                                [fields.DRIVING_LICENCE_REQUIRED], [True])
     _fetch_and_validate_result({taxonomy.DRIVING_LICENCE_REQUIRED: 'false'},
@@ -386,6 +390,8 @@ def test_driving_license_required():
                           ])
 @pytest.mark.integration
 def test_occupation_codes(query, path, expected, non_negative):
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    
     _fetch_and_validate_result(query, path, expected, non_negative)
 
 
@@ -398,11 +404,14 @@ def test_occupation_codes(query, path, expected, non_negative):
                           ])
 @pytest.mark.integration
 def test_occupation_location_combo(query, path, expected):
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    
     _fetch_and_validate_result(query, path, expected)
 
 
 @pytest.mark.integration
 def test_skill():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
     app.testing = True
     with app.test_client() as testclient:
         query = {taxonomy.SKILL: 'DHhX_uVf_y6X', "limit": 100}
@@ -419,6 +428,7 @@ def test_skill():
 
 @pytest.mark.integration
 def test_negative_skill():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
     app.testing = True
     with app.test_client() as testclient:
         query = {taxonomy.SKILL: '-DHhX_uVf_y6X', "limit": 100}
@@ -434,6 +444,8 @@ def test_negative_skill():
 
 @pytest.mark.integration
 def test_worktime_extent():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    
     _fetch_and_validate_result({taxonomy.WORKTIME_EXTENT: '947z_JGS_Uk2'},
                                [fields.WORKING_HOURS_TYPE + ".concept_id"],
                                ['947z_JGS_Uk2'])
@@ -441,6 +453,7 @@ def test_worktime_extent():
 
 @pytest.mark.integration
 def test_scope_of_work():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
     app.testing = True
     with app.test_client() as testclient:
         query = {search_settings.PARTTIME_MIN: 50, search_settings.PARTTIME_MAX: 80, "limit": 100}
@@ -462,7 +475,8 @@ def test_scope_of_work():
 
 
 @pytest.mark.integration
-def test_driving_license():
+def test_driving_licence():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
     app.testing = True
     with app.test_client() as testclient:
         query = {taxonomy.DRIVING_LICENCE: ['VTK8_WRx_GcM'], "limit": 100}
@@ -476,12 +490,16 @@ def test_driving_license():
 
 @pytest.mark.integration
 def test_employment_type():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    
     _fetch_and_validate_result({taxonomy.EMPLOYMENT_TYPE: 'PFZr_Syz_cUq'},
                                [fields.EMPLOYMENT_TYPE + ".concept_id"], ['PFZr_Syz_cUq'])
 
 
 @pytest.mark.integration
 def test_experience():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    
     _fetch_and_validate_result({search_settings.EXPERIENCE_REQUIRED: 'true'},
                                [fields.EXPERIENCE_REQUIRED], [True])
     _fetch_and_validate_result({search_settings.EXPERIENCE_REQUIRED: 'false'},
@@ -490,6 +508,8 @@ def test_experience():
 
 @pytest.mark.integration
 def test_region():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    
     _fetch_and_validate_result({taxonomy.REGION: '01'},
                                [fields.WORKPLACE_ADDRESS_REGION_CODE], ['01'])
     _fetch_and_validate_result({taxonomy.REGION: '-01'},
@@ -498,6 +518,8 @@ def test_region():
 
 @pytest.mark.integration
 def test_country():
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    
     _fetch_and_validate_result({taxonomy.REGION: '199'},
                                [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'])
     _fetch_and_validate_result({taxonomy.REGION: '-199'},

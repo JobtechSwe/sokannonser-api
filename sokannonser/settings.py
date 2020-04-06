@@ -68,7 +68,6 @@ DEFAULT_FREETEXT_BOOL_METHOD = 'and'
 MAX_OFFSET = 2000
 MAX_LIMIT = 100
 MAX_TAXONOMY_LIMIT = 8000
-MAX_COMPLETE_LIMIT = 50
 
 RESULT_MODEL = 'resultmodel'
 DETAILS = 'resdet'
@@ -83,10 +82,6 @@ PLACE = 'place'
 
 # For Batch
 DATE = 'date'
-OCCUPATION_CONCEPT_ID = 'occupation-concept-id'
-LOCATION_CONCEPT_ID = 'location-concept-id'
-OCCUPATION_LIST = ['occupation', 'occupation_field', 'occupation_group']
-LOCATION_LIST = ['region', 'city', 'country', 'municipality']
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'

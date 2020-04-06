@@ -10,7 +10,6 @@ from tests.integration_tests.test_resources.check_response import check_response
 from sokannonser.settings import number_of_ads, headers
 
 
-
 @pytest.mark.skip(
     reason="Temporarily disabled. Needs fix according to Trello Card #137, Multipla ord i ett yrke")  # Missing test data?
 @pytest.mark.integration
@@ -140,7 +139,6 @@ def test_freetext_query_geo_param2():
 
     app.testing = True
     with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
         # result = testclient.get('/search', headers=headers, data={'q': 'sjukssköterska noggran javasscript',
         #                                                           'limit': '1'})
         result_freetext = testclient.get('/search', headers=headers, data={'q': 'restaurangbiträde stockholm',
@@ -304,9 +302,7 @@ def _get_nested_value(path, dictionary):
 def _fetch_and_validate_result(query, resultfield, expected, non_negative=True):
     app.testing = True
     with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers,
-                                data=query)
+        result = testclient.get('/search', headers=headers, data=query)
         json_response = check_response_return_json(result)
         hits = json_response['hits']
         for hit in hits:
@@ -432,7 +428,6 @@ def test_scope_of_work():
 def test_driving_license():
     app.testing = True
     with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
         query = {taxonomy.DRIVING_LICENCE: ['VTK8_WRx_GcM'], "limit": 100}
         result = testclient.get('/search', headers=headers, data=query)
         json_response = check_response_return_json(result)

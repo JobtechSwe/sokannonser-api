@@ -52,14 +52,24 @@ Transport 47"""
 
 @pytest.mark.parametrize('date, occupation_field, expected_number', [
     ('2000-01-01T00:00:01', 'Hantverksyrken', 9999),
-    ('2000-01-01T00:00:01', 'Hantverksyrken', 9999),
     ('2020-01-01T00:00:01', 'Hantverksyrken', 9999),
+    ('2020-02-01T00:00:01', 'Hantverksyrken', 9999),
     ('2020-01-01T00:00:01', 'Data/IT', 9999),
     ('2020-02-01T00:00:01', 'Data/IT', 9999),
     ('2020-03-25T07:29:41', 'Försäljning, inköp, marknadsföring', 9999),
     ('2020-04-25T07:29:41', 'Hälso- och sjukvård', 9999)
 ])
-def test_filter(session, url, date, occupation_field, expected_number):
+def test_filter_with_date_and_occupation_field(session, url, date, occupation_field, expected_number):
+    """
+    test of filtering in /stream
+    should return results based on both date and occupation_field
+    :param session:
+    :param url: 
+    :param date:
+    :param occupation_field:
+    :param expected_number:
+    :return:
+    """
     filter_param = {'date': date, 'occupation': occupation_field}
     response = session.get(f"{url}/stream", params=filter_param)
     response.raise_for_status()
@@ -78,7 +88,7 @@ def test_filter(session, url, date, occupation_field, expected_number):
     ('2020-02-01T00:00:01', 971),
     ('2020-03-25T07:29:41', 273),
     ('2020-04-25T07:29:41', 0)])
-def test_filter_with_date_and_occupation_field(session, url, date, expected_number):
+def test_filter_date(session, url, date, expected_number):
     date_param = {'date': date}
     response = session.get(f"{url}/stream", params=date_param)
     response.raise_for_status()

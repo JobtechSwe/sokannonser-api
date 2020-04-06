@@ -5,7 +5,7 @@ import pytest
 from sokannonser import app
 from sokannonser import settings
 from tests.integration_tests.test_resources.check_response import check_response_return_json
-from sokannonser.settings import test_api_key
+from sokannonser.settings import headers, test_api_key
 
 
 @pytest.mark.integration
@@ -45,9 +45,7 @@ def test_complete_one_param_competence():
         json_response = check_response_return_json(result)
         assert 'typeahead' in json_response
         json_typeahead = json_response['typeahead']
-
         complete_values = [item['value'] for item in json_typeahead]
-
         assert len(complete_values) > 0, f"no hits for '{query}'"
         assert 'angular' in complete_values
         assert 'angularjs' in complete_values
@@ -56,7 +54,6 @@ def test_complete_one_param_competence():
 @pytest.mark.integration
 def test_complete_two_params():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
     app.testing = True
     with app.test_client() as testclient:
         query = 'systemutvecklare angu'
@@ -66,9 +63,7 @@ def test_complete_two_params():
         json_response = check_response_return_json(result)
         assert 'typeahead' in json_response
         json_typeahead = json_response['typeahead']
-
         complete_values = [item['value'] for item in json_typeahead]
-
         assert len(complete_values) > 0, f"no hits for '{query}'"
         assert 'angular' in complete_values
         assert 'angularjs' in complete_values
@@ -91,7 +86,6 @@ def test_complete_one_param_competence_special_char():
         complete_values = [item['value'] for item in json_typeahead]
 
         assert len(complete_values) > 0, f"no hits for '{query}'"
-        # pprint(complete_values)	# This test case is for test complete endpoint with auto complete suggest
         assert 'c#' in complete_values
 
 

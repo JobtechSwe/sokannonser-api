@@ -93,7 +93,7 @@ class Search(Resource):
 
 @ns_platsannons.route('complete')
 class Complete(Resource):
-    method_decorators = [check_api_key_and_return_metadata('pb')]
+    #method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
@@ -116,8 +116,8 @@ class Complete(Resource):
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''
-        args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
-
+        #args[settings.LIMIT] = 0  # Always return 0 ads when calling typeahead
+        limit = args[settings.LIMIT] if args[settings.LIMIT] <= 50 else 50
         result = {}
         # if last input is space, and suggest extra word feature allow empty feature both are true,
         # check suggest without space
@@ -154,12 +154,16 @@ class Complete(Resource):
         log.debug("Query results after %d milliseconds."
                   % (int(time.time()*1000)-start_time))
 
-        return self.marshal_results(result, start_time)
+        return self.marshal_results(result, limit, start_time)
 
-    def marshal_results(self, esresult, start_time):
+    def marshal_results(self, esresult, limit, start_time):
+        typeahead_result = esresult.get('aggs', [])
+        if len(typeahead_result) > limit:
+            typeahead_result = typeahead_result[:limit]
+
         result = {
             "time_in_millis": esresult.get('took', 0),
-            "typeahead": esresult.get('aggs', []),
+            "typeahead": typeahead_result,
         }
         log.debug("Sending results after %d milliseconds."
                   % (int(time.time()*1000) - start_time))

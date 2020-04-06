@@ -22,4 +22,4 @@ bulk_stream_query = reqparse.RequestParser()
 bulk_stream_query.add_argument(settings.APIKEY, location='headers', required=True)
 bulk_stream_query.add_argument(settings.DATE, type=inputs.datetime_from_iso8601,
                                required=True)
-bulk_stream_query.add_argument(settings.OCCUPATION, required=False)
+bulk_stream_query.add_argument(settings.OCCUPATION_CONCEPT_ID, required=False)

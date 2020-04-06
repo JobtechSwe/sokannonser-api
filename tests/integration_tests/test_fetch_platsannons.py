@@ -2,6 +2,7 @@ import sys
 import os
 import pytest
 from sokannonser import app
+import http
 
 test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
@@ -9,7 +10,6 @@ headers = {'api-key': test_api_key, 'accept': 'application/json'}
 
 @pytest.mark.integration
 def test_fetch_ad_by_id():
-    import http
     print('==================', sys._getframe().f_code.co_name, '================== ')
     app.testing = True
     with app.test_client() as testclient:

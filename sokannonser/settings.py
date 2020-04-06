@@ -86,8 +86,6 @@ DATE = 'date'
 # For all ads
 SHOW_EXPIRED = 'show-expired'
 
-
-
 result_models = [
     'pbapi', 'simple'
 ]
@@ -108,7 +106,7 @@ auranest_stats_options = {
 # sweden country concept id: /v1/taxonomy/main/concepts?id=i46j_HmG_v64'
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
-API_VERSION = '1.11.1'
+API_VERSION = '1.12.0'
 
 
 # for tests:

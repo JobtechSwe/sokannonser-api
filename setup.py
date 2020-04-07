@@ -5,7 +5,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'jobtech-common', 'flask', 'flask-restplus', 'flask-cors', 'elasticsearch',
+        'jobtech-common', 'flask', 'flask_restx', 'flask-cors', 'elasticsearch',
         'certifi', 'requests'
     ],
     setup_requires=["pytest-runner"],

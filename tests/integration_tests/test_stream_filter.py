@@ -27,39 +27,18 @@ def url(scope="session"):
     return f"http://{base_url}:{port}"
 
 
-"""
-Bygg och anläggning 40
-Chefer och verksamhetsledare 32
-Data/IT 85
-Försäljning, inköp, marknadsföring 103
-Hantverksyrken 6
-Hotell, restaurang, storhushåll 55
-Hälso- och sjukvård 194
-Industriell tillverkning 37
-Installation, drift, underhåll 42
-Kropps- och skönhetsvård 5
-Kultur, media, design 10
-Militärt arbete 1
-Naturbruk 7
-Naturvetenskapligt arbete 11
-Pedagogiskt arbete 135
-Sanering och renhållning 24
-Socialt arbete 95
-Säkerhetsarbete 11
-Tekniskt arbete 41
-Transport 47"""
-
-
-@pytest.mark.parametrize('date, occupation_field, expected_number', [
-    ('2000-01-01T00:00:01', 'Hantverksyrken', 9999),
-    ('2020-01-01T00:00:01', 'Hantverksyrken', 9999),
-    ('2020-02-01T00:00:01', 'Hantverksyrken', 9999),
-    ('2020-01-01T00:00:01', 'Data/IT', 9999),
-    ('2020-02-01T00:00:01', 'Data/IT', 9999),
-    ('2020-03-25T07:29:41', 'Försäljning, inköp, marknadsföring', 9999),
-    ('2020-04-25T07:29:41', 'Hälso- och sjukvård', 9999)
+# todo: adjust expected_number to reality
+@pytest.mark.parametrize('date, concept_id, expected_number', [
+    ('2000-01-01T00:00:01', 'PaxQ_o1G_wWH', 9999),
+    ('2020-01-01T00:00:01', 'PaxQ_o1G_wWH', 9999),
+    ('2020-02-01T00:00:01', 'PaxQ_o1G_wWH', 9999),
+    ('2020-01-01T00:00:01', 'yhCP_AqT_tns', 9999),
+    ('2020-02-01T00:00:01', 'yhCP_AqT_tns', 9999),
+    ('2020-02-25T07:29:41', 'MVqp_eS8_kDZ', 9999),
+    ('2020-03-25T07:29:41', 'MVqp_eS8_kDZ', 9999),
+    ('2020-04-25T07:29:41', '6Hq3_tKo_V57', 9999)
 ])
-def test_filter_with_date_and_occupation_field(session, url, date, occupation_field, expected_number):
+def test_filter_with_date_and_concept_id(session, url, date, concept_id, expected_number):
     """
     test of filtering in /stream
     should return results based on both date and occupation_field
@@ -70,15 +49,16 @@ def test_filter_with_date_and_occupation_field(session, url, date, occupation_fi
     :param expected_number:
     :return:
     """
-    list_of_ads = _get_stream(session, url, param={'date': date, 'occupation': occupation_field})
-    assert expected_number == len(list_of_ads), f'expected {expected_number} but got {len(list_of_ads)} ads'
-    print(f'{len(list_of_ads)} for occupation {occupation_field}')
+    list_of_ads = _get_stream(session, url, param={'date': date, 'filter': concept_id})
+    assert len(list_of_ads) == expected_number, f'expected {expected_number} but got {len(list_of_ads)} ads'
 
     # the query only seems to filter on date, not on occupation_field.
     # number of hits with 'occupation' param is the same as without it
 
 
-# test below for comaprison of number of hits for different dates
+# are concept ids case sensitive?
+
+# test below for comparison of number of hits for different dates
 @pytest.mark.parametrize('date, expected_number', [
     ('2000-01-01T00:00:01', 1065),
     ('2020-01-01T00:00:01', 1032),

@@ -18,18 +18,18 @@ def _es_dsl():
     dsl = {
         "query": {
             "bool": {
-                'filter': [
+                "filter": [
                     {
-                        'range': {
-                            'publication_date': {
-                                'lte': 'now/m'
+                        "range": {
+                            "publication_date": {
+                                "lte": "now/m+2H/m"
                             }
                         }
                     },
                     {
-                        'range': {
-                            'last_publication_date': {
-                                'gte': 'now/m'
+                        "range": {
+                            "last_publication_date": {
+                                "gte": "now/m"
                             }
                         }
                     }
@@ -151,7 +151,7 @@ def add_filter_occupation_query(dsl, occupation_concept_id):
         should_query.append({"term": {
                                 "%s.concept_id.keyword" % occupation: occupation_concept_id
                             }})
-    dsl['query']['bool']['filter'].append({'bool': {'should': should_query}})
+    dsl['query']['bool']['filter'].append({"bool": {"should": should_query}})
     return dsl
 
 

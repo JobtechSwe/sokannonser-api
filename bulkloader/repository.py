@@ -136,18 +136,21 @@ def load_all(args):
 
     occupation_concept_id = args.get(settings.OCCUPATION_CONCEPT_ID)
     if occupation_concept_id:
-        dsl['query']['bool']['should'] = []
-        dsl = add_filter_occupation_query(dsl, occupation_concept_id)
+        add_filter_occupation_query(dsl, occupation_concept_id)
+
     log.debug('load_all, dsl: %s' % json.dumps(dsl))
 
 
 def add_filter_occupation_query(dsl, occupation_concept_id):
     # add occupation concept id
     occupation_list = ['occupation', 'occupation_field', 'occupation_group']
+
+    should_query = []
     for occupation in occupation_list:
-        dsl['query']['bool']['should'].append({"term": {
+        should_query.append({"term": {
                                 "%s.concept_id.keyword" % occupation: occupation_concept_id
                             }})
+    dsl['query']['bool']['must'].append({'bool': {'should': should_query}})
     return dsl
 
 

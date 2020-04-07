@@ -150,7 +150,7 @@ def add_filter_occupation_query(dsl, occupation_concept_id):
         should_query.append({"term": {
                                 "%s.concept_id.keyword" % occupation: occupation_concept_id
                             }})
-    dsl['query']['bool']['must'].append({'bool': {'should': should_query}})
+    dsl['query']['bool']['filter'].append({'bool': {'should': should_query}})
     return dsl
 
 

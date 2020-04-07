@@ -119,6 +119,13 @@ def load_all(args):
             }
         }
     }]
+
+    occupation_concept_id = args.get(settings.OCCUPATION_CONCEPT_ID)
+    if occupation_concept_id:
+        add_filter_occupation_query(dsl, occupation_concept_id)
+
+    log.debug('load_all, dsl: %s' % json.dumps(dsl))
+
     scan_result = scan(elastic, dsl, index=index)
     counter = 0
     yield '['
@@ -133,12 +140,6 @@ def load_all(args):
         counter += 1
     log.debug("Delivered %d ads as stream" % counter)
     yield ']'
-
-    occupation_concept_id = args.get(settings.OCCUPATION_CONCEPT_ID)
-    if occupation_concept_id:
-        add_filter_occupation_query(dsl, occupation_concept_id)
-
-    log.debug('load_all, dsl: %s' % json.dumps(dsl))
 
 
 def add_filter_occupation_query(dsl, occupation_concept_id):

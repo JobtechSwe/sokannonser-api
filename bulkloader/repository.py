@@ -9,11 +9,9 @@ from elasticsearch.helpers import scan
 from sokannonser import settings
 from sokannonser.repository import elastic
 from sokannonser.rest.model.result_models import job_ad
-from sokannonser.repository.querybuilder import calculate_utc_offset
 
 log = logging.getLogger(__name__)
 marshaller = Namespace('Marshaller')
-offset = calculate_utc_offset()
 
 
 def _es_dsl():
@@ -24,14 +22,14 @@ def _es_dsl():
                     {
                         "range": {
                             "publication_date": {
-                                "lte": "now/m+%dH/m" % offset
+                                "lte": "now/m+2H/m"
                             }
                         }
                     },
                     {
                         "range": {
                             "last_publication_date": {
-                                "gte": "now/m+%dH/m" % offset
+                                "gte": "now/m"
                             }
                         }
                     }
@@ -106,11 +104,10 @@ def convert_to_timestamp(day):
 # Generator function
 def load_all(args):
     since = args.get(settings.DATE)
-    # input is not allowed by type=inputs.datetime_from_iso8601
     if since == 'yesterday':
         since = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
 
-    ts = int(time.mktime(since.timetuple())) * 1000
+    ts = time.mktime(since.timetuple()) * 1000
     index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
         else settings.ES_INDEX
 
@@ -123,7 +120,11 @@ def load_all(args):
         }
     }]
 
-    log.debug('QUERY(load_all): %s' % json.dumps(dsl))
+    occupation_concept_id = args.get(settings.OCCUPATION_CONCEPT_ID)
+    if occupation_concept_id:
+        add_filter_occupation_query(dsl, occupation_concept_id)
+
+    log.debug('load_all, dsl: %s' % json.dumps(dsl))
 
     scan_result = scan(elastic, dsl, index=index)
     counter = 0
@@ -141,6 +142,19 @@ def load_all(args):
     yield ']'
 
 
+def add_filter_occupation_query(dsl, occupation_concept_id):
+    # add occupation concept id
+    occupation_list = ['occupation', 'occupation_field', 'occupation_group']
+
+    should_query = []
+    for occupation in occupation_list:
+        should_query.append({"term": {
+                                "%s.concept_id.keyword" % occupation: occupation_concept_id
+                            }})
+    dsl['query']['bool']['filter'].append({"bool": {"should": should_query}})
+    return dsl
+
+
 @marshaller.marshal_with(job_ad)
 def format_ad(ad_data):
     return ad_data
@@ -152,24 +166,3 @@ def format_removed_ad(ad_data):
         'id': ad_data.get('id'), 'removed': ad_data.get('removed'),
         'removed_date': ad_data.get('removed_date')
     }
-
-
-def load_snapshot():
-    index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
-        else settings.ES_INDEX
-    log.debug("Elastic index(load_all): % s" % index)
-
-    dsl = _es_dsl()
-    dsl['query']['bool']['filter'].append({"term": {"removed": False}})
-    log.debug('QUERY(load_all): %s' % json.dumps(dsl))
-    scan_result = scan(elastic, dsl, index=index)
-    counter = 0
-    yield '['
-    for ad in scan_result:
-        if counter > 0:
-            yield ','
-        source = ad['_source']
-        yield json.dumps(format_ad(source))
-        counter += 1
-    log.debug("Delivered %d ads as stream" % counter)
-    yield ']'

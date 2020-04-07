@@ -15,4 +15,4 @@ urllib3
 python-simplexml
 pytest_bdd
 elasticsearch-dsl
-Werkzeug==0.16.1
+Werkzeug==1.0.1

@@ -68,6 +68,6 @@ class BulkLoad(Resource):
     def get(self, **kwargs):
         elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         args = bulk_stream_query.parse_args()
-        log.debug('args: %s' % args)
+        log.debug('ARGS: %s' % args)
         return Response(repository.load_all(args),
                         mimetype='application/json')

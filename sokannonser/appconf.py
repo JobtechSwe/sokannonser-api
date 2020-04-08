@@ -20,7 +20,7 @@ def configure_app(flask_app):
             'SECRET_TOKEN': settings.APM_SECRET,
             'COLLECT_LOCAL_VARIABLES': 'off',
             # regex to ignore specific routes
-            'TRANSACTIONS_IGNORE_PATTERNS': ['^OPTIONS ', '^HEAD ', '^.*\W\s*$', '.*swagger']
+            'TRANSACTIONS_IGNORE_PATTERNS': ['^OPTIONS ', '^HEAD ', '^.*\/\s*$', '.*swagger']
         }
         apm = ElasticAPM(flask_app, logging=logging.INFO)
         apm.capture_message('hello, apm!')

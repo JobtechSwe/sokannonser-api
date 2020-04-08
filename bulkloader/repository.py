@@ -121,6 +121,7 @@ def load_all(args):
     }]
 
     occupation_concept_ids = args.get(settings.OCCUPATION_CONCEPT_ID)
+    log.debug('Occupation concept ids: %s' % occupation_concept_ids)
     if occupation_concept_ids:
         occupation_list = [occupation + '.' for occupation in settings.OCCUPATION_LIST]
         add_filter_query(dsl, occupation_list, occupation_concept_ids)

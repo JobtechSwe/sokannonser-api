@@ -1,5 +1,7 @@
 Changelog Application Jobsearch
 ===============================
+# 1.12.1
+* Add limit to complete endpoint
 
 # 1.12.0
 * Allow empty space for autocomplete endpoint

@@ -53,7 +53,7 @@ class BulkLoad(Resource):
             "Accepts datetime as YYYY-MM-DDTHH:MM:SS, "
             "for example %s. Rate limit is one request per minute." % example_date,
             settings.OCCUPATION_CONCEPT_ID: "Filter stream ads by one or more occupations' concept ids. "
-            "(concept_ids from occupation, occupation_field, occupation_group)",
+            "(concept_ids from occupation, occupation_group, occupation_field)",
             settings.LOCATION_CONCEPT_ID: "Filter stream ads by one or more locations' concept ids. "
             "(concept_ids from Country, Region, Municipality)"
         },

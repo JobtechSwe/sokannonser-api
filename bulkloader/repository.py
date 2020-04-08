@@ -18,18 +18,18 @@ def _es_dsl():
     dsl = {
         "query": {
             "bool": {
-                'filter': [
+                "filter": [
                     {
-                        'range': {
-                            'publication_date': {
-                                'lte': 'now/m'
+                        "range": {
+                            "publication_date": {
+                                "lte": "now/m+2H/m"
                             }
                         }
                     },
                     {
-                        'range': {
-                            'last_publication_date': {
-                                'gte': 'now/m'
+                        "range": {
+                            "last_publication_date": {
+                                "gte": "now/m"
                             }
                         }
                     }
@@ -158,7 +158,7 @@ def add_filter_query(dsl, items, concept_ids):
                 should_query.append({"term": {
                                         item: concept_id
                                     }})
-    dsl['query']['bool']['filter'].append({'bool': {'should': should_query}})
+    dsl['query']['bool']['filter'].append({"bool": {"should": should_query}})
     return dsl
 
 

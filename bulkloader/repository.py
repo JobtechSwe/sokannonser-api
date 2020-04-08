@@ -126,7 +126,7 @@ def load_all(args):
         add_filter_query(dsl, occupation_list, occupation_concept_ids)
 
     location_concept_ids = args.get(settings.LOCATION_CONCEPT_ID)
-    log.debug('@@', location_concept_ids)
+    log.debug('Location concept ids: %s' % location_concept_ids)
     if location_concept_ids:
         location_list = ['workplace_address.' + location + '_' for location in settings.LOCATION_LIST]
         add_filter_query(dsl, location_list, location_concept_ids)

@@ -1,10 +1,11 @@
 Changelog Application Jobsearch
 ===============================
+# 1.12.1
+* Add limit to complete endpoint
 
 # 1.12.0
 * Allow empty space for autocomplete endpoint
 * Phrase search searches in both description.text and headline
-* Add occupation field to Jobstream endpoint
 
 # 1.11.1
 * Add concept Id to aggregation

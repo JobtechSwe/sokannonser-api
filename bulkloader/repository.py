@@ -122,12 +122,12 @@ def load_all(args):
 
     occupation_concept_ids = args.get(settings.OCCUPATION_CONCEPT_ID)
     if occupation_concept_ids:
-        occupation_list = [occupation + '.' for occupation in settings.OCCUPATION_LIST]
+        occupation_list = [occupation + '.' + 'concept_id.keyword' for occupation in settings.OCCUPATION_LIST]
         add_filter_query(dsl, occupation_list, occupation_concept_ids)
 
     location_concept_ids = args.get(settings.LOCATION_CONCEPT_ID)
     if location_concept_ids:
-        location_list = ['workplace_address.' + location + '_' for location in settings.LOCATION_LIST]
+        location_list = ['workplace_address.' + location + '_concept_id' for location in settings.LOCATION_LIST]
         add_filter_query(dsl, location_list, location_concept_ids)
 
     log.debug('QUERY(load_all): %s' % json.dumps(dsl))
@@ -156,7 +156,7 @@ def add_filter_query(dsl, items, concept_ids):
         if concept_id:
             for item in items:
                 should_query.append({"term": {
-                                        "%sconcept_id.keyword" % item: concept_id
+                                        item: concept_id
                                     }})
     dsl['query']['bool']['filter'].append({'bool': {'should': should_query}})
     return dsl

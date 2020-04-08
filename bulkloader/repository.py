@@ -18,18 +18,18 @@ def _es_dsl():
     dsl = {
         "query": {
             "bool": {
-                "filter": [
+                'filter': [
                     {
-                        "range": {
-                            "publication_date": {
-                                "lte": "now/m+2H/m"
+                        'range': {
+                            'publication_date': {
+                                'lte': 'now/m'
                             }
                         }
                     },
                     {
-                        "range": {
-                            "last_publication_date": {
-                                "gte": "now/m"
+                        'range': {
+                            'last_publication_date': {
+                                'gte': 'now/m'
                             }
                         }
                     }
@@ -120,9 +120,15 @@ def load_all(args):
         }
     }]
 
-    occupation_concept_id = args.get(settings.OCCUPATION_CONCEPT_ID)
-    if occupation_concept_id:
-        add_filter_occupation_query(dsl, occupation_concept_id)
+    occupation_concept_ids = args.get(settings.OCCUPATION_CONCEPT_ID)
+    if occupation_concept_ids:
+        occupation_list = [occupation + '.' for occupation in settings.OCCUPATION_LIST]
+        add_filter_query(dsl, occupation_list, occupation_concept_ids)
+
+    location_concept_ids = args.get(settings.LOCATION_CONCEPT_ID)
+    if occupation_concept_ids:
+        location_list = ['workplace_address.' + location + '_' for location in settings.LOCATION_LIST]
+        add_filter_query(dsl, location_list, occupation_concept_ids)
 
     log.debug('load_all, dsl: %s' % json.dumps(dsl))
 
@@ -142,16 +148,16 @@ def load_all(args):
     yield ']'
 
 
-def add_filter_occupation_query(dsl, occupation_concept_id):
-    # add occupation concept id
-    occupation_list = ['occupation', 'occupation_field', 'occupation_group']
+def add_filter_query(dsl, items, concept_ids):
+    # add occupation or location filter query
 
     should_query = []
-    for occupation in occupation_list:
-        should_query.append({"term": {
-                                "%s.concept_id.keyword" % occupation: occupation_concept_id
-                            }})
-    dsl['query']['bool']['filter'].append({"bool": {"should": should_query}})
+    for concept_id in concept_ids:
+        for item in items:
+            should_query.append({"term": {
+                                    "%sconcept_id.keyword" % item: concept_id
+                                }})
+    dsl['query']['bool']['filter'].append({'bool': {'should': should_query}})
     return dsl
 
 

@@ -271,7 +271,7 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
     query_result['aggs'] = aggs[:10]
 
     # check occurrences even i think it will take some trouble and stupid
-    query_result['aggs'] = suggest_check_occurence(aggs[:20], args, querybuilder)
+    query_result['aggs'] = suggest_check_occurence(aggs[:50], args, querybuilder)
 
     return query_result
 

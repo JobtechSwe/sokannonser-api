@@ -149,8 +149,8 @@ class QueryBuilder(object):
                 value_list.append(value)
                 filtered_aggs.append(ac_hit)
 
-        if len(filtered_aggs) > 10:
-            return filtered_aggs[0:10]
+        if len(filtered_aggs) > 50:
+            return filtered_aggs[0:50]
         return filtered_aggs
 
     def _parse_x_fields(self, x_fields):
@@ -254,7 +254,7 @@ class QueryBuilder(object):
             for n in list(range(len(word_list) - 1)):
                 ngrams_complete.append(' '.join(word_list[n:]))
 
-            size = 12 / len(complete_fields)
+            size = 60 / len(complete_fields)
 
             enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
                 settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED

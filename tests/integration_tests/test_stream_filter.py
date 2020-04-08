@@ -19,14 +19,14 @@ from tests.integration_tests.test_resources.settings import headers
     ('2020-03-25T07:29:41', work.mjukvaruutvecklare, 9999),
     ('2020-04-25T07:29:41', work.mjukvaruutvecklare, 9999)
 ])
-def test_filter_concept_id_for_occupation(session, url, date, concept_id, expected):
+def test_filter_concept_id_for_one_occupation(session, url, date, concept_id, expected):
     """
     test of filtering in /stream: should return results based on date AND occupation-related concept_id
     """
     _get_stream_check_number_of_results(session, url, expected, param={'date': date, 'filter': concept_id})
 
 
-@pytest.mark.parametrize('date, work_1, work_2, expected_number', [
+@pytest.mark.parametrize('date, work_1, work_2, expected', [
     ('2000-01-01T00:00:01', work.account_manager, work.cykelbud, 9999),
     ('2020-01-01T00:00:01', work.mjukvaruutvecklare, group.arbetsformedlare, 9999),
     ('2020-02-01T00:00:01', work.administrativ_chef, field.militart_arbete, 9999),
@@ -36,25 +36,64 @@ def test_filter_concept_id_for_occupation(session, url, date, concept_id, expect
     ('2020-03-25T07:29:41', field.pedagogiskt_arbete, field.halso__och_sjukvard, 9999),
     ('2020-04-25T07:29:41', field.hantverksyrken, group.hudterapeuter, 9999),
     ('2020-04-25T07:29:41', field.socialt_arbete, work.databasutvecklare, 9999)])
-def test_filter_with_date_and_multiple_concept_id(session, url, date, work_1, work_2, expected_number):
+def test_filter_with_date_and_two_occupations(session, url, date, work_1, work_2, expected):
     """
     test of filtering in /stream with date and 2 occupation-related concept_ids
     should return results based on both date AND (work_1 OR work_2)
     """
-    _get_stream_check_number_of_results(session, url, expected_number,
+    _get_stream_check_number_of_results(session, url, expected,
                                         param={'date': date, 'filter': work_1, 'filter': work_2})
 
 
-@pytest.mark.parametrize('date, work, geo, expected_number', [
+@pytest.mark.parametrize('date, work_1, work_2, work_3, expected', [
+    ('2000-01-01T00:00:01', work.account_manager, work.cykelbud, work.databasutvecklare, 9999),
+    ('2020-01-01T00:00:01', work.mjukvaruutvecklare, work.databasutvecklare, group.arbetsformedlare, 9999),
+    ('2020-02-01T00:00:01', work.administrativ_chef, work.apotekschef, field.militart_arbete, 9999),
+    ('2020-01-01T00:00:01', group.bagare_och_konditorer, group.bartendrar, group.hovmastare_och_servitorer, 9999),
+    ('2020-02-01T00:00:01', group.apotekare, group.ambulanssjukskoterskor_m_fl_, field.data_it, 9999),
+    ('2020-02-25T07:29:41', group.frisorer, group.hudterapeuter, work.akupunktor, 9999),
+    ('2020-03-25T07:29:41', field.pedagogiskt_arbete, field.halso__och_sjukvard, field.kropps__och_skonhetsvard, 9999),
+    ('2020-04-25T07:29:41', field.hantverksyrken, field.data_it, group.hudterapeuter, 9999),
+    ('2020-04-25T07:29:41', field.socialt_arbete, field.bygg_och_anlaggning, work.databasutvecklare, 9999)])
+def test_filter_with_date_and_three_occupations(session, url, date, work_1, work_2, work_3, expected):
+    """
+    test of filtering in /stream with date and 2 occupation-related concept_ids
+    should return results based on date AND (work_1 OR work_2 OR work 3)
+    """
+    _get_stream_check_number_of_results(session, url, expected,
+                                        param={'date': date, 'filter': work_1, 'filter': work_2, 'filter': work_3})
+
+
+@pytest.mark.parametrize('date, work, geo, expected', [
     ('2000-01-01T00:00:01', work.arbetsterapeut, geo.arboga, 33),
     ('2020-01-01T00:00:01', group.apotekare, geo.dalarnas_lan, 9999),
     ('2020-02-01T00:00:01', field.militart_arbete, geo.schweiz, 9999)])
-def test_filter_with_date_and_work_and_geographical(session, url, date, work, geo, expected_number):
+def test_filter_with_date_and_work_and_location(session, url, date, work, geo, expected):
     """
     should return results based on date AND occupation type AND location
     """
-    _get_stream_check_number_of_results(session, url, expected_number,
+    _get_stream_check_number_of_results(session, url, expected,
                                         param={'date': date, 'filter': work, 'filter': geo})
+
+
+@pytest.mark.parametrize('date, work, geo_1, geo_2, expected', [
+    ('2000-01-01T00:00:01', work.arbetsterapeut, work.bussforare_busschauffor, geo.falun, 9999),
+    ('2000-01-01T00:00:01', work.arbetsterapeut, group.apotekare, geo.stockholms_lan, 9999),
+    ('2000-01-01T00:00:01', work.arbetsterapeut, field.kropps__och_skonhetsvard, geo.norge, 9999),
+    ('2020-01-01T00:00:01', group.apotekare, group.apotekare, geo.hallands_lan, 9999),
+    ('2020-01-01T00:00:01', group.apotekare, group.hovmastare_och_servitorer, geo.linkoping, 9999),
+    ('2020-01-01T00:00:01', group.apotekare, group.arbetsformedlare, geo.sverige, 9999),
+    ('2020-02-01T00:00:01', field.militart_arbete, field.hantverksyrken, geo.stockholm, 9999),
+    ('2020-02-01T00:00:01', field.militart_arbete, group.ambulanssjukskoterskor_m_fl_, geo.jonkopings_lan, 9999),
+    ('2020-02-01T00:00:01', field.militart_arbete, work.bussforare_busschauffor, geo.norge, 9999),
+    ('2020-01-01T00:00:01', group.mjukvaru__och_systemutvecklare_m_fl_, geo.dalarnas_lan, geo.schweiz, 9999),
+    ('2020-02-01T00:00:01', work.bussforare_busschauffor, geo.schweiz, geo.norge, 9999)])
+def test_filter_with_date_and_two_work_and_locations(session, url, date, work, geo_1, geo_2, expected):
+    """
+    should return results based on date AND occupation type AND location
+    """
+    _get_stream_check_number_of_results(session, url, expected,
+                                        param={'date': date, 'filter': work, 'filter': geo_1, 'filter': geo_2})
 
 
 @pytest.mark.parametrize('date, work, geo_1, geo_2, expected', [
@@ -67,8 +106,9 @@ def test_filter_with_date_and_work_and_geographical(session, url, date, work, ge
     ('2020-02-01T00:00:01', field.militart_arbete, geo.schweiz, geo.stockholm, 9999),
     ('2020-02-01T00:00:01', field.militart_arbete, geo.schweiz, geo.jonkopings_lan, 9999),
     ('2020-02-01T00:00:01', field.militart_arbete, geo.schweiz, geo.norge, 9999),
-])
-def test_filter_with_date_and_work_and_two_geographical(session, url, date, work, geo_1, geo_2, expected):
+    ('2020-01-01T00:00:01', group.mjukvaru__och_systemutvecklare_m_fl_, geo.dalarnas_lan, geo.schweiz, 9999),
+    ('2020-02-01T00:00:01', work.bussforare_busschauffor, geo.schweiz, geo.norge, 9999)])
+def test_filter_with_date_and_work_and_two_locations(session, url, date, work, geo_1, geo_2, expected):
     """
     should return results based on date AND occupation type AND location
     """

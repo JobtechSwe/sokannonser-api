@@ -116,7 +116,7 @@ class Complete(Resource):
         start_time = int(time.time()*1000)
         args = annons_complete_query.parse_args()
         freetext_query = args.get(settings.FREETEXT_QUERY) or ''
-        limit = args[settings.LIMIT] if args[settings.LIMIT] <= 50 else 50
+        limit = args[settings.LIMIT] if args[settings.LIMIT] <= settings.MAX_COMPLETE_LIMIT else settings.MAX_COMPLETE_LIMIT
         result = {}
         # if last input is space, and suggest extra word feature allow empty feature both are true,
         # check suggest without space

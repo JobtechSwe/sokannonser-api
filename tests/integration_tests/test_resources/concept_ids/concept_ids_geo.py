@@ -1,3 +1,5 @@
+# location concept ids, most frequent of each type on top
+
 #  ["municipality"]
 stockholm = "AvNB_uwa_6n6"
 goteborg = "PVZL_BQT_XtL"

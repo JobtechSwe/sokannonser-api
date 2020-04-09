@@ -1,14 +1,12 @@
-import json
 import pytest
-import requests
 
-from tests.integration_tests.test_resources.settings import headers
 from sokannonser.settings import OCCUPATION_CONCEPT_ID, LOCATION_CONCEPT_ID
 
 import tests.integration_tests.test_resources.concept_ids.concept_ids_geo as geo
 import tests.integration_tests.test_resources.concept_ids.occupation as work
 import tests.integration_tests.test_resources.concept_ids.occupation_group as group
 import tests.integration_tests.test_resources.concept_ids.occupation_field as field
+from tests.integration_tests.test_resources.stream import _get_stream_check_number_of_results
 
 
 @pytest.mark.parametrize('date, work, expected', [
@@ -19,9 +17,10 @@ import tests.integration_tests.test_resources.concept_ids.occupation_field as fi
     ('2000-01-01T00:00:01', work.arbetsterapeut, 5)])
 def test_check_number_of_ads(session, url, date, work, expected):
     """
-    Returns number of hits in the db. Looks a bit low for 'mjukvarutvecklare', but let's accept it for now
+    Returns number of hits in the db. Temporary to verify results in other tests
     """
-    _get_stream_check_number_of_results(session, url, expected, param={'date': date, OCCUPATION_CONCEPT_ID: work})
+    params = {'date': date, OCCUPATION_CONCEPT_ID: work}
+    _get_stream_check_number_of_results(session, url, expected, params)
 
 
 @pytest.mark.parametrize('date, work, geo, expected', [
@@ -45,8 +44,8 @@ def test_filter_with_date_and_work_and_location(session, url, date, work, geo, e
     """
     should return results based on date AND occupation type AND location
     """
-    _get_stream_check_number_of_results(session, url, expected,
-                                        param={'date': date, OCCUPATION_CONCEPT_ID: work, LOCATION_CONCEPT_ID: geo})
+    params = {'date': date, OCCUPATION_CONCEPT_ID: work, LOCATION_CONCEPT_ID: geo}
+    _get_stream_check_number_of_results(session, url, expected, params)
 
 
 @pytest.mark.parametrize('date, concept_id, expected', [
@@ -73,7 +72,8 @@ def test_filter_concept_id_for_one_occupation(session, url, date, concept_id, ex
     """
     test of filtering in /stream: should return results based on date AND occupation-related concept_id
     """
-    _get_stream_check_number_of_results(session, url, expected, param={'date': date, OCCUPATION_CONCEPT_ID: concept_id})
+    params = {'date': date, OCCUPATION_CONCEPT_ID: concept_id}
+    _get_stream_check_number_of_results(session, url, expected, params)
 
 
 @pytest.mark.parametrize('date, geo, expected', [
@@ -93,27 +93,11 @@ def test_filter_with_date_and_location(session, url, date, geo, expected):
     """
     should return results based on date AND occupation type AND (location_1 OR location_2)
     """
-    param = {'date': date, LOCATION_CONCEPT_ID: geo}
-    _get_stream_check_number_of_results(session, url, expected, param)
+    params = {'date': date, LOCATION_CONCEPT_ID: geo}
+    _get_stream_check_number_of_results(session, url, expected, params)
 
 
 #   multiple params of same type
-
-
-@pytest.mark.parametrize('date, work_1, work_2, expected', [
-    ('2000-01-25T07:29:41', work.mjukvaruutvecklare, group.arbetsformedlare, 17),
-    ('2000-01-25T07:29:41', group.arbetsformedlare, work.mjukvaruutvecklare, 17)])
-def test_compare_order_of_occupation_params(session, url, date, work_1, work_2, expected):
-    """
-    Expected behaviour:
-    - date AND (work_1 OR work_2).
-    - same result from both queries
-    - result is sum of both occupations
-    Actual behaviour:
-    - looks like only last param is used
-    """
-    _get_stream_check_number_of_results(session, url, expected,
-                                        param={'date': date, OCCUPATION_CONCEPT_ID: [work_1, work_2]})
 
 
 @pytest.mark.parametrize('date, work_1, work_2, expected', [
@@ -133,8 +117,8 @@ def test_filter_with_date_and_two_occupations(session, url, date, work_1, work_2
     test of filtering in /stream with date and 2 occupation-related concept_ids
     should return results based on both date AND (work_1 OR work_2)
     """
-    param = {'date': date, OCCUPATION_CONCEPT_ID: [work_1, work_2]}
-    _get_stream_check_number_of_results(session, url, expected, param)
+    params = {'date': date, OCCUPATION_CONCEPT_ID: [work_1, work_2]}
+    _get_stream_check_number_of_results(session, url, expected, params)
 
 
 @pytest.mark.parametrize('date, work_1, work_2, work_3, expected', [
@@ -156,10 +140,11 @@ def test_filter_with_date_and_three_occupations(session, url, date, work_1, work
     test of filtering in /stream with date and 2 occupation-related concept_ids
     should return results based on date AND (work_1 OR work_2 OR work 3)
     """
-    _get_stream_check_number_of_results(session, url, expected,
-                                        param={'date': date, OCCUPATION_CONCEPT_ID: [work_1, work_2, work_3]})
+    params = {'date': date, OCCUPATION_CONCEPT_ID: [work_1, work_2, work_3]}
+    _get_stream_check_number_of_results(session, url, expected, params=params)
 
 
+@pytest.mark.smoke
 @pytest.mark.parametrize('date, work_1, work_2, geo_1, expected', [
     ('2000-01-01T00:00:01', work.arbetsterapeut, work.bussforare_busschauffor, geo.sverige, 6),
     ('2000-01-01T00:00:01', work.arbetsterapeut, group.apotekare, geo.stockholms_lan, 1),
@@ -177,9 +162,8 @@ def test_filter_with_date_and_two_work_and_locations(session, url, date, work_1,
     should return results based on date AND location AND (work_1 OR work_2)
     results = work_1 + work_2 that matches location
     """
-    _get_stream_check_number_of_results(session, url, expected,
-                                        param={'date': date, OCCUPATION_CONCEPT_ID: [work_1, work_2],
-                                               LOCATION_CONCEPT_ID: geo_1})
+    params = {'date': date, OCCUPATION_CONCEPT_ID: [work_1, work_2], LOCATION_CONCEPT_ID: geo_1}
+    _get_stream_check_number_of_results(session, url, expected, params)
 
 
 @pytest.mark.parametrize('date, geo_1, geo_2, expected', [
@@ -198,8 +182,8 @@ def test_filter_with_date_and_two_locations(session, url, date, geo_1, geo_2, ex
     """
     should return results based on date AND occupation type AND (location_1 OR location_2)
     """
-    param = {'date': date, LOCATION_CONCEPT_ID: [geo_1, geo_2]}
-    _get_stream_check_number_of_results(session, url, expected, param)
+    params = {'date': date, LOCATION_CONCEPT_ID: [geo_1, geo_2]}
+    _get_stream_check_number_of_results(session, url, expected, params)
 
 
 @pytest.mark.parametrize('date, work, geo_1, geo_2, expected', [
@@ -217,8 +201,8 @@ def test_filter_with_date_and_work_and_two_locations(session, url, date, work, g
     """
     should return results based on date AND occupation type AND (location_1 OR location_2)
     """
-    param = {'date': date, OCCUPATION_CONCEPT_ID: work, LOCATION_CONCEPT_ID: [geo_1, geo_2]}
-    _get_stream_check_number_of_results(session, url, expected, param)
+    params = {'date': date, OCCUPATION_CONCEPT_ID: work, LOCATION_CONCEPT_ID: [geo_1, geo_2]}
+    _get_stream_check_number_of_results(session, url, expected, params)
 
 
 @pytest.mark.parametrize('work, expected', [
@@ -228,8 +212,8 @@ def test_filter_with_lowercase_concept_id(session, url, work, expected):
     """
     compare correct concept_id with a lower case version
     """
-    param = {'date': '2000-01-01T00:00:01', OCCUPATION_CONCEPT_ID: work}
-    _get_stream_check_number_of_results(session, url, expected, param)
+    params = {'date': '2000-01-01T00:00:01', OCCUPATION_CONCEPT_ID: work}
+    _get_stream_check_number_of_results(session, url, expected, params)
 
 
 # test below for comparison of number of hits for different dates
@@ -241,35 +225,7 @@ def test_filter_with_lowercase_concept_id(session, url, work, expected):
     ('2020-03-25T07:29:41', 273),
     ('2020-04-25T07:29:41', 0)])
 def test_filter_date(session, url, date, expected_number):
-    _get_stream_check_number_of_results(session, url, expected_number, param={'date': date})
-
-
-def _get_stream_check_number_of_results(session, url, expected_number, param):
-    response = session.get(f"{url}/stream", params=param)
-    response.raise_for_status()
-    assert response.content is not None
-    list_of_ads = json.loads(response.content.decode('utf8'))
-    assert len(list_of_ads) == expected_number, f'expected {expected_number} but got {len(list_of_ads)} ads'
-
-
-@pytest.fixture
-def session(scope="session"):
     """
-    creates a Session object which will persist over the entire test run ("session").
-    http connections will be reused (higher performance, less resource usage)
-    Returns a Session object
+    Test basic stream with filtering on date
     """
-    s = requests.sessions.Session()
-    s.headers.update(headers)
-    return s
-
-
-@pytest.fixture
-def url(scope="session"):
-    """
-    returns an url
-
-    """
-    base_url = 'localhost'  # from ENV
-    port = 5000  # from env
-    return f"http://{base_url}:{port}"
+    _get_stream_check_number_of_results(session, url, expected_number, params={'date': date})

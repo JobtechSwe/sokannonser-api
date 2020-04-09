@@ -1,4 +1,4 @@
-#  ["occupation"]
+#  ["occupation"] most frequent on top
 sjukskoterska__grundutbildad = "bXNH_MNX_dUR"
 personlig_assistent = "eU1q_zvL_9Rf"
 larare_i_grundskolan__arskurs_7_9 = "iYgm_hfD_Bez"

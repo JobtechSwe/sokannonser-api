@@ -1,4 +1,4 @@
-#  ["occupation_field"]
+#  ["occupation_field"] most frequent on top
 halso__och_sjukvard = "NYW6_mP6_vwf"
 pedagogiskt_arbete = "MVqp_eS8_kDZ"
 forsaljning__inkop__marknadsforing = "RPTn_bxG_ExZ"

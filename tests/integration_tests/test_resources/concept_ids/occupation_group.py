@@ -1,4 +1,4 @@
-#  ["occupation_group"]
+#  ["occupation_group"] most frequent on top
 grundutbildade_sjukskoterskor = "Z8ci_bBE_tmx"
 personliga_assistenter = "sq3e_WVv_Fjd"
 mjukvaru__och_systemutvecklare_m_fl_ = "DJh5_yyF_hEM"

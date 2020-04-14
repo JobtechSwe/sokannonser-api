@@ -23,9 +23,7 @@ def url(scope="session"):
     returns an url
 
     """
-    base_url = os.getenv('TEST_URL')
-    if base_url is None:
-        base_url = 'localhost'
+    test_url = os.getenv('TEST_URL', 'localhost')
     port = os.getenv('TEST_PORT', 5000)
 
-    return f"http://{base_url}:{port}"
+    return f"http://{test_url}:{port}"

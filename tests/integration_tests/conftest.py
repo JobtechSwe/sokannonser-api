@@ -21,9 +21,7 @@ def session(scope="session"):
 def url(scope="session"):
     """
     returns an url
-
     """
-    test_url = os.getenv('TEST_URL', 'localhost')
+    test_url = os.getenv('TEST_URL', 'http://localhost')
     port = os.getenv('TEST_PORT', 5000)
-
-    return f"http://{test_url}:{port}"
+    return f"{test_url}:{port}"

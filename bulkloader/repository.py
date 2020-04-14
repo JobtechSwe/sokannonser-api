@@ -14,7 +14,14 @@ log = logging.getLogger(__name__)
 marshaller = Namespace('Marshaller')
 
 
+def _calculate_utc_offset():
+    is_dst = time.daylight and time.localtime().tm_isdst > 0
+    utc_offset = - (time.altzone if is_dst else time.timezone)
+    return int(utc_offset / 3600) if utc_offset > 0 else 0
+
+
 def _es_dsl():
+    offset = _calculate_utc_offset()
     dsl = {
         "query": {
             "bool": {
@@ -22,14 +29,14 @@ def _es_dsl():
                     {
                         "range": {
                             "publication_date": {
-                                "lte": "now/m+2H/m"
+                                "lte": "now/m+%dH/m" % offset
                             }
                         }
                     },
                     {
                         "range": {
                             "last_publication_date": {
-                                "gte": "now/m+2H/m"
+                                "gte": "now/m+%dH/m" % offset
                             }
                         }
                     }

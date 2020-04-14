@@ -15,11 +15,25 @@ from tests.integration_tests.test_resources.stream import _get_stream_check_numb
     ('2000-01-25T07:29:41', group.mjukvaru__och_systemutvecklare_m_fl_, 57),
     ('2000-01-25T07:29:41', work.mjukvaruutvecklare, 12),
     ('2000-01-01T00:00:01', work.arbetsterapeut, 5)])
-def test_check_number_of_ads(session, url, date, work, expected):
+def test_only_work(session, url, date, work, expected):
     """
     Returns number of hits in the db. Temporary to verify results in other tests
     """
     params = {'date': date, OCCUPATION_CONCEPT_ID: work}
+    _get_stream_check_number_of_results(session, url, expected, params)
+
+
+@pytest.mark.parametrize('date, geo, expected', [
+    ('2000-01-25T07:29:41', geo.aland_tillhor_finland, 1),
+    ('2000-01-25T07:29:41', geo.kalmar_lan, 17),
+    ('2000-01-25T07:29:41', geo.botkyrka, 5),
+    ('2000-01-25T07:29:41', geo.stockholms_lan, 289),
+    ('2000-01-01T00:00:01', geo.stockholm, 194)])
+def test_only_location(session, url, date, geo, expected):
+    """
+    Returns number of hits in the db. Temporary to verify results in other tests
+    """
+    params = {'date': date, LOCATION_CONCEPT_ID: geo}
     _get_stream_check_number_of_results(session, url, expected, params)
 
 

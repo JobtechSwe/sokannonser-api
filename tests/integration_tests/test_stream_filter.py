@@ -9,6 +9,20 @@ import tests.integration_tests.test_resources.concept_ids.occupation_field as fi
 from tests.integration_tests.test_resources.stream import _get_stream_check_number_of_results
 
 
+@pytest.mark.parametrize('date, geo, expected', [('2000-01-25T07:29:41', geo.sverige, 1050), ])
+def test_too_many_hits_for_location(session, url, date, geo, expected):
+    """
+    Returns number of hits in the db.
+    Expected: 1050 hits (1056 hits - ads with location in other countries than 'sverige')
+        can an ad have multiple countries?
+
+    Actual result: 1059.  more than the actual number of ads in the test data
+
+    """
+    params = {'date': date, LOCATION_CONCEPT_ID: geo}
+    _get_stream_check_number_of_results(session, url, expected, params)
+
+
 @pytest.mark.parametrize('date, work, expected', [
     ('2000-01-25T07:29:41', group.arbetsformedlare, 5),
     ('2000-01-25T07:29:41', group.apotekare, 2),
@@ -25,6 +39,9 @@ def test_only_work(session, url, date, work, expected):
 
 @pytest.mark.parametrize('date, geo, expected', [
     ('2000-01-25T07:29:41', geo.aland_tillhor_finland, 1),
+    ('2000-01-25T07:29:41', geo.norge, 3),
+    ('2000-01-25T07:29:41', geo.malta, 1),
+    ('2000-01-25T07:29:41', geo.schweiz, 1),
     ('2000-01-25T07:29:41', geo.kalmar_lan, 17),
     ('2000-01-25T07:29:41', geo.botkyrka, 5),
     ('2000-01-25T07:29:41', geo.stockholms_lan, 289),

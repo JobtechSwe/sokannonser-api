@@ -9,19 +9,14 @@ from elasticsearch.helpers import scan
 from sokannonser import settings
 from sokannonser.repository import elastic
 from sokannonser.rest.model.result_models import job_ad
+from sokannonser.repository.querybuilder import calculate_utc_offset
 
 log = logging.getLogger(__name__)
 marshaller = Namespace('Marshaller')
 
 
-def _calculate_utc_offset():
-    is_dst = time.daylight and time.localtime().tm_isdst > 0
-    utc_offset = - (time.altzone if is_dst else time.timezone)
-    return int(utc_offset / 3600) if utc_offset > 0 else 0
-
-
 def _es_dsl():
-    offset = _calculate_utc_offset()
+    offset = calculate_utc_offset()
     dsl = {
         "query": {
             "bool": {

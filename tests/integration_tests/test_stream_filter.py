@@ -31,7 +31,7 @@ def test_too_many_hits_for_location(session, url, date, geo, expected):
     ('2000-01-25T07:29:41', group.mjukvaru__och_systemutvecklare_m_fl_, 57),
     ('2000-01-25T07:29:41', work.mjukvaruutvecklare, 12),
     ('2000-01-01T00:00:01', work.arbetsterapeut, 5)])
-def test_only_work(session, url, date, work, expected):
+def test_filter_only_on_occupation(session, url, date, work, expected):
     """
     Returns number of hits in the db. Temporary to verify results in other tests
     """
@@ -48,7 +48,7 @@ def test_only_work(session, url, date, work, expected):
     ('2000-01-25T07:29:41', geo.botkyrka, 5),
     ('2000-01-25T07:29:41', geo.stockholms_lan, 289),
     ('2000-01-01T00:00:01', geo.stockholm, 194)])
-def test_only_location(session, url, date, geo, expected):
+def test_filter_only_on_location(session, url, date, geo, expected):
     """
     Returns number of hits in the db. Temporary to verify results in other tests
     """
@@ -73,7 +73,7 @@ def test_only_location(session, url, date, geo, expected):
     ('2020-02-25T00:00:01', field.halso__och_sjukvard, geo.sverige, 158),
     ('2020-02-25T00:00:01', field.halso__och_sjukvard, geo.stockholms_lan, 35),
 ])
-def test_filter_with_date_and_work_and_location(session, url, date, work, geo, expected):
+def test_filter_with_date_and_occupation_and_location(session, url, date, work, geo, expected):
     """
     should return results based on date AND occupation type AND location
     """
@@ -101,7 +101,7 @@ def test_filter_with_date_and_work_and_location(session, url, date, work, geo, e
     ('2000-01-25T07:29:41', work.account_manager, 3),
     ('2000-01-25T07:29:41', work.cykelbud, 1),
 ])
-def test_filter_concept_id_for_one_occupation(session, url, date, concept_id, expected):
+def test_filter_with_date_and_one_occupation(session, url, date, concept_id, expected):
     """
     test of filtering in /stream: should return results based on date AND occupation-related concept_id
     """
@@ -190,7 +190,7 @@ def test_filter_with_date_and_three_occupations(session, url, date, work_1, work
     ('2020-02-01T00:00:01', field.militart_arbete, work.bussforare_busschauffor, geo.norge, 1),
     ('2020-01-01T00:00:01', group.mjukvaru__och_systemutvecklare_m_fl_, geo.dalarnas_lan, geo.schweiz, 1),
     ('2020-02-01T00:00:01', work.bussforare_busschauffor, geo.schweiz, geo.norge, 1)])
-def test_filter_with_date_and_two_work_and_locations(session, url, date, work_1, work_2, geo_1, expected):
+def test_filter_with_date_and_two_occupations_and_location(session, url, date, work_1, work_2, geo_1, expected):
     """
     should return results based on date AND location AND (work_1 OR work_2)
     results = work_1 + work_2 that matches location
@@ -258,7 +258,7 @@ def test_filter_with_date_and_multiple_occupations_within_same_field(session, ur
     ('2020-02-01T00:00:01', field.bygg_och_anlaggning, geo.schweiz, geo.norge, 0),
     ('2020-01-01T00:00:01', group.mjukvaru__och_systemutvecklare_m_fl_, geo.dalarnas_lan, geo.schweiz, 1),
     ('2020-02-01T00:00:01', work.bussforare_busschauffor, geo.schweiz, geo.norge, 1)])
-def test_filter_with_date_and_work_and_two_locations(session, url, date, work, geo_1, geo_2, expected):
+def test_filter_with_date_and_occupation_and_two_locations(session, url, date, work, geo_1, geo_2, expected):
     """
     should return results based on date AND occupation type AND (location_1 OR location_2)
     """
@@ -285,7 +285,7 @@ def test_filter_with_lowercase_concept_id(session, url, work, expected):
     ('2020-02-25T07:29:41', 872),
     ('2020-03-25T07:29:41', 273),
     ('2020-04-25T07:29:41', 0)])
-def test_filter_date(session, url, date, expected_number):
+def test_filter_only_on_date(session, url, date, expected_number):
     """
     Test basic stream with filtering on date
     """

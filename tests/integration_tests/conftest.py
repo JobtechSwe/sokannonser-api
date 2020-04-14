@@ -26,7 +26,6 @@ def url(scope="session"):
     base_url = os.getenv('TEST_URL')
     if base_url is None:
         base_url = 'localhost'
-    port = os.getenv('TEST_PORT')
-    if port is None:
-        port = 5000
+    port = os.getenv('TEST_PORT', 5000)
+
     return f"http://{base_url}:{port}"

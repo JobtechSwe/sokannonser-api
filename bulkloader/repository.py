@@ -29,7 +29,7 @@ def _es_dsl():
                     {
                         "range": {
                             "last_publication_date": {
-                                "gte": "now/m"
+                                "gte": "now/m+2H/m"
                             }
                         }
                     }

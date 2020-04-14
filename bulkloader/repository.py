@@ -106,10 +106,11 @@ def convert_to_timestamp(day):
 # Generator function
 def load_all(args):
     since = args.get(settings.DATE)
+    # input is not allowed by type=inputs.datetime_from_iso8601
     if since == 'yesterday':
         since = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
 
-    ts = time.mktime(since.timetuple()) * 1000
+    ts = int(time.mktime(since.timetuple())) * 1000
     index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
         else settings.ES_INDEX
 

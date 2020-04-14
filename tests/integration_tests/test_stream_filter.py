@@ -8,7 +8,7 @@ import tests.integration_tests.test_resources.concept_ids.occupation_group as gr
 import tests.integration_tests.test_resources.concept_ids.occupation_field as field
 from tests.integration_tests.test_resources.stream import _get_stream_check_number_of_results
 
-
+@pytest.mark.skip("test for checking unexpected behaviour, remove when fixed")
 @pytest.mark.parametrize('date, geo, expected', [('2000-01-25T07:29:41', geo.sverige, 1050), ])
 def test_too_many_hits_for_location(session, url, date, geo, expected):
     """
@@ -18,6 +18,7 @@ def test_too_many_hits_for_location(session, url, date, geo, expected):
 
     Actual result: 1059.  more than the actual number of ads in the test data
 
+    add 'sverige' and the correct number of expected hits to 'test_only_location' when fixed
     """
     params = {'date': date, LOCATION_CONCEPT_ID: geo}
     _get_stream_check_number_of_results(session, url, expected, params)

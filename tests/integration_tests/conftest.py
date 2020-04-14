@@ -1,3 +1,4 @@
+import os
 import pytest
 import requests
 
@@ -22,7 +23,10 @@ def url(scope="session"):
     returns an url
 
     """
-    # Todo: use environment variables
-    base_url = 'localhost'  # from ENV
-    port = 5000  # from env
+    base_url = os.getenv('TEST_URL')
+    if base_url is None:
+        base_url = 'localhost'
+    port = os.getenv('TEST_PORT')
+    if port is None:
+        port = 5000
     return f"http://{base_url}:{port}"

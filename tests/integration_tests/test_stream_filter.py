@@ -8,6 +8,7 @@ import tests.integration_tests.test_resources.concept_ids.occupation_group as gr
 import tests.integration_tests.test_resources.concept_ids.occupation_field as field
 from tests.integration_tests.test_resources.stream import _get_stream_check_number_of_results
 
+
 @pytest.mark.skip("test for checking unexpected behaviour, remove when fixed")
 @pytest.mark.parametrize('date, geo, expected', [('2000-01-25T07:29:41', geo.sverige, 1050), ])
 def test_too_many_hits_for_location(session, url, date, geo, expected):
@@ -215,6 +216,34 @@ def test_filter_with_date_and_two_locations(session, url, date, geo_1, geo_2, ex
     should return results based on date AND occupation type AND (location_1 OR location_2)
     """
     params = {'date': date, LOCATION_CONCEPT_ID: [geo_1, geo_2]}
+    _get_stream_check_number_of_results(session, url, expected, params)
+
+
+@pytest.mark.parametrize('date, geo_list, expected', [
+    ('2000-01-01T00:00:01', [geo.stockholms_lan], 289),
+    ('2000-01-01T00:00:01', [geo.stockholms_lan, geo.solna], 289),
+    ('2000-01-01T00:00:01', [geo.stockholms_lan, geo.stockholm, geo.botkyrka], 289),
+    ('2000-01-01T00:00:01', [geo.stockholms_lan, geo.stockholm, geo.botkyrka, geo.solna, geo.nacka], 289)])
+def test_filter_with_date_and_multiple_locations_in_same_region(session, url, date, geo_list, expected):
+    """
+    should return results based on date AND occupation type AND (location_1 OR location_2)
+    """
+    params = {'date': date, LOCATION_CONCEPT_ID: geo_list}
+    _get_stream_check_number_of_results(session, url, expected, params)
+
+
+@pytest.mark.parametrize('date, work_list, expected', [
+    ('2000-01-01T00:00:01', [field.halso__och_sjukvard], 194),
+    ('2000-01-01T00:00:01', [field.halso__och_sjukvard, work.sjukskoterska__grundutbildad], 194),
+    ('2000-01-01T00:00:01', [field.halso__och_sjukvard, group.grundutbildade_sjukskoterskor], 194),
+    ('2000-01-01T00:00:01',
+     [field.halso__och_sjukvard, group.grundutbildade_sjukskoterskor, group.ambulanssjukskoterskor_m_fl_,
+      work.sjukskoterska__medicin_och_kirurgi], 194)])
+def test_filter_with_date_and_multiple_occupations_within_same_field(session, url, date, work_list, expected):
+    """
+    should return results based on date AND occupation type AND (location_1 OR location_2)
+    """
+    params = {'date': date, OCCUPATION_CONCEPT_ID: work_list}
     _get_stream_check_number_of_results(session, url, expected, params)
 
 

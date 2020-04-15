@@ -2,8 +2,7 @@ import os
 import pytest
 
 from sokannonser import app
-
-test_api_key = os.getenv("TEST_API_KEY")
+from sokannonser.settings import headers
 
 @pytest.mark.smoke
 @pytest.mark.parametrize("query, expected_number", [
@@ -37,7 +36,6 @@ test_api_key = os.getenv("TEST_API_KEY")
 def test_wildcard_search(query, expected_number):
     app.testing = True
     with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
         results = testclient.get('/search', headers=headers, data={'q': query, "limit": 100})
         assert 'hits' in results.json
         actual_number = len(results.json['hits'])

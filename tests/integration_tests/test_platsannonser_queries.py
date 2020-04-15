@@ -24,7 +24,7 @@ def test_freetext_query_ssk():
         hits_total = json_response['total']['value']
         assert int(hits_total) > 0, f"no hits for query '{query}'"
 
-
+@pytest.mark.smoke
 @pytest.mark.integration
 def test_freetext_query_one_param():
     print('==================', sys._getframe().f_code.co_name, '================== ')

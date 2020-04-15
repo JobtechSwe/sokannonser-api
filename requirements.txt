@@ -8,12 +8,7 @@ certifi
 python-dateutil
 pytest
 pytest-cov
-pytest-envfiles
-# on 4xx shows correct transaction.result, not 5xx
-elastic-apm[flask]==5.2.3
+elastic-apm[flask]
 flashtext
-urllib3
-python-simplexml
-pytest_bdd
 elasticsearch-dsl
 Werkzeug==1.0.1

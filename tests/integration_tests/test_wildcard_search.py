@@ -5,7 +5,7 @@ from sokannonser import app
 
 test_api_key = os.getenv("TEST_API_KEY")
 
-
+@pytest.mark.smoke
 @pytest.mark.parametrize("query, expected_number", [
     ('murar*', 0),
     ('systemutvecklar*', 10),

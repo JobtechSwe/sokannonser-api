@@ -7,7 +7,7 @@ from sokannonser import settings
 from tests.integration_tests.test_resources.check_response import check_response_return_json
 from sokannonser.settings import headers, test_api_key
 
-
+@pytest.mark.smoke
 @pytest.mark.integration
 @pytest.mark.parametrize("synonym, expected",
                          [('servit', ['servitris', 'servitör']),

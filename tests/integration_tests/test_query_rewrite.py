@@ -20,7 +20,7 @@ text_to_concept = TextToConcept(ontologyhost=host,
                                 ontologyuser=user,
                                 ontologypwd=pwd)
 
-
+@pytest.mark.smoke
 @pytest.mark.integration
 def test_rewrite_unigram_competence():
     print('\n==================', sys._getframe().f_code.co_name, '==================')

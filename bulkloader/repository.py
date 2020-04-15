@@ -9,27 +9,29 @@ from elasticsearch.helpers import scan
 from sokannonser import settings
 from sokannonser.repository import elastic
 from sokannonser.rest.model.result_models import job_ad
+from sokannonser.repository.querybuilder import calculate_utc_offset
 
 log = logging.getLogger(__name__)
 marshaller = Namespace('Marshaller')
+offset = calculate_utc_offset()
 
 
 def _es_dsl():
     dsl = {
         "query": {
             "bool": {
-                'filter': [
+                "filter": [
                     {
-                        'range': {
-                            'publication_date': {
-                                'lte': 'now/m'
+                        "range": {
+                            "publication_date": {
+                                "lte": "now/m+%dH/m" % offset
                             }
                         }
                     },
                     {
-                        'range': {
-                            'last_publication_date': {
-                                'gte': 'now/m'
+                        "range": {
+                            "last_publication_date": {
+                                "gte": "now/m+%dH/m" % offset
                             }
                         }
                     }
@@ -102,23 +104,41 @@ def convert_to_timestamp(day):
 
 
 # Generator function
-def load_all(since):
+def load_all(args):
+    since = args.get(settings.DATE)
+    # input is not allowed by type=inputs.datetime_from_iso8601
     if since == 'yesterday':
         since = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
 
-    ts = time.mktime(since.timetuple()) * 1000
+    ts = int(time.mktime(since.timetuple())) * 1000
     index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
         else settings.ES_INDEX
 
     dsl = _es_dsl()
-    dsl['query']['bool']['must'] = [{
-        "range": {
-            "timestamp": {
-                "gte": ts
+    snapshot = args.get(settings.SNAPSHOT)
+    if snapshot:
+        dsl['query']['bool']['filter'].append({"term": {"removed": False}})
+    else:
+        dsl['query']['bool']['must'] = [{
+            "range": {
+                "timestamp": {
+                    "gte": ts
+                }
             }
-        }
-    }]
-    log.debug('load_all, dsl: %s' % json.dumps(dsl))
+        }]
+
+    occupation_concept_ids = args.get(settings.OCCUPATION_CONCEPT_ID)
+    if occupation_concept_ids and not snapshot:
+        occupation_list = [occupation + '.' + 'concept_id.keyword' for occupation in settings.OCCUPATION_LIST]
+        add_filter_query(dsl, occupation_list, occupation_concept_ids)
+
+    location_concept_ids = args.get(settings.LOCATION_CONCEPT_ID)
+    if location_concept_ids and not snapshot:
+        location_list = ['workplace_address.' + location + '_concept_id' for location in settings.LOCATION_LIST]
+        add_filter_query(dsl, location_list, location_concept_ids)
+
+    log.debug('QUERY(load_all): %s' % json.dumps(dsl))
+
     scan_result = scan(elastic, dsl, index=index)
     counter = 0
     yield '['

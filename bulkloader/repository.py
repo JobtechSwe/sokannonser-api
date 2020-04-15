@@ -13,10 +13,10 @@ from sokannonser.repository.querybuilder import calculate_utc_offset
 
 log = logging.getLogger(__name__)
 marshaller = Namespace('Marshaller')
+offset = calculate_utc_offset()
 
 
 def _es_dsl():
-    offset = calculate_utc_offset()
     dsl = {
         "query": {
             "bool": {
@@ -115,21 +115,25 @@ def load_all(args):
         else settings.ES_INDEX
 
     dsl = _es_dsl()
-    dsl['query']['bool']['must'] = [{
-        "range": {
-            "timestamp": {
-                "gte": ts
+    snapshot = args.get(settings.SNAPSHOT)
+    if snapshot:
+        dsl['query']['bool']['filter'].append({"term": {"removed": False}})
+    else:
+        dsl['query']['bool']['must'] = [{
+            "range": {
+                "timestamp": {
+                    "gte": ts
+                }
             }
-        }
-    }]
+        }]
 
     occupation_concept_ids = args.get(settings.OCCUPATION_CONCEPT_ID)
-    if occupation_concept_ids:
+    if occupation_concept_ids and not snapshot:
         occupation_list = [occupation + '.' + 'concept_id.keyword' for occupation in settings.OCCUPATION_LIST]
         add_filter_query(dsl, occupation_list, occupation_concept_ids)
 
     location_concept_ids = args.get(settings.LOCATION_CONCEPT_ID)
-    if location_concept_ids:
+    if location_concept_ids and not snapshot:
         location_list = ['workplace_address.' + location + '_concept_id' for location in settings.LOCATION_LIST]
         add_filter_query(dsl, location_list, location_concept_ids)
 

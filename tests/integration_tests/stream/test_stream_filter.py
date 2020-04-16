@@ -6,7 +6,7 @@ import tests.integration_tests.test_resources.concept_ids.concept_ids_geo as geo
 import tests.integration_tests.test_resources.concept_ids.occupation as work
 import tests.integration_tests.test_resources.concept_ids.occupation_group as group
 import tests.integration_tests.test_resources.concept_ids.occupation_field as field
-from tests.integration_tests.test_resources.stream import get_stream_check_number_of_results
+from tests.integration_tests.test_resources.stream import get_stream_check_number_of_results, get_stream_expect_error
 
 
 @pytest.mark.skip("test for checking unexpected behaviour, remove when fixed")
@@ -293,12 +293,11 @@ def test_filter_with_lowercase_concept_id(session, url, work, expected):
 @pytest.mark.parametrize('type, value', [
     (OCCUPATION_CONCEPT_ID, work.bartender),
     (LOCATION_CONCEPT_ID, geo.stockholm)])
-def test_filter_without_date(session, url, type, value):
+def test_filter_without_date_expect_bad_request_response(session, url, type, value):
     """
-    test that a 'bad request' (http 400 ) is returned when doing a request without date parameter
+    test that a 'bad request' response (http 400) is returned when doing a request without date parameter
     """
-    r = session.get(f"{url}/stream", params={type: value})
-    assert r.status_code == requests.codes.bad_request
+    get_stream_expect_error(session, url, params={type: value}, expected_http_code=requests.codes.bad_request)
 
 
 # test below for comparison of number of hits for different dates

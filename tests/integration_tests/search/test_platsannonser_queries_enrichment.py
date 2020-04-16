@@ -1,10 +1,12 @@
 import sys
-
+import os
 import pytest
 
 from sokannonser import app
-from tests.integration_tests.test_resources.settings import headers
 from tests.integration_tests.test_resources.check_response import check_response_return_json
+
+test_api_key = os.getenv('TEST_API_KEY')
+headers = {'api-key': test_api_key, 'accept': 'application/json'}
 
 
 @pytest.mark.skip("Test does not find expected ad")

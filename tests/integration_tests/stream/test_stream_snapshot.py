@@ -5,6 +5,6 @@ from tests.integration_tests.test_resources.stream import get_snapshot_check_num
 @pytest.mark.smoke
 def test_snapshot(session, url):
     """
-    Test snapshot with filtering on date
+    Test snapshot, should return everything
     """
     get_snapshot_check_number_of_results(session, url, expected_number=1065)

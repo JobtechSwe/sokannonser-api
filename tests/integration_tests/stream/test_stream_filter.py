@@ -297,7 +297,19 @@ def test_filter_without_date_expect_bad_request_response(session, url, type, val
     """
     test that a 'bad request' response (http 400) is returned when doing a request without date parameter
     """
-    get_stream_expect_error(session, url, params={type: value}, expected_http_code=requests.codes.bad_request)
+    get_stream_expect_error(session, url, path='/stream', params={type: value},
+                            expected_http_code=requests.codes.bad_request)
+
+
+@pytest.mark.parametrize('path', ['/stream', '/snapshot'])
+def test_filter_wrong_api_key_expect_unauthorized_response(session, url, path):
+    """
+    test that a 'bad request' response (http 400) is returned when doing a request without date parameter
+    """
+    session.headers.update({'api-key': 'wrong key'})
+    params = {LOCATION_CONCEPT_ID: geo.stockholm}
+    expected_http_code = requests.codes.unauthorized
+    get_stream_expect_error(session, url, path, params, expected_http_code)
 
 
 # test below for comparison of number of hits for different dates

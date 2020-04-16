@@ -115,25 +115,21 @@ def load_all(args):
         else settings.ES_INDEX
 
     dsl = _es_dsl()
-    snapshot = args.get(settings.SNAPSHOT)
-    if snapshot:
-        dsl['query']['bool']['filter'].append({"term": {"removed": False}})
-    else:
-        dsl['query']['bool']['must'] = [{
-            "range": {
-                "timestamp": {
-                    "gte": ts
-                }
+    dsl['query']['bool']['must'] = [{
+        "range": {
+            "timestamp": {
+                "gte": ts
             }
-        }]
+        }
+    }]
 
     occupation_concept_ids = args.get(settings.OCCUPATION_CONCEPT_ID)
-    if occupation_concept_ids and not snapshot:
+    if occupation_concept_ids:
         occupation_list = [occupation + '.' + 'concept_id.keyword' for occupation in settings.OCCUPATION_LIST]
         add_filter_query(dsl, occupation_list, occupation_concept_ids)
 
     location_concept_ids = args.get(settings.LOCATION_CONCEPT_ID)
-    if location_concept_ids and not snapshot:
+    if location_concept_ids:
         location_list = ['workplace_address.' + location + '_concept_id' for location in settings.LOCATION_LIST]
         add_filter_query(dsl, location_list, location_concept_ids)
 
@@ -166,3 +162,22 @@ def format_removed_ad(ad_data):
         'id': ad_data.get('id'), 'removed': ad_data.get('removed'),
         'removed_date': ad_data.get('removed_date')
     }
+
+
+def load_snapshot():
+    index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
+        else settings.ES_INDEX
+    dsl = _es_dsl()
+    dsl['query']['bool']['filter'].append({"term": {"removed": False}})
+    log.debug('QUERY(load_all): %s' % json.dumps(dsl))
+    scan_result = scan(elastic, dsl, index=index)
+    counter = 0
+    yield '['
+    for ad in scan_result:
+        if counter > 0:
+            yield ','
+        source = ad['_source']
+        yield json.dumps(format_ad(source))
+        counter += 1
+    log.debug("Delivered %d ads as stream" % counter)
+    yield ']'

@@ -24,6 +24,8 @@ default_time = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M
 
 bulk_stream_query = reqparse.RequestParser()
 bulk_stream_query.add_argument(settings.APIKEY, location='headers', required=True)
-bulk_stream_query.add_argument(settings.SNAPSHOT, type=inputs.boolean, default=False)
 bulk_stream_query.add_argument(settings.DATE, type=inputs.datetime_from_iso8601,
                                required=True, default=default_time)
+
+bulk_snapshot_query = reqparse.RequestParser()
+bulk_snapshot_query.add_argument(settings.APIKEY, location='headers', required=True)

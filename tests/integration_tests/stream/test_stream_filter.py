@@ -1,5 +1,5 @@
 import pytest
-
+import requests
 from sokannonser.settings import OCCUPATION_CONCEPT_ID, LOCATION_CONCEPT_ID
 
 import tests.integration_tests.test_resources.concept_ids.concept_ids_geo as geo
@@ -288,6 +288,17 @@ def test_filter_with_lowercase_concept_id(session, url, work, expected):
     """
     params = {'date': '2000-01-01T00:00:01', OCCUPATION_CONCEPT_ID: work}
     get_stream_check_number_of_results(session, url, expected, params)
+
+
+@pytest.mark.parametrize('type, value', [
+    (OCCUPATION_CONCEPT_ID, work.bartender),
+    (LOCATION_CONCEPT_ID, geo.stockholm)])
+def test_filter_without_date(session, url, type, value):
+    """
+    test that a 'bad request' (http 400 ) is returned when doing a request without date parameter
+    """
+    r = session.get(f"{url}/stream", params={type: value})
+    assert r.status_code == requests.codes.bad_request
 
 
 # test below for comparison of number of hits for different dates

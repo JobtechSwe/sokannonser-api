@@ -3,7 +3,7 @@ import sys
 import pytest
 
 from sokannonser import app
-from tests.integration_tests.test_platsannonser_queries import test_api_key
+from tests.integration_tests.search import test_api_key
 from tests.integration_tests.test_resources.check_response import check_response_return_json
 
 

@@ -304,7 +304,7 @@ def test_filter_without_date_expect_bad_request_response(session, url, type, val
 @pytest.mark.parametrize('path', ['/stream', '/snapshot'])
 def test_filter_wrong_api_key_expect_unauthorized_response(session, url, path):
     """
-    test that a 'bad request' response (http 400) is returned when doing a request without date parameter
+    test that a 'unauthorized' response (http 401) is returned when doing a request with an incorrect api key
     """
     session.headers.update({'api-key': 'wrong key'})
     params = {LOCATION_CONCEPT_ID: geo.stockholm}

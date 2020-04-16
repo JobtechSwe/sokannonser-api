@@ -2,7 +2,8 @@ import os
 import pytest
 import requests
 
-from tests.integration_tests.test_resources.settings import headers
+test_api_key = os.getenv('TEST_API_KEY')
+headers = {'api-key': test_api_key, 'accept': 'application/json'}
 
 
 @pytest.fixture

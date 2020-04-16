@@ -2,7 +2,7 @@ FROM alpine:3.10
 
 EXPOSE 8081
 
-RUN apk update && apk upgrade && \
+RUN date && apk update && apk upgrade && \
     apk add --no-cache --update \
         uwsgi-python3 \
         python3 \
@@ -22,7 +22,7 @@ COPY . /app
 
 # COPY nginx.conf /etc/nginx/nginx.conf
 
-RUN date +"%Y-%m-%dT%H:%M:%S %Z" && \
+RUN date && \
     mkdir -p /var/run/nginx && \
     chmod -R 777 /var/run/nginx && \
     mkdir -p /var/run/supervisord /var/log/supervisord && \

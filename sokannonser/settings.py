@@ -7,7 +7,6 @@ ES_USER = os.getenv("ES_USER")
 ES_PWD = os.getenv("ES_PWD")
 ES_INDEX = os.getenv("ES_INDEX", "platsannons-read")
 ES_STREAM_INDEX = os.getenv("ES_BULK_INDEX", "platsannons-stream")
-ES_AURANEST = os.getenv("ES_AURANEST", "auranest-read")
 ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy")
 
 # APM and Debug settings
@@ -95,19 +94,6 @@ SHOW_EXPIRED = 'show-expired'
 result_models = [
     'pbapi', 'simple'
 ]
-auranest_sort_options = {
-    'relevance': "_score",
-    'pubdate-desc': {"source.firstSeenAt": "desc"},
-    'pubdate-asc': {"source.firstSeenAt": "asc"},
-    'applydate-desc': {"application.deadline": "desc"},
-    'applydate-asc': {"application.deadline": "asc"},
-}
-
-auranest_stats_options = {
-    'employers': 'employer.name.keyword',
-    'sites': 'source.site.name.keyword',
-    'locations': 'location.translations.sv-SE.keyword'
-}
 
 # sweden country concept id: /v1/taxonomy/main/concepts?id=i46j_HmG_v64'
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
@@ -119,4 +105,3 @@ test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
 
 API_VERSION = '1.13.1'
-

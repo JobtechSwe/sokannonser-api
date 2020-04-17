@@ -22,3 +22,14 @@ def _check_ok_response_and_number_of_ads(response, expected_number):
     assert response.content is not None
     list_of_ads = json.loads(response.content.decode('utf8'))
     assert len(list_of_ads) == expected_number, f'expected {expected_number} but got {len(list_of_ads)} ads'
+
+    for ad in list_of_ads:
+        checks = []
+        checks.append(ad['id'])
+        checks.append(ad['headline'])
+        checks.append(ad['description'])
+        checks.append(ad['occupation'])
+        checks.append(ad['workplace_address']['country'])
+        for c in checks:
+            assert c is not None, ad['id']
+

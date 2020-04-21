@@ -44,7 +44,7 @@ class BulkZip(Resource):
 
 @ns_bulk.route('stream')
 class BulkLoad(Resource):
-    method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
+    #method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
     example_date = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M:%S")
 
     @ns_bulk.doc(
@@ -55,7 +55,7 @@ class BulkLoad(Resource):
             settings.OCCUPATION_CONCEPT_ID: "Filter stream by one or more concept id’s for occupations. "
             "(occupation_field, occupation_group, occupation)",
             settings.LOCATION_CONCEPT_ID: "Filter stream ads by one or more locations' concept ids. "
-            "(concept_ids from Country, City, Region, Municipality)"
+            "(concept_ids from Country, Region, Municipality)"
         },
         responses={
             200: 'OK',

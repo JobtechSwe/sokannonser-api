@@ -113,6 +113,7 @@ def load_all(args):
     ts = int(time.mktime(since.timetuple())) * 1000
     index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
         else settings.ES_INDEX
+    log.debug("Elastic index(load_all): % s" % index)
 
     dsl = _es_dsl()
     dsl['query']['bool']['must'] = [{

@@ -7,82 +7,42 @@ from sokannonser import settings
 from tests.integration_tests.test_resources.check_response import check_response_return_json
 from sokannonser.settings import headers
 
+
 @pytest.mark.smoke
 @pytest.mark.integration
-@pytest.mark.parametrize("synonym, expected",
-                         [('servit', ['servitris', 'servitör']),
-                          ('systemutvecklare angu', ['angular', 'angularjs']),
-                          ('angu', ['angular', 'angularjs'])])
-def test_complete_one_param_occupation(synonym, expected):
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
+@pytest.mark.parametrize("query, synonyms, expect_success",
+                         [('servit', ['servitris', 'servitör'], True),
+                          ('servit', ['servitris', 'servitör', 'servitriser', 'servitörer'], True),
+                           ('systemutvecklare angu', ['angular', 'angularjs'], True),
+                           ('angu', ['angular', 'angularjs'], True),
+                           ('ang', ['angularjs', 'angular', 'angular.js', 'angered'], True),
+                           ('c#', ['c#'], True),
+                           ('pyth', ['python'], True),
+                           # check that synonyms are not suggested
+                           ('c#', ['c++'], False),
+                           ('c#', ['java'], False)])
+def test_complete_endpoint_synonyms_typeahead(query, synonyms, expect_success):
+    """
+    Test that incomplete search queries will return synonyms
+    when 'x-feature-include-synonyms-typeahead' is set in headers
+    first arg is the query
+    second arg is a list of expected synonyms, which all must be found in the response
+    """
     app.testing = True
     with app.test_client() as testclient:
-        headers[settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD] = 'true'
-        result = testclient.get('/complete', headers=headers, data={'q': synonym})
-        json_response = check_response_return_json(result)
-        assert 'typeahead' in json_response
-        json_typeahead = json_response['typeahead']
-
-        complete_values = [item['value'] for item in json_typeahead]
-
-        assert len(complete_values) > 0, f"no hits for synonym '{synonym}'"
-        for exp in expected:
-            assert exp in complete_values
-
-
-@pytest.mark.integration
-def test_complete_one_param_competence():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    app.testing = True
-    with app.test_client() as testclient:
-        query = 'angu'
         headers[settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD] = 'true'
         result = testclient.get('/complete', headers=headers, data={'q': query})
         json_response = check_response_return_json(result)
         assert 'typeahead' in json_response
         json_typeahead = json_response['typeahead']
         complete_values = [item['value'] for item in json_typeahead]
-        assert len(complete_values) > 0, f"no hits for '{query}'"
-        assert 'angular' in complete_values
-        assert 'angularjs' in complete_values
-
-
-@pytest.mark.integration
-def test_complete_two_params():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-    app.testing = True
-    with app.test_client() as testclient:
-        query = 'systemutvecklare angu'
-        headers[settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD] = 'true'
-        result = testclient.get('/complete', headers=headers, data={'q': query})
-        json_response = check_response_return_json(result)
-        assert 'typeahead' in json_response
-        json_typeahead = json_response['typeahead']
-        complete_values = [item['value'] for item in json_typeahead]
-        assert len(complete_values) > 0, f"no hits for '{query}'"
-        assert 'angular' in complete_values
-        assert 'angularjs' in complete_values
-
-
-@pytest.mark.integration
-def test_complete_one_param_competence_special_char():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    app.testing = True
-    with app.test_client() as testclient:
-        query = 'c#'
-        headers[settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD] = 'true'
-        result = testclient.get('/complete', headers=headers, data={'q': query})
-        json_response = check_response_return_json(result)
-        assert 'typeahead' in json_response
-        json_typeahead = json_response['typeahead']
-
-        complete_values = [item['value'] for item in json_typeahead]
-
-        assert len(complete_values) > 0, f"no hits for '{query}'"
-        assert 'c#' in complete_values
+        assert len(complete_values) > 0, f"no synonyms found for '{query}'"
+        for s in synonyms:
+            if expect_success:
+                assert s in complete_values, f"Synonym '{s}' not found in response"
+            else:
+                assert s not in complete_values, f"Synonym '{s}' was found in response"
+        print(synonyms)
 
 
 # This test case is for test complete endpoint with auto complete suggest

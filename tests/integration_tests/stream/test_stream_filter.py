@@ -328,3 +328,32 @@ def test_filter_only_on_date(session, url, date, expected_number):
     Test basic stream with filtering on date
     """
     get_stream_check_number_of_results(session, url, expected_number, params={'date': date})
+
+
+@pytest.mark.skip("not implemented yet")
+@pytest.mark.parametrize('from_date, to_date, expected_number', [
+    # verify that results are the same as when only using a single date
+    ('2000-01-01T00:00:01', '2020-04-30T00:00:00', 1065),
+    ('2020-01-01T00:00:01', '2020-04-30T00:00:00', 1032),
+    ('2020-02-01T00:00:01', '2020-04-30T00:00:00', 971),
+    ('2020-02-25T07:29:41', '2020-04-30T00:00:00', 872),
+    ('2020-03-14T07:29:41', '2020-04-30T00:00:00', 556),
+    ('2020-03-25T07:29:41', '2020-04-30T00:00:00', 273),
+    ('2020-03-27T07:29:41', '2020-04-30T00:00:00', 186),
+    ('2020-03-31T07:29:41', '2020-04-30T00:00:00', 74),
+    ('2020-04-25T07:29:41', '2020-04-30T00:00:00', 0),
+    # smaller interval
+    ('2020-02-25T07:29:41', '2020-03-25T00:00:00', 9999),
+    ('2020-03-14T07:29:41', '2020-03-30T00:00:00', 9999),
+    ('2020-03-25T07:29:41', '2020-03-30T00:00:00', 9999),
+    ('2020-03-27T07:29:41', '2020-03-30T00:00:00', 9999),
+    ('2020-03-31T07:29:41', '2020-04-02T00:00:00', 9999),
+    ('2020-04-25T07:29:41', '2020-04-30T00:00:00', 9999),
+
+])
+def test_filter_on_date_interval(session, url, from_date, to_date, expected_number):
+    """
+    Test basic stream with filtering on date
+    """
+    params = {'from': from_date, 'to': to_date}
+    get_stream_check_number_of_results(session, url, expected_number, params)

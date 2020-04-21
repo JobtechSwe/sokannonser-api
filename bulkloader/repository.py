@@ -174,8 +174,15 @@ def format_ad(ad_data):
 # @marshaller.marshal_with(removed_job_ad)
 def format_removed_ad(ad_data):
     return {
-        'id': ad_data.get('id'), 'removed': ad_data.get('removed'),
-        'removed_date': ad_data.get('removed_date')
+        'id': ad_data.get('id'),
+        'removed': ad_data.get('removed'),
+        'removed_date': ad_data.get('removed_date'),
+        'occupation': ad_data.get('occupation', None).get('concept_id', None),
+        'occupation_group': ad_data.get('occupation_group', None).get('concept_id', None),
+        'occupation_field': ad_data.get('occupation_field', None).get('concept_id', None),
+        'municipality': ad_data.get('workplace_address', None).get('municipality_concept_id', None),
+        'region': ad_data.get('workplace_address', None).get('region_concept_id', None),
+        'country': ad_data.get('workplace_address', None).get('country_concept_id', None)
     }
 
 

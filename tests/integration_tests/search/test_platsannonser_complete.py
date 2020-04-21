@@ -5,7 +5,7 @@ import pytest
 from sokannonser import app
 from sokannonser import settings
 from tests.integration_tests.test_resources.check_response import check_response_return_json
-from sokannonser.settings import test_api_key
+from sokannonser.settings import headers
 
 @pytest.mark.smoke
 @pytest.mark.integration
@@ -18,8 +18,7 @@ def test_complete_one_param_occupation(synonym, expected):
 
     app.testing = True
     with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json',
-                   settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: 'true'}
+        headers[settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD] = 'true'
         result = testclient.get('/complete', headers=headers, data={'q': synonym})
         json_response = check_response_return_json(result)
         assert 'typeahead' in json_response
@@ -39,8 +38,7 @@ def test_complete_one_param_competence():
     app.testing = True
     with app.test_client() as testclient:
         query = 'angu'
-        headers = {'api-key': test_api_key, 'accept': 'application/json',
-                   settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: 'true'}
+        headers[settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD] = 'true'
         result = testclient.get('/complete', headers=headers, data={'q': query})
         json_response = check_response_return_json(result)
         assert 'typeahead' in json_response
@@ -57,8 +55,7 @@ def test_complete_two_params():
     app.testing = True
     with app.test_client() as testclient:
         query = 'systemutvecklare angu'
-        headers = {'api-key': test_api_key, 'accept': 'application/json',
-                   settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: 'true'}
+        headers[settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD] = 'true'
         result = testclient.get('/complete', headers=headers, data={'q': query})
         json_response = check_response_return_json(result)
         assert 'typeahead' in json_response
@@ -76,8 +73,7 @@ def test_complete_one_param_competence_special_char():
     app.testing = True
     with app.test_client() as testclient:
         query = 'c#'
-        headers = {'api-key': test_api_key, 'accept': 'application/json',
-                   settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: 'true'}
+        headers[settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD] = 'true'
         result = testclient.get('/complete', headers=headers, data={'q': query})
         json_response = check_response_return_json(result)
         assert 'typeahead' in json_response
@@ -96,8 +92,7 @@ def test_complete_endpoint_with_auto_complete_suggest():
     app.testing = True
     with app.test_client() as testclient:
         query = 'pyth'
-        headers = {'api-key': test_api_key, 'accept': 'application/json',
-                   settings.X_FEATURE_SPELLCHECK_TYPEAHEAD: 'true'}
+        headers[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD] = 'true'
         result = testclient.get('/complete', headers=headers, data={'q': query})
         json_response = check_response_return_json(result)
 

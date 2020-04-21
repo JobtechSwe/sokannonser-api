@@ -24,6 +24,7 @@ def _check_ok_response_and_number_of_ads(response, expected_number):
     assert len(list_of_ads) == expected_number, f'expected {expected_number} but got {len(list_of_ads)} ads'
 
     for ad in list_of_ads:
+        assert isinstance(ad['id'], str)
         checks = []
         checks.append(ad['id'])
         checks.append(ad['headline'])
@@ -32,4 +33,3 @@ def _check_ok_response_and_number_of_ads(response, expected_number):
         checks.append(ad['workplace_address']['country'])
         for c in checks:
             assert c is not None, ad['id']
-

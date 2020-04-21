@@ -173,16 +173,40 @@ def format_ad(ad_data):
 
 # @marshaller.marshal_with(removed_job_ad)
 def format_removed_ad(ad_data):
+    if ad_data.get('occupation', None):
+        occupation = ad_data.get('occupation', None).get('concept_id', None)
+    else:
+        occupation = None
+
+    if ad_data.get('occupation_group', None):
+        occupation_group = ad_data.get('occupation_group', None).get('concept_id', None)
+    else:
+        occupation_group = None
+
+    if ad_data.get('occupation_field', None):
+        occupation_field = ad_data.get('occupation_field', None).get('concept_id', None)
+    else:
+        occupation_field = None
+
+    if ad_data.get('workplace_address', None):
+        municipality = ad_data.get('workplace_address', None).get('municipality_concept_id', None)
+        region = ad_data.get('workplace_address', None).get('region_concept_id', None)
+        country = ad_data.get('workplace_address', None).get('country_concept_id', None)
+    else:
+        municipality = None
+        region = None
+        country = None
+
     return {
         'id': ad_data.get('id'),
         'removed': ad_data.get('removed'),
         'removed_date': ad_data.get('removed_date'),
-        'occupation': ad_data.get('occupation', None).get('concept_id', None),
-        'occupation_group': ad_data.get('occupation_group', None).get('concept_id', None),
-        'occupation_field': ad_data.get('occupation_field', None).get('concept_id', None),
-        'municipality': ad_data.get('workplace_address', None).get('municipality_concept_id', None),
-        'region': ad_data.get('workplace_address', None).get('region_concept_id', None),
-        'country': ad_data.get('workplace_address', None).get('country_concept_id', None)
+        'occupation': occupation,
+        'occupation_group': occupation_group,
+        'occupation_field': occupation_field,
+        'municipality': municipality,
+        'region': region,
+        'country': country
     }
 
 

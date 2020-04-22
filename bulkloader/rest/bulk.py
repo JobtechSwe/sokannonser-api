@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from flask import send_file, Response
 from flask_restx import Resource
 from jobtech.common.rest.decorators import check_api_key, check_api_key_and_return_metadata
-from bulkloader.rest import ns_bulk, bulk_zip_query, bulk_stream_query
+from bulkloader.rest import ns_bulk, bulk_zip_query, bulk_stream_query, bulk_snapshot_query
 from bulkloader import repository
 from sokannonser import settings
 import elasticapm
@@ -64,5 +64,26 @@ class BulkLoad(Resource):
     def get(self, **kwargs):
         elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         args = bulk_stream_query.parse_args()
-        return Response(repository.load_all(args.get(settings.DATE)),
+        return Response(repository.load_all(args),
+                        mimetype='application/json')
+
+
+@ns_bulk.route('snapshot')
+class SnapshotLoad(Resource):
+    method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
+
+    @ns_bulk.doc(
+        responses={
+            200: 'OK',
+            401: 'Invalid API-key',
+            429: 'Rate limit exceeded',
+            500: 'Technical error'
+        }
+    )
+    @ns_bulk.expect(bulk_snapshot_query)
+    def get(self, **kwargs):
+        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
+        args = bulk_snapshot_query.parse_args()
+        log.debug('ARGS: %s' % args)
+        return Response(repository.load_snapshot(),
                         mimetype='application/json')

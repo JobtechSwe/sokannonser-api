@@ -46,6 +46,7 @@ def test_complete_endpoint_synonyms_typeahead(query, synonyms, expect_success):
             else:
                 assert s not in complete_values, f"Synonym '{s}' was found in response"
 
+
 @pytest.mark.skip("4 failing test cases, skipped until investigated")
 @pytest.mark.integration
 @pytest.mark.parametrize("query, expected_suggestions", [
@@ -53,20 +54,29 @@ def test_complete_endpoint_synonyms_typeahead(query, synonyms, expect_success):
                 'servicemedarbetare', 'serviceyrke', 'service manager', 'servicebiträde', 'serviceelektriker']),
     ('systemutvecklare angu', ['systemutvecklare angularjs']),
     ('angu', ['angularjs']),
+    ('pyth', ['python']),
     ('c#', ['c#']),
     ('c+', ['c++']),
     ('ang', ['angularjs', 'angered']),
     ('c', ['civilingenjör', 'c#', 'c', 'can', 'c körkort', 'cnc- operatör', 'c++', 'cad', 'cloud', 'css']),
-    ('pyth', ['python']),
+    ('uppd', ['uppdragsutbildning', 'uppdukning', 'uppdragsledare']),
+    ('underh',
+     ['underhållsmekaniker', 'underhållsarbete', 'underhållstekniker', 'underhållssystem', 'underhållsrutiner',
+      'underhållsarbetare', 'underhållsingenjör']),
+    ('sjuks', ['sjuksköterska', 'sjuksköterskeuppgifter', 'sjuksköterskeutbildning', 'sjuksköterskelegitimation']),
+    ('arbetsl', ['arbetslivserfarenhet', 'arbetsledning', 'arbetsledare', 'arbetsliv', 'arbetslivspsykologi',
+                 'arbetsledarutbildning', 'arbetslivsfrågor']),
+    ('servitr', ['server', 'service', 'servrar']),
 
     # Failing
-    ('servit', ['servitris', 'servitör', 'servitriser', 'servitörer']),
+    ('servitr', ['servitris', 'servitör', 'servitriser', 'servitörer']),
+
     ('servi', ['servicetekniker', 'servicearbete', 'service och underhåll', 'servicedesk', 'servicehandläggare',
                'servicemedarbetare', 'serviceyrke', 'service manager', 'servicebiträde', 'serviceelektriker']),
-    ('angu', ['angular', 'angularjs']),
-    ('ang', ['angular', 'angularjs', 'angered'])
+    ('angu', ['angular', 'angularjs']),  # actual ['angularjs']
+    ('ang', ['angular', 'angularjs', 'angered'])  # actual ['angularjs', 'angered']
 ])
-def test_complete_endpoint_with_auto_complete_suggest(query, expected_suggestions):
+def test_complete_endpoint_with_spellcheck_typeahead(query, expected_suggestions):
     """
     test of /complete endpoint with 'x-feature-spellcheck-typeahead' header
     parameters: query and list of expected result(s)
@@ -83,8 +93,7 @@ def test_complete_endpoint_with_auto_complete_suggest(query, expected_suggestion
         assert len(actual_suggestions) == len(
             expected_suggestions), f"\nQuery: {query}\nExpected suggestions: {expected_suggestions}\nActual suggestions: {actual_suggestions} "
         for s in expected_suggestions:
-            assert s in actual_suggestions, f"\Did not find {query} in {actual_suggestions} "
-
+            assert s in actual_suggestions, f"\Did not find {s} in {actual_suggestions} "
 
 
 if __name__ == '__main__':

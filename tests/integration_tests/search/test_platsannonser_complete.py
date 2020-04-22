@@ -27,6 +27,7 @@ def test_complete_endpoint_synonyms_typeahead(query, synonyms, expect_success):
     when 'x-feature-include-synonyms-typeahead' is set in headers
     first arg is the query
     second arg is a list of expected synonyms, which all must be found in the response
+    third arg True/False determines if synonyms are supposed to be found or not
     """
     app.testing = True
     with app.test_client() as testclient:

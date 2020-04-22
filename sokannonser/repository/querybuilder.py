@@ -208,7 +208,7 @@ class QueryBuilder(object):
             args.pop(settings.APIKEY)
 
         # Make sure to only serve published ads
-        offset = self.calculate_utc_offset()
+        offset = calculate_utc_offset()
         query_dsl['query'] = {
             'bool': {
                 'must': [],
@@ -998,7 +998,7 @@ class QueryBuilder(object):
         return json.dumps(search)
 
 
-def calculate_utc_offset(self):
+def calculate_utc_offset():
     is_dst = time.daylight and time.localtime().tm_isdst > 0
     utc_offset = - (time.altzone if is_dst else time.timezone)
     return int(utc_offset / 3600) if utc_offset > 0 else 0

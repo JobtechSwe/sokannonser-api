@@ -1,5 +1,7 @@
 Changelog Application Jobsearch
 ===============================
+# 1.13.0
+* Add snapshot endpoint to Jobstream
 # 1.12.1
 * Add limit to complete endpoint
 

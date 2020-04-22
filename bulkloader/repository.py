@@ -124,7 +124,7 @@ def load_all(args):
         }
     }]
 
-    log.debug('load_all, dsl: %s' % json.dumps(dsl))
+    log.debug('QUERY(load_all): %s' % json.dumps(dsl))
 
     scan_result = scan(elastic, dsl, index=index)
     counter = 0
@@ -140,19 +140,6 @@ def load_all(args):
         counter += 1
     log.debug("Delivered %d ads as stream" % counter)
     yield ']'
-
-
-def add_filter_occupation_query(dsl, occupation_concept_id):
-    # add occupation concept id
-    occupation_list = ['occupation', 'occupation_field', 'occupation_group']
-
-    should_query = []
-    for occupation in occupation_list:
-        should_query.append({"term": {
-                                "%s.concept_id.keyword" % occupation: occupation_concept_id
-                            }})
-    dsl['query']['bool']['filter'].append({"bool": {"should": should_query}})
-    return dsl
 
 
 @marshaller.marshal_with(job_ad)

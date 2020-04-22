@@ -157,6 +157,8 @@ def format_removed_ad(ad_data):
 def load_snapshot():
     index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
         else settings.ES_INDEX
+    log.debug("Elastic index(load_all): % s" % index)
+
     dsl = _es_dsl()
     dsl['query']['bool']['filter'].append({"term": {"removed": False}})
     log.debug('QUERY(load_all): %s' % json.dumps(dsl))

@@ -87,24 +87,3 @@ class SnapshotLoad(Resource):
         log.debug('ARGS: %s' % args)
         return Response(repository.load_snapshot(),
                         mimetype='application/json')
-
-
-@ns_bulk.route('snapshot')
-class SnapshotLoad(Resource):
-    method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
-
-    @ns_bulk.doc(
-        responses={
-            200: 'OK',
-            401: 'Invalid API-key',
-            429: 'Rate limit exceeded',
-            500: 'Technical error'
-        }
-    )
-    @ns_bulk.expect(bulk_snapshot_query)
-    def get(self, **kwargs):
-        elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
-        args = bulk_snapshot_query.parse_args()
-        log.debug('ARGS: %s' % args)
-        return Response(repository.load_snapshot(),
-                        mimetype='application/json')

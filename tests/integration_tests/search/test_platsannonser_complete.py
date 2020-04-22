@@ -47,7 +47,7 @@ def test_complete_endpoint_synonyms_typeahead(query, synonyms, expect_success):
                 assert s not in complete_values, f"Synonym '{s}' was found in response"
 
 
-@pytest.mark.skip("4 failing test cases, skipped until investigated")
+# @pytest.mark.skip("4 failing test cases, skipped until investigated")
 @pytest.mark.integration
 @pytest.mark.parametrize("query, expected_suggestions", [
     ('servit', ['servicetekniker', 'servicearbete', 'service och underhåll', 'servicedesk', 'servicehandläggare',
@@ -92,6 +92,53 @@ def test_complete_endpoint_with_spellcheck_typeahead(query, expected_suggestions
         assert len(actual_suggestions) > 0, f"no suggested values as auto-complete for '{query}'"
         assert len(actual_suggestions) == len(
             expected_suggestions), f"\nQuery: {query}\nExpected suggestions: {expected_suggestions}\nActual suggestions: {actual_suggestions} "
+        for s in expected_suggestions:
+            assert s in actual_suggestions, f"\Did not find {s} in {actual_suggestions} "
+
+
+@pytest.mark.parametrize("query, expected_suggestions", [
+    ('lärare', ['lärare', 'lärare i grundskolan', 'lärare i förskola', 'lärare i fritidshem', 'lärarexamen',
+                'lärare i förskoleklass', 'lärare i praktiska och estetiska ämnen']),
+    ('lärare i', ['i grundskolan', 'idrott', 'i fritidshem', 'idrott och hälsa', 'it-kunskaper', 'i förskoleklass',
+                  'informationsteknik', 'insatser', 'integration', 'intellektuell funktionsnedsättning']),
+    ('lärare i ',
+     ['sverige', 'grundskolan', 'undervisning', 'lärarlegitimation', 'svenska', 'skola', 'stockholms län', 'verktyg',
+      'västra götaland', 'gymnasielärare']),
+    ('lärare i fr', ['fritidshem', 'fritidspedagog', 'franska', 'friluftsaktiviteter', 'fritidspedagogutbildning']),
+    ('lärare i fö', ['förskola', 'förskoleklass', 'förskollärarexamen', 'förskollärare']),
+    ('gymnas', ['gymnasieutbildning', 'gymnasielärare', 'gymnasiekompetens', 'gymnasium', 'gymnasieexamen', 'gymnastik',
+                'gymnasieprogram', 'gymnasieskola', 'gymnasieskolekompetens']),
+    ('bygg ', ['sverige', 'stockholms län', 'körkort', 'svenska', 'stockholm', 'el', 'administration', 'industri',
+               'västra götaland', 'drifting']),
+    ('bygg', ['byggbranschen', 'byggteknik', 'byggproduktion', 'byggnadsingenjör', 'byggprojektledare', 'byggprojekt',
+              'byggarbetsplats', 'bygghandlingar', 'byggledning', 'bygglov']),
+    ('kock', ['kock', 'kockerfarenheter', 'kockutbildning', 'kockutbildare']),
+    ('kock ',
+     ['sverige', 'stockholms län', 'mat', 'stockholm', 'matlagning', 'svenska', 'à la carte', 'kök', 'specialkost',
+      'tillagning']
+     ),
+
+])
+def test_suggest_extra_word_and_allow_empty(query, expected_suggestions):
+    """
+    if not freetext_query.split(' ')[-1] and args[settings.X_FEATURE_SUGGEST_EXTRA_WORD] \
+                and args[settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD]:
+
+
+    """
+
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json',
+                   settings.X_FEATURE_SUGGEST_EXTRA_WORD: 'true', settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD: 'true'}
+        result = testclient.get('/complete', headers=headers, data={'q': query})
+        json_response = check_response_return_json(result)
+        assert 'typeahead' in json_response
+        actual_suggestions = [suggest.get('value') for suggest in json_response.get('typeahead')]
+        assert len(actual_suggestions) > 0, f"no suggested values as auto-complete for '{query}'"
+        assert len(actual_suggestions) == len(
+            expected_suggestions), f"\nQuery: {query}\nExpected suggestions: {expected_suggestions}\nActual suggestions: {actual_suggestions} "
+        print(actual_suggestions)
         for s in expected_suggestions:
             assert s in actual_suggestions, f"\Did not find {s} in {actual_suggestions} "
 

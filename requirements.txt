@@ -9,10 +9,11 @@ python-dateutil
 pytest
 pytest-cov
 pytest-envfiles
-elastic-apm[flask]
+# on 4xx shows correct transaction.result, not 5xx
+elastic-apm[flask]==5.2.3
 flashtext
 urllib3
 python-simplexml
 pytest_bdd
 elasticsearch-dsl
-Werkzeug==0.16.1
+Werkzeug==1.0.1

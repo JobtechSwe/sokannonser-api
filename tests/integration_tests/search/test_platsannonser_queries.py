@@ -24,6 +24,7 @@ def test_freetext_query_ssk():
         hits_total = json_response['total']['value']
         assert int(hits_total) > 0, f"no hits for query '{query}'"
 
+
 @pytest.mark.smoke
 @pytest.mark.integration
 def test_freetext_query_one_param():
@@ -35,6 +36,32 @@ def test_freetext_query_one_param():
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
         assert int(hits_total) > 0, f"no hits for query '{query}'"
+
+
+# Todo: different queries
+@pytest.mark.integration
+@pytest.mark.parametrize("minimum_relevance, expect_to_get_results",
+                         [(0, True),
+                          (1, True),
+                          (2, False),
+                          (3, False),
+                          (4, False),
+                          (5, False),
+                          (6, False),
+                          (7, False),
+                          (8, False),
+                          (9, False)])
+def test_min_relevance(minimum_relevance, expect_to_get_results):
+    app.testing = True
+    with app.test_client() as testclient:
+        query = 'sjuksköterska grundutbildad'
+        result = testclient.get('/search', headers=headers, data={'q': query, search_settings.MIN_RELEVANCE: minimum_relevance})
+        json_response = check_response_return_json(result)
+        hits_total = json_response['total']['value']
+        if expect_to_get_results:
+            assert int(hits_total) > 0, f"no hits for query '{query}' with 'relevance-threshold' {minimum_relevance}"
+        else:
+            assert int(hits_total) == 0, f"Expected no hits for query '{query}' but got {int(hits_total)}"
 
 
 @pytest.mark.integration
@@ -56,7 +83,8 @@ def test_freetext_query_one_param():
                                              ('sjuksköterska -malmö', 80),
                                              ('sjuksköterska -stockholm -malmö', 72),
                                              ('sjuksköterska -stockholm -malmö -göteborg -eskilstuna', 65),
-                                             ('sjuksköterska Helsingborg -stockholm -malmö -göteborg -eskilstuna', 1)  # 3 ads with work_place.municipality Helsingborg
+                                             ('sjuksköterska Helsingborg -stockholm -malmö -göteborg -eskilstuna', 1)
+                                             # 3 ads with work_place.municipality Helsingborg
                                              ])
 def test_freetext_plus_minus(query, expected):
     """
@@ -75,7 +103,10 @@ def test_freetext_plus_minus(query, expected):
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("typo", ['sjukssköterska', 'javasscript'])  # todo: no match for 'montesori'
+@pytest.mark.parametrize("typo", ['sjukssköterska',
+                                  'javasscript'
+                                  # 'montesori' # todo: no match for 'montesori'
+                                  ])
 def test_freetext_query_misspelled_param(typo):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     app.testing = True
@@ -247,7 +278,7 @@ def test_total_hits():
 @pytest.mark.integration
 def test_removed_ads_should_not_be_in_result():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    
+
     app.testing = True
     with app.test_client() as testclient:
         for offset in range(0, 1100, 100):
@@ -355,7 +386,7 @@ def _fetch_and_validate_result(query, resultfield, expected, non_negative=True):
 @pytest.mark.integration
 def test_driving_license_required():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    
+
     _fetch_and_validate_result({taxonomy.DRIVING_LICENCE_REQUIRED: 'true'},
                                [fields.DRIVING_LICENCE_REQUIRED], [True])
     _fetch_and_validate_result({taxonomy.DRIVING_LICENCE_REQUIRED: 'false'},
@@ -391,7 +422,7 @@ def test_driving_license_required():
 @pytest.mark.integration
 def test_occupation_codes(query, path, expected, non_negative):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    
+
     _fetch_and_validate_result(query, path, expected, non_negative)
 
 
@@ -405,7 +436,7 @@ def test_occupation_codes(query, path, expected, non_negative):
 @pytest.mark.integration
 def test_occupation_location_combo(query, path, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    
+
     _fetch_and_validate_result(query, path, expected)
 
 
@@ -445,7 +476,7 @@ def test_negative_skill():
 @pytest.mark.integration
 def test_worktime_extent():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    
+
     _fetch_and_validate_result({taxonomy.WORKTIME_EXTENT: '947z_JGS_Uk2'},
                                [fields.WORKING_HOURS_TYPE + ".concept_id"],
                                ['947z_JGS_Uk2'])
@@ -491,7 +522,7 @@ def test_driving_licence():
 @pytest.mark.integration
 def test_employment_type():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    
+
     _fetch_and_validate_result({taxonomy.EMPLOYMENT_TYPE: 'PFZr_Syz_cUq'},
                                [fields.EMPLOYMENT_TYPE + ".concept_id"], ['PFZr_Syz_cUq'])
 
@@ -499,7 +530,7 @@ def test_employment_type():
 @pytest.mark.integration
 def test_experience():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    
+
     _fetch_and_validate_result({search_settings.EXPERIENCE_REQUIRED: 'true'},
                                [fields.EXPERIENCE_REQUIRED], [True])
     _fetch_and_validate_result({search_settings.EXPERIENCE_REQUIRED: 'false'},
@@ -509,7 +540,7 @@ def test_experience():
 @pytest.mark.integration
 def test_region():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    
+
     _fetch_and_validate_result({taxonomy.REGION: '01'},
                                [fields.WORKPLACE_ADDRESS_REGION_CODE], ['01'])
     _fetch_and_validate_result({taxonomy.REGION: '-01'},
@@ -519,7 +550,7 @@ def test_region():
 @pytest.mark.integration
 def test_country():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    
+
     _fetch_and_validate_result({taxonomy.REGION: '199'},
                                [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'])
     _fetch_and_validate_result({taxonomy.REGION: '-199'},

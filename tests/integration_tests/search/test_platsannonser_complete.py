@@ -68,12 +68,12 @@ def test_complete_endpoint_synonyms_typeahead(query, synonyms, expect_success):
     ('servitr', ['server', 'service', 'servrar']),
 
     # Failing
-    #('servitr', ['servitris', 'servitör', 'servitriser', 'servitörer']),
+    # ('servitr', ['servitris', 'servitör', 'servitriser', 'servitörer']),
 
-    #('servi', ['servicetekniker', 'servicearbete', 'service och underhåll', 'servicedesk', 'servicehandläggare',
+    # ('servi', ['servicetekniker', 'servicearbete', 'service och underhåll', 'servicedesk', 'servicehandläggare',
     #           'servicemedarbetare', 'serviceyrke', 'service manager', 'servicebiträde', 'serviceelektriker']),
-    #('angu', ['angular', 'angularjs']),  # actual ['angularjs']
-   # ('ang', ['angular', 'angularjs', 'angered'])  # actual ['angularjs', 'angered']
+    # ('angu', ['angular', 'angularjs']),  # actual ['angularjs']
+    # ('ang', ['angular', 'angularjs', 'angered'])  # actual ['angularjs', 'angered']
 ])
 def test_complete_endpoint_with_spellcheck_typeahead(query, expected_suggestions):
     """
@@ -92,21 +92,28 @@ def test_complete_endpoint_with_spellcheck_typeahead(query, expected_suggestions
         assert len(actual_suggestions) == len(
             expected_suggestions), f"\nQuery: {query}\nExpected suggestions: {expected_suggestions}\nActual suggestions: {actual_suggestions} "
         for s in expected_suggestions:
-            assert s in actual_suggestions, f"\Did not find {s} in {actual_suggestions} "
+            assert s in actual_suggestions, f"Did not find {s} in {actual_suggestions} "
 
 
 @pytest.mark.parametrize("query, expected_suggestions", [
     ('lärare', ['lärare', 'lärare i grundskolan', 'lärare i förskola', 'lärare i fritidshem', 'lärarexamen',
                 'lärare i förskoleklass', 'lärare i praktiska och estetiska ämnen']),
+    ('lärare ',
+     ['sverige', 'i grundskolan', 'undervisning', 'lärarlegitimation', 'svenska', 'skola', 'stockholms län', 'verktyg',
+      'västra götaland', 'gymnasielärare']),
     ('lärare i', ['i grundskolan', 'idrott', 'i fritidshem', 'idrott och hälsa', 'it-kunskaper', 'i förskoleklass',
                   'informationsteknik', 'insatser', 'integration', 'intellektuell funktionsnedsättning']),
     ('lärare i ',
      ['sverige', 'grundskolan', 'undervisning', 'lärarlegitimation', 'svenska', 'skola', 'stockholms län', 'verktyg',
       'västra götaland', 'gymnasielärare']),
+    ('lärare fr', ['fritidshem', 'fritidspedagog', 'franska', 'friluftsaktiviteter', 'fritidspedagogutbildning']),
     ('lärare i fr', ['fritidshem', 'fritidspedagog', 'franska', 'friluftsaktiviteter', 'fritidspedagogutbildning']),
     ('lärare i fö', ['förskola', 'förskoleklass', 'förskollärarexamen', 'förskollärare']),
     ('gymnas', ['gymnasieutbildning', 'gymnasielärare', 'gymnasiekompetens', 'gymnasium', 'gymnasieexamen', 'gymnastik',
                 'gymnasieprogram', 'gymnasieskola', 'gymnasieskolekompetens']),
+    ('gymnasie',
+     ['gymnasieutbildning', 'gymnasielärare', 'gymnasiekompetens', 'gymnasieexamen', 'gymnasieprogram', 'gymnasieskola',
+      'gymnasieskolekompetens']),
     ('bygg ', ['sverige', 'stockholms län', 'körkort', 'svenska', 'stockholm', 'el', 'administration', 'industri',
                'västra götaland', 'drifting']),
     ('bygg', ['byggbranschen', 'byggteknik', 'byggproduktion', 'byggnadsingenjör', 'byggprojektledare', 'byggprojekt',
@@ -114,14 +121,15 @@ def test_complete_endpoint_with_spellcheck_typeahead(query, expected_suggestions
     ('kock', ['kock', 'kockerfarenheter', 'kockutbildning', 'kockutbildare']),
     ('kock ',
      ['sverige', 'stockholms län', 'mat', 'stockholm', 'matlagning', 'svenska', 'à la carte', 'kök', 'specialkost',
-      'tillagning']
-     ),
-
+      'tillagning'])
 ])
 def test_suggest_extra_word_and_allow_empty(query, expected_suggestions):
     """
-    if not freetext_query.split(' ')[-1] and args[settings.X_FEATURE_SUGGEST_EXTRA_WORD] \
-                and args[settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD]:
+    Test suggestions for extra words
+    test difference between 'query' and 'query ' (with trailing space)
+
+    X_FEATURE_SUGGEST_EXTRA_WORD
+    X_FEATURE_ALLOW_EMPTY_TYPEAHEAD
 
 
     """
@@ -139,7 +147,7 @@ def test_suggest_extra_word_and_allow_empty(query, expected_suggestions):
             expected_suggestions), f"\nQuery: {query}\nExpected suggestions: {expected_suggestions}\nActual suggestions: {actual_suggestions} "
         print(actual_suggestions)
         for s in expected_suggestions:
-            assert s in actual_suggestions, f"\Did not find {s} in {actual_suggestions} "
+            assert s in actual_suggestions, f"Did not find {s} in {actual_suggestions} "
 
 
 if __name__ == '__main__':

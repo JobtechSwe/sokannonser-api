@@ -121,7 +121,25 @@ def test_complete_endpoint_with_spellcheck_typeahead(query, expected_suggestions
     ('kock', ['kock', 'kockerfarenheter', 'kockutbildning', 'kockutbildare']),
     ('kock ',
      ['sverige', 'stockholms län', 'mat', 'stockholm', 'matlagning', 'svenska', 'à la carte', 'kök', 'specialkost',
-      'tillagning'])
+      'tillagning']),
+    ('stockholm  ',
+     ['sverige', 'stockholms län', 'svenska', 'engelska', 'försäljning', 'körkort', 'ekonomi', 'microsoft office',
+      'administration', 'data']),
+    ('malmö ',
+     ['malmö butikssäljare', 'malmö sjuksköterska', 'malmö civilingenjör', 'malmö högskoleingenjör',
+      'malmö lagerarbetare', 'malmö redovisningsekonom']),
+    ('upplands ',
+     ['upplands väsby', 'upplands väsby bemanningssjuksköterska', 'upplands väsby handledare',
+      'upplands väsby javautvecklare', 'upplands väsby mjukvaruutvecklare', 'upplands väsby personlig assistent',
+      'upplands väsby servicetekniker']),
+    ('upplands väsby ',
+     ['väsby', 'väsby bemanningssjuksköterska', 'väsby sjuksköterska']),
+    ('sverige ',
+     ['sverige sjuksköterska', 'sverige lärare', 'sverige personlig assistent', 'sverige lärare i grundskolan',
+      'sverige säljare', 'sverige butikssäljare']),
+    ('sverige',
+     ['sverige', 'sverige sjuksköterska', 'sverige lärare', 'sverige personlig assistent',
+      'sverige lärare i grundskolan', 'sverige säljare', 'sverige butikssäljare']),
 ])
 def test_suggest_extra_word_and_allow_empty(query, expected_suggestions):
     """
@@ -130,10 +148,7 @@ def test_suggest_extra_word_and_allow_empty(query, expected_suggestions):
 
     X_FEATURE_SUGGEST_EXTRA_WORD
     X_FEATURE_ALLOW_EMPTY_TYPEAHEAD
-
-
     """
-
     app.testing = True
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json',

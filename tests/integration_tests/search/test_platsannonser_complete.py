@@ -50,14 +50,19 @@ def test_complete_endpoint_synonyms_typeahead(query, synonyms, expect_success):
 @pytest.mark.integration
 @pytest.mark.parametrize("query, expected_suggestions", [
     ('servit', ['servicetekniker', 'servicearbete', 'service och underhåll', 'servicedesk', 'servicehandläggare',
-                'servicemedarbetare', 'serviceyrke', 'service manager', 'servicebiträde', 'serviceelektriker']),
+                'servicemedarbetare', 'serviceyrke', 'service manager', 'servicebiträde', 'serviceelektriker',
+                'serviceinsatser', 'servicerådgivare']),
     ('systemutvecklare angu', ['systemutvecklare angularjs']),
     ('angu', ['angularjs']),
     ('pyth', ['python']),
     ('c#', ['c#']),
     ('c+', ['c++']),
     ('ang', ['angularjs', 'angered']),
-    ('c', ['civilingenjör', 'c#', 'c', 'can', 'c körkort', 'cnc- operatör', 'c++', 'cad', 'cloud', 'css']),
+    ('c', ['civilingenjör', 'c#', 'c', 'can', 'c körkort', 'cnc- operatör', 'c++', 'cad', 'cloud', 'css', 'chaufför',
+           'certifikat', 'ci/cd', 'citrix', 'civilingenjörsutbildning', 'continuous integration', 'cnc', 'coachning',
+           'cykling', 'c-chaufför', 'c-kort', 'cellbiologi', 'cisco', 'confluence', 'controller', 'copy', 'ce-chaufför',
+           'cheerleadingtränare', 'chefskock', 'civilekonom', 'cnc-svarvare', 'coach', 'consultant manager',
+           'copywriter', 'customer success manager', 'cykelbud', 'cykelsäljare']),
     ('uppd', ['uppdragsutbildning', 'uppdukning', 'uppdragsledare']),
     ('underh',
      ['underhållsmekaniker', 'underhållsarbete', 'underhållstekniker', 'underhållssystem', 'underhållsrutiner',
@@ -84,7 +89,7 @@ def test_complete_endpoint_with_spellcheck_typeahead(query, expected_suggestions
     with app.test_client() as testclient:
         headers = {'api-key': test_api_key, 'accept': 'application/json',
                    settings.X_FEATURE_SPELLCHECK_TYPEAHEAD: 'true'}
-        result = testclient.get('/complete', headers=headers, data={'q': query})
+        result = testclient.get('/complete', headers=headers, data={'q': query, 'limit': 50})
         json_response = check_response_return_json(result)
         assert 'typeahead' in json_response
         actual_suggestions = [suggest.get('value') for suggest in json_response.get('typeahead')]

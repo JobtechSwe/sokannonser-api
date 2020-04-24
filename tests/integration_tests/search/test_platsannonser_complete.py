@@ -172,5 +172,17 @@ def test_suggest_extra_word_and_allow_empty(query, expected_suggestions):
                 assert s in actual_suggestions, f"Did not find {s} in {actual_suggestions} "
 
 
+def test_check_400_bad_request_when_limit_is_greater_than_allowed():
+    """
+    Test that a limit of 51 will give a '400 BAD REQUEST' response with a meaningful error message
+    """
+    app.testing = True
+    with app.test_client() as testclient:
+        headers = {'api-key': test_api_key, 'accept': 'application/json'}
+        result = testclient.get('/complete', headers=headers, data={'q': 'c', 'limit': 51})
+        assert result.status == '400 BAD REQUEST', f"expected '400 BAD REQUEST' but got {result.status}"
+        assert result.json['errors']['limit'] == 'Invalid argument: 51. argument must be within the range 0 - 50'
+
+
 if __name__ == '__main__':
     pytest.main([os.path.realpath(__file__), '-svv', '-ra', '-m integration'])

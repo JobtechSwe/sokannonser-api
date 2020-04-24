@@ -434,44 +434,11 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
                 ]
             })
 
-    # create_found_in_enriched(results, query_result)  # TODO
     _modify_results(results)
-    # log.debug(json.dumps(results, indent=2))
     return results
 
 
-# TODO never executed since it's commented out in 'transform_platsannons_query_result'
-def create_found_in_enriched(results, query_result):
-    found_in_enriched = False
-    freetext_concepts_node = query_result.get('concepts', {})
 
-    input_type_vals = []
-    type_names = ['occupation', 'skill', 'trait']
-
-    for type_name in type_names:
-        if type_name in freetext_concepts_node:
-            input_type_vals.extend(freetext_concepts_node[type_name])
-        must_key = '%s_must' % type_name
-        if must_key in freetext_concepts_node:
-            input_type_vals.extend(freetext_concepts_node[must_key])
-
-    if len(input_type_vals) == 0:
-        for hit in results['hits']:
-            hit['_source']['found_in_enriched'] = False
-        return
-
-    for hit in results['hits']:
-        enriched_node = hit['_source'].get('keywords', {}).get('enriched', {})
-        enriched_vals = []
-        for type_name in type_names:
-            enriched_vals.extend(enriched_node.get(type_name, {}))
-
-        for type_val in input_type_vals:
-            if type_val in enriched_vals:
-                found_in_enriched = True
-                break
-
-        hit['_source']['found_in_enriched'] = found_in_enriched
 
 
 def _modify_results(results):

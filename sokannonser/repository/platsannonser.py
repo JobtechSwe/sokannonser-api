@@ -96,7 +96,6 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):  # TODO: unused ar
     return result
 
 
-# TODO: not executed at all, needs test coverage (2020-04-21)
 def suggest_extra_word(args, original_word, querybuilder):
     # input one word and suggest extra word
     search_text = original_word['value'].strip()
@@ -106,7 +105,7 @@ def suggest_extra_word(args, original_word, querybuilder):
         if search_text_type == 'location':
             second_suggest_type = 'occupation'
         else:
-            second_suggest_type = 'location'
+            second_suggest_type = 'location'  # TODO never executed by tests
         query_dsl = querybuilder.create_suggest_extra_word_query(
             search_text, search_text_type, second_suggest_type, args)
         log.debug('QUERY suggest: %s' % query_dsl)
@@ -124,7 +123,6 @@ def suggest_extra_word(args, original_word, querybuilder):
     return new_suggest_list
 
 
-# todo: Unused, only called from suggest_extra_word above (which is not called at all)
 def _check_search_word_type(args, search_text, querybuilder):
     # this function is used for checking input words type, return type location/skill/occupation
     query_dsl = querybuilder.create_check_search_word_type_query(search_text, args)
@@ -187,7 +185,7 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):  # TODO: 
     word_list = input_words.split()
     word = word_list[-1] if word_list else ''
     if word_list and word_list[:-1]:
-        prefix = ' '.join(input_words.split()[:-1])
+        prefix = ' '.join(input_words.split()[:-1])  # TODO not executed by tests
     else:
         prefix = ''
 
@@ -231,7 +229,7 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):  # TODO: 
 
     return query_result
 
-# TODO: never called
+
 def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)
@@ -275,7 +273,7 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
 
     return query_result
 
-# TODO never called
+
 def suggest_check_occurence(aggs, args, querybuilder):
     # check the frequence one by one, future will change it
     for agg in aggs:
@@ -373,6 +371,7 @@ def get_correct_logo_url(ad_id):
 
 not_found_file = None
 
+
 # TODO not called by tests
 def get_not_found_logo_file():
     global not_found_file
@@ -440,6 +439,7 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
     # log.debug(json.dumps(results, indent=2))
     return results
 
+
 # TODO never executed since it's commented out in 'transform_platsannons_query_result'
 def create_found_in_enriched(results, query_result):
     found_in_enriched = False
@@ -482,6 +482,7 @@ def _modify_results(results):
             pass
         except ValueError:
             pass
+
 
 # TODO not executed by tests
 def find_agg_and_delete(value, aggs):

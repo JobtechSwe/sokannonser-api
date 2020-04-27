@@ -1,8 +1,8 @@
-import os
 import pytest
 
 from sokannonser import app
 from sokannonser.settings import headers
+
 
 @pytest.mark.smoke
 @pytest.mark.parametrize("query, expected_number_of_hits", [

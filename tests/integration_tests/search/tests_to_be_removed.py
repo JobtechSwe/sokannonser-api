@@ -7,6 +7,9 @@ from sokannonser.settings import headers
 from tests.integration_tests.test_resources.check_response import check_response_return_json
 
 
+# The tests in this file were skipped with the messages "to be removed".
+# Needs more investigation. Do we have enough coverage of enrichement?
+
 @pytest.mark.skip("lacking enrichment - does not find field 'keywords'")
 @pytest.mark.integration
 def test_freetext_query_one_param_deleted_enriched():

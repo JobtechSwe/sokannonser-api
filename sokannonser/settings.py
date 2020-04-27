@@ -98,7 +98,7 @@ result_models = [
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
 # for tests:
-number_of_ads = 1065
+NUMBER_OF_ADS = 1072
 test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
 

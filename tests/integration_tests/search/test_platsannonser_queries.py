@@ -7,7 +7,7 @@ from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
 from tests.integration_tests.test_resources.check_response import check_response_return_json
-from sokannonser.settings import number_of_ads, headers
+from sokannonser.settings import NUMBER_OF_ADS, headers
 
 
 @pytest.mark.skip(
@@ -69,7 +69,7 @@ def test_min_relevance(minimum_relevance, expect_to_get_results):
                                              ('python php', 7),
                                              ('+python php', 7),
                                              ('+python -php', 7),
-                                             ('-python -php', 1058),  # of 1056
+                                             ('-python -php', 1065),  # of 1072
                                              ('php', 0),  # ?
                                              ('systemutvecklare +python java linux mac', 2),
                                              ('systemutvecklare +python -java linux mac', 0),
@@ -78,11 +78,11 @@ def test_min_relevance(minimum_relevance, expect_to_get_results):
                                              ('systemutvecklare python java -php', 12),
                                              ('lärarexamen', 6),
                                              ('lärarexamen -lärare', 1),
-                                             ('sjuksköterska', 83),
-                                             ('sjuksköterska -stockholm', 75),
-                                             ('sjuksköterska -malmö', 80),
-                                             ('sjuksköterska -stockholm -malmö', 72),
-                                             ('sjuksköterska -stockholm -malmö -göteborg -eskilstuna', 65),
+                                             ('sjuksköterska', 85),
+                                             ('sjuksköterska -stockholm', 77),
+                                             ('sjuksköterska -malmö', 82),
+                                             ('sjuksköterska -stockholm -malmö', 74),
+                                             ('sjuksköterska -stockholm -malmö -göteborg -eskilstuna', 67),
                                              ('sjuksköterska Helsingborg -stockholm -malmö -göteborg -eskilstuna', 1)
                                              # 3 ads with work_place.municipality Helsingborg
                                              ])
@@ -272,7 +272,7 @@ def test_total_hits():
         result = testclient.get('/search', headers=headers, data={'offset': '0', 'limit': '0'})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
-        assert int(hits_total) == 1065, f"to few hits, actual number: {hits_total} "
+        assert int(hits_total) == NUMBER_OF_ADS, f"to few hits, actual number: {hits_total} "
 
 
 @pytest.mark.integration
@@ -300,14 +300,14 @@ def test_find_all_ads():
     app.testing = True
     with app.test_client() as testclient:
         limit = 100
-        for offset in range(0, number_of_ads, limit):
+        for offset in range(0, NUMBER_OF_ADS, limit):
             result = testclient.get('/search', headers=headers, data={'offset': offset, 'limit': limit})
             json_response = check_response_return_json(result)
             hits = json_response['hits']
-            if number_of_ads - offset > limit:
+            if NUMBER_OF_ADS - offset > limit:
                 expected = limit
             else:
-                expected = number_of_ads % limit
+                expected = NUMBER_OF_ADS % limit
             assert len(hits) == expected, f"wrong number of hits, actual number: {len(hits)} "
 
 

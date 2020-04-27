@@ -3,7 +3,7 @@ import os
 import http
 import pytest
 from sokannonser import app
-from sokannonser.settings import test_api_key, headers
+from sokannonser.settings import headers
 
 
 @pytest.mark.smoke

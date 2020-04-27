@@ -3,70 +3,53 @@ import sys
 import pytest
 
 from sokannonser import app
-from tests.integration_tests.search import test_api_key
+from sokannonser.settings import headers
 from tests.integration_tests.test_resources.check_response import check_response_return_json
 
 
-@pytest.mark.skip(reason="To be removed.")
+@pytest.mark.skip("does not find field 'keywords'")
 @pytest.mark.integration
 def test_freetext_query_one_param_deleted_enriched():
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
     app.testing = True
     with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers, data={'q': 'gymnasielärare',
-                                                                  'limit': '10'})
+        result = testclient.get('/search', headers=headers, data={'q': 'gymnasielärare', 'limit': '10'})
         json_response = check_response_return_json(result)
-        # pprint(json_response)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) > 0
+        assert int(json_response['total']['value']) > 0
         hits = json_response['hits']
         assert len(hits) <= 10
-        # pprint(hits[0])
+        try:
+            keywords = hits[0]['keywords']
+        except KeyError:
+            print("KeyError - could not find field 'keywords'")
+            raise
+        assert 'extracted' in keywords
+        assert 'enriched' not in keywords
 
-        assert 'extracted' in hits[0]['keywords']
-        assert 'enriched' not in hits[0]['keywords']
-
-
-@pytest.mark.skip(reason="To be removed")
+@pytest.mark.skip("Field 'found_in_enriched' was not found")
 @pytest.mark.integration
 def test_freetext_query_one_param_found_in_enriched_pos():
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     app.testing = True
     with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers, data={'q': 'diskare',
-                                                                  'limit': '100'})
+        result = testclient.get('/search', headers=headers, data={'q': 'diskare', 'limit': '100'})
         json_response = check_response_return_json(result)
-        # pprint(json_response)
-        # hits_total = json_response['total']
-        # assert int(hits_total) > 0
         hits = json_response['hits']
-        # assert len(hits) > 0
-        # pprint(hits[0])
+        assert len(hits) > 0
         assert 'found_in_enriched' in hits[0]
 
-
-@pytest.mark.skip(reason="To be removed")
+@pytest.mark.skip("Field 'found_in_enriched' was not found")
 @pytest.mark.integration
 def test_freetext_query_one_param_found_in_enriched_neg():
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     app.testing = True
     with app.test_client() as testclient:
-        headers = {'api-key': test_api_key, 'accept': 'application/json'}
-        result = testclient.get('/search', headers=headers, data={'q': 'ninja',
-                                                                  'limit': '100'})
+        result = testclient.get('/search', headers=headers, data={'q': 'sjuksköterska'})
         json_response = check_response_return_json(result)
-        # pprint(json_response)
-        # hits_total = json_response['total']
-        # assert int(hits_total) > 0
         hits = json_response['hits']
-        # assert len(hits) > 0
-        # pprint(hits[0])
+        assert len(hits) > 0
         for hit in hits:
-            assert 'found_in_enriched' in hit
-            assert hit['found_in_enriched'] is False
-            
+            assert 'found_in_enriched' in hit, "field 'found_in_enriched' was not found"
+            assert hit['found_in_enriched'] is False, "field 'found_in_enriched' was not False as expected"

@@ -83,6 +83,6 @@ class SnapshotLoad(Resource):
     def get(self, **kwargs):
         elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         args = bulk_snapshot_query.parse_args()
-        log.debug('ARGS: %s' % args)
+        log.info('ARGS: %s' % args)
         return Response(repository.load_snapshot(),
                         mimetype='application/json')

@@ -5,7 +5,7 @@ from sokannonser import app
 from sokannonser.settings import headers
 
 @pytest.mark.smoke
-@pytest.mark.parametrize("query, expected_number", [
+@pytest.mark.parametrize("query, expected_number_of_hits", [
     ('murar*', 0),
     ('systemutvecklar*', 10),
     ('*utvecklare', 37),
@@ -33,10 +33,10 @@ from sokannonser.settings import headers
     ('sju*', 100)  # max 100 hits returned
 ])
 @pytest.mark.integration
-def test_wildcard_search(query, expected_number):
+def test_wildcard_search(query, expected_number_of_hits):
     app.testing = True
     with app.test_client() as testclient:
         results = testclient.get('/search', headers=headers, data={'q': query, "limit": 100})
         assert 'hits' in results.json
         actual_number = len(results.json['hits'])
-        assert actual_number == expected_number, f"wrong number of hits for query '{query}'"
+        assert actual_number == expected_number_of_hits, f"wrong number of hits for query '{query}'"

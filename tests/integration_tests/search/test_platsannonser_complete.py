@@ -55,6 +55,8 @@ def test_complete_endpoint_synonyms_typeahead(query, synonyms, expect_success):
     ('systemutvecklare angu', ['systemutvecklare angularjs']),
     ('angu', ['angularjs']),
     ('pyth', ['python']),
+    ('#coro', ['corona']),
+    ('#coron', ['corona']),
     ('c#', ['c#']),
     ('c+', ['c++']),
     ('ang', ['angularjs', 'angered']),

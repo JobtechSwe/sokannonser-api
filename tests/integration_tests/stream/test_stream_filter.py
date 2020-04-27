@@ -1,6 +1,6 @@
 import pytest
 import requests
-from sokannonser.settings import OCCUPATION_CONCEPT_ID, LOCATION_CONCEPT_ID
+from sokannonser.settings import OCCUPATION_CONCEPT_ID, LOCATION_CONCEPT_ID, NUMBER_OF_ADS
 
 import tests.integration_tests.test_resources.concept_ids.concept_ids_geo as geo
 import tests.integration_tests.test_resources.concept_ids.occupation as work
@@ -68,9 +68,9 @@ def test_filter_only_on_location(session, url, date, geo, expected):
     ('2020-01-01T00:00:01', group.mjukvaru__och_systemutvecklare_m_fl_, geo.sverige, 51),
     ('2020-02-01T00:00:01', field.militart_arbete, geo.schweiz, 0),
     ('2000-02-01T00:00:01', field.militart_arbete, geo.sverige, 1),
-    ('2000-01-01T00:00:01', field.halso__och_sjukvard, geo.sverige, 194),
+    ('2000-01-01T00:00:01', field.halso__och_sjukvard, geo.sverige, 196),
     ('2000-01-01T00:00:01', field.halso__och_sjukvard, geo.stockholms_lan, 43),
-    ('2020-02-25T00:00:01', field.halso__och_sjukvard, geo.sverige, 158),
+    ('2020-02-25T00:00:01', field.halso__och_sjukvard, geo.sverige, 160),
     ('2020-02-25T00:00:01', field.halso__och_sjukvard, geo.stockholms_lan, 35),
 ])
 def test_filter_with_date_and_occupation_and_location(session, url, date, work, geo, expected):
@@ -114,9 +114,9 @@ def test_filter_with_date_and_one_occupation(session, url, date, concept_id, exp
     ('2000-01-01T00:00:01', geo.stockholms_lan, 289),
     ('2000-01-01T00:00:01', geo.norge, 3),
     ('2020-01-01T00:00:01', geo.hallands_lan, 29),
-    ('2020-01-01T00:00:01', geo.linkoping, 23),
-    ('1999-01-01T00:00:01', geo.sverige, 1059),
-    ('2020-01-01T00:00:01', geo.sverige, 1026),
+    ('2020-01-01T00:00:01', geo.linkoping, 24),
+    ('1999-01-01T00:00:01', geo.sverige, 1066),
+    ('2020-01-01T00:00:01', geo.sverige, 1033),
     ('2020-02-01T00:00:01', geo.stockholm, 172),
     ('2020-02-01T00:00:01', geo.schweiz, 1),
     ('2020-02-01T00:00:01', geo.norge, 3),
@@ -142,7 +142,7 @@ def test_filter_with_date_and_location(session, url, date, geo, expected):
     ('2020-01-01T00:00:01', group.bagare_och_konditorer, group.bartendrar, 5),
     ('2020-02-01T00:00:01', group.apotekare, field.data_it, 77),
     ('2020-02-25T07:29:41', group.frisorer, work.akupunktor, 3),
-    ('2020-03-25T07:29:41', field.pedagogiskt_arbete, field.halso__och_sjukvard, 95),
+    ('2020-03-25T07:29:41', field.pedagogiskt_arbete, field.halso__och_sjukvard, 97),
     ('2020-02-25T07:29:41', field.hantverksyrken, group.hudterapeuter, 3),
     ('2020-01-25T07:29:41', field.socialt_arbete, work.databasutvecklare, 88)])
 def test_filter_with_date_and_two_occupations(session, url, date, work_1, work_2, expected):
@@ -161,8 +161,8 @@ def test_filter_with_date_and_two_occupations(session, url, date, work_1, work_2
     ('2020-01-01T00:00:01', group.bagare_och_konditorer, group.bartendrar, group.hovmastare_och_servitorer, 11),
     ('2020-02-01T00:00:01', group.apotekare, group.ambulanssjukskoterskor_m_fl_, field.data_it, 78),
     ('2020-02-25T07:29:41', group.frisorer, group.hudterapeuter, work.akupunktor, 3),
-    ('1980-03-25T07:29:41', field.pedagogiskt_arbete, field.halso__och_sjukvard, field.kropps__och_skonhetsvard, 334),
-    ('2020-03-25T07:29:41', field.pedagogiskt_arbete, field.halso__och_sjukvard, field.kropps__och_skonhetsvard, 95),
+    ('1980-03-25T07:29:41', field.pedagogiskt_arbete, field.halso__och_sjukvard, field.kropps__och_skonhetsvard, 336),
+    ('2020-03-25T07:29:41', field.pedagogiskt_arbete, field.halso__och_sjukvard, field.kropps__och_skonhetsvard, 97),
     ('2000-04-25T07:29:41', field.hantverksyrken, field.data_it, group.hudterapeuter, 92),
     ('2020-03-25T07:29:41', field.hantverksyrken, field.data_it, group.hudterapeuter, 17),
     ('1920-04-25T07:29:41', field.socialt_arbete, field.bygg_och_anlaggning, work.databasutvecklare, 136),
@@ -204,8 +204,8 @@ def test_filter_with_date_and_two_occupations_and_location(session, url, date, w
     ('2000-01-01T00:00:01', geo.arboga, geo.stockholms_lan, 290),
     ('2000-01-01T00:00:01', geo.arboga, geo.norge, 4),
     ('2020-01-01T00:00:01', geo.dalarnas_lan, geo.hallands_lan, 49),
-    ('2020-01-01T00:00:01', geo.dalarnas_lan, geo.linkoping, 43),
-    ('2020-01-01T00:00:01', geo.dalarnas_lan, geo.sverige, 1026),
+    ('2020-01-01T00:00:01', geo.dalarnas_lan, geo.linkoping, 44),
+    ('2020-01-01T00:00:01', geo.dalarnas_lan, geo.sverige, 1033),
     ('2020-02-01T00:00:01', geo.schweiz, geo.stockholm, 173),
     ('2020-02-01T00:00:01', geo.schweiz, geo.jonkopings_lan, 51),
     ('2020-02-01T00:00:01', geo.schweiz, geo.norge, 4),
@@ -232,25 +232,25 @@ def test_filter_with_date_and_multiple_locations_in_same_region(session, url, da
     get_stream_check_number_of_results(session, url, expected, params)
 
 
-@pytest.mark.parametrize('date, work_list, expected', [
-    ('2000-01-01T00:00:01', [field.halso__och_sjukvard], 194),
-    ('2000-01-01T00:00:01', [field.halso__och_sjukvard, work.sjukskoterska__grundutbildad], 194),
-    ('2000-01-01T00:00:01', [field.halso__och_sjukvard, group.grundutbildade_sjukskoterskor], 194),
+@pytest.mark.parametrize('date, work_list, expected_number_of_hits', [
+    ('2000-01-01T00:00:01', [field.halso__och_sjukvard], 196),
+    ('2000-01-01T00:00:01', [field.halso__och_sjukvard, work.sjukskoterska__grundutbildad], 196),
+    ('2000-01-01T00:00:01', [field.halso__och_sjukvard, group.grundutbildade_sjukskoterskor], 196),
     ('2000-01-01T00:00:01',
      [field.halso__och_sjukvard, group.grundutbildade_sjukskoterskor, group.ambulanssjukskoterskor_m_fl_,
-      work.sjukskoterska__medicin_och_kirurgi], 194)])
-def test_filter_with_date_and_multiple_occupations_within_same_field(session, url, date, work_list, expected):
+      work.sjukskoterska__medicin_och_kirurgi], 196)])
+def test_filter_with_date_and_multiple_occupations_within_same_field(session, url, date, work_list, expected_number_of_hits):
     """
     should return results based on date AND occupation type AND (location_1 OR location_2)
     """
     params = {'date': date, OCCUPATION_CONCEPT_ID: work_list}
-    get_stream_check_number_of_results(session, url, expected, params)
+    get_stream_check_number_of_results(session, url, expected_number_of_hits, params)
 
 
 @pytest.mark.parametrize('date, work_list, expected', [
-    ('2000-01-01T00:00:01', [field.halso__och_sjukvard], 194),
-    ('2000-01-01T00:00:01', [group.grundutbildade_sjukskoterskor], 68),
-    ('2000-01-01T00:00:01', [work.sjukskoterska__grundutbildad], 66)
+    ('2000-01-01T00:00:01', [field.halso__och_sjukvard], 196),
+    ('2000-01-01T00:00:01', [group.grundutbildade_sjukskoterskor], 70),
+    ('2000-01-01T00:00:01', [work.sjukskoterska__grundutbildad], 68)
 ])
 def test_filter_narrowing_down_occupations_within_same_field(session, url, date, work_list, expected):
     """
@@ -314,15 +314,17 @@ def test_filter_wrong_api_key_expect_unauthorized_response(session, url, path):
 
 # test below for comparison of number of hits for different dates
 @pytest.mark.parametrize('date, expected_number', [
-    ('2000-01-01T00:00:01', 1065),
-    ('2020-01-01T00:00:01', 1032),
-    ('2020-02-01T00:00:01', 971),
-    ('2020-02-25T07:29:41', 872),
-    ('2020-03-14T07:29:41', 556),
-    ('2020-03-25T07:29:41', 273),
-    ('2020-03-27T07:29:41', 186),
-    ('2020-03-31T07:29:41', 74),
-    ('2020-04-25T07:29:41', 0)])
+    ('2000-01-01T00:00:01', NUMBER_OF_ADS),
+    ('2020-01-01T00:00:01', 1039),
+    ('2020-02-01T00:00:01', 978),
+    ('2020-02-25T07:29:41', 879),
+    ('2020-03-14T07:29:41', 563),
+    ('2020-03-25T07:29:41', 280),
+    ('2020-03-27T07:29:41', 193),
+    ('2020-03-31T07:29:41', 81),
+    ('2020-04-25T07:29:41', 2),
+    ('2020-04-27T08:29:41', 0),
+])
 def test_filter_only_on_date(session, url, date, expected_number):
     """
     Test basic stream with filtering on date
@@ -333,15 +335,16 @@ def test_filter_only_on_date(session, url, date, expected_number):
 @pytest.mark.skip("not implemented yet")
 @pytest.mark.parametrize('from_date, to_date, expected_number', [
     # verify that results are the same as when only using a single date
-    ('2000-01-01T00:00:01', '2020-04-30T00:00:00', 1065),
-    ('2020-01-01T00:00:01', '2020-04-30T00:00:00', 1032),
-    ('2020-02-01T00:00:01', '2020-04-30T00:00:00', 971),
-    ('2020-02-25T07:29:41', '2020-04-30T00:00:00', 872),
-    ('2020-03-14T07:29:41', '2020-04-30T00:00:00', 556),
-    ('2020-03-25T07:29:41', '2020-04-30T00:00:00', 273),
+    ('2000-01-01T00:00:01', '2020-04-30T00:00:00', NUMBER_OF_ADS),
+    ('2020-01-01T00:00:01', '2020-04-30T00:00:00', 1039),
+    ('2020-02-01T00:00:01', '2020-04-30T00:00:00', 978),
+    ('2020-02-25T07:29:41', '2020-04-30T00:00:00', 879),
+    ('2020-03-14T07:29:41', '2020-04-30T00:00:00', 563),
+    ('2020-03-25T07:29:41', '2020-04-30T00:00:00', 280),
     ('2020-03-27T07:29:41', '2020-04-30T00:00:00', 186),
-    ('2020-03-31T07:29:41', '2020-04-30T00:00:00', 74),
-    ('2020-04-25T07:29:41', '2020-04-30T00:00:00', 0),
+    ('2020-03-31T07:29:41', '2020-04-30T00:00:00', 81),
+    ('2020-04-25T07:29:41', '2020-04-30T00:00:00', 2),
+    ('2020-04-27T07:29:41', '2020-04-30T00:00:00', 2),
     # smaller interval, Todo: add correct number of expected hits
     ('2020-02-25T07:29:41', '2020-03-25T00:00:00', 9999),
     ('2020-03-14T07:29:41', '2020-03-30T00:00:00', 9999),

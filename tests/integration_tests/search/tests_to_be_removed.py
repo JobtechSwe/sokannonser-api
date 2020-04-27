@@ -7,7 +7,7 @@ from sokannonser.settings import headers
 from tests.integration_tests.test_resources.check_response import check_response_return_json
 
 
-@pytest.mark.skip("does not find field 'keywords'")
+@pytest.mark.skip("lacking enrichment - does not find field 'keywords'")
 @pytest.mark.integration
 def test_freetext_query_one_param_deleted_enriched():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -26,7 +26,7 @@ def test_freetext_query_one_param_deleted_enriched():
         assert 'extracted' in keywords
         assert 'enriched' not in keywords
 
-@pytest.mark.skip("Field 'found_in_enriched' was not found")
+@pytest.mark.skip("lacking enrichment - Field 'found_in_enriched' was not found")
 @pytest.mark.integration
 def test_freetext_query_one_param_found_in_enriched_pos():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -39,7 +39,7 @@ def test_freetext_query_one_param_found_in_enriched_pos():
         assert len(hits) > 0
         assert 'found_in_enriched' in hits[0]
 
-@pytest.mark.skip("Field 'found_in_enriched' was not found")
+@pytest.mark.skip("lacking enrichment - Field 'found_in_enriched' was not found")
 @pytest.mark.integration
 def test_freetext_query_one_param_found_in_enriched_neg():
     print('==================', sys._getframe().f_code.co_name, '================== ')

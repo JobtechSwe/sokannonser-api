@@ -79,10 +79,13 @@ swagger_filter_doc_params = {
     "few days left for application)\n"
     "updated: sort by update date (descending)\n",
     settings.STATISTICS: "Show statistics for specified fields "
-    "(available fields: %s, %s and %s)" % (
+    "(available fields: %s, %s, %s, %s, %s and %s)" % (
         taxonomy.OCCUPATION,
         taxonomy.GROUP,
-        taxonomy.FIELD),
+        taxonomy.FIELD,
+        taxonomy.COUNTRY,
+        taxonomy.MUNICIPALITY,
+        taxonomy.REGION),
     settings.STAT_LMT: "Maximum number of statistical rows per field",
 }
 
@@ -175,7 +178,8 @@ pb_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_LIMI
 pb_query.add_argument(settings.SORT, choices=list(fields.sort_options.keys()) + ['id'])
 pb_query.add_argument(settings.STATISTICS, action='append',
                       choices=[taxonomy.OCCUPATION, taxonomy.GROUP,
-                               taxonomy.FIELD])
+                               taxonomy.FIELD, taxonomy.COUNTRY,
+                               taxonomy.MUNICIPALITY, taxonomy.REGION])
 pb_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 30), required=False)
 
 taxonomy_query = reqparse.RequestParser()

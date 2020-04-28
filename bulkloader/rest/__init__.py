@@ -26,6 +26,8 @@ bulk_stream_query = reqparse.RequestParser()
 bulk_stream_query.add_argument(settings.APIKEY, location='headers', required=True)
 bulk_stream_query.add_argument(settings.DATE, type=inputs.datetime_from_iso8601,
                                required=True, default=default_time)
+bulk_stream_query.add_argument(settings.UPDATED_BEFORE_DATE, type=inputs.datetime_from_iso8601,
+                               required=False)
 
 bulk_snapshot_query = reqparse.RequestParser()
 bulk_snapshot_query.add_argument(settings.APIKEY, location='headers', required=True)

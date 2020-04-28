@@ -1,3 +1,4 @@
+import datetime
 import logging
 import json
 import time
@@ -106,11 +107,19 @@ def convert_to_timestamp(day):
 # Generator function
 def load_all(args):
     since = args.get(settings.DATE)
+    # time span, default is None
+    if args.get(settings.UPDATED_BEFORE_DATE, None):
+        before = args.get(settings.UPDATED_BEFORE_DATE)
+    else:
+        before = datetime.datetime.strptime(settings.MAX_DATE, '%Y-%m-%d %H:%M:%S')
+
     # input is not allowed by type=inputs.datetime_from_iso8601
     if since == 'yesterday':
         since = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
 
     ts = int(time.mktime(since.timetuple())) * 1000
+    bets = int(time.mktime(before.timetuple())) * 1000
+
     index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
         else settings.ES_INDEX
     log.debug("Elastic index(load_all): % s" % index)
@@ -119,7 +128,8 @@ def load_all(args):
     dsl['query']['bool']['must'] = [{
         "range": {
             "timestamp": {
-                "gte": ts
+                "gte": ts,
+                "lte": bets
             }
         }
     }]

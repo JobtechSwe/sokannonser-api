@@ -82,6 +82,12 @@ PLACE = 'place'
 
 # For Batch
 DATE = 'date'
+UPDATED_BEFORE_DATE = 'updated-before-date'
+MAX_DATE = '3000-01-01 00:00:00'
+OCCUPATION_CONCEPT_ID = 'occupation-concept-id'
+LOCATION_CONCEPT_ID = 'location-concept-id'
+OCCUPATION_LIST = ['occupation', 'occupation_field', 'occupation_group']
+LOCATION_LIST = ['region', 'city', 'country', 'municipality']
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'

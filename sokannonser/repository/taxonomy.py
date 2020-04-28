@@ -230,7 +230,7 @@ def get_term(elastic_client, taxtype, taxid):
 def get_concept_id(elastic_client, taxtype, taxid):
     taxonomy_entity = find_concept_by_legacy_ams_taxonomy_id(elastic_client,
                                                              taxtype, taxid, {})
-    return taxonomy_entity['concept_id']
+    return taxonomy_entity.get('concept_id', None)
 
 
 def get_entity(elastic_client, taxtype, taxid, not_found_response=None):

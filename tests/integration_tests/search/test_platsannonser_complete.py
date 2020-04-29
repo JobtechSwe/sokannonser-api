@@ -50,7 +50,8 @@ def test_complete_endpoint_synonyms_typeahead(query, synonyms, expect_success):
 @pytest.mark.integration
 @pytest.mark.parametrize("query, expected_suggestions", [
     ('servit', ['servicetekniker', 'servicearbete', 'service och underhåll', 'servicedesk', 'servicehandläggare',
-                'servicemedarbetare', 'serviceyrke', 'service manager', 'servicebiträde', 'serviceelektriker',
+                'servicemedarbetare', 'servicetjänster', 'serviceyrke', 'service manager', 'servicebiträde',
+                'serviceelektriker',
                 'serviceinsatser', 'servicerådgivare']),
     ('systemutvecklare angu', ['systemutvecklare angularjs']),
     ('angu', ['angularjs']),

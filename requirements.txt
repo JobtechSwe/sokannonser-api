@@ -14,6 +14,5 @@ flashtext
 elasticsearch-dsl
 Werkzeug==1.0.1
 
-Werkzeug==0.16.1
 slackclient==2.0.0
 django==3.0.4

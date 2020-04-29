@@ -20,7 +20,6 @@ def print_result_output(input, output):
         pprint(output)
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_diverse_companyname_in_text():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -32,7 +31,6 @@ def test_get_diverse_companyname_in_text():
     assert 'ikea ab' in concepts
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_companyname_ab_in_text():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -43,7 +41,6 @@ def test_get_companyname_ab_in_text():
     assert 'ikea ab' in concepts
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_companyname_ab_in_text2():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -54,7 +51,6 @@ def test_get_companyname_ab_in_text2():
     assert 'ikea ab' in concepts
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_companyname_multiple_in_text():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -65,7 +61,6 @@ def test_get_companyname_multiple_in_text():
     assert 'volvo car retail solutions ab' in concepts
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_companyname_multiple_words_in_text():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -75,7 +70,6 @@ def test_get_companyname_multiple_words_in_text():
     assert 'active clean i stockholm ab' in concepts
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_ab_companyname_in_text():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -85,7 +79,6 @@ def test_get_ab_companyname_in_text():
     assert 'ab banan-kompaniet' in concepts
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_one_companyname_in_text3():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -96,7 +89,6 @@ def test_get_one_companyname_in_text3():
     assert len(concepts) == 0
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_one_companyname_in_text4():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -107,7 +99,6 @@ def test_get_one_companyname_in_text4():
     assert len(concepts) > 0
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_one_companyname_unicode():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -118,7 +109,6 @@ def test_get_one_companyname_unicode():
     assert len(concepts) > 0
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_companyname_collides_with_skill():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -129,7 +119,6 @@ def test_get_companyname_collides_with_skill():
     assert len(concepts) == 0
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_companyname_one_part_companyname():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -140,7 +129,6 @@ def test_get_companyname_one_part_companyname():
     assert len(concepts) > 0
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_companyname_city_and_companyname():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -151,7 +139,6 @@ def test_get_companyname_city_and_companyname():
     assert len(concepts) == 0
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_get_companyname_city_and_not_companyname():
     print('============================', sys._getframe().f_code.co_name, '============================ ')

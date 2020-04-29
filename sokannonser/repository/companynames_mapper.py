@@ -22,13 +22,13 @@ class CompanynamesMapper(object):
         self._init_companynames(self.keyword_processor)
 
     def _get_partial_to_companynames_mappings(self):
-        '''
+        """
         # "ikea" --> "ikea ab"
         # "ikea ab" --> "ikea ab"
         # "Volvo Car" --> "volvo car mobility ab", "volvo car retail solutions ab"
         # "Banan-Kompaniet" --> "ab banan-kompaniet"
         :return: Mappings between partial companyname to original variants of the complete name.
-        '''
+        """
         companylist = self.load_all_companynames()
 
         companies_mappings = dict()
@@ -115,7 +115,8 @@ class CompanynamesMapper(object):
             res = elastic.search(index=es_index, body=aggs_query)
 
             for bucket in res['aggregations']['names_agg']['buckets']:
-                if i == max_size: break
+                if i == max_size:
+                    break
                 i = i + 1
                 yield bucket['key']
 
@@ -147,7 +148,7 @@ class CompanynamesMapper(object):
 
     def _init_companynames(self, keyword_processor):
         for key, term_obj_list in self._get_partial_to_companynames_mappings().items():
-            keyword_processor.add_keyword(key, (term_obj_list))
+            keyword_processor.add_keyword(key, term_obj_list)
 
     @staticmethod
     def _init_keyword_processor(keyword_processor):

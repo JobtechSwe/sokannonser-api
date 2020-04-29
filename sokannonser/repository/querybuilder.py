@@ -59,7 +59,8 @@ class QueryBuilder(object):
                                                        args.get(settings.PARTTIME_MAX)))
         must_queries.append(self._build_plats_query(args.get(taxonomy.MUNICIPALITY),
                                                     args.get(taxonomy.REGION),
-                                                    args.get(taxonomy.COUNTRY)))
+                                                    args.get(taxonomy.COUNTRY),
+                                                    args.get(settings.UNSPECIFIED_SWEDEN_WORKPLACE)))
         # Replaced by _build_plats_query
         # must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
         must_queries.append(self._build_generic_query([f.MUST_HAVE_SKILLS + "." +
@@ -118,36 +119,38 @@ class QueryBuilder(object):
 
         for stat in args.get(settings.STATISTICS) or []:
             query_dsl['aggs'][stat] = {
-                "terms": {
-                    "field": f.stats_options[stat],
-                    "size": args.get(settings.STAT_LMT) or 5
-                }
+                 "terms": {
+                     "field": f.stats_options[stat],
+                     "size": args.get(settings.STAT_LMT) or 5
+                 }
             }
         return query_dsl
 
     def filter_aggs(self, aggs, freetext):
+        #will not use in future
         fwords = freetext.split(' ') if freetext else []
         value_dicts = []
         for agg in aggs:
             if agg.startswith('complete_'):
                 value_dicts += [{"type": agg[12:], **bucket}
                                 for bucket in aggs[agg]['buckets']]
-
         filtered_aggs = []
+        value_list = []
         for kv in sorted(value_dicts, key=lambda k: k['doc_count'], reverse=True):
             found_words = kv['key'].split(' ')
             value = ' '.join([w for w in found_words if w not in fwords])
-            if kv['key'] not in fwords:
+            if kv['key'] not in fwords and value not in value_list:
                 ac_hit = {
                     "value": value,
                     "found_phrase": kv['key'],
                     "type": kv['type'],
                     "occurrences": kv['doc_count']
                 }
+                value_list.append(value)
                 filtered_aggs.append(ac_hit)
 
-        if len(filtered_aggs) > 10:
-            return filtered_aggs[0:10]
+        if len(filtered_aggs) > 50:
+            return filtered_aggs[0:50]
         return filtered_aggs
 
     def _parse_x_fields(self, x_fields):
@@ -177,8 +180,8 @@ class QueryBuilder(object):
                     bracket_positions[istart.pop()] = i
                 except IndexError:
                     pass
-        idx = text.find('hits{')+4
-        r = text[idx+1:bracket_positions[idx]]
+        idx = text.find('hits{') + 4
+        r = text[idx + 1:bracket_positions[idx]]
         return r
 
     def _bootstrap_query(self, args, x_fields):
@@ -192,8 +195,8 @@ class QueryBuilder(object):
 
         if args.pop(settings.DETAILS, '') == queries.OPTIONS_BRIEF:
             query_dsl['_source'] = [f.ID, f.HEADLINE, f.APPLICATION_DEADLINE,
-                                    f.EMPLOYMENT_TYPE+"."+f.LABEL,
-                                    f.WORKING_HOURS_TYPE+"."+f.LABEL,
+                                    f.EMPLOYMENT_TYPE + "." + f.LABEL,
+                                    f.WORKING_HOURS_TYPE + "." + f.LABEL,
                                     f.EMPLOYER_NAME,
                                     f.PUBLICATION_DATE]
 
@@ -205,7 +208,7 @@ class QueryBuilder(object):
             args.pop(settings.APIKEY)
 
         # Make sure to only serve published ads
-        offset = self._calculate_utc_offset()
+        offset = calculate_utc_offset()
         query_dsl['query'] = {
             'bool': {
                 'must': [],
@@ -242,20 +245,19 @@ class QueryBuilder(object):
         if not complete_fields:
             complete_fields = queries.QF_CHOICES.copy()
             complete_fields.remove('employer')
-
         if complete_string or args.get(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD):
             complete_string = self._rewrite_word_for_regex(complete_string)
             word_list = complete_string.split(' ')
             complete = word_list[-1]
 
             ngrams_complete = []
-            for n in list(range(len(word_list)-1)):
+            for n in list(range(len(word_list) - 1)):
                 ngrams_complete.append(' '.join(word_list[n:]))
-   
-            size = 12/len(complete_fields)
+
+            size = 60 / len(complete_fields)
 
             enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
-                settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED_TYPEAHEAD_TERMS
+                settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
 
             for field in complete_fields:
                 base_field = f.KEYWORDS_EXTRACTED \
@@ -295,11 +297,6 @@ class QueryBuilder(object):
             if char in inputstr:
                 escaped_str = inputstr.replace(char, '[%s]' % char)
         return escaped_str
-
-    def _calculate_utc_offset(self):
-        is_dst = time.daylight and time.localtime().tm_isdst > 0
-        utc_offset = - (time.altzone if is_dst else time.timezone)
-        return int(utc_offset/3600) if utc_offset > 0 else 0
 
     def _assemble_queries(self, query_dsl, additional_queries, additional_filters):
         for query in additional_queries:
@@ -384,7 +381,10 @@ class QueryBuilder(object):
             for phrase in phrases[key]:
                 if bool_type not in ft_query['bool']:
                     ft_query['bool'][bool_type] = []
-                ft_query['bool'][bool_type].append({"match_phrase": {"description.text": phrase}})
+                ft_query['bool'][bool_type].append({"multi_match":
+                                                    {"query": phrase,
+                                                     "fields": ["headline", "description.text"],
+                                                     "type": "phrase"}})
 
         return ft_query
 
@@ -461,9 +461,9 @@ class QueryBuilder(object):
                     "query": searchword,
                     "type": "cross_fields",
                     "operator": method,
-                    "fields": [f.HEADLINE+"^3", f.KEYWORDS_EXTRACTED+".employer^2",
+                    "fields": [f.HEADLINE + "^3", f.KEYWORDS_EXTRACTED + ".employer^2",
                                f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
-                               f.KEYWORDS_EXTRACTED+".location^5"]
+                               f.KEYWORDS_EXTRACTED + ".location^5"]
                 }
             }
         ]
@@ -475,7 +475,7 @@ class QueryBuilder(object):
                     "query": searchword,
                     "type": "cross_fields",
                     "operator": method,
-                    "fields": [f.HEADLINE+"."+wildcard_side, f.DESCRIPTION_TEXT+"."+wildcard_side]
+                    "fields": [f.HEADLINE + "." + wildcard_side, f.DESCRIPTION_TEXT + "." + wildcard_side]
                 }
             }
         ]
@@ -591,57 +591,57 @@ class QueryBuilder(object):
 
         yrke_term_query = [{
             "term": {
-                f.OCCUPATION+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y,
                     "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION_GROUP+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_GROUP + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION_GROUP+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_GROUP + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION_FIELD+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_FIELD + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION_FIELD+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_FIELD + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
         neg_yrke_term_query = [{
             "term": {
-                f.OCCUPATION+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION_GROUP+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_GROUP + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION_GROUP+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_GROUP + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION_FIELD+"."+f.CONCEPT_ID+".keyword": {
+                f.OCCUPATION_FIELD + "." + f.CONCEPT_ID + ".keyword": {
                     "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION_FIELD+"."+f.LEGACY_AMS_TAXONOMY_ID: {
+                f.OCCUPATION_FIELD + "." + f.LEGACY_AMS_TAXONOMY_ID: {
                     "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
 
         if yrke_term_query or neg_yrke_term_query:
@@ -655,7 +655,7 @@ class QueryBuilder(object):
             return None
 
     # Parses MUNICIPALITY and REGION
-    def _build_plats_query(self, kommunkoder, lanskoder, landskoder):
+    def _build_plats_query(self, kommunkoder, lanskoder, landskoder, unspecify):
         kommuner = []
         neg_komm = []
         lan = []
@@ -685,23 +685,13 @@ class QueryBuilder(object):
             f.WORKPLACE_ADDRESS_MUNICIPALITY_CONCEPT_ID: {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
 
-        # Change region = 90 or region = null for a short time
-        # For unspecified area
-        # After future change data struction this part will be deleted
-        if 'null' in lan:
+        # Add unspecified field, when it is true, system will return all adds with unspecified in sweden.
+        if unspecify:
             plats_term_query += [
                 {
                     "bool": {
-                        "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CODE: {"value": '199'}}},
-                        "must_not": {"exists": {"field": f.WORKPLACE_ADDRESS_REGION_CODE}},
-                        "boost": 1.0
-                    }
-                },
-            ]
-            plats_term_query += [
-                {
-                    "bool": {
-                        "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {"value": 'i46j_HmG_v64'}}},
+                        "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+                            "value": settings.SWEDEN_CONCEPT_ID}}},
                         "must_not": {"exists": {"field": f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID}},
                         "boost": 1.0
                     }
@@ -754,9 +744,7 @@ class QueryBuilder(object):
         if neg_komm_term_query or neg_lan_term_query or neg_land_term_query:
             if 'bool' not in plats_bool_query:
                 plats_bool_query['bool'] = {}
-            plats_bool_query['bool']['must_not'] = neg_komm_term_query + \
-                                                   neg_lan_term_query + \
-                                                   neg_land_term_query
+            plats_bool_query['bool']['must_not'] = neg_komm_term_query + neg_lan_term_query + neg_land_term_query
 
         return plats_bool_query
 
@@ -896,60 +884,69 @@ class QueryBuilder(object):
                 geo_bool['bool']['should'].append(geo_filter)
         return geo_bool
 
-    def create_auto_complete_suggester(self, word):
+    def create_auto_complete_suggester(self, word, args):
         """"
         parse args and create auto complete suggester
         """
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+
         fields = ['compound', ]
         search = elasticsearch_dsl.Search()
         search = search.source('suggest')
         for field in fields:
-           search = search.suggest(
-               '%s-suggest' % field,
-               word,
-               completion={
-                   'field': 'keywords.enriched_typeahead_terms.%s.suggest' % field,
-                   "skip_duplicates": True,
-                   "size": 50,
-                   "fuzzy": {
-                       "min_length": 3,
-                       "prefix_length": 0
-                   }
-               }
-           )
+            search = search.suggest(
+                '%s-suggest' % field,
+                word,
+                completion={
+                    'field': '%s.%s.suggest' % (enriched_typeahead_field, field),
+                    "skip_duplicates": True,
+                    "size": 50,
+                    "fuzzy": {
+                        "min_length": 3,
+                        "prefix_length": 0
+                    }
+                }
+            )
         return search.to_dict()
 
-    def create_phrase_suggester(self, args):
+    def create_phrase_suggester(self, input, args):
         """"
         parse args and create phrase suggester
         """
-        field = 'keywords.enriched_typeahead_terms.compound'
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+
+        field = '%s.compound' % enriched_typeahead_field
         search = elasticsearch_dsl.Search()
         search = search.source('suggest')
         search = search.suggest(
             '%s_simple_phrase' % field,
-            args,
+            input,
             phrase={
-               'field': '%s.trigram' % field,
-               'size': 10,
-               'max_errors': 2,
-               'direct_generator': [{
+                'field': '%s.trigram' % field,
+                'size': 10,
+                'max_errors': 2,
+                'direct_generator': [{
                     'field': '%s.trigram' % field,
                     'suggest_mode': 'always',
                     'min_word_length': 1
-               }, {
+                }, {
                     'field': '%s.reverse' % field,
                     'suggest_mode': 'always',
                     'pre_filter': 'reverse',
                     'post_filter': 'reverse',
                     'min_word_length': 1
-               }]
+                }]
             }
         )
         return search.to_dict()
 
-    def create_suggest_search(self, suggest):
-        field = 'keywords.enriched_typeahead_terms.compound'
+    def create_suggest_search(self, suggest, args):
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+
+        field = '%s.compound' % enriched_typeahead_field
         search = defaultdict(dict)
         query = search.setdefault('query', {})
         match = query.setdefault('match', {})
@@ -959,5 +956,49 @@ class QueryBuilder(object):
 
         return json.dumps(search)
 
+    def create_check_search_word_type_query(self, word, args):
+        """"
+            Create check search word type query
+        """
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+        search = defaultdict(dict)
+        aggs = search.setdefault('aggs', {})
+        for field in ('location', 'skill', 'occupation'):
+            aggs['search_type_%s' % field] = {
+                'terms': {
+                    'field': '%s.%s.raw' % (enriched_typeahead_field, field),
+                    'include': word
+                }
+            }
+        return json.dumps(search)
+
+    def create_suggest_extra_word_query(self, word, first_word_type, second_word_type, args):
+        """"
+           Create suggest extra word query
+        """
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+        search = defaultdict(dict)
+        aggs = search.setdefault('aggs', {})
+        first_word = aggs.setdefault('first_word', {})
+        first_word['filter'] = {
+            'term': {
+                '%s.%s.raw' % (enriched_typeahead_field, first_word_type): word,
+            }
+        }
+        first_word['aggs'] = {
+            'second_word': {
+                'terms': {
+                    'field': '%s.%s.raw' % (enriched_typeahead_field, second_word_type),
+                    'size': 6
+                }
+            }
+        }
+        return json.dumps(search)
 
 
+def calculate_utc_offset():
+    is_dst = time.daylight and time.localtime().tm_isdst > 0
+    utc_offset = - (time.altzone if is_dst else time.timezone)
+    return int(utc_offset / 3600) if utc_offset > 0 else 0

@@ -16,11 +16,10 @@ tax_stat = [[t.OCCUPATION], [t.GROUP], [t.FIELD], [t.SKILL]]
 tax_other = [[t.MUNICIPALITY], [t.REGION]]
 tax_noexist = [['  ', 'blabla', '']]
 
-
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.smoke
 @pytest.mark.integration
 @pytest.mark.parametrize("taxonomy_type", tax_stat + tax_other + tax_noexist)
-def test_get_stats_for(taxonomy_type):
+def test_get_stats_for_taxonomy_type(taxonomy_type):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     if taxonomy_type not in tax_stat:
         try:

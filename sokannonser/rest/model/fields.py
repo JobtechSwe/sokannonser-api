@@ -42,6 +42,9 @@ DRIVING_LICENCE = 'driving_license'
 OCCUPATION = 'occupation'
 OCCUPATION_GROUP = 'occupation_group'
 OCCUPATION_FIELD = 'occupation_field'
+REGION = 'region'
+COUNTRY = 'country'
+MUNICIPALITY = 'municipality'
 CONCEPT_ID = 'concept_id'
 LABEL = 'label'
 LEGACY_AMS_TAXONOMY_ID = 'legacy_ams_taxonomy_id'
@@ -73,7 +76,6 @@ SOURCE_TYPE = 'source_type'
 KEYWORDS_ENRICHED = 'keywords.enriched'
 KEYWORDS_ENRICHED_SYNONYMS = 'keywords.enriched_typeahead_terms'
 KEYWORDS_EXTRACTED = 'keywords.extracted'
-KEYWORDS_ENRICHED_TYPEAHEAD_TERMS = 'keywords.enriched_typeahead_terms'
 
 sort_options = {
     'relevance': ["_score", {PUBLICATION_DATE: "desc"}],
@@ -88,4 +90,7 @@ stats_options = {
     taxonomy.GROUP: "%s.%s.keyword" % (OCCUPATION_GROUP, LEGACY_AMS_TAXONOMY_ID),
     taxonomy.FIELD: "%s.%s.keyword" % (OCCUPATION_FIELD, LEGACY_AMS_TAXONOMY_ID),
     taxonomy.SKILL: "%s.%s.keyword" % (MUST_HAVE_SKILLS, LEGACY_AMS_TAXONOMY_ID),
+    COUNTRY: WORKPLACE_ADDRESS_COUNTRY_CODE,
+    MUNICIPALITY: WORKPLACE_ADDRESS_MUNICIPALITY_CODE,
+    REGION: WORKPLACE_ADDRESS_REGION_CODE,
 }

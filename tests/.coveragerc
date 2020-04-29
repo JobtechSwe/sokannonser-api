@@ -1,0 +1,7 @@
+[run]
+omit = tests/*
+        venv/*
+        startFlask.py
+        setup.py
+
+

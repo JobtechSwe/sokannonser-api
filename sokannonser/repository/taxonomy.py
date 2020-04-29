@@ -130,6 +130,9 @@ annons_key_to_jobtech_taxonomy_key = {
     'kommun': JobtechTaxonomy.MUNICIPALITY,
     'lan': JobtechTaxonomy.REGION,
     'land': JobtechTaxonomy.COUNTRY,
+    REGION: JobtechTaxonomy.REGION,
+    COUNTRY: JobtechTaxonomy.COUNTRY,
+    MUNICIPALITY: JobtechTaxonomy.MUNICIPALITY,
     'korkort': JobtechTaxonomy.DRIVING_LICENCE,
     'kompetens': JobtechTaxonomy.SKILL,
     SKILL: JobtechTaxonomy.SKILL,
@@ -224,6 +227,12 @@ def get_term(elastic_client, taxtype, taxid):
     return label
 
 
+def get_concept_id(elastic_client, taxtype, taxid):
+    taxonomy_entity = find_concept_by_legacy_ams_taxonomy_id(elastic_client,
+                                                             taxtype, taxid, {})
+    return taxonomy_entity.get('concept_id', None)
+
+
 def get_entity(elastic_client, taxtype, taxid, not_found_response=None):
 
     # old version doc_id = "%s-%s" % (taxtype_legend.get(taxtype, ''), taxid)
@@ -273,8 +282,7 @@ def find_concept_by_legacy_ams_taxonomy_id(elastic_client, taxonomy_type,
     return hits[0]['_source']
 
 
-def find_concepts(elastic_client, query_string=None, taxonomy_code=[], entity_type=[],
-                  offset=0, limit=10):
+def find_concepts(elastic_client, query_string=None, taxonomy_code=[], entity_type=[], offset=0, limit=10):
     query_dsl = _build_query(query_string, taxonomy_code, entity_type, offset, limit)
     log.debug("Query: %s" % json.dumps(query_dsl))
     try:

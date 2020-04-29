@@ -1,6 +1,7 @@
 from flask_restx import Api, Namespace
+from sokannonser import settings
 
-api = Api(version='1.8.1', title='Search job ads',
+api = Api(version=settings.API_VERSION, title='Search job ads',
           description='An API for searching and retrieving job ads and for finding '
           'concepts in the Jobtech Taxonomy.',
           default='sokannonser',
@@ -11,7 +12,7 @@ ns_platsannons = Namespace('Open AF-job ads',
                            'job ads. Used for online operations.')
 
 ns_valuestore = Namespace('Jobtech Taxonomy',
-                          description='DEPRECATED, use https://taxonomy.api.jobtechdev.se/v1/taxonomy/swagger-ui/index.html instead')
+                          description=settings.TAX_DESCRIPTION)
 
 api.add_namespace(ns_platsannons, '/')
 api.add_namespace(ns_valuestore, '/taxonomy')

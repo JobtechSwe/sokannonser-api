@@ -40,7 +40,7 @@ swagger_doc_params = {
     taxonomy.FIELD: "One or more occupational area codes according to the taxonomy",
     taxonomy.SKILL: "One or more competency codes according to the taxonomy",
     taxonomy.LANGUAGE: "One or more language codes according to the taxonomy",
-    taxonomy.DRIVING_LICENCE_REQUIRED: "Set to true if driving license required"
+    taxonomy.DRIVING_LICENCE_REQUIRED: "Set to true if driving licence required"
     ", false if not",
     taxonomy.DRIVING_LICENCE: "One or more types of demanded driving licenses, code "
     "according to the taxonomy",
@@ -57,6 +57,7 @@ swagger_doc_params = {
     "the taxonomy",
     taxonomy.REGION: "One or more region codes, code according to the taxonomy",
     taxonomy.COUNTRY: "One or more country codes, code according to the taxonomy",
+    settings.UNSPECIFIED_SWEDEN_WORKPLACE: "True will return all unspecified ads in Sweden",
     settings.POSITION: "Latitude and longitude in the format \"59.329,18.068\" "
     "(latitude,longitude)",
     settings.POSITION_RADIUS: "Radius from the specified " + settings.POSITION +
@@ -78,10 +79,13 @@ swagger_filter_doc_params = {
     "few days left for application)\n"
     "updated: sort by update date (descending)\n",
     settings.STATISTICS: "Show statistics for specified fields "
-    "(available fields: %s, %s and %s)" % (
+    "(available fields: %s, %s, %s, %s, %s and %s)" % (
         taxonomy.OCCUPATION,
         taxonomy.GROUP,
-        taxonomy.FIELD),
+        taxonomy.FIELD,
+        taxonomy.COUNTRY,
+        taxonomy.MUNICIPALITY,
+        taxonomy.REGION),
     settings.STAT_LMT: "Maximum number of statistical rows per field",
 }
 
@@ -129,6 +133,7 @@ base_annons_query.add_argument(settings.EXPERIENCE_REQUIRED,
 base_annons_query.add_argument(taxonomy.MUNICIPALITY, action='append')
 base_annons_query.add_argument(taxonomy.REGION, action='append')
 base_annons_query.add_argument(taxonomy.COUNTRY, action='append')
+base_annons_query.add_argument(settings.UNSPECIFIED_SWEDEN_WORKPLACE, type=inputs.boolean)
 # Matches(lat,long) +90.0,-127.554334; 45,180; -90,-180; -90.000,-180.0000; +90,+180
 # r for raw, PEP8
 position_regex = r'^[-+]?([1-8]?\d(\.\d*)?|90(\.0*)?),' \
@@ -143,6 +148,8 @@ base_annons_query.add_argument(settings.FREETEXT_FIELDS, action='append',
                                choices=QF_CHOICES)
 
 annons_complete_query = base_annons_query.copy()
+annons_complete_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_COMPLETE_LIMIT),
+                                   default=10)
 annons_complete_query.add_argument(settings.CONTEXTUAL_TYPEAHEAD, type=inputs.boolean,
                                    default=True)
 annons_complete_query.add_argument(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD,
@@ -152,6 +159,10 @@ annons_complete_query.add_argument(settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD
                                    type=inputs.boolean, location='headers',
                                    required=False)
 annons_complete_query.add_argument(settings.X_FEATURE_SPELLCHECK_TYPEAHEAD,
+                                   type=inputs.boolean, location='headers',
+                                   required=False)
+
+annons_complete_query.add_argument(settings.X_FEATURE_SUGGEST_EXTRA_WORD,
                                    type=inputs.boolean, location='headers',
                                    required=False)
 
@@ -167,7 +178,8 @@ pb_query.add_argument(settings.LIMIT, type=inputs.int_range(0, settings.MAX_LIMI
 pb_query.add_argument(settings.SORT, choices=list(fields.sort_options.keys()) + ['id'])
 pb_query.add_argument(settings.STATISTICS, action='append',
                       choices=[taxonomy.OCCUPATION, taxonomy.GROUP,
-                               taxonomy.FIELD])
+                               taxonomy.FIELD, taxonomy.COUNTRY,
+                               taxonomy.MUNICIPALITY, taxonomy.REGION])
 pb_query.add_argument(settings.STAT_LMT, type=inputs.int_range(0, 30), required=False)
 
 taxonomy_query = reqparse.RequestParser()

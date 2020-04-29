@@ -26,11 +26,14 @@ def run_test_cases(file_name, channel1, channel2):
             q = line.rstrip("\n")
             channel1_result = get_search_result(q, url[channel1])
             channel2_result = get_search_result(q, url[channel2])
-
+            different_count = 0
+            sum_count = 0
+            sum_count += 1
             # this only use freetext to check hits
             freetext_hits = check_freetext_hits(channel1_result, channel2_result)
             if freetext_hits:
                 freetext_hits_result.append(freetext_hits+[q, channel1, channel2])
+                different_count += 1
 
             # this only use freetext to check first hit
             freetext_first_hit = check_freetext_first_hits(channel1_result, channel2_result)
@@ -44,6 +47,7 @@ def run_test_cases(file_name, channel1, channel2):
 
     # send slack message
     send_freetext_hits_result_slack_message(freetext_hits_result)
+    send_freetext_hit_result_utility_slack_message(different_count, sum_count)
     send_freetext_first_hit_result_slack_message(freetext_first_hit_result)
     send_freetext_first_ten_hits_result_slack_message(freetext_first_ten_hits_result)
 
@@ -145,6 +149,16 @@ def send_freetext_hits_result_slack_message(result):
         ).send()
 
 
+def send_freetext_hit_result_utility_slack_message(difference, all_count):
+    SlackMessage(channel=settings.TEST_RESULT_CHANNEL,
+                 attachments=[SlackAttachment(
+                     title="Freetext hits difference number is `{difference}` and utility is `{utility}`%".format(
+                         difference=difference,
+                         utility=round(difference/all_count*100, 2)
+                     ),
+                 )]).send()
+
+
 def send_freetext_first_hit_result_slack_message(result):
     SlackMessage(channel=settings.TEST_RESULT_CHANNEL,
                  attachments=[SlackAttachment(
@@ -175,8 +189,6 @@ def send_freetext_first_ten_hits_result_slack_message(result):
                  )]).send()
 
     for channel1_first_ten_hit, channel2_first_ten_hit, q, channel1, channel2 in result:
-        print(channel1_first_ten_hit)
-        print(channel2_first_ten_hit)
         SlackMessage(
             channel=settings.TEST_RESULT_CHANNEL,
             attachments=[

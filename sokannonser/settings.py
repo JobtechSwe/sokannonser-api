@@ -1,4 +1,5 @@
 import os
+import datetime
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "localhost")
@@ -101,7 +102,8 @@ SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
 # for tests:
 NUMBER_OF_ADS = 1072
+DAWN_OF_TIME = '1970-01-01T00:00:01'
 test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
-
+current_time_stamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 API_VERSION = '1.13.0'

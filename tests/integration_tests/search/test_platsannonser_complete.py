@@ -51,8 +51,7 @@ def test_complete_endpoint_synonyms_typeahead(query, synonyms, expect_success):
 @pytest.mark.parametrize("query, expected_suggestions", [
     ('servit', ['servicetekniker', 'servicearbete', 'service och underhåll', 'servicedesk', 'servicehandläggare',
                 'servicemedarbetare', 'servicetjänster', 'serviceyrke', 'service manager', 'servicebiträde',
-                'serviceelektriker',
-                'serviceinsatser', 'servicerådgivare']),
+                'serviceelektriker', 'serviceinsatser', 'servicerådgivare']),
     ('systemutvecklare angu', ['systemutvecklare angularjs']),
     ('angu', ['angularjs']),
     ('pyth', ['python']),
@@ -97,8 +96,9 @@ def test_complete_endpoint_with_spellcheck_typeahead(query, expected_suggestions
         assert 'typeahead' in json_response
         actual_suggestions = [suggest.get('value') for suggest in json_response.get('typeahead')]
         assert len(actual_suggestions) > 0, f"no suggested values as auto-complete for '{query}'"
-        assert len(actual_suggestions) == len(
-            expected_suggestions), f"\nQuery: {query}\nExpected suggestions: {expected_suggestions}\nActual suggestions: {actual_suggestions} "
+        error_msg = f"\nQuery: {query}\nExpected suggestions: ({len(expected_suggestions)}) {expected_suggestions}\nActual suggestions: ({len(actual_suggestions)}){actual_suggestions} "
+
+        assert len(actual_suggestions) == len(expected_suggestions), error_msg
         for s in expected_suggestions:
             assert s in actual_suggestions, f"Did not find {s} in {actual_suggestions} "
 

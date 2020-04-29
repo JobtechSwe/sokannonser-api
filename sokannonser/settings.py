@@ -107,3 +107,21 @@ test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
 current_time_stamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 API_VERSION = '1.13.0'
+
+
+# Slack integration
+SLACK_TOKEN = 'SLACK'
+SLACK_CHANNEL = 'test-result'
+SLACK_USERNAME = 'lina-test'
+SLACK_ENABLED = True
+SLACK_REDIRECT_CHANNEL: str = None
+PRINT_SLACK_MESSAGE = False
+SLACK_SERVER_STATISTICS = False
+SLACK_DEFAULT_TEMPLATE = 'slack/base_message.slack'
+SLACK_STORE_MESSAGE = False
+TEST_RESULT_CHANNEL = 'test-result'
+
+# URL
+URL_DEV = 'https://dev-jobsearch.test.services.jtech.se/'
+URL_STAGE = 'https://staging-jobsearch.test.services.jtech.se/'
+URL_PROD = 'https://jobsearch.api.jobtechdev.se/'

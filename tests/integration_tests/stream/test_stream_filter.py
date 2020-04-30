@@ -359,7 +359,7 @@ def test_filter_only_on_date(session, url, date, expected_number_of_hits):
 ])
 def test_filter_on_date_interval(session, url, from_date, to_date, expected_number_of_hits):
     """
-    Test basic stream with filtering on date
+    Test stream with filtering on date interval. 
     """
     params = {'date': from_date, UPDATED_BEFORE_DATE: to_date}
     get_stream_check_number_of_results(session, url, expected_number_of_hits, params)

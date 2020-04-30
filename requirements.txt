@@ -1,19 +1,16 @@
 git+https://github.com/JobtechSwe/jobtech-common.git
-elasticsearch
-flask
-flask-restx
-flask-cors
-requests
-certifi
-python-dateutil
-pytest
-pytest-cov
-# on 4xx shows correct transaction.result, not 5xx
-elastic-apm[flask]==5.2.3
-flashtext
-elasticsearch-dsl
-Werkzeug==1.0.1
-
-#slackclient==2.0.0
-pycares==2.4.0
-slackclient
+elasticsearch~=7.6.0
+elasticsearch-dsl~=7.1.0
+elastic-apm[flask]==5.2.3 # on 4xx shows correct transaction.result, not 5xx
+flask~=1.1.2
+flask-restx~=0.2.0
+flask-cors~=3.0.8
+Werkzeug~=1.0.1
+requests~=2.23.0
+certifi~=2020.4.5.1
+python-dateutil~=2.8.1
+pytest~=5.4.1
+pytest-cov~=2.8.1
+flashtext~=2.7
+pycares==2.4.0  # need to be this older version for slackclient to work
+slackclient~=2.5.0

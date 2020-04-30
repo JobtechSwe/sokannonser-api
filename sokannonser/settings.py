@@ -78,9 +78,6 @@ MIN_RELEVANCE = 'relevance-threshold'
 SHOW_COUNT = 'show-count'
 TAX_DESCRIPTION = 'DEPRECATED, use https://taxonomy.api.jobtechdev.se/v1/taxonomy/swagger-ui/index.html instead'
 
-# For auranest
-PLACE = 'place'
-
 # For Batch
 DATE = 'date'
 UPDATED_BEFORE_DATE = 'updated-before-date'
@@ -106,8 +103,6 @@ DAWN_OF_TIME = '1970-01-01T00:00:01'
 test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
 current_time_stamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-API_VERSION = '1.13.0'
-
 
 # Slack integration
 SLACK_TOKEN = 'SLACK'
@@ -125,3 +120,5 @@ TEST_RESULT_CHANNEL = 'test-result'
 URL_DEV = 'https://dev-jobsearch.test.services.jtech.se/'
 URL_STAGE = 'https://staging-jobsearch.test.services.jtech.se/'
 URL_PROD = 'https://jobsearch.api.jobtechdev.se/'
+
+API_VERSION = '1.13.0'

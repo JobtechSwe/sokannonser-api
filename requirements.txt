@@ -14,4 +14,4 @@ flashtext
 elasticsearch-dsl
 Werkzeug==1.0.1
 
-slackclient==2.0.0
+#slackclient==2.0.0

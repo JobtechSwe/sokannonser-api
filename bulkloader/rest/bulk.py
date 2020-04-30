@@ -51,7 +51,9 @@ class BulkLoad(Resource):
         params={
             settings.DATE: "Stream ads updated since datetime. "
             "Accepts datetime as YYYY-MM-DDTHH:MM:SS, "
-            "for example %s. Rate limit is one request per minute." % example_date
+            "for example %s. Rate limit is one request per minute." % example_date,
+            settings.UPDATED_BEFORE_DATE: "Stream ads updated before datetime. Optional if you want to set a custom time span. "
+                                          "Defaults to now if not set. Accepts datetime as YYYY-MM-DDTHH:MM:SS"
         },
         responses={
             200: 'OK',

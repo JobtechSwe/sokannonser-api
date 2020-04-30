@@ -15,3 +15,5 @@ elasticsearch-dsl
 Werkzeug==1.0.1
 
 #slackclient==2.0.0
+pycares==2.4.0
+slackclient

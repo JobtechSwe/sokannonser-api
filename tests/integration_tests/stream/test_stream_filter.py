@@ -276,6 +276,31 @@ def test_filter_with_date_and_occupation_and_two_locations(session, url, date, w
     get_stream_check_number_of_results(session, url, expected_number_of_hits, params)
 
 
+@pytest.mark.parametrize('date, work_1, work_2, geo_1, geo_2, expected_number_of_hits', [
+    (DAWN_OF_TIME, work.databasutvecklare, work.arbetsterapeut, geo.arboga, geo.falun, 0),
+    (DAWN_OF_TIME, work.databasutvecklare, work.sjukskoterska__grundutbildad, geo.arboga, geo.falun, 2),
+    (DAWN_OF_TIME, group.mjukvaru__och_systemutvecklare_m_fl_, work.arbetsterapeut, geo.arboga, geo.stockholms_lan, 24),
+    (DAWN_OF_TIME, work.farmaceut_apotekare, group.apotekare, geo.dalarnas_lan, geo.hallands_lan, 0),
+    (DAWN_OF_TIME, work.sjukskoterska__grundutbildad, group.apotekare, geo.dalarnas_lan, geo.linkoping, 4),
+    (DAWN_OF_TIME, work.barnsjukskoterska, group.apotekare, geo.malta, geo.sverige, 5),
+    ('2020-02-01T00:00:01', work.eltekniker, field.kultur__media__design, geo.schweiz, geo.stockholm, 2),
+    ('2020-02-01T00:00:01', work.butikssaljare__fackhandel, field.naturvetenskapligt_arbete, geo.schweiz,
+     geo.stockholms_lan, 4),
+    ('2020-02-01T00:00:01', group.gymnasielarare, field.bygg_och_anlaggning, geo.schweiz, geo.norge, 0),
+    ('2020-02-01T00:00:01', group.grundutbildade_sjukskoterskor, field.bygg_och_anlaggning, geo.schweiz, geo.norge, 0),
+    ('2020-02-01T00:00:01', group.grundutbildade_sjukskoterskor, field.halso__och_sjukvard, geo.schweiz, geo.norge, 0),
+    (DAWN_OF_TIME, work.bygg__och_anlaggningsforare, group.mjukvaru__och_systemutvecklare_m_fl_, geo.dalarnas_lan,
+     geo.schweiz, 1),
+    ('2020-02-01T00:00:01', field.halso__och_sjukvard, work.bussforare_busschauffor, geo.schweiz, geo.norge, 1)])
+def test_filter_with_date_and_two_occupations_and_two_locations(session, url, date, work_1, work_2, geo_1, geo_2,
+                                                                expected_number_of_hits):
+    """
+    should return results based on date AND (occupation 1 OR occupation 2) AND (location_1 OR location_2)
+    """
+    params = {'date': date, OCCUPATION_CONCEPT_ID: [work_1, work_2], LOCATION_CONCEPT_ID: [geo_1, geo_2]}
+    get_stream_check_number_of_results(session, url, expected_number_of_hits, params)
+
+
 @pytest.mark.parametrize('work, expected_number_of_hits', [
     (group.mjukvaru__och_systemutvecklare_m_fl_, 57),
     (group.mjukvaru__och_systemutvecklare_m_fl_.lower(), 0)])

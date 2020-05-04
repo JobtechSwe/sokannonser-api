@@ -157,7 +157,6 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
         log.info("QUERY: %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         log.debug("Elastic results after %d milliseconds." % (int(time.time() * 1000) - start_time))
-        log.info(f"Query DSL: {query_dsl}")
     except exceptions.ConnectionError as e:
         log.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')

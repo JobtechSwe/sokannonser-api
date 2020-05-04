@@ -1,6 +1,6 @@
 import pytest
 import requests
-from tests.integration_tests.test_resources.stream import get_stream_expect_error
+from tests.integration_tests.test_resources.stream import get_zip_expect_connection_refused_error_or_not_found
 
 
 @pytest.mark.smoke
@@ -11,5 +11,4 @@ def test_zip_endpoint_expect_not_found_response(session, url):
     when trying to access the /zip endpoint
     This test will detect if the endpoint is mistakenly activated
     """
-    get_stream_expect_error(session, url, path='/zip', params={},
-                            expected_http_code=requests.codes.not_found)
+    get_zip_expect_connection_refused_error_or_not_found(session, url)

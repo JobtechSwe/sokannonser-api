@@ -118,7 +118,8 @@ def load_all(args):
         since = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
 
     ts = int(time.mktime(since.timetuple())) * 1000
-    bets = int(time.mktime(before.timetuple())) * 1000
+    # add 1 sec to find ad (ms truncation problem)
+    bets = int(time.mktime(before.timetuple())+1) * 1000
 
     index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
         else settings.ES_INDEX

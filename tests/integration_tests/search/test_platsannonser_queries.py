@@ -38,6 +38,29 @@ def test_freetext_query_one_param():
         assert int(hits_total) > 0, f"no hits for query '{query}'"
 
 
+@pytest.mark.smoke
+@pytest.mark.integration
+@pytest.mark.parametrize("query, expected_number_of_hits, identifier", [
+    ('"gymnasielärare"', 5, 'a'),
+    ("'gymnasielärare'", 4, 'b'),
+    ("\"gymnasielärare\"", 5, 'c'),
+    ("\'gymnasielärare\'", 4, 'd'),
+    ("""gymnasielärare""", 18, 'e'),
+    ('''gymnasielärare''', 18, 'f'),
+    ('gymnasielärare', 18, 'g'),
+    ("gymnasielärare""", 18, 'h'),
+])
+def test_query_with_different_quotes(query, expected_number_of_hits, identifier):
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    app.testing = True
+    with app.test_client() as testclient:
+        result = testclient.get('/search', headers=headers, data={'q': query, 'limit': '0'})
+        json_response = check_response_return_json(result)
+        hits_total = json_response['total']['value']
+        assert int(hits_total) == expected_number_of_hits, f"wrong number of hits for query '{query}'"
+        print(f"{hits_total} number of hits for query {query} with identifier: {identifier}")
+
+
 # Todo: different queries
 @pytest.mark.integration
 @pytest.mark.parametrize("minimum_relevance, expect_to_get_results",
@@ -55,7 +78,8 @@ def test_min_relevance(minimum_relevance, expect_to_get_results):
     app.testing = True
     with app.test_client() as testclient:
         query = 'sjuksköterska grundutbildad'
-        result = testclient.get('/search', headers=headers, data={'q': query, search_settings.MIN_RELEVANCE: minimum_relevance})
+        result = testclient.get('/search', headers=headers,
+                                data={'q': query, search_settings.MIN_RELEVANCE: minimum_relevance})
         json_response = check_response_return_json(result)
         hits_total = json_response['total']['value']
         if expect_to_get_results:

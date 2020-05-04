@@ -78,6 +78,9 @@ class SnapshotLoad(Resource):
     method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
 
     @ns_bulk.doc(
+        description="Download all the ads currently published in Platsbanken. "
+                    "The intended usage for this endpoint is to make an initial copy of the job ad dataset "
+                    "and then use the stream endpoint to keep it up to date",
         responses={
             200: 'OK',
             401: 'Invalid API-key',

@@ -7,6 +7,7 @@ from sokannonser.settings import headers
 @pytest.mark.smoke
 @pytest.mark.integration
 @pytest.mark.parametrize("limit, stats_limit, expected_number_of_hits", [
+    (10, 0, 10),
     (10, 10, 10),
     (10, 15, 10),
     (15, 15, 15),

@@ -410,6 +410,21 @@ def test_rewrite_querystring():
 
 
 @pytest.mark.unit
+@pytest.mark.parametrize("querystring, expected, test_id", [
+    ('"gymnasielärare"', ({"phrases": ['gymnasielärare'], "phrases_must": [], "phrases_must_not": []}, ''), 'a'),
+    ("'gymnasielärare'", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, "'gymnasielärare'"), 'b'),
+    ("\"gymnasielärare\"", ({"phrases": ['gymnasielärare'], "phrases_must": [], "phrases_must_not": []}, ''), 'c'),
+    ("""gymnasielärare""", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'd'),
+    ('''gymnasielärare''', ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'e'),
+    ('gymnasielärare', ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'f'),
+    ("gymnasielärare", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'g')
+])
+def test_extract_querystring_different_quotes(querystring, expected, test_id):
+    actual_result = pbquery.extract_quoted_phrases(querystring)
+    assert expected == actual_result, f"test {test_id} - expected {expected} but got {actual_result}"
+
+
+@pytest.mark.unit
 @pytest.mark.parametrize("querystring, expected", [
     ("python \"grym kodare\"", ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": []}, "python")),
     ("java \"malmö stad\"", ({"phrases": ["malmö stad"], "phrases_must": [], "phrases_must_not": []}, "java")),

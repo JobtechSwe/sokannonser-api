@@ -1,14 +1,21 @@
 import pytest
+import urllib3
 import requests
-from tests.integration_tests.test_resources.stream import get_zip_expect_connection_refused_error_or_not_found
 
 
 @pytest.mark.smoke
 @pytest.mark.integration
 def test_zip_endpoint_expect_not_found_response(session, url):
     """
-    test that a 'not found' response (http 404) is returned
-    when trying to access the /zip endpoint
     This test will detect if the endpoint is mistakenly activated
+
+    test that a 'not found' response (http 404) is returned
+    when trying to access the /zip endpoint or that the test can't connect at all.
+
     """
-    get_zip_expect_connection_refused_error_or_not_found(session, url)
+    try:
+        r = session.get(f"{url}/zip")
+    except (IOError, urllib3.exceptions.HTTPError):
+        pass  # not being able to connect to the endpoint is fine
+    else:  # received an http response, check that it's '404 not found'
+        assert r.status_code == requests.codes.not_found

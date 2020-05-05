@@ -410,31 +410,44 @@ def test_rewrite_querystring():
 
 
 @pytest.mark.unit
-@pytest.mark.parametrize("querystring, expected, test_id", [
-    ('"gymnasielärare"', ({"phrases": ['gymnasielärare'], "phrases_must": [], "phrases_must_not": []}, ''), 'a'),
-    ("'gymnasielärare'", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, "'gymnasielärare'"), 'b'),
-    ("\"gymnasielärare\"", ({"phrases": ['gymnasielärare'], "phrases_must": [], "phrases_must_not": []}, ''), 'c'),
-    ("""gymnasielärare""", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'd'),
-    ('''gymnasielärare''', ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'e'),
-    ('gymnasielärare', ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'f'),
-    ("gymnasielärare", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'g'),
-    ("gymnasielärare\"", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare""'), 'h'),
-    ("\"gymnasielärare", ({'phrases': ['gymnasielärare'], 'phrases_must': [], 'phrases_must_not': []}, ''), 'i'),
-    ("gymnasielärare\'", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, "gymnasielärare'"), 'j'),
-    ("\'gymnasielärare", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, "'gymnasielärare"), 'k'),
-])
-def test_extract_querystring_different_quotes(querystring, expected, test_id):
-    actual_result = pbquery.extract_quoted_phrases(querystring)
-    print(actual_result)
+@pytest.mark.parametrize("querystring, expected_phrase, expected_returned_query, test_id", [
+    ('"gymnasielärare"', ['gymnasielärare'], '', 'a'),
+    ("'gymnasielärare'", [], "'gymnasielärare'", 'b'),
+    ("\"gymnasielärare\"", ['gymnasielärare'], '', 'c'),
+    ("""gymnasielärare""", [], 'gymnasielärare', 'd'),
+    ('''gymnasielärare''', [], 'gymnasielärare', 'e'),
+    ("gymnasielärare\"", [], 'gymnasielärare""', 'f'),
+    ("\"gymnasielärare", ['gymnasielärare'], '', 'g'),
+    ("gymnasielärare\'", [], "gymnasielärare'", 'h'),
+    ("\'gymnasielärare", [], "'gymnasielärare", 'i'),
+    (r"""gymnasielärare""", [], 'gymnasielärare', 'j'),
+    (r'''gymnasielärare''', [], 'gymnasielärare', 'k'),
+    ("gymnasielärare lärare", [], 'gymnasielärare lärare', 'l'),
+    ('''"gymnasielärare" "lärare"''', ['gymnasielärare', 'lärare'], '', 'm'),
+    ('''"gymnasielärare"''', ['gymnasielärare'], '', 'n'),
+    ("""'gymnasielärare'""", [], "'gymnasielärare'", 'o'),
 
+    # "normal" queries
+    ("gymnasielärare", [], 'gymnasielärare', 'x'),
+    ('gymnasielärare', [], 'gymnasielärare', 'y'),
+])
+def test_extract_querystring_different_quotes(querystring, expected_phrase, expected_returned_query, test_id):
+    """
+    Test behavior of querybuilder.extract_quoted_phrases
+    when sending strings with different types of quotes
+
+    This documents the current behavior
+    """
+    actual_result = pbquery.extract_quoted_phrases(querystring)
+    # no plus or minus used in this test, so these fields must be empty
     assert actual_result[0]['phrases_must'] == []
     assert actual_result[0]['phrases_must_not'] == []
 
-    # assert actual_result[0]['phrases'][0] == 'gymnasielärare'
-    # assert actual_result[1] == 'gymnasielärare'
+    actual_phrases = actual_result[0]['phrases']
+    assert actual_phrases == expected_phrase, f"got {actual_phrases} but expected {expected_phrase}"
 
-    assert expected == actual_result, f"test {test_id} - expected {expected} but got {actual_result}"
-
+    actual_returned_query = actual_result[1]
+    assert actual_returned_query == expected_returned_query, f"got {actual_returned_query} but expected {expected_returned_query}"
 
 
 @pytest.mark.unit
@@ -462,7 +475,6 @@ def test_extract_querystring_phrases(querystring, expected):
 ])
 def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expected):
     assert expected == pbquery.extract_quoted_phrases(querystring)
-
 
 
 @pytest.mark.unit

@@ -417,11 +417,24 @@ def test_rewrite_querystring():
     ("""gymnasielärare""", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'd'),
     ('''gymnasielärare''', ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'e'),
     ('gymnasielärare', ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'f'),
-    ("gymnasielärare", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'g')
+    ("gymnasielärare", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare'), 'g'),
+    ("gymnasielärare\"", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'gymnasielärare""'), 'h'),
+    ("\"gymnasielärare", ({'phrases': ['gymnasielärare'], 'phrases_must': [], 'phrases_must_not': []}, ''), 'i'),
+    ("gymnasielärare\'", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, "gymnasielärare'"), 'j'),
+    ("\'gymnasielärare", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, "'gymnasielärare"), 'k'),
 ])
 def test_extract_querystring_different_quotes(querystring, expected, test_id):
     actual_result = pbquery.extract_quoted_phrases(querystring)
+    print(actual_result)
+
+    assert actual_result[0]['phrases_must'] == []
+    assert actual_result[0]['phrases_must_not'] == []
+
+    # assert actual_result[0]['phrases'][0] == 'gymnasielärare'
+    # assert actual_result[1] == 'gymnasielärare'
+
     assert expected == actual_result, f"test {test_id} - expected {expected} but got {actual_result}"
+
 
 
 @pytest.mark.unit

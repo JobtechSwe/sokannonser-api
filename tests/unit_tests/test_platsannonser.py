@@ -411,25 +411,33 @@ def test_rewrite_querystring():
 
 @pytest.mark.unit
 @pytest.mark.parametrize("querystring, expected_phrase, expected_returned_query, test_id", [
-    ('"gymnasielärare"', ['gymnasielärare'], '', 'a'),
-    ("'gymnasielärare'", [], "'gymnasielärare'", 'b'),
-    ("\"gymnasielärare\"", ['gymnasielärare'], '', 'c'),
-    ("""gymnasielärare""", [], 'gymnasielärare', 'd'),
-    ('''gymnasielärare''', [], 'gymnasielärare', 'e'),
-    ("gymnasielärare\"", [], 'gymnasielärare""', 'f'),
-    ("\"gymnasielärare", ['gymnasielärare'], '', 'g'),
-    ("gymnasielärare\'", [], "gymnasielärare'", 'h'),
-    ("\'gymnasielärare", [], "'gymnasielärare", 'i'),
-    (r"""gymnasielärare""", [], 'gymnasielärare', 'j'),
-    (r'''gymnasielärare''', [], 'gymnasielärare', 'k'),
-    ("gymnasielärare lärare", [], 'gymnasielärare lärare', 'l'),
-    ('''"gymnasielärare" "lärare"''', ['gymnasielärare', 'lärare'], '', 'm'),
-    ('''"gymnasielärare"''', ['gymnasielärare'], '', 'n'),
-    ("""'gymnasielärare'""", [], "'gymnasielärare'", 'o'),
+    # With these quotes, the query will be returned with some quote modification
+    # the 'matches' field will be empty
+    ("'gymnasielärare'", [], "'gymnasielärare'", 'a'),
+    ("""gymnasielärare""", [], 'gymnasielärare', 'b'),
+    ('''gymnasielärare''', [], 'gymnasielärare', 'c'),
+    ("gymnasielärare\"", [], 'gymnasielärare""', 'd'),
+    ("gymnasielärare\'", [], "gymnasielärare'", 'e'),
+    ("\'gymnasielärare", [], "'gymnasielärare", 'f'),
+    (r"""gymnasielärare""", [], 'gymnasielärare', 'g'),
+    (r'''gymnasielärare''', [], 'gymnasielärare', 'h'),
+    ("gymnasielärare lärare", [], 'gymnasielärare lärare', 'i'),
+    ("""'gymnasielärare'""", [], "'gymnasielärare'", 'j'),
 
-    # "normal" queries
+    # with these quotes, the 'phrases' field has data quoted with single quotes
+    # and the query is not returned
+    ('''"gymnasielärare" "lärare"''', ['gymnasielärare', 'lärare'], '', 'aa'),
+    ('''"gymnasielärare lärare"''', ['gymnasielärare lärare'], '', 'ab'),
+    ('"gymnasielärare"', ['gymnasielärare'], '', 'ac'),
+    ("\"gymnasielärare\"", ['gymnasielärare'], '', 'ad'),
+    ("\"gymnasielärare", ['gymnasielärare'], '', 'ae'),
+    ("\"gymnasielärare", ['gymnasielärare'], '', 'af'),
+    ('''"gymnasielärare"''', ['gymnasielärare'], '', 'ag'),
+
+    # "normal" quotes, 'phrases' field empty, query returned
     ("gymnasielärare", [], 'gymnasielärare', 'x'),
     ('gymnasielärare', [], 'gymnasielärare', 'y'),
+    ('python', [], 'python', 'z'),
 ])
 def test_extract_querystring_different_quotes(querystring, expected_phrase, expected_returned_query, test_id):
     """
@@ -501,7 +509,8 @@ def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expecte
      {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
 ])
 def test_freetext_bool_structure(querystring, expected):
-    result = pbquery._build_freetext_query(querystring, None, "and", False)
+    result = pbquery._build_freetext_query(querystring, queryfields=None, freetext_bool_method="and",
+                                           disable_smart_freetext=False)
     assert _assert_json_structure(result, expected)
 
 

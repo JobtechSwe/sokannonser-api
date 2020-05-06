@@ -118,7 +118,8 @@ def load_all(args):
         since = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
 
     ts = int(time.mktime(since.timetuple())) * 1000
-    bets = int(time.mktime(before.timetuple())) * 1000
+    # add 1 sec to find ad (ms truncation problem)
+    bets = int(time.mktime(before.timetuple())+1) * 1000
 
     index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
         else settings.ES_INDEX
@@ -150,6 +151,19 @@ def load_all(args):
         counter += 1
     log.debug("Delivered %d ads as stream" % counter)
     yield ']'
+
+
+def add_filter_query(dsl, items, concept_ids):
+    # add occupation or location filter query
+    should_query = []
+    for concept_id in concept_ids:
+        if concept_id:
+            for item in items:
+                should_query.append({"term": {
+                                        item: concept_id
+                                    }})
+    dsl['query']['bool']['filter'].append({"bool": {"should": should_query}})
+    return dsl
 
 
 @marshaller.marshal_with(job_ad)

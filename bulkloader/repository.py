@@ -165,7 +165,6 @@ def load_all(args):
 
 def add_filter_query(dsl, items, concept_ids):
     # add occupation or location filter query
-
     should_query = []
     for concept_id in concept_ids:
         if concept_id:

@@ -11,6 +11,7 @@ certifi~=2020.4.5.1
 python-dateutil~=2.8.1
 pytest~=5.4.1
 pytest-cov~=2.8.1
+pytest-html~=2.1.1
 flashtext~=2.7
 pycares==2.4.0  # need to be this older version for slackclient to work
 slackclient~=2.5.0

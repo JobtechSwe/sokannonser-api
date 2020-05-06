@@ -209,7 +209,7 @@ def format_removed_ad(ad_data):
         country = None
 
     return {
-        'id': ad_data.get('id'),
+        'id': float(ad_data.get('id')),
         'removed': ad_data.get('removed'),
         'removed_date': ad_data.get('removed_date'),
         'occupation': occupation,

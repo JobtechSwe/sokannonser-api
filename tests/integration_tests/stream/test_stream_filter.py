@@ -7,7 +7,7 @@ import tests.integration_tests.test_resources.concept_ids.concept_ids_geo as geo
 import tests.integration_tests.test_resources.concept_ids.occupation as work
 import tests.integration_tests.test_resources.concept_ids.occupation_group as group
 import tests.integration_tests.test_resources.concept_ids.occupation_field as field
-from tests.integration_tests.test_resources.stream import get_stream_check_number_of_results, get_stream_expect_error
+from tests.integration_tests.test_resources.helper import get_stream_check_number_of_results, get_stream_expect_error
 
 
 @pytest.mark.parametrize('date, work, expected_number_of_hits', [

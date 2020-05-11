@@ -1,5 +1,12 @@
 Changelog Application Jobsearch
 ===============================
+# 1.13.1
+* Add snapshot endpoint to Jobstream
+* Add locations in the stats in Jobsearch
+* Add time span to Jobstream
+* Fix removed ads' ID type problem
+* Add test cases
+
 # 1.13.0
 * Add snapshot endpoint to Jobstream
 # 1.12.1

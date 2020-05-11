@@ -107,9 +107,6 @@ auranest_stats_options = {
 # sweden country concept id: /v1/taxonomy/main/concepts?id=i46j_HmG_v64'
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
-API_VERSION = '1.12.0'
-
-
 # for tests:
 number_of_ads = 1065
 test_api_key = os.getenv('TEST_API_KEY')

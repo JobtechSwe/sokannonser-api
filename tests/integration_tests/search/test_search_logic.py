@@ -1,11 +1,9 @@
 import sys
-
+import json
 import pytest
 
-from sokannonser import app
-from sokannonser.settings import headers
-from tests.integration_tests.test_resources.check_response import check_response_return_json
 from tests.integration_tests.test_resources.concept_ids import concept_ids_geo as geo
+from tests.integration_tests.test_resources.helper import get_search_check_number_of_results
 
 
 @pytest.mark.integration
@@ -14,38 +12,81 @@ from tests.integration_tests.test_resources.concept_ids import concept_ids_geo a
     ('lärare stockholm', 'Stockholm', '0180', geo.stockholm, 4),
     ('lärare göteborg', 'Göteborg', '1480', geo.goteborg, 4),
 ])
-def test_freetext_work_and_location_details(query, municipality, code, municipality_concept_id,
+def test_freetext_work_and_location_details(session, url, query, municipality, code, municipality_concept_id,
                                             expected_number_of_hits):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': query, 'limit': '100'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) == expected_number_of_hits, f"wrong number of hits for query '{query}'"
-        hits = json_response['hits']
+    params = {'q': query, 'limit': '100'}
+    response = get_search_check_number_of_results(session, url, expected_number_of_hits, params)
+    response_json = json.loads(response.content.decode('utf8'))
 
-        for hit in hits:
-            assert hit['workplace_address']['municipality'] == municipality
-            assert hit['workplace_address']['municipality_code'] == code
-            assert hit['workplace_address']['municipality_concept_id'] == municipality_concept_id
+    for ad in response_json['hits']:
+        assert ad['workplace_address']['municipality'] == municipality
+        assert ad['workplace_address']['municipality_code'] == code
+        assert ad['workplace_address']['municipality_concept_id'] == municipality_concept_id
 
 
-@pytest.mark.skip("work in progress")
-@pytest.mark.parametrize("query, id_1, id_2, expected_number_of_hits", [
-    ('bagare kock Stockholm Göteborg', '000', '123', 15),
-])
-def test_freetext_two_work_and_two_locations_details(query, id_1, id_2, expected_number_of_hits):
+@pytest.mark.parametrize("query, expected_ids_and_relevance", [
+    ('bagare kock Stockholm Göteborg',
+     [('23780773', 1.0), ('23578307', 1.0), ('23762170', 1.0), ('23934411', 0.897897309155177),
+      ('23918920', 0.897897309155177), ('23783846', 0.8949498104298874), ('23978318', 0.7716591497509147),
+      ('23826966', 0.7716591497509147), ('23566906', 0.7716591497509147), ('23552714', 0.7716591497509147),
+      ('23502782', 0.7716591497509147), ('23451218', 0.7716591497509147), ('23981076', 0.45415871049258943),
+      ('23978439', 0.45415871049258943), ('23550781', 0.45415871049258943),
+      ])])
+def test_freetext_two_work_and_two_locations_check_order(session, url, query, expected_ids_and_relevance):
+    """
+    Tests that the sorting order of hits is as expected and that relevance value has not changed
+    This documents current behavior
+    """
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': query, 'limit': '100'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) == expected_number_of_hits, f"wrong number of hits for query '{query}'"
-        hits = json_response['hits']
 
-        # assert hits[0]['id'] == '23783846'  #h as both bagare and kock in ad but is 6th hit
-        for hit in hits:
-            result = f"{hit['headline']}"
-            print((result))
+    params = {'q': query, 'limit': '100'}
+    response = get_search_check_number_of_results(session, url, len(expected_ids_and_relevance), params)
+    response_json = json.loads(response.content.decode('utf8'))
+    old_relevance = 1
+    for index, hit in enumerate(response_json['hits']):
+        relevance = hit['relevance']
+        assert old_relevance >= relevance
+        assert hit['id'] == expected_ids_and_relevance[index][0]
+        assert hit['relevance'] == expected_ids_and_relevance[index][1]
+        old_relevance = relevance
+
+
+@pytest.mark.parametrize("query, top_id, expected_number_of_hits", [
+    ('bagare kock Stockholm Göteborg', '23780773', 15),
+    ('kock bagare Stockholm Göteborg', '23780773', 15),
+    ('kallskänka kock Stockholm Göteborg', '23552714', 13),
+    ('lärare lågstadielärare Malmö Göteborg', '23981080', 5),
+])
+def test_freetext_two_work_and_two_locations(session, url, query, top_id, expected_number_of_hits):
+    """
+    Test that the top hit for a search has not changed and that the number of hits for query has not changed
+    This documents current behavior
+    """
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+
+    params = {'q': query, 'limit': '100'}
+    response = get_search_check_number_of_results(session, url, expected_number_of_hits, params)
+    response_json = json.loads(response.content.decode('utf8'))
+
+    assert response_json['hits'][0]['id'] == top_id
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("query, expected_id", [
+    ('Bauhaus Kundtjänst', '23783146'),
+    ('Sirius crew', '10537882'),
+    ('super', '23801747'),
+    ('Säsongande', '23437355'),
+    ('Diskretessen', '23396767'),
+])
+def test_freetext_search(session, url, query, expected_id):
+    """
+    Tests from examples
+    Test that specific queries should return only one hit (identified by id)
+    """
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    params = {'q': query, 'limit': '100'}
+    response = get_search_check_number_of_results(session, url, 1, params)
+    response_json = json.loads(response.content.decode('utf8'))
+    assert response_json['hits'][0]['id'] == expected_id

@@ -1,10 +1,14 @@
 import json
 
 
-
 def get_stream_check_number_of_results(session, url, expected_number, params):
     response = session.get(f"{url}/stream", params=params)
     _check_ok_response_and_number_of_ads(response, expected_number)
+
+
+def get_search_check_number_of_results(session, url, expected_number, params):
+    response = session.get(f"{url}/search", params=params)
+    return _check_ok_response_and_number_of_ads(response, expected_number)
 
 
 def get_stream_expect_error(session, url, path, params, expected_http_code):

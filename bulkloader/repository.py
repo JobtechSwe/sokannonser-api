@@ -175,6 +175,7 @@ def format_ad(ad_data):
 def format_removed_ad(ad_data):
     return {
         'id': str(ad_data.get('id')),
+        'removed': ad_data.get('removed'),
         'removed_date': ad_data.get('removed_date')
     }
 

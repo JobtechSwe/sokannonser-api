@@ -5,11 +5,12 @@ EXPOSE 8081
 RUN date && apk update && apk upgrade && \
     apk add --no-cache --update \
         uwsgi-python3 \
-        python3 \
+        python3-dev \
         nginx \
         git \
         curl \
         memcached \
+        build-base  \
         tzdata && \
      rm -rfv /var/cache/apk/*
 
@@ -38,8 +39,8 @@ RUN date && \
 
 WORKDIR /app
 
-RUN python3 -m pip install --upgrade setuptools
-RUN python3 -m pip install supervisor 
+RUN python3 -m pip install --upgrade setuptools wheel pip
+RUN python3 -m pip install supervisor
 # RUN pip3 install --no-cache-dir -r requirements.txt
 # delete all __pycache__-folders in tests-folder
 # runs unit tests with @pytest.mark.unit annotation only

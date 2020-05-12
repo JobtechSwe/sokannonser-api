@@ -41,3 +41,15 @@ def _check_ok_response_and_number_of_ads(response, expected_number):
         for c in checks:
             assert c is not None, ad['id']
     return response
+
+
+def check_freetext_concepts(free_text_concepts, list_of_expected):
+    assert free_text_concepts['skill'] == list_of_expected[0]
+    assert free_text_concepts['occupation'] == list_of_expected[1]
+    assert free_text_concepts['location'] == list_of_expected[2]
+    assert free_text_concepts['skill_must'] == list_of_expected[3]
+    assert free_text_concepts['occupation_must'] == list_of_expected[4]
+    assert free_text_concepts['location_must'] == list_of_expected[5]
+    assert free_text_concepts['skill_must_not'] == list_of_expected[6]
+    assert free_text_concepts['occupation_must_not'] == list_of_expected[7]
+    assert free_text_concepts['location_must_not'] == list_of_expected[8]

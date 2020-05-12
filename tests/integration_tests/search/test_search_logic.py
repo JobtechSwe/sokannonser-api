@@ -3,7 +3,7 @@ import json
 import pytest
 
 from tests.integration_tests.test_resources.concept_ids import concept_ids_geo as geo
-from tests.integration_tests.test_resources.helper import get_search_check_number_of_results
+from tests.integration_tests.test_resources.helper import get_search_check_number_of_results, check_freetext_concepts
 
 
 @pytest.mark.integration
@@ -88,19 +88,26 @@ def test_freetext_search(session, url, query, expected_id):
     """
     print('==================', sys._getframe().f_code.co_name, '================== ')
     params = {'q': query, 'limit': '100'}
-    response = get_search_check_number_of_results(session, url, 1, params)
+    response = get_search_check_number_of_results(session, url, expected_number=1, params=params)
     response_json = json.loads(response.content.decode('utf8'))
 
     assert response_json['hits'][0]['id'] == expected_id
 
     # freetext concepts should be empty
-    free_text_concepts = response_json['freetext_concepts']
-    assert free_text_concepts['skill'] == []
-    assert free_text_concepts['occupation'] == []
-    assert free_text_concepts['location'] == []
-    assert free_text_concepts['skill_must'] == []
-    assert free_text_concepts['occupation_must'] == []
-    assert free_text_concepts['location_must'] == []
-    assert free_text_concepts['skill_must_not'] == []
-    assert free_text_concepts['occupation_must_not'] == []
-    assert free_text_concepts['location_must_not'] == []
+    check_freetext_concepts(response_json['freetext_concepts'], [[], [], [], [], [], [], [], [], []])
+
+
+def test_search_rules(session, url):
+    params = {'q': "systemutvecklare python java stockholm blocket", 'limit': '100'}
+    response = get_search_check_number_of_results(session, url, expected_number=1, params=params)
+    response_json = json.loads(response.content.decode('utf8'))
+    hit = response_json['hits'][0]
+    check_freetext_concepts(response_json['freetext_concepts'], [
+        ['python', 'java'], ['systemutvecklare'], ['stockholm'], [], [], [], [], [], []
+    ])
+    assert 'blocket' in hit['headline'].lower()
+    assert 'blocket' in hit['employer']['name'].lower()
+    assert 'blocket' in hit['employer']['workplace'].lower()
+    assert 'systemutvecklare' in hit['occupation']['label'].lower()
+    assert 'stockholm' in hit['description']['text'].lower()
+    assert 'stockholm' in hit['workplace_address']['municipality'].lower()

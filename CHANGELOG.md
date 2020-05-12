@@ -1,14 +1,11 @@
 Changelog Application Jobsearch
 ===============================
-# 1.13.1
+# 1.13.0
 * Add snapshot endpoint to Jobstream. To download all the currently published ads for bootstraping scenarios.
 * Add locations to the stats feature in Jobsearch
 * Add updated-before-date to Jobstream so its possible to set a time span for ad events to stream
 * Fix removed ads ID data type inconsistency 
 * Add test cases
-
-# 1.13.0
-* Add snapshot endpoint to Jobstream
 
 # 1.12.1
 * Add limit to complete endpoint

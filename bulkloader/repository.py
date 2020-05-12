@@ -174,7 +174,7 @@ def format_ad(ad_data):
 # @marshaller.marshal_with(removed_job_ad)
 def format_removed_ad(ad_data):
     return {
-        'id': ad_data.get('id'), 'removed': ad_data.get('removed'),
+        'id': str(ad_data.get('id')),
         'removed_date': ad_data.get('removed_date')
     }
 

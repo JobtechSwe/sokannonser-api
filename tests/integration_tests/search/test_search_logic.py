@@ -84,9 +84,23 @@ def test_freetext_search(session, url, query, expected_id):
     """
     Tests from examples
     Test that specific queries should return only one hit (identified by id)
+    and that freetext concepts are not included in search result
     """
     print('==================', sys._getframe().f_code.co_name, '================== ')
     params = {'q': query, 'limit': '100'}
     response = get_search_check_number_of_results(session, url, 1, params)
     response_json = json.loads(response.content.decode('utf8'))
+
     assert response_json['hits'][0]['id'] == expected_id
+
+    # freetext concepts should be empty
+    free_text_concepts = response_json['freetext_concepts']
+    assert free_text_concepts['skill'] == []
+    assert free_text_concepts['occupation'] == []
+    assert free_text_concepts['location'] == []
+    assert free_text_concepts['skill_must'] == []
+    assert free_text_concepts['occupation_must'] == []
+    assert free_text_concepts['location_must'] == []
+    assert free_text_concepts['skill_must_not'] == []
+    assert free_text_concepts['occupation_must_not'] == []
+    assert free_text_concepts['location_must_not'] == []

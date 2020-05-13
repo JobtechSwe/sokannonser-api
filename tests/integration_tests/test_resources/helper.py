@@ -5,6 +5,10 @@ def get_stream_check_number_of_results(session, url, expected_number, params):
     response = session.get(f"{url}/stream", params=params)
     _check_ok_response_and_number_of_ads(response, expected_number)
 
+def get_with_path_return_json(session, url, path, params):
+    response = session.get(f"{url}{path}", params=params)
+    response.raise_for_status()
+    return json.loads(response.content.decode('utf8'))
 
 def get_stream(session, url, params):
     response = session.get(f"{url}/stream", params=params)
@@ -77,3 +81,4 @@ def check_freetext_concepts(free_text_concepts, list_of_expected):
     assert free_text_concepts['skill_must_not'] == list_of_expected[6]
     assert free_text_concepts['occupation_must_not'] == list_of_expected[7]
     assert free_text_concepts['location_must_not'] == list_of_expected[8]
+

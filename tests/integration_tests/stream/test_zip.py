@@ -2,10 +2,10 @@ import pytest
 import urllib3
 import requests
 
-
+@pytest.mark.live_data
 @pytest.mark.smoke
 @pytest.mark.integration
-def test_zip_endpoint_expect_not_found_response(session, url):
+def test_zip_endpoint_expect_not_found_response(session, stream_url):
     """
     This test will detect if the endpoint is mistakenly activated
 
@@ -14,7 +14,7 @@ def test_zip_endpoint_expect_not_found_response(session, url):
 
     """
     try:
-        r = session.get(f"{url}/zip")
+        r = session.get(f"{stream_url}/zip")
     except (IOError, urllib3.exceptions.HTTPError):
         pass  # not being able to connect to the endpoint is fine
     else:  # received an http response, check that it's '404 not found'

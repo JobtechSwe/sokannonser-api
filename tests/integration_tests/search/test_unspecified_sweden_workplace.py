@@ -3,8 +3,8 @@ import pytest
 
 
 @pytest.mark.integration
-def test_unspecified_sweden_workplace(session, url):
-    url = url + "/search?unspecified-sweden-workplace=true&offset=0&limit=100&stats=region"
+def test_unspecified_sweden_workplace(session, search_url):
+    url = search_url + "/search?unspecified-sweden-workplace=true&offset=0&limit=100&stats=region"
 
     response = session.get(url)
     response.raise_for_status()

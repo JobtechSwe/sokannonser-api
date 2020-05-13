@@ -1,4 +1,5 @@
 import os
+import datetime
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "localhost")
@@ -7,7 +8,6 @@ ES_USER = os.getenv("ES_USER")
 ES_PWD = os.getenv("ES_PWD")
 ES_INDEX = os.getenv("ES_INDEX", "platsannons-read")
 ES_STREAM_INDEX = os.getenv("ES_BULK_INDEX", "platsannons-stream")
-ES_AURANEST = os.getenv("ES_AURANEST", "auranest-read")
 ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy")
 
 # APM and Debug settings
@@ -78,11 +78,14 @@ MIN_RELEVANCE = 'relevance-threshold'
 SHOW_COUNT = 'show-count'
 TAX_DESCRIPTION = 'DEPRECATED, use https://taxonomy.api.jobtechdev.se/v1/taxonomy/swagger-ui/index.html instead'
 
-# For auranest
-PLACE = 'place'
-
 # For Batch
 DATE = 'date'
+UPDATED_BEFORE_DATE = 'updated-before-date'
+MAX_DATE = '3000-01-01 00:00:00'
+OCCUPATION_CONCEPT_ID = 'occupation-concept-id'
+LOCATION_CONCEPT_ID = 'location-concept-id'
+OCCUPATION_LIST = ['occupation', 'occupation_field', 'occupation_group']
+LOCATION_LIST = ['region', 'city', 'country', 'municipality']
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'
@@ -90,26 +93,16 @@ SHOW_EXPIRED = 'show-expired'
 result_models = [
     'pbapi', 'simple'
 ]
-auranest_sort_options = {
-    'relevance': "_score",
-    'pubdate-desc': {"source.firstSeenAt": "desc"},
-    'pubdate-asc': {"source.firstSeenAt": "asc"},
-    'applydate-desc': {"application.deadline": "desc"},
-    'applydate-asc': {"application.deadline": "asc"},
-}
-
-auranest_stats_options = {
-    'employers': 'employer.name.keyword',
-    'sites': 'source.site.name.keyword',
-    'locations': 'location.translations.sv-SE.keyword'
-}
 
 # sweden country concept id: /v1/taxonomy/main/concepts?id=i46j_HmG_v64'
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
+
 # for tests:
-number_of_ads = 1065
+NUMBER_OF_ADS = 1072
+DAWN_OF_TIME = '1970-01-01T00:00:01'
 test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
 
 API_VERSION = '1.13.0'
+current_time_stamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")

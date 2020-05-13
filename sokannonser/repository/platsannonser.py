@@ -21,7 +21,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 def get_stats_for(taxonomy_type):
     value_path = {
         taxonomy.OCCUPATION: "%s.%s.keyword" %
-        (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
+                             (fields.OCCUPATION, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.GROUP: "%s.%s.keyword" % (
             fields.OCCUPATION_GROUP, fields.LEGACY_AMS_TAXONOMY_ID),
         taxonomy.FIELD: "%s.%s.keyword" % (
@@ -80,7 +80,7 @@ def get_stats_for(taxonomy_type):
     return code_count
 
 
-def suggest(args, querybuilder, start_time=0, x_fields=None):
+def suggest(args, querybuilder, start_time=0, x_fields=None):  # TODO: unused arguments
     # old auto complete part, keep this first
     result = find_platsannonser(args, querybuilder, start_time=0, x_fields=None)
     if result.get('aggs'):
@@ -89,7 +89,7 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):
             value = item['value']
             item['value'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
             item['found_phrase'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
-    elif args.get(settings.TYPEAHEAD_QUERY):
+    elif args.get(settings.TYPEAHEAD_QUERY):  # TODO: this elif is not covered by tests (2020-04-21)
         result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
         if not result['aggs']:
             result = phrase_suggest(args, querybuilder, start_time=0, x_fields=None)
@@ -105,7 +105,7 @@ def suggest_extra_word(args, original_word, querybuilder):
         if search_text_type == 'location':
             second_suggest_type = 'occupation'
         else:
-            second_suggest_type = 'location'
+            second_suggest_type = 'location'  # TODO never executed by tests
         query_dsl = querybuilder.create_suggest_extra_word_query(
             search_text, search_text_type, second_suggest_type, args)
         log.debug('QUERY suggest: %s' % query_dsl)
@@ -139,27 +139,24 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)
     query_dsl = querybuilder.parse_args(args, x_fields)
-    log.debug("Query constructed after %d milliseconds."
-              % (int(time.time() * 1000) - start_time))
+    log.debug("Query constructed after %d milliseconds." % (int(time.time() * 1000) - start_time))
     try:
         # First pass, find highest score:
-        if args.get(settings.MIN_RELEVANCE):
+        if args.get(settings.MIN_RELEVANCE):  # TODO: not executed by tests
             max_score_query = query_dsl.copy()
             max_score_query['from'] = 0
             max_score_query['size'] = 1
             max_score_query['track_total_hits'] = False
             del max_score_query['aggs']
             del max_score_query['sort']
-            max_score_result = elastic.search(index=settings.ES_INDEX,
-                                              body=max_score_query)
+            max_score_result = elastic.search(index=settings.ES_INDEX, body=max_score_query)
             max_score = max_score_result.get('hits', {}).get('max_score')
             if max_score:
                 query_dsl['min_score'] = max_score * args.get(settings.MIN_RELEVANCE)
-        log.debug("ARGS: %s" % args)
-        log.debug("QUERY: %s" % json.dumps(query_dsl))
+        log.info("ARGS: %s" % args)
+        log.info("QUERY: %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
-        log.debug("Elastic results after %d milliseconds."
-                  % (int(time.time() * 1000) - start_time))
+        log.debug("Elastic results after %d milliseconds." % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
         log.exception('Failed to connect to elasticsearch: %s' % str(e))
         abort(500, 'Failed to establish connection to database')
@@ -172,14 +169,15 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
         query_result['concepts'] = \
             _extract_concept_from_concepts(
                 querybuilder.ttc.text_to_concepts(qs)
-        )
+            )
 
     log.debug("Elasticsearch reports: took=%d, timed_out=%s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
     return transform_platsannons_query_result(args, query_result, querybuilder)
 
 
-def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
+# TODO not called at all
+def complete_suggest(args, querybuilder, start_time=0, x_fields=None):  # TODO: x_fields arg is not used
     if start_time == 0:
         start_time = int(time.time() * 1000)
 
@@ -187,7 +185,7 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):
     word_list = input_words.split()
     word = word_list[-1] if word_list else ''
     if word_list and word_list[:-1]:
-        prefix = ' '.join(input_words.split()[:-1])
+        prefix = ' '.join(input_words.split()[:-1])  # TODO not executed by tests
     else:
         prefix = ''
 
@@ -327,7 +325,7 @@ def fetch_platsannons(ad_id):
             }
             query_result = elastic.search(index=settings.ES_INDEX, body=ext_id_query)
             hits = query_result.get('hits', {}).get('hits', [])
-            if hits:
+            if hits:  # TODO: never executed by tests
                 log.debug('Ad found by external id: %s' % ad_id)
                 return _format_ad(hits[0])
 
@@ -347,10 +345,10 @@ def get_correct_logo_url(ad_id):
     ad = fetch_platsannons(ad_id)
 
     logo_url = None
+
     if ad and 'employer' in ad:
-        if 'workplace_id' in ad['employer'] \
-                and ad['employer']['workplace_id'] \
-                and int(ad['employer']['workplace_id']) > 0:
+        if 'workplace_id' in ad['employer'] and ad['employer']['workplace_id'] and int(
+                ad['employer']['workplace_id']) > 0:  # TODO: never executed by tests
             '''
             Special logo for workplace_id for ads with source_type VIA_AF_FORMULAR eller VIA_PLATSBANKEN_AD or 
             VIA_ANNONSERA (workplace_id > 0)
@@ -374,6 +372,7 @@ def get_correct_logo_url(ad_id):
 not_found_file = None
 
 
+# TODO not called by tests
 def get_not_found_logo_file():
     global not_found_file
     if not_found_file is None:
@@ -385,7 +384,7 @@ def get_not_found_logo_file():
 
 
 def fetch_platsannons_logo(ad_id):
-    if settings.COMPANY_LOGO_FETCH_DISABLED:
+    if settings.COMPANY_LOGO_FETCH_DISABLED:  # TODO: not executed by tests
         logo_url = None
     else:
         logo_url = get_correct_logo_url(ad_id)
@@ -393,7 +392,7 @@ def fetch_platsannons_logo(ad_id):
     attachment_filename = 'logo.png'
     mimetype = 'image/png'
 
-    if logo_url is None:
+    if logo_url is None:  # TODO not executed by tests
         return send_file(
             io.BytesIO(get_not_found_logo_file()),
             attachment_filename=attachment_filename,
@@ -419,7 +418,7 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
         results['aggs'] = querybuilder.filter_aggs(query_result.get('aggregations', {}),
                                                    args.get(settings.FREETEXT_QUERY))
 
-        for stat in args.get(settings.STATISTICS) or []:
+        for stat in args.get(settings.STATISTICS) or []:  # TODO: never executed by tests
             log.debug("Statistic for field: %s" % stat)
             if 'stats' not in results:
                 results['stats'] = []
@@ -435,43 +434,11 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
                 ]
             })
 
-    # create_found_in_enriched(results, query_result)
     _modify_results(results)
-    # log.debug(json.dumps(results, indent=2))
     return results
 
 
-def create_found_in_enriched(results, query_result):
-    found_in_enriched = False
-    freetext_concepts_node = query_result.get('concepts', {})
 
-    input_type_vals = []
-    type_names = ['occupation', 'skill', 'trait']
-
-    for type_name in type_names:
-        if type_name in freetext_concepts_node:
-            input_type_vals.extend(freetext_concepts_node[type_name])
-        must_key = '%s_must' % type_name
-        if must_key in freetext_concepts_node:
-            input_type_vals.extend(freetext_concepts_node[must_key])
-
-    if len(input_type_vals) == 0:
-        for hit in results['hits']:
-            hit['_source']['found_in_enriched'] = False
-        return
-
-    for hit in results['hits']:
-        enriched_node = hit['_source'].get('keywords', {}).get('enriched', {})
-        enriched_vals = []
-        for type_name in type_names:
-            enriched_vals.extend(enriched_node.get(type_name, {}))
-
-        for type_val in input_type_vals:
-            if type_val in enriched_vals:
-                found_in_enriched = True
-                break
-
-        hit['_source']['found_in_enriched'] = found_in_enriched
 
 
 def _modify_results(results):
@@ -484,6 +451,7 @@ def _modify_results(results):
             pass
 
 
+# TODO not executed by tests
 def find_agg_and_delete(value, aggs):
     # use to find item from aggs result
     remove_agg = ''

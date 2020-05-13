@@ -1,44 +1,35 @@
 import sys
 import os
-import http
+import requests
 import pytest
-from sokannonser import app
-from sokannonser.settings import headers
+
+from tests.integration_tests.test_resources.helper import get_with_path_return_json
 
 
+@pytest.mark.live_data
 @pytest.mark.smoke
 @pytest.mark.integration
-def test_fetch_ad_by_id():
+def test_fetch_ad_by_id(session, search_url):
     """
     Get an ad by a request to /search without a query,and limiting the result to one ad
     use the id of the ad when doing a request to the /ad path
     verify that the id of the ad is the same as used when doing the request
     """
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    app.testing = True
-    with app.test_client() as testclient:
-        # First do a search and use that ad:s ID to test fetch
-        found_ad = testclient.get('/search', headers=headers, data={'limit': '1'})
-        assert found_ad.status_code == http.HTTPStatus.OK
-        ad_id = found_ad.json.get("hits")[0].get("id")
-
-        result = testclient.get('/ad/' + ad_id, headers=headers, data={})
-        assert result.status_code == http.HTTPStatus.OK
-        ad_result = result.json
-
-        assert 'id' in ad_result
-        assert ad_result['id'] == ad_id
+    json_response = get_with_path_return_json(session, search_url, '/search', params={'limit': '1'})
+    ad_id = json_response['hits'][0]['id']
+    ad_response = get_with_path_return_json(session, search_url, path=f"/ad/{ad_id}", params={})
+    assert ad_response['id'] == ad_id
+    assert len(ad_response) == 33
 
 
+@pytest.mark.live_data
 @pytest.mark.integration
-def test_fetch_not_found_ad_by_id():
+def test_fetch_not_found_ad_by_id(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    app.testing = True
-    with app.test_client() as testclient:
-        ad_id = '823069282306928230692823069282306928230692'
-        result = testclient.get('/ad/' + ad_id, headers=headers, data={})
-        assert result.status_code == http.HTTPStatus.NOT_FOUND
+    ad_id = '823069282306928230692823069282306928230692'
+    r = session.get(f"{search_url}/ad/{ad_id}", params={})
+    assert r.status_code == requests.codes.not_found
 
 
 if __name__ == '__main__':

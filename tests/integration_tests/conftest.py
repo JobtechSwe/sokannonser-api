@@ -36,3 +36,13 @@ def search_url(scope="session"):
     test_url = os.getenv('TEST_URL_SEARCH', 'http://localhost')
     port = os.getenv('TEST_PORT_SEARCH', 5000)
     return f"{test_url}:{port}"
+
+
+@pytest.fixture
+def search_url(scope="session"):
+    """
+    returns an url
+    """
+    test_url = os.getenv('TEST_URL_SEARCH', 'http://localhost')
+    port = os.getenv('TEST_PORT_SEARCH', 5000)
+    return f"{test_url}:{port}"

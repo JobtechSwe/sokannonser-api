@@ -1,6 +1,8 @@
 import sys
 import os
 import pytest
+import requests
+import json
 from dateutil import parser
 from sokannonser import app
 from sokannonser import settings as search_settings
@@ -8,6 +10,7 @@ from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
 from tests.integration_tests.test_resources.check_response import check_response_return_json
 from sokannonser.settings import NUMBER_OF_ADS, headers
+from tests.integration_tests.test_resources.helper import get_search
 
 
 @pytest.mark.skip(
@@ -50,42 +53,26 @@ def test_freetext_query_one_param():
     ('gymnasielärare', 18, 'g'),
     ("gymnasielärare""", 18, 'h'),
 ])
-def test_query_with_different_quotes(query, expected_number_of_hits, identifier):
+def test_query_with_different_quotes(session, search_url, query, expected_number_of_hits, identifier):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': query, 'limit': '0'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) == expected_number_of_hits, f"wrong number of hits for query '{query}'"
-        print(f"{hits_total} number of hits for query {query} with identifier: {identifier}")
+    json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})
+    assert int(json_response['total']['value']) == expected_number_of_hits, f"wrong number of hits for query '{query}'"
 
 
 # Todo: different queries
 @pytest.mark.integration
 @pytest.mark.parametrize("minimum_relevance, expect_to_get_results",
-                         [(0, True),
-                          (1, True),
-                          (2, False),
-                          (3, False),
-                          (4, False),
-                          (5, False),
-                          (6, False),
-                          (7, False),
-                          (8, False),
-                          (9, False)])
-def test_min_relevance(minimum_relevance, expect_to_get_results):
-    app.testing = True
-    with app.test_client() as testclient:
-        query = 'sjuksköterska grundutbildad'
-        result = testclient.get('/search', headers=headers,
-                                data={'q': query, search_settings.MIN_RELEVANCE: minimum_relevance})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        if expect_to_get_results:
-            assert int(hits_total) > 0, f"no hits for query '{query}' with 'relevance-threshold' {minimum_relevance}"
-        else:
-            assert int(hits_total) == 0, f"Expected no hits for query '{query}' but got {int(hits_total)}"
+                         [(0, True), (1, True), (2, False), (3, False), (4, False), (5, False), (6, False), (7, False),
+                          (8, False), (9, False)])
+def test_min_relevance_new(session, search_url, minimum_relevance, expect_to_get_results):
+    query = 'sjuksköterska grundutbildad'
+    params = {'q': query, search_settings.MIN_RELEVANCE: minimum_relevance}
+    json_response = get_search(session, search_url, params)
+    hits_total = json_response['total']['value']
+    if expect_to_get_results:
+        assert int(hits_total) > 0, f"no hits for query '{query}' with 'relevance-threshold' {minimum_relevance}"
+    else:
+        assert int(hits_total) == 0, f"Expected no hits for query '{query}' but got {int(hits_total)}"
 
 
 @pytest.mark.integration
@@ -110,7 +97,7 @@ def test_min_relevance(minimum_relevance, expect_to_get_results):
                                              ('sjuksköterska Helsingborg -stockholm -malmö -göteborg -eskilstuna', 1)
                                              # 3 ads with work_place.municipality Helsingborg
                                              ])
-def test_freetext_plus_minus(query, expected):
+def test_freetext_plus_minus(session, search_url, query, expected):
     """
     Tests query with plus and minus modifiers
     :param query: Which terms to search for, icluding + - modifiers
@@ -118,43 +105,36 @@ def test_freetext_plus_minus(query, expected):
     :return: None if expected number of hits are found, AssertionError if not
     """
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': query, 'limit': '0'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) == expected, f"expected {expected} hits but got {hits_total} for query '{query}'"
+    json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})
+    hits_total = json_response['total']['value']
+    assert int(hits_total) == expected, f"expected {expected} hits but got {hits_total} for query '{query}'"
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("typo", ['sjukssköterska',
-                                  'javasscript'
-                                  # 'montesori' # todo: no match for 'montesori'
-                                  ])
-def test_freetext_query_misspelled_param(typo):
+@pytest.mark.parametrize("typo, expected_number_of_hits", [('sjukssköterska', 85),
+                                                           ('javasscript', 10)
+                                                           # 'montesori' # todo: no match for 'montesori'
+                                                           ])
+def test_freetext_query_misspelled_param(session, search_url, typo, expected_number_of_hits):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': typo, 'limit': '0'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) > 0, f"no hits for query '{typo}'"
+    json_response = get_search(session, search_url, params={'q': typo, 'limit': '0'})
+    hits_total = json_response['total']['value']
+    assert int(
+        hits_total) == expected_number_of_hits, f"expected {expected_number_of_hits} hits but got {hits_total} for query '{typo}'"
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("special, expected", [('c++', 7), ('c#', 15)])
-def test_freetext_query_with_special_characters(special, expected):
+@pytest.mark.parametrize("special, expected_number_of_hits", [('c++', 7), ('c#', 15)])
+def test_freetext_query_with_special_characters(session, search_url, special, expected_number_of_hits):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': special, 'limit': '0'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) == expected, f"Expected {expected} hits for query '{special}' but got {hits_total}"
+    json_response = get_search(session, search_url, params={'q': special, 'limit': '0'})
+    hits_total = json_response['total']['value']
+    assert int(
+        hits_total) == expected_number_of_hits, f"expected {expected_number_of_hits} hits but got {hits_total} for query '{typo}'"
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("geo, expected", [
+@pytest.mark.parametrize("geo, expected_number_of_hits", [
     ('kista', 6),
     ('gärdet', 1),
     ('stockholm', 205),
@@ -164,7 +144,7 @@ def test_freetext_query_with_special_characters(special, expected):
     ('örebro län', 28),
     ('rissne', 1)
 ])
-def test_freetext_query_geo_param(geo, expected):
+def test_freetext_query_geo_param(session, search_url, geo, expected_number_of_hits):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     # todo check this test and remove the comment below
     # kista: 119 (46)
@@ -176,23 +156,17 @@ def test_freetext_query_geo_param(geo, expected):
     # örebro: 351 (178)
     # örebros län: 66 (66)
 
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': geo, 'limit': '0'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) == expected, f"Expected {expected} hits for query '{geo}' but got {hits_total}"
+    json_response = get_search(session, search_url, params={'q': geo, 'limit': '0'})
+    hits_total = json_response['total']['value']
+    assert int(
+        hits_total) == expected_number_of_hits, f"expected {expected_number_of_hits} hits but got {hits_total} for query '{typo}'"
 
 
 @pytest.mark.integration
-def test_bugfix_reset_query_rewrite_location():
+def test_bugfix_reset_query_rewrite_location(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': 'rissne', 'limit': '0'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) > 0, f"no hits for query 'rissne'"
+    json_response = get_search(session, search_url, params={'q': 'rissne', 'limit': '0'})
+    assert int(json_response['total']['value']) > 0, f"no hits for query 'rissne'"
 
 
 @pytest.mark.integration
@@ -204,18 +178,15 @@ def test_bugfix_reset_query_rewrite_location():
     ('kallhäll ystad', 5),
     ('stockholm malmö', 240)
 ])
-def test_freetext_query_location_extracted_or_enriched_or_freetext(query_location, expected):
+def test_freetext_query_location_extracted_or_enriched_or_freetext(session, search_url, query_location, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': query_location, 'limit': '0'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        assert int(
-            hits_total) == expected, f"Expected {expected} hits for query '{query_location}' but got {hits_total}"
+    json_response = get_search(session, search_url, params={'q': query_location, 'limit': '0'})
+    hits_total = json_response['total']['value']
+    assert int(
+        hits_total) == expected, f"Expected {expected} hits for query '{query_location}' but got {hits_total}"
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_freetext_query_geo_param2():
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -274,29 +245,22 @@ def test_freetext_query_geo_param2():
 
 
 @pytest.mark.integration
-def test_too_big_offset():
+def test_too_big_offset(session, search_url):
     print('===================', sys._getframe().f_code.co_name, '================== ')
 
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'offset': '2001', 'limit': '0'})
-        json_response = result.json
-        assert result.status == '400 BAD REQUEST'
-        assert json_response['errors'] == {
-            'offset': 'Invalid argument: 2001. argument must be within the range 0 - 2000'}
-        assert json_response['message'] == 'Input payload validation failed'
+    response = session.get(f"{search_url}/search", params={'offset': '2001', 'limit': '0'})
+    assert response.status_code == requests.codes.bad_request
+    response_json = json.loads(response.content.decode('utf8'))
+    assert response_json['errors']['offset'] == "Invalid argument: 2001. argument must be within the range 0 - 2000"
+    assert 'Input payload validation failed' in str(response.text)
 
 
 @pytest.mark.integration
-def test_total_hits():
+def test_total_hits(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'offset': '0', 'limit': '0'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) == NUMBER_OF_ADS, f"to few hits, actual number: {hits_total} "
+    json_response = get_search(session, search_url, params={'offset': '0', 'limit': '0'})
+    hits_total = json_response['total']['value']
+    assert int(hits_total) == NUMBER_OF_ADS, f"too few hits, actual number: {hits_total} "
 
 
 @pytest.mark.integration
@@ -319,8 +283,18 @@ def test_removed_ads_should_not_be_in_result():
 
 
 @pytest.mark.integration
-def test_find_all_ads():
+def test_find_all_ads(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')
+    limit = 100
+    for offset in range(0, NUMBER_OF_ADS, limit):
+        json_response = get_search(session, search_url, params={'offset': offset, 'limit': limit})
+        hits = json_response['hits']
+        if NUMBER_OF_ADS - offset > limit:
+            expected = limit
+        else:
+            expected = NUMBER_OF_ADS % limit
+        assert len(hits) == expected, f"wrong number of hits, actual number: {len(hits)} "
+
     app.testing = True
     with app.test_client() as testclient:
         limit = 100

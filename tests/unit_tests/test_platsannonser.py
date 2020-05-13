@@ -410,6 +410,55 @@ def test_rewrite_querystring():
 
 
 @pytest.mark.unit
+@pytest.mark.parametrize("querystring, expected_phrase, expected_returned_query, test_id", [
+    # With these quotes, the query will be returned with some quote modification
+    # the 'matches' field will be empty
+    ("'gymnasielärare'", [], "'gymnasielärare'", 'a'),
+    ("""gymnasielärare""", [], 'gymnasielärare', 'b'),
+    ('''gymnasielärare''', [], 'gymnasielärare', 'c'),
+    ("gymnasielärare\"", [], 'gymnasielärare""', 'd'),
+    ("gymnasielärare\'", [], "gymnasielärare'", 'e'),
+    ("\'gymnasielärare", [], "'gymnasielärare", 'f'),
+    (r"""gymnasielärare""", [], 'gymnasielärare', 'g'),
+    (r'''gymnasielärare''', [], 'gymnasielärare', 'h'),
+    ("gymnasielärare lärare", [], 'gymnasielärare lärare', 'i'),
+    ("""'gymnasielärare'""", [], "'gymnasielärare'", 'j'),
+
+    # with these quotes, the 'phrases' field has data quoted with single quotes
+    # and the query is not returned
+    ('''"gymnasielärare" "lärare"''', ['gymnasielärare', 'lärare'], '', 'aa'),
+    ('''"gymnasielärare lärare"''', ['gymnasielärare lärare'], '', 'ab'),
+    ('"gymnasielärare"', ['gymnasielärare'], '', 'ac'),
+    ("\"gymnasielärare\"", ['gymnasielärare'], '', 'ad'),
+    ("\"gymnasielärare", ['gymnasielärare'], '', 'ae'),
+    ("\"gymnasielärare", ['gymnasielärare'], '', 'af'),
+    ('''"gymnasielärare"''', ['gymnasielärare'], '', 'ag'),
+
+    # "normal" quotes, 'phrases' field empty, query returned
+    ("gymnasielärare", [], 'gymnasielärare', 'x'),
+    ('gymnasielärare', [], 'gymnasielärare', 'y'),
+    ('python', [], 'python', 'z'),
+])
+def test_extract_querystring_different_quotes(querystring, expected_phrase, expected_returned_query, test_id):
+    """
+    Test behavior of querybuilder.extract_quoted_phrases
+    when sending strings with different types of quotes
+
+    This documents the current behavior
+    """
+    actual_result = pbquery.extract_quoted_phrases(querystring)
+    # no plus or minus used in this test, so these fields must be empty
+    assert actual_result[0]['phrases_must'] == []
+    assert actual_result[0]['phrases_must_not'] == []
+
+    actual_phrases = actual_result[0]['phrases']
+    assert actual_phrases == expected_phrase, f"got {actual_phrases} but expected {expected_phrase}"
+
+    actual_returned_query = actual_result[1]
+    assert actual_returned_query == expected_returned_query, f"got {actual_returned_query} but expected {expected_returned_query}"
+
+
+@pytest.mark.unit
 @pytest.mark.parametrize("querystring, expected", [
     ("python \"grym kodare\"", ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": []}, "python")),
     ("java \"malmö stad\"", ({"phrases": ["malmö stad"], "phrases_must": [], "phrases_must_not": []}, "java")),
@@ -436,7 +485,6 @@ def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expecte
     assert expected == pbquery.extract_quoted_phrases(querystring)
 
 
-
 @pytest.mark.unit
 @pytest.mark.parametrize("querystring, expected", [
     ("-php", {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
@@ -461,7 +509,8 @@ def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expecte
      {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
 ])
 def test_freetext_bool_structure(querystring, expected):
-    result = pbquery._build_freetext_query(querystring, None, "and", False)
+    result = pbquery._build_freetext_query(querystring, queryfields=None, freetext_bool_method="and",
+                                           disable_smart_freetext=False)
     assert _assert_json_structure(result, expected)
 
 

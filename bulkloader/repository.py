@@ -1,3 +1,4 @@
+import datetime
 import logging
 import json
 import time
@@ -106,19 +107,30 @@ def convert_to_timestamp(day):
 # Generator function
 def load_all(args):
     since = args.get(settings.DATE)
+    # time span, default is None
+    if args.get(settings.UPDATED_BEFORE_DATE, None):
+        before = args.get(settings.UPDATED_BEFORE_DATE)
+    else:
+        before = datetime.datetime.strptime(settings.MAX_DATE, '%Y-%m-%d %H:%M:%S')
+
     # input is not allowed by type=inputs.datetime_from_iso8601
     if since == 'yesterday':
         since = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
 
     ts = int(time.mktime(since.timetuple())) * 1000
+    # add 1 sec to find ad (ms truncation problem)
+    bets = int(time.mktime(before.timetuple())+1) * 1000
+
     index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
         else settings.ES_INDEX
+    log.debug("Elastic index(load_all): % s" % index)
 
     dsl = _es_dsl()
     dsl['query']['bool']['must'] = [{
         "range": {
             "timestamp": {
-                "gte": ts
+                "gte": ts,
+                "lte": bets
             }
         }
     }]
@@ -141,6 +153,19 @@ def load_all(args):
     yield ']'
 
 
+def add_filter_query(dsl, items, concept_ids):
+    # add occupation or location filter query
+    should_query = []
+    for concept_id in concept_ids:
+        if concept_id:
+            for item in items:
+                should_query.append({"term": {
+                                        item: concept_id
+                                    }})
+    dsl['query']['bool']['filter'].append({"bool": {"should": should_query}})
+    return dsl
+
+
 @marshaller.marshal_with(job_ad)
 def format_ad(ad_data):
     return ad_data
@@ -149,7 +174,8 @@ def format_ad(ad_data):
 # @marshaller.marshal_with(removed_job_ad)
 def format_removed_ad(ad_data):
     return {
-        'id': ad_data.get('id'), 'removed': ad_data.get('removed'),
+        'id': str(ad_data.get('id')),
+        'removed': ad_data.get('removed'),
         'removed_date': ad_data.get('removed_date')
     }
 

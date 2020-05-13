@@ -5,7 +5,7 @@ import pytest
 from sokannonser import app
 from sokannonser.settings import headers
 
-@pytest.mark.live_data
+
 @pytest.mark.smoke
 @pytest.mark.integration
 def test_fetch_ad_by_id():

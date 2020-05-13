@@ -19,7 +19,6 @@ from sokannonser.settings import NUMBER_OF_ADS, UPDATED_BEFORE_DATE, DAWN_OF_TIM
     ('stockholm', 200),
     ('systemutvecklare +python ', 1),
     ('systemutvecklare -python ', 25),
-
 ])
 def test_search(session, search_url, query, minimum_number_of_hits):
     """
@@ -32,6 +31,7 @@ def test_search(session, search_url, query, minimum_number_of_hits):
                'value'] >= minimum_number_of_hits, f"Expected at least {minimum_number_of_hits} hits but got only {response['total']['value']} for query: {query}"
 
 
+@pytest.mark.skip("stream filtering is not in production yet")
 @pytest.mark.live_data
 def test_stream_filter_on_date_interval(session, stream_url):
     params = {'date': DAWN_OF_TIME, UPDATED_BEFORE_DATE: current_time_stamp}

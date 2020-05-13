@@ -8,11 +8,10 @@ from sokannonser.rest import api
 from sokannonser.rest.endpoint.platsannonser import Search, Proxy
 # from sokannonser.rest.endpoint.openapi import OpenSearch
 from sokannonser.rest.endpoint.valuestore import Valuestore
-# from market.rest.endpoint import MarketComplete, MarketSearch
 
 app = Flask(__name__)
 CORS(app)
-configure_logging([__name__.split('.')[0], 'market', 'bulkloader', 'jobtech', 'sokannonser'])
+configure_logging([__name__.split('.')[0], 'bulkloader', 'jobtech', 'sokannonser'])
 log = logging.getLogger(__name__)
 log.info(logging.getLevelName(log.getEffectiveLevel()) + ' log level activated')
 log.info("Starting %s" % __name__)

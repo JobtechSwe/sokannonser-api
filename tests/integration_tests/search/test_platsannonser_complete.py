@@ -1,12 +1,12 @@
 import os
-import sys
+import json
 import pytest
 
 from sokannonser import app
 from sokannonser import settings
 from tests.integration_tests.test_resources.check_response import check_response_return_json
 from sokannonser.settings import test_api_key
-
+from tests.integration_tests.test_resources.helper import get_complete
 
 @pytest.mark.smoke
 @pytest.mark.integration
@@ -187,5 +187,25 @@ def test_check_400_bad_request_when_limit_is_greater_than_allowed():
         assert result.json['errors']['limit'] == 'Invalid argument: 51. argument must be within the range 0 - 50'
 
 
-if __name__ == '__main__':
-    pytest.main([os.path.realpath(__file__), '-svv', '-ra', '-m integration'])
+@pytest.mark.parametrize("query, query_2, expected_typeahead", [
+    ("stor", "", ['storkök', 'storhushåll', 'storstädning', 'storage', 'stored procedures', 'storuman']),
+    ("stor", "s",
+     ['sverige', 'svenska', 'stockholms län', 'stockholm', 'skåne', 'sjuksköterska', 'sjukvård', 'språkkunskaper',
+      'städning', 'skola']),
+    ("storage", "", ['storage', 'storage solna', 'storage stockholms län']),
+    ("storage", "s", ['servrar', 'säkerhet', 'solna', 'stockholms län', 'sverige']),
+
+])
+def test_complete_from_readme(session, url, query, query_2, expected_typeahead):
+    headers = {'api-key': settings.test_api_key, 'accept': 'application/json',
+               settings.X_FEATURE_SUGGEST_EXTRA_WORD: 'true', settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD: 'true'}
+    if query_2 == "":
+        full_query = query
+    else:
+        full_query = query + ' ' + query_2
+    response = get_complete(session, url, {'q': full_query}, headers)
+    response_json = json.loads(response.content.decode('utf8'))
+    typeahead = response_json['typeahead']
+    assert len(typeahead) == len(expected_typeahead)
+    for index, suggestion in enumerate(typeahead):
+        assert suggestion['value'] == expected_typeahead[index]

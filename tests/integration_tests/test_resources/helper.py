@@ -11,6 +11,14 @@ def get_search_check_number_of_results(session, url, expected_number, params):
     return _check_ok_response_and_number_of_ads(response, expected_number)
 
 
+def get_complete(session, url, params, headers):
+    old_headers = session.headers
+    session.headers = headers
+    response = session.get(f"{url}/complete", params=params)
+    session.headers = old_headers
+    return response
+
+
 def get_stream_expect_error(session, url, path, params, expected_http_code):
     r = session.get(f"{url}{path}", params=params)
     status = r.status_code
@@ -29,7 +37,11 @@ def _check_ok_response_and_number_of_ads(response, expected_number):
     if '/search' in response.url:
         list_of_ads = list_of_ads['hits']
     assert len(list_of_ads) == expected_number, f'expected {expected_number} but got {len(list_of_ads)} ads'
+    _check_list_of_ads(list_of_ads)
+    return response
 
+
+def _check_list_of_ads(list_of_ads):
     for ad in list_of_ads:
         assert isinstance(ad['id'], str)
         checks = []
@@ -40,7 +52,6 @@ def _check_ok_response_and_number_of_ads(response, expected_number):
         checks.append(ad['workplace_address']['country'])
         for c in checks:
             assert c is not None, ad['id']
-    return response
 
 
 def check_freetext_concepts(free_text_concepts, list_of_expected):

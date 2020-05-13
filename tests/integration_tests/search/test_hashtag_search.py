@@ -1,7 +1,6 @@
 import pytest
 
-from sokannonser import app
-from sokannonser.settings import headers
+from tests.integration_tests.test_resources.helper import get_with_path_return_json
 
 
 @pytest.mark.smoke
@@ -16,10 +15,7 @@ from sokannonser.settings import headers
     ('wedo', 0)
 ])
 @pytest.mark.integration
-def test_hashtag_search(query, expected_number_of_hits):
-    app.testing = True
-    with app.test_client() as testclient:
-        results = testclient.get('/search', headers=headers, data={'q': query})
-        assert 'hits' in results.json
-        actual_number = len(results.json['hits'])
-        assert actual_number == expected_number_of_hits, f"wrong number of hits for query '{query}'"
+def test_hashtag_search(session, search_url, query, expected_number_of_hits):
+    json_response = get_with_path_return_json(session, search_url, '/search', params={'q': query})
+    actual_number = len(json_response['hits'])
+    assert actual_number == expected_number_of_hits, f"wrong number of hits for query '{query}'"

@@ -1,7 +1,7 @@
 import json
 import pytest
 
-
+@pytest.mark.live_data
 @pytest.mark.integration
 def test_unspecified_sweden_workplace(session, search_url):
     url = search_url + "/search?unspecified-sweden-workplace=true&offset=0&limit=100&stats=region"
@@ -10,7 +10,7 @@ def test_unspecified_sweden_workplace(session, search_url):
     response.raise_for_status()
     hits = json.loads(response.content.decode('utf8'))['hits']
 
-    assert len(hits) == 27
+    assert len(hits) >= 27  # for use on static test data or prod
     for hit in hits:
         assert hit['workplace_address']['region'] == 'Ospecificerad arbetsort'
         assert hit['workplace_address']['municipality'] is None

@@ -19,10 +19,20 @@ def session(scope="session"):
 
 
 @pytest.fixture
-def url(scope="session"):
+def stream_url(scope="session"):
     """
     returns an url
     """
-    test_url = os.getenv('TEST_URL', 'http://localhost')
-    port = os.getenv('TEST_PORT', 5000)
+    test_url = os.getenv('TEST_URL_STREAM', 'http://localhost')
+    port = os.getenv('TEST_PORT_STREAM', 5000)
+    return f"{test_url}:{port}"
+
+
+@pytest.fixture
+def search_url(scope="session"):
+    """
+    returns an url
+    """
+    test_url = os.getenv('TEST_URL_SEARCH', 'http://localhost')
+    port = os.getenv('TEST_PORT_SEARCH', 5000)
     return f"{test_url}:{port}"

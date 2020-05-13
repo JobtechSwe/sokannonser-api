@@ -196,14 +196,14 @@ def test_check_400_bad_request_when_limit_is_greater_than_allowed():
     ("storage", "s", ['servrar', 'säkerhet', 'solna', 'stockholms län', 'sverige']),
 
 ])
-def test_complete_from_readme(session, url, query, query_2, expected_typeahead):
+def test_complete_from_readme(session, search_url, query, query_2, expected_typeahead):
     headers = {'api-key': settings.test_api_key, 'accept': 'application/json',
                settings.X_FEATURE_SUGGEST_EXTRA_WORD: 'true', settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD: 'true'}
     if query_2 == "":
         full_query = query
     else:
         full_query = query + ' ' + query_2
-    response = get_complete(session, url, {'q': full_query}, headers)
+    response = get_complete(session, search_url, {'q': full_query}, headers)
     response_json = json.loads(response.content.decode('utf8'))
     typeahead = response_json['typeahead']
     assert len(typeahead) == len(expected_typeahead)

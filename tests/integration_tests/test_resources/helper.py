@@ -5,10 +5,18 @@ def get_stream_check_number_of_results(session, url, expected_number, params):
     response = session.get(f"{url}/stream", params=params)
     _check_ok_response_and_number_of_ads(response, expected_number)
 
+
+def get_stream(session, url, params):
+    response = session.get(f"{url}/stream", params=params)
+    response.raise_for_status()
+    return json.loads(response.content.decode('utf8'))
+
+
 def get_search(session, url, params):
     response = session.get(f"{url}/search", params=params)
     response.raise_for_status()
     return json.loads(response.content.decode('utf8'))
+
 
 def get_search_check_number_of_results(session, url, expected_number, params):
     response = session.get(f"{url}/search", params=params)

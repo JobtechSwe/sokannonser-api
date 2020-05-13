@@ -12,11 +12,11 @@ from tests.integration_tests.test_resources.helper import get_search_check_numbe
     ('lärare stockholm', 'Stockholm', '0180', geo.stockholm, 4),
     ('lärare göteborg', 'Göteborg', '1480', geo.goteborg, 4),
 ])
-def test_freetext_work_and_location_details(session, url, query, municipality, code, municipality_concept_id,
+def test_freetext_work_and_location_details(session, search_url, query, municipality, code, municipality_concept_id,
                                             expected_number_of_hits):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     params = {'q': query, 'limit': '100'}
-    response = get_search_check_number_of_results(session, url, expected_number_of_hits, params)
+    response = get_search_check_number_of_results(session, search_url, expected_number_of_hits, params)
     response_json = json.loads(response.content.decode('utf8'))
 
     for ad in response_json['hits']:
@@ -33,7 +33,7 @@ def test_freetext_work_and_location_details(session, url, query, municipality, c
       ('23502782', 0.7716591497509147), ('23451218', 0.7716591497509147), ('23981076', 0.45415871049258943),
       ('23978439', 0.45415871049258943), ('23550781', 0.45415871049258943),
       ])])
-def test_freetext_two_work_and_two_locations_check_order(session, url, query, expected_ids_and_relevance):
+def test_freetext_two_work_and_two_locations_check_order(session, search_url, query, expected_ids_and_relevance):
     """
     Tests that the sorting order of hits is as expected and that relevance value has not changed
     This documents current behavior
@@ -41,7 +41,7 @@ def test_freetext_two_work_and_two_locations_check_order(session, url, query, ex
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     params = {'q': query, 'limit': '100'}
-    response = get_search_check_number_of_results(session, url, len(expected_ids_and_relevance), params)
+    response = get_search_check_number_of_results(session, search_url, len(expected_ids_and_relevance), params)
     response_json = json.loads(response.content.decode('utf8'))
     old_relevance = 1
     for index, hit in enumerate(response_json['hits']):
@@ -58,7 +58,7 @@ def test_freetext_two_work_and_two_locations_check_order(session, url, query, ex
     ('kallskänka kock Stockholm Göteborg', '23552714', 13),
     ('lärare lågstadielärare Malmö Göteborg', '23981080', 5),
 ])
-def test_freetext_two_work_and_two_locations(session, url, query, top_id, expected_number_of_hits):
+def test_freetext_two_work_and_two_locations(session, search_url, query, top_id, expected_number_of_hits):
     """
     Test that the top hit for a search has not changed and that the number of hits for query has not changed
     This documents current behavior
@@ -66,7 +66,7 @@ def test_freetext_two_work_and_two_locations(session, url, query, top_id, expect
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     params = {'q': query, 'limit': '100'}
-    response = get_search_check_number_of_results(session, url, expected_number_of_hits, params)
+    response = get_search_check_number_of_results(session, search_url, expected_number_of_hits, params)
     response_json = json.loads(response.content.decode('utf8'))
 
     assert response_json['hits'][0]['id'] == top_id
@@ -80,7 +80,7 @@ def test_freetext_two_work_and_two_locations(session, url, query, top_id, expect
     ('Säsongande', '23437355'),
     ('Diskretessen', '23396767'),
 ])
-def test_freetext_search(session, url, query, expected_id):
+def test_freetext_search(session, search_url, query, expected_id):
     """
     Tests from examples
     Test that specific queries should return only one hit (identified by id)
@@ -88,7 +88,7 @@ def test_freetext_search(session, url, query, expected_id):
     """
     print('==================', sys._getframe().f_code.co_name, '================== ')
     params = {'q': query, 'limit': '100'}
-    response = get_search_check_number_of_results(session, url, expected_number=1, params=params)
+    response = get_search_check_number_of_results(session, search_url, expected_number=1, params=params)
     response_json = json.loads(response.content.decode('utf8'))
 
     assert response_json['hits'][0]['id'] == expected_id
@@ -97,9 +97,9 @@ def test_freetext_search(session, url, query, expected_id):
     check_freetext_concepts(response_json['freetext_concepts'], [[], [], [], [], [], [], [], [], []])
 
 
-def test_search_rules(session, url):
+def test_search_rules(session, search_url):
     params = {'q': "systemutvecklare python java stockholm blocket", 'limit': '100'}
-    response = get_search_check_number_of_results(session, url, expected_number=1, params=params)
+    response = get_search_check_number_of_results(session, search_url, expected_number=1, params=params)
     response_json = json.loads(response.content.decode('utf8'))
     hit = response_json['hits'][0]
     check_freetext_concepts(response_json['freetext_concepts'], [

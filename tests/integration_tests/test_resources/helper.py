@@ -5,6 +5,10 @@ def get_stream_check_number_of_results(session, url, expected_number, params):
     response = session.get(f"{url}/stream", params=params)
     _check_ok_response_and_number_of_ads(response, expected_number)
 
+def get_search(session, url, params):
+    response = session.get(f"{url}/search", params=params)
+    response.raise_for_status()
+    return json.loads(response.content.decode('utf8'))
 
 def get_search_check_number_of_results(session, url, expected_number, params):
     response = session.get(f"{url}/search", params=params)
@@ -36,7 +40,8 @@ def _check_ok_response_and_number_of_ads(response, expected_number):
     list_of_ads = json.loads(response.content.decode('utf8'))
     if '/search' in response.url:
         list_of_ads = list_of_ads['hits']
-    assert len(list_of_ads) == expected_number, f'expected {expected_number} but got {len(list_of_ads)} ads'
+    if expected_number is not None:
+        assert len(list_of_ads) == expected_number, f'expected {expected_number} but got {len(list_of_ads)} ads'
     _check_list_of_ads(list_of_ads)
     return response
 

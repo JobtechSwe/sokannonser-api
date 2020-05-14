@@ -4,11 +4,10 @@ import pytest
 import requests
 import json
 from dateutil import parser
-from sokannonser import app
 from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
-from sokannonser.settings import NUMBER_OF_ADS, headers
+from sokannonser.settings import NUMBER_OF_ADS
 from tests.integration_tests.test_resources.helper import get_search, compare, _fetch_and_validate_result_old, \
     _fetch_and_validate_result
 from tests.integration_tests.test_resources.concept_ids import occupation as work
@@ -179,64 +178,6 @@ def test_freetext_query_location_extracted_or_enriched_or_freetext(session, sear
     hits_total = json_response['total']['value']
     assert int(
         hits_total) == expected, f"Expected {expected} hits for query '{query_location}' but got {hits_total}"
-
-
-@pytest.mark.skip(reason="Temporarily disabled")
-@pytest.mark.integration
-def test_freetext_query_geo_param2():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    # kista: 119 (46)
-    # gärdet: 62 (8)
-    # råsunda: 8 (8)
-    # stockholm: 5826 (1196)
-    # skåne: 2718 (260)
-    # värmland: 103 (47)
-    # örebro: 351 (178)
-    # örebros län: 66 (66)
-
-    app.testing = True
-    with app.test_client() as testclient:
-        # result = testclient.get('/search', headers=headers, data={'q': 'sjukssköterska noggran javasscript',
-        #                                                           'limit': '1'})
-        result_freetext = testclient.get('/search', headers=headers, data={'q': 'restaurangbiträde stockholm',
-                                                                           'limit': '100'})
-        json_response = result_freetext.json
-        # pprint(json_response)
-
-        hits_total = json_response['total']['value']
-        # print(hits_total)
-
-        ids_freetext = [hit['id'] for hit in json_response['hits']]
-        result_freetext2 = testclient.get('/search', headers=headers, data={'q': 'restaurangbiträde stockholm',
-                                                                            'limit': '100', 'offset': 80})
-        json_response2 = result_freetext2.json
-        ids_freetext.extend([hit['id'] for hit in json_response2['hits']])
-
-        # pprint(sorted(ids_freetext))
-
-        result_taxonomy = testclient.get('/search', headers=headers, data={'occupation-name': '5555', 'q': 'stockholm',
-                                                                           'limit': '100'})
-        json_response_tax = result_taxonomy.json
-        # pprint(json_response)
-
-        hits_total_tax = json_response_tax['total']['value']
-        # print(hits_total_tax)
-
-        ids_tax = [hit['id'] for hit in json_response_tax['hits']]
-
-        result_taxonomy2 = testclient.get('/search', headers=headers, data={'occupation-name': '5555', 'q': 'stockholm',
-                                                                            'limit': '100', 'offset': 80})
-        json_response_tax2 = result_taxonomy2.json
-        ids_tax.extend([hit['id'] for hit in json_response_tax2['hits']])
-
-        # pprint(sorted(ids_tax))
-
-        result_ids_tax_minus_freetext = sorted(list(set(ids_tax) - set(ids_freetext)))
-        # print('tax - free', result_ids_tax_minus_freetext)
-        # All hits in structured search should be covered when doing an equivalent freetext search.
-        assert len(result_ids_tax_minus_freetext) == 0
-        # print('free - tax', sorted(list(set(ids_freetext) - set(ids_tax))))
 
 
 @pytest.mark.integration

@@ -1,9 +1,24 @@
 import json
 
+from sokannonser import app
+from sokannonser.settings import TEST_ENV, headers
+from tests.integration_tests.test_resources.check_response import check_response_return_json
+
+
+def compare(actual, expected, msg=None):
+    error_msg = f"expected {expected} but got {actual}. \n"
+    if msg:
+        error_msg = error_msg + msg
+    if TEST_ENV == 'DEVELOP':  # static test data == strict comparision
+        assert actual == expected, error_msg
+    else:  # staging and prod will have live data which should return a larger number of results
+        assert actual >= expected, error_msg
+
 
 def get_stream_check_number_of_results(session, url, expected_number, params):
     response = session.get(f"{url}/stream", params=params)
     _check_ok_response_and_number_of_ads(response, expected_number)
+
 
 def get_with_path_return_json(session, url, path, params):
     response = session.get(f"{url}{path}", params=params)
@@ -82,3 +97,45 @@ def check_freetext_concepts(free_text_concepts, list_of_expected):
     assert free_text_concepts['occupation_must_not'] == list_of_expected[7]
     assert free_text_concepts['location_must_not'] == list_of_expected[8]
 
+
+def _fetch_and_validate_result_old(query, resultfield, expected, non_negative=True):
+    # Todo investigate
+    app.testing = True
+    with app.test_client() as testclient:
+        result = testclient.get('/search', headers=headers, data=query)
+        json_response = check_response_return_json(result)
+        hits = json_response['hits']
+        # compare(len(hits), 1)
+        assert len(hits) > 0
+        # since hits == 0, the code below was never executed and it looked like the tets passed
+        for hit in hits:
+            for i in range(len(resultfield)):
+                if non_negative:
+                    assert _get_nested_value(resultfield[i], hit) == expected[i]
+                else:
+                    assert not _get_nested_value(resultfield[i], hit) == expected[i]
+
+
+def _fetch_and_validate_result(session, search_url, query, resultfield, expected, non_negative=True):
+    json_response = get_search(session, search_url, query)
+    hits = json_response['hits']
+    assert len(hits) > 0, "Did not get any hits"
+    for hit in hits:
+        for i in range(len(resultfield)):
+            if non_negative:
+                assert _get_nested_value(resultfield[i], hit) == expected[i]
+            else:
+                assert not _get_nested_value(resultfield[i], hit) == expected[i]
+
+
+def _get_nested_value(path, dictionary):
+    keypath = path.split('.')
+    value = None
+    for i in range(len(keypath)):
+        element = dictionary.get(keypath[i])
+        if isinstance(element, dict):
+            dictionary = element
+        else:
+            value = element
+            break
+    return value

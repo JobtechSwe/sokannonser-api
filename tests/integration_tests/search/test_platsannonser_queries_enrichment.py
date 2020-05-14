@@ -1,48 +1,37 @@
 import sys
 import pytest
 
-from sokannonser import app
-from tests.integration_tests.test_resources.check_response import check_response_return_json
-from sokannonser.settings import headers
-
+from tests.integration_tests.test_resources.helper import get_search, compare
 
 
 @pytest.mark.skip("Test does not find expected ad")
 @pytest.mark.integration
 @pytest.mark.parametrize("synonym", ['montessori'])
-def test_freetext_query_synonym_param(synonym):
+def test_freetext_query_synonym_param(session, search_url, synonym):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    app.testing = True
-    with app.test_client() as testclient:
-        # todo: Should get hits enriched with 'montessoripedagogik'. ad 23891324 in testdata should match
-        result = testclient.get('/search', headers=headers, data={'q': synonym, 'limit': '1'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        assert int(hits_total) > 0, f"no synonyms for query '{synonym}'"
+    json_response = get_search(session, search_url, params={'q': synonym, 'limit': '1'})
+    hits_total = json_response['total']['value']
+    compare(hits_total, 1)
+    # todo: Should get hits enriched with 'montessoripedagogik'. ad 23891324 in testdata should match
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("geo", [
-    'kista kallhäll',
-    'vara',
-    'kallhäll',
-    'rissne',
-    'skåne län',
-    'skåne'
-   # '+trelleborg -stockholm ystad',
-   # 'storlien',
-    #'fridhemsplan',
+@pytest.mark.parametrize("geo, expected_number_of_hits", [
+    ('kista kallhäll', 7),
+    ('vara', 1),
+    ('kallhäll', 1),
+    ('rissne', 1),
+    ('skåne län', 122),
+    ('skåne', 130),
+    ('+trelleborg -stockholm ystad', 0),
+    ('storlien', 0),
+    ('fridhemsplan', 0)
 ])
-def test_freetext_query_location_extracted_or_enriched(geo):
+def test_freetext_query_location_extracted_or_enriched(session, search_url, geo, expected_number_of_hits):
     """
     Describe what the test is testing
     """
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    app.testing = True
-    with app.test_client() as testclient:
-        result = testclient.get('/search', headers=headers, data={'q': geo, 'limit': '0'})
-        json_response = check_response_return_json(result)
-        hits_total = json_response['total']['value']
-        print(hits_total)
-        assert int(hits_total) > 0, f"no hit for '{geo}' "
+    json_response = get_search(session, search_url, params={'q': geo, 'limit': '0'})
+    hits_total = json_response['total']['value']
+    compare(hits_total, expected_number_of_hits)

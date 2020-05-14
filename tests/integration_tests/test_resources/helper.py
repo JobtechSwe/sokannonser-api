@@ -41,14 +41,26 @@ def get_search_check_number_of_results(session, url, expected_number, params):
     response = session.get(f"{url}/search", params=params)
     return _check_ok_response_and_number_of_ads(response, expected_number)
 
+def get_raw(session, url, path, params):
+    response = session.get(f"{url}{path}", params=params)
+    response.raise_for_status()
 
-def get_complete(session, url, params, headers):
+
+def get_complete_with__headers(session, url, params, headers):
     old_headers = session.headers
     session.headers = headers
     response = session.get(f"{url}/complete", params=params)
+    response.raise_for_status()
     session.headers = old_headers
     return response
 
+
+def get_search_with_headers(session, url, params, headers):
+    old_headers = session.headers
+    session.headers = headers
+    response = session.get(f"{url}/search", params=params)
+    session.headers = old_headers
+    return response
 
 def get_stream_expect_error(session, url, path, params, expected_http_code):
     r = session.get(f"{url}{path}", params=params)

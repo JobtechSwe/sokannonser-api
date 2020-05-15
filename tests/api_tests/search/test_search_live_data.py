@@ -1,9 +1,8 @@
 import pytest
 
-from tests.integration_tests.test_resources.helper import get_search
+from tests.test_resources.helper import get_search
 
 
-@pytest.mark.live_data
 @pytest.mark.smoke
 @pytest.mark.integration
 @pytest.mark.parametrize("query, minimum_number_of_hits", [

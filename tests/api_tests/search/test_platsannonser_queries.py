@@ -7,12 +7,11 @@ from dateutil import parser
 from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
-from sokannonser.settings import NUMBER_OF_ADS
-from tests.integration_tests.test_resources.helper import get_search, compare, _fetch_and_validate_result_old, \
-    _fetch_and_validate_result
-from tests.integration_tests.test_resources.concept_ids import occupation as work
-from tests.integration_tests.test_resources.concept_ids import occupation_group as group
-from tests.integration_tests.test_resources.concept_ids import occupation_field as field
+from tests.test_resources.settings import NUMBER_OF_ADS, TEST_USE_STATIC_DATA
+from tests.test_resources.helper import get_search, compare, _fetch_and_validate_result_old, \
+    _fetch_and_validate_result, check_len_more_than, check_value_more_than
+from tests.test_resources.concept_ids import occupation as work, occupation_field as field, \
+    occupation_group as group
 
 
 @pytest.mark.skip(
@@ -54,6 +53,7 @@ def test_query_with_different_quotes(session, search_url, query, expected_number
 
 
 # Todo: different queries
+@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.integration
 @pytest.mark.parametrize("minimum_relevance, expect_to_get_results",
                          [(0, True), (1, True), (2, False), (3, False), (4, False), (5, False), (6, False), (7, False),
@@ -100,8 +100,7 @@ def test_freetext_plus_minus(session, search_url, query, expected):
     """
     print('==================', sys._getframe().f_code.co_name, '================== ')
     json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})
-    hits_total = json_response['total']['value']
-    compare(hits_total, expected, msg=f'Query: {query}')
+    compare(json_response['total']['value'], expected, msg=f'Query: {query}')
 
 
 @pytest.mark.integration
@@ -112,9 +111,7 @@ def test_freetext_plus_minus(session, search_url, query, expected):
 def test_freetext_query_misspelled_param(session, search_url, typo, expected_number_of_hits):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     json_response = get_search(session, search_url, params={'q': typo, 'limit': '0'})
-    hits_total = json_response['total']['value']
-    assert int(
-        hits_total) == expected_number_of_hits, f"expected {expected_number_of_hits} hits but got {hits_total} for query '{typo}'"
+    compare(json_response['total']['value'], expected_number_of_hits, msg=f'Query: {typo}')
 
 
 @pytest.mark.integration
@@ -122,9 +119,7 @@ def test_freetext_query_misspelled_param(session, search_url, typo, expected_num
 def test_freetext_query_with_special_characters(session, search_url, special, expected_number_of_hits):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     json_response = get_search(session, search_url, params={'q': special, 'limit': '0'})
-    hits_total = json_response['total']['value']
-    assert int(
-        hits_total) == expected_number_of_hits, f"expected {expected_number_of_hits} hits but got {hits_total} for query '{typo}'"
+    compare(json_response['total']['value'], expected_number_of_hits, msg=f'Query: {special}')
 
 
 @pytest.mark.integration
@@ -151,16 +146,15 @@ def test_freetext_query_geo_param(session, search_url, geo, expected_number_of_h
     # örebros län: 66 (66)
 
     json_response = get_search(session, search_url, params={'q': geo, 'limit': '0'})
-    hits_total = json_response['total']['value']
-    assert int(
-        hits_total) == expected_number_of_hits, f"expected {expected_number_of_hits} hits but got {hits_total} for query '{typo}'"
+
+    compare(json_response['total']['value'], expected_number_of_hits, geo)
 
 
 @pytest.mark.integration
 def test_bugfix_reset_query_rewrite_location(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     json_response = get_search(session, search_url, params={'q': 'rissne', 'limit': '0'})
-    assert int(json_response['total']['value']) > 0, f"no hits for query 'rissne'"
+    check_value_more_than(json_response['total']['value'], 0)
 
 
 @pytest.mark.integration
@@ -175,9 +169,7 @@ def test_bugfix_reset_query_rewrite_location(session, search_url):
 def test_freetext_query_location_extracted_or_enriched_or_freetext(session, search_url, query_location, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     json_response = get_search(session, search_url, params={'q': query_location, 'limit': '0'})
-    hits_total = json_response['total']['value']
-    assert int(
-        hits_total) == expected, f"Expected {expected} hits for query '{query_location}' but got {hits_total}"
+    compare(json_response['total']['value'], expected, f"Query: {query_location} ")
 
 
 @pytest.mark.integration
@@ -211,7 +203,7 @@ def test_find_all_ads_check_removed_is_false(session, search_url):
             expected = limit
         else:
             expected = NUMBER_OF_ADS % limit
-        assert len(hits) == expected, f"wrong number of hits, actual number: {len(hits)} "
+        compare(len(hits), expected)
 
 
 @pytest.mark.integration
@@ -284,7 +276,7 @@ def test_occupation_codes(session, search_url, query, path, expected, non_negati
     _fetch_and_validate_result(session, search_url, query, path, expected, non_negative)
 
 
-@pytest.mark.skip("no hits for query")
+@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.parametrize("query, path, expected",
                          [({taxonomy.OCCUPATION: "D7Ns_RG6_hD2",
                             taxonomy.MUNICIPALITY: "0180", "limit": 100},
@@ -370,17 +362,6 @@ def test_employment_type(session, search_url):
 
 
 @pytest.mark.integration
-def test_experience_old():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    _fetch_and_validate_result_old({search_settings.EXPERIENCE_REQUIRED: 'true'},
-                                   [fields.EXPERIENCE_REQUIRED], [True])
-    _fetch_and_validate_result_old({search_settings.EXPERIENCE_REQUIRED: 'false'},
-                                   [fields.EXPERIENCE_REQUIRED], [False])
-
-
-@pytest.mark.skip("investigate why this differ from _old")
-@pytest.mark.integration
 def test_experience(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
@@ -411,7 +392,7 @@ def test_country_old(session, search_url):
                                    [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'], False)
 
 
-@pytest.mark.skip("check expected number of hits for static test data")
+@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 def test_country(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')
 

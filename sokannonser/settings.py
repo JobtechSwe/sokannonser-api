@@ -1,5 +1,4 @@
 import os
-import datetime
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "localhost")
@@ -96,14 +95,6 @@ result_models = [
 
 # sweden country concept id: /v1/taxonomy/main/concepts?id=i46j_HmG_v64'
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
-
-# for tests:
-NUMBER_OF_ADS = 1072
-DAWN_OF_TIME = '1970-01-01T00:00:01'
-TEST_ENV = os.getenv('TEST_ENV') if os.getenv('TEST_ENV') else 'DEVELOP'
-test_api_key = os.getenv('TEST_API_KEY')
-headers = {'api-key': test_api_key, 'accept': 'application/json'}
-current_time_stamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
 # Slack integration
 SLACK_TOKEN = 'SLACK'

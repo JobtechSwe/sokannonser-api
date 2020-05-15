@@ -2,9 +2,9 @@ import sys
 
 import pytest
 
-from sokannonser import app
-from sokannonser.settings import headers
-from tests.integration_tests.test_resources.check_response import check_response_return_json
+# from sokannonser import app
+from tests.test_resources import headers
+from tests.test_resources import check_response_return_json
 
 
 # The tests in this file were skipped with the messages "to be removed".

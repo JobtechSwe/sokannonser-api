@@ -2,10 +2,12 @@ import sys
 import json
 import pytest
 
-from tests.integration_tests.test_resources.concept_ids import concept_ids_geo as geo
-from tests.integration_tests.test_resources.helper import get_search_check_number_of_results, check_freetext_concepts
+from tests.test_resources.concept_ids import concept_ids_geo as geo
+from tests.test_resources.helper import get_search_check_number_of_results, check_freetext_concepts
+from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 
+@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.integration
 @pytest.mark.parametrize("query, municipality, code, municipality_concept_id, expected_number_of_hits", [
     ('bagare stockholm', 'Stockholm', '0180', geo.stockholm, 3),
@@ -20,11 +22,13 @@ def test_freetext_work_and_location_details(session, search_url, query, municipa
     response_json = json.loads(response.content.decode('utf8'))
 
     for ad in response_json['hits']:
+        print(ad)
         assert ad['workplace_address']['municipality'] == municipality
         assert ad['workplace_address']['municipality_code'] == code
         assert ad['workplace_address']['municipality_concept_id'] == municipality_concept_id
 
 
+@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.parametrize("query, expected_ids_and_relevance", [
     ('bagare kock Stockholm Göteborg',
      [('23780773', 1.0), ('23578307', 1.0), ('23762170', 1.0), ('23934411', 0.897897309155177),
@@ -68,10 +72,11 @@ def test_freetext_two_work_and_two_locations(session, search_url, query, top_id,
     params = {'q': query, 'limit': '100'}
     response = get_search_check_number_of_results(session, search_url, expected_number_of_hits, params)
     response_json = json.loads(response.content.decode('utf8'))
+    if TEST_USE_STATIC_DATA:
+        assert response_json['hits'][0]['id'] == top_id
 
-    assert response_json['hits'][0]['id'] == top_id
 
-
+@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.integration
 @pytest.mark.parametrize("query, expected_id", [
     ('Bauhaus Kundtjänst', '23783146'),
@@ -90,13 +95,13 @@ def test_freetext_search(session, search_url, query, expected_id):
     params = {'q': query, 'limit': '100'}
     response = get_search_check_number_of_results(session, search_url, expected_number=1, params=params)
     response_json = json.loads(response.content.decode('utf8'))
-
-    assert response_json['hits'][0]['id'] == expected_id
-
     # freetext concepts should be empty
     check_freetext_concepts(response_json['freetext_concepts'], [[], [], [], [], [], [], [], [], []])
+    if TEST_USE_STATIC_DATA:
+        assert response_json['hits'][0]['id'] == expected_id
 
 
+@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 def test_search_rules(session, search_url):
     params = {'q': "systemutvecklare python java stockholm blocket", 'limit': '100'}
     response = get_search_check_number_of_results(session, search_url, expected_number=1, params=params)

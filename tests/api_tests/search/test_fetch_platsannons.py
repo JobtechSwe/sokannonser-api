@@ -3,10 +3,9 @@ import os
 import requests
 import pytest
 
-from tests.integration_tests.test_resources.helper import get_with_path_return_json
+from tests.test_resources.helper import get_with_path_return_json
 
 
-@pytest.mark.live_data
 @pytest.mark.smoke
 @pytest.mark.integration
 def test_fetch_ad_by_id(session, search_url):
@@ -23,7 +22,6 @@ def test_fetch_ad_by_id(session, search_url):
     assert len(ad_response) == 33
 
 
-@pytest.mark.live_data
 @pytest.mark.integration
 def test_fetch_not_found_ad_by_id(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')

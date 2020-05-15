@@ -1,6 +1,6 @@
 import pytest
 
-from tests.integration_tests.test_resources.helper import get_search
+from tests.test_resources.helper import get_search, compare
 
 test_data = [
     ('murar*', 0),
@@ -39,12 +39,9 @@ def test_wildcard_search_exact_match(session, search_url, query, expected_number
     Test different wildcard queries
     check that the number of results is exactly as expected
     """
-    response = get_search(session, search_url, {'q': query, 'limit': '0'})
-    assert response['total'][
-               'value'] == expected_number_of_hits, f"Expected {expected_number_of_hits} hits but got only {response['total']['value']} for query: {query}"
+    response_json = get_search(session, search_url, {'q': query, 'limit': '0'})
+    compare(response_json['total']['value'], expected_number_of_hits, msg=f"Query: {query}")
 
-
-@pytest.mark.live_data
 @pytest.mark.parametrize("query, minimum_number_of_hits", test_data)
 @pytest.mark.integration
 def test_wildcard_search_minimum_match(session, search_url, query, minimum_number_of_hits):
@@ -52,6 +49,5 @@ def test_wildcard_search_minimum_match(session, search_url, query, minimum_numbe
     Test different wildcard queries
     check that the number of results is equal to or higher than 'minimum_number_of_hits'
     """
-    response = get_search(session, search_url, {'q': query, 'limit': '0'})
-    assert response['total'][
-               'value'] >= minimum_number_of_hits, f"Expected {minimum_number_of_hits} hits but got only {response['total']['value']} for query: {query}"
+    response_json = get_search(session, search_url, {'q': query, 'limit': '0'})
+    compare(response_json['total']['value'], minimum_number_of_hits, msg=f"Query: {query}")

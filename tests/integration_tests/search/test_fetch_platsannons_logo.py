@@ -3,7 +3,8 @@ import os
 import pytest
 import requests
 from sokannonser.repository import platsannonser
-from tests.integration_tests.test_resources.helper import get_with_path_return_json
+from tests.test_resources.settings import TEST_USE_STATIC_DATA
+from tests.test_resources.helper import get_with_path_return_json
 
 
 def get_correct_logo_url_for_any_ad(list_of_ads):
@@ -19,7 +20,7 @@ def get_correct_logo_url_for_any_ad(list_of_ads):
     return False  # if no logo_url is found in list_of_ads
 
 
-@pytest.mark.live_data
+@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.integration
 def test_fetch_org_logo_url_by_ad_id(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -29,6 +30,7 @@ def test_fetch_org_logo_url_by_ad_id(session, search_url):
     assert get_correct_logo_url_for_any_ad(hits)
 
 
+@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.integration
 def test_fetch_ad_logo_by_id(session, search_url):
     """

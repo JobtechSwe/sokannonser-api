@@ -2,7 +2,7 @@ import sys
 
 import pytest
 
-from sokannonser import app
+# from sokannonser import app
 from sokannonser.repository import platsannonser
 
 

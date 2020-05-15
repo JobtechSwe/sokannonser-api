@@ -1,7 +1,7 @@
 import sys
 import pytest
 
-from tests.integration_tests.test_resources.helper import get_search, compare
+from tests.test_resources.helper import get_search, compare
 
 
 @pytest.mark.skip("Test does not find expected ad")

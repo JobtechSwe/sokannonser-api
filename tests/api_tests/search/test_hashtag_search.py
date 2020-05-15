@@ -1,6 +1,7 @@
 import pytest
 
-from tests.integration_tests.test_resources.helper import get_with_path_return_json
+from tests.test_resources.helper import get_with_path_return_json, compare
+from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 
 @pytest.mark.smoke
@@ -16,6 +17,5 @@ from tests.integration_tests.test_resources.helper import get_with_path_return_j
 ])
 @pytest.mark.integration
 def test_hashtag_search(session, search_url, query, expected_number_of_hits):
-    json_response = get_with_path_return_json(session, search_url, '/search', params={'q': query})
-    actual_number = len(json_response['hits'])
-    assert actual_number == expected_number_of_hits, f"wrong number of hits for query '{query}'"
+    response_json = get_with_path_return_json(session, search_url, '/search', params={'q': query})
+    compare(response_json['total']['value'], expected_number_of_hits, msg=f"Query: {query}")

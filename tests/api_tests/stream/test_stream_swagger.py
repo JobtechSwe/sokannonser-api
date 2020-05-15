@@ -1,9 +1,7 @@
 import json
-import pytest
 from sokannonser import settings
 
 
-@pytest.mark.live_data
 def test_swagger(session, stream_url):
     """
     Test Swagger info

@@ -3,7 +3,6 @@ import pytest
 from sokannonser import settings
 
 
-@pytest.mark.live_data
 def test_search_swagger(session, search_url):
     """
     Test Swagger info for search

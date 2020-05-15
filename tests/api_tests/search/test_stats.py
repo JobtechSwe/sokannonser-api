@@ -1,7 +1,7 @@
 import pytest
 
-from tests.integration_tests.test_resources.concept_ids import concept_ids_geo as geo
-from tests.integration_tests.test_resources.helper import get_with_path_return_json
+from tests.test_resources.concept_ids import concept_ids_geo as geo
+from tests.test_resources.helper import get_with_path_return_json, compare
 
 
 @pytest.mark.smoke
@@ -14,8 +14,8 @@ from tests.integration_tests.test_resources.helper import get_with_path_return_j
 def test_stats(session, search_url, limit, stats_limit, expected_number_of_hits, expected_values):
     params = {'stats': 'region', 'offset': 0, 'limit': limit, 'stats.limit': stats_limit}
     results_json = get_with_path_return_json(session, search_url, '/search', params)
-    assert len(results_json['hits']) == expected_number_of_hits, f"wrong number of hits"
-    assert len(results_json['stats'][0]['values']) == expected_values, f"wrong number of entries in [values]"
+    compare(len(results_json['hits']), expected_number_of_hits)
+    compare(len(results_json['stats'][0]['values']), expected_values)
 
 
 def test_stats_details(session, search_url):
@@ -29,7 +29,7 @@ def test_stats_details(session, search_url):
                         ('Östergötlands län', 45, geo.ostergotlands_lan, '05')]
 
     for index, result in enumerate(results_json['stats'][0]['values']):  # results should be sorted
-        assert result['term'] == expected_results[index][0]
-        assert result['count'] == expected_results[index][1]
-        assert result['concept_id'] == expected_results[index][2]
-        assert result['code'] == expected_results[index][3]
+        compare(result['term'], expected_results[index][0])
+        compare(result['count'], expected_results[index][1])
+        compare(result['concept_id'], expected_results[index][2])
+        compare(result['code'], expected_results[index][3])

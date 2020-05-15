@@ -29,4 +29,8 @@ if [ "$test_type" = "integration" ]; then
 fi
 
 echo "starting "$test_type "tests"
+
 pytest --html=test_reports/$test_type/report/$test_type.html --cov=. --cov-config=tests/.coveragerc --cov-report html:test_reports/$test_type/coverage_$test_to_run tests/$test_to_run
+
+export test_api_key=narwhal
+pytest --html=test_reports/search_dev/report.html tests/integration_tests/search

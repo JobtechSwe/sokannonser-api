@@ -1,9 +1,12 @@
 import json
 import pytest
 import requests
+
+import tests.test_resources.settings
 from sokannonser import settings
-from sokannonser.settings import test_api_key
-from tests.integration_tests.test_resources.helper import get_complete_with__headers
+from tests.test_resources.settings import test_api_key_search
+from tests.test_resources.helper import get_complete_with__headers, compare, compare_suggestions, compare_typeahead, \
+    compare_synonyms, check_len_more_than
 
 
 @pytest.mark.parametrize("query, synonyms, expect_success", [('servit', ['servitris', 'servitör'], True),
@@ -27,7 +30,7 @@ def test_complete_endpoint_synonyms_typeahead(session, search_url, query, synony
     second arg is a list of expected synonyms, which all must be found in the response
     third arg True/False determines if synonyms are supposed to be found or not
     """
-    headers = {'api-key': test_api_key, 'accept': 'application/json',
+    headers = {'api-key': test_api_key_search, 'accept': 'application/json',
                settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: 'true'}
     response = get_complete_with__headers(session, search_url, params={'q': query}, headers=headers)
     json_response = json.loads(response.content.decode('utf8'))
@@ -36,11 +39,7 @@ def test_complete_endpoint_synonyms_typeahead(session, search_url, query, synony
     json_typeahead = json_response['typeahead']
     complete_values = [item['value'] for item in json_typeahead]
     assert len(complete_values) > 0, f"no synonyms found for '{query}'"
-    for s in synonyms:
-        if expect_success:
-            assert s in complete_values, f"Synonym '{s}' not found in response"
-        else:
-            assert s not in complete_values, f"Synonym '{s}' was found in response"
+    compare_synonyms(synonyms, complete_values, expect_success)
 
 
 @pytest.mark.integration
@@ -83,18 +82,15 @@ def test_complete_endpoint_with_spellcheck_typeahead(session, search_url, query,
     test of /complete endpoint with 'x-feature-spellcheck-typeahead' header
     parameters: query and list of expected result(s)
     """
-    headers = {'api-key': test_api_key, 'accept': 'application/json',
+    headers = {'api-key': test_api_key_search, 'accept': 'application/json',
                settings.X_FEATURE_SPELLCHECK_TYPEAHEAD: 'true'}
     response = get_complete_with__headers(session, search_url, params={'q': query, 'limit': 50}, headers=headers)
     json_response = json.loads(response.content.decode('utf8'))
     assert 'typeahead' in json_response
     actual_suggestions = [suggest.get('value') for suggest in json_response.get('typeahead')]
-    assert len(actual_suggestions) > 0, f"no suggested values as auto-complete for '{query}'"
-    error_msg = f"\nQuery: {query}\nExpected suggestions: ({len(expected_suggestions)}) {expected_suggestions}\nActual suggestions: ({len(actual_suggestions)}){actual_suggestions} "
+    compare(len(actual_suggestions), len(expected_suggestions), f"\nQuery: {query} ")
+    compare_suggestions(actual_suggestions, expected_suggestions, query)
 
-    assert len(actual_suggestions) == len(expected_suggestions), error_msg
-    for s in expected_suggestions:
-        assert s in actual_suggestions, f"Did not find {s} in {actual_suggestions} "
 
 
 @pytest.mark.parametrize("query, expected_suggestions", [
@@ -151,21 +147,15 @@ def test_suggest_extra_word_and_allow_empty(session, search_url, query, expected
     X_FEATURE_SUGGEST_EXTRA_WORD
     X_FEATURE_ALLOW_EMPTY_TYPEAHEAD
     """
-    headers = {'api-key': test_api_key, 'accept': 'application/json',
+    headers = {'api-key': test_api_key_search, 'accept': 'application/json',
                settings.X_FEATURE_SUGGEST_EXTRA_WORD: 'true', settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD: 'true'}
 
     response = get_complete_with__headers(session, search_url, params={'q': query, 'limit': 50}, headers=headers)
     json_response = json.loads(response.content.decode('utf8'))
     assert 'typeahead' in json_response
     actual_suggestions = [suggest.get('value') for suggest in json_response.get('typeahead')]
-
-    assert len(actual_suggestions) > 0, f"no suggested values as auto-complete for '{query}'"
-
-    if len(actual_suggestions) < 50:
-        assert len(actual_suggestions) == len(
-            expected_suggestions), f"\nQuery: {query}\nExpected suggestions: {expected_suggestions}\nActual suggestions: {actual_suggestions} "
-        for s in expected_suggestions:
-            assert s in actual_suggestions, f"Did not find {s} in {actual_suggestions} "
+    compare(len(actual_suggestions), len(expected_suggestions))
+    compare_suggestions(actual_suggestions, expected_suggestions, query)
 
 
 def test_check_400_bad_request_when_limit_is_greater_than_allowed(session, search_url):
@@ -180,7 +170,6 @@ def test_check_400_bad_request_when_limit_is_greater_than_allowed(session, searc
     assert response_json['errors']['limit'] == 'Invalid argument: 51. argument must be within the range 0 - 50'
     assert response_json['message'] == 'Input payload validation failed'
 
-
 @pytest.mark.parametrize("query, query_2, expected_typeahead", [
     ("stor", "", ['storkök', 'storhushåll', 'storstädning', 'storage', 'stored procedures', 'storuman']),
     ("stor", "s",
@@ -191,7 +180,7 @@ def test_check_400_bad_request_when_limit_is_greater_than_allowed(session, searc
 
 ])
 def test_complete_from_readme(session, search_url, query, query_2, expected_typeahead):
-    headers = {'api-key': settings.test_api_key, 'accept': 'application/json',
+    headers = {'api-key': tests.test_resources.settings.test_api_key_search, 'accept': 'application/json',
                settings.X_FEATURE_SUGGEST_EXTRA_WORD: 'true', settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD: 'true'}
     if query_2 == "":
         full_query = query
@@ -200,6 +189,5 @@ def test_complete_from_readme(session, search_url, query, query_2, expected_type
     response = get_complete_with__headers(session, search_url, {'q': full_query}, headers)
     response_json = json.loads(response.content.decode('utf8'))
     typeahead = response_json['typeahead']
-    assert len(typeahead) == len(expected_typeahead)
-    for index, suggestion in enumerate(typeahead):
-        assert suggestion['value'] == expected_typeahead[index]
+    compare(len(typeahead), len(expected_typeahead))
+    compare_typeahead(typeahead, expected_typeahead)

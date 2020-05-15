@@ -22,7 +22,8 @@ pipeline {
             steps{
                 script{
                     sh 'python3 -m pip install --user -r requirements.txt'
-                    sh 'python3 -m pytest -svv -ra -m integration tests/integration_tests/'    
+                    sh 'python3 -m pytest -svv -ra tests/integration_tests/'
+                    sh 'python3 -m pytest -svv -ra tests/api_tests/'
                 }
             }
         }

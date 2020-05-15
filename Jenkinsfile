@@ -23,6 +23,17 @@ pipeline {
                 script{
                     sh 'python3 -m pip install --user -r requirements.txt'
                     sh 'python3 -m pytest -svv -ra tests/integration_tests/'
+                }
+            }
+        }
+
+        stage('Run api tests'){
+            agent {
+                label 'alpinepython'
+            }
+            steps{
+                script{
+                    sh 'python3 -m pip install --user -r requirements.txt'
                     sh 'python3 -m pytest -svv -ra tests/api_tests/'
                 }
             }

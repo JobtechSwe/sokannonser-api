@@ -168,13 +168,6 @@ def test_rewrite_must_words():
 
 
 @pytest.mark.integration
-def test_clean_plus_minus():
-    cleaned_text = text_to_concept.clean_plus_minus(
-        '-mållare målare +undersköterska java-utvecklare -key account manager c-sharp -java -noggrann flexibel')
-    assert cleaned_text == 'mållare målare undersköterska java-utvecklare key account manager c-sharp java noggrann flexibel'
-
-
-@pytest.mark.integration
 def test_rewrite_must_not_words():
     concepts = text_to_concept.text_to_concepts(
         'mållare -målare java-utvecklare -key account manager c-sharp -java -noggrann flexibel solna -sundbyberg')

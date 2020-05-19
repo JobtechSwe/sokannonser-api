@@ -1,5 +1,8 @@
 Changelog Application Jobsearch
 ===============================
+# 1.13.1
+* Set APM log level
+
 # 1.13.0
 * Add snapshot endpoint to Jobstream. To download all the currently published ads for bootstraping scenarios.
 * Add locations to the stats feature in Jobsearch

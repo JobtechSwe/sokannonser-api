@@ -81,7 +81,7 @@ TAX_DESCRIPTION = 'DEPRECATED, use https://taxonomy.api.jobtechdev.se/v1/taxonom
 # For Batch
 DATE = 'date'
 UPDATED_BEFORE_DATE = 'updated-before-date'
-MAX_DATE = '3000-01-01 00:00:00'
+MAX_DATE = '3000-01-01T00:00:00'
 OCCUPATION_CONCEPT_ID = 'occupation-concept-id'
 LOCATION_CONCEPT_ID = 'location-concept-id'
 OCCUPATION_LIST = ['occupation', 'occupation_field', 'occupation_group']
@@ -114,4 +114,4 @@ URL_DEV = 'https://dev-jobsearch.test.services.jtech.se/'
 URL_STAGE = 'https://staging-jobsearch.test.services.jtech.se/'
 URL_PROD = 'https://jobsearch.api.jobtechdev.se/'
 
-API_VERSION = '1.13.0'
+API_VERSION = '1.13.1'

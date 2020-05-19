@@ -104,5 +104,5 @@ DAWN_OF_TIME = '1970-01-01T00:00:01'
 test_api_key = os.getenv('TEST_API_KEY')
 headers = {'api-key': test_api_key, 'accept': 'application/json'}
 
-API_VERSION = '1.13.0'
+API_VERSION = '1.13.1'
 current_time_stamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")

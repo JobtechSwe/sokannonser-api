@@ -1,4 +1,5 @@
 import os
+import datetime
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "localhost")

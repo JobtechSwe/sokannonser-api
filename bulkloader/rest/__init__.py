@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-
 from flask_restx import Api, Namespace, reqparse, inputs
 from sokannonser import settings
 
@@ -25,12 +24,6 @@ default_time = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M
 bulk_stream_query = reqparse.RequestParser()
 bulk_stream_query.add_argument(settings.APIKEY, location='headers', required=True)
 bulk_stream_query.add_argument(settings.DATE, type=inputs.datetime_from_iso8601,
-                               required=True, default=default_time)
-bulk_stream_query.add_argument(settings.UPDATED_BEFORE_DATE, type=inputs.datetime_from_iso8601,
-                               required=False)
-
-bulk_snapshot_query = reqparse.RequestParser()
-bulk_snapshot_query.add_argument(settings.APIKEY, location='headers', required=True)
                                required=True, default=default_time)
 bulk_stream_query.add_argument(settings.UPDATED_BEFORE_DATE, type=inputs.datetime_from_iso8601,
                                required=False)

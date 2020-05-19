@@ -111,7 +111,7 @@ def load_all(args):
     if args.get(settings.UPDATED_BEFORE_DATE, None):
         before = args.get(settings.UPDATED_BEFORE_DATE)
     else:
-        before = datetime.datetime.strptime(settings.MAX_DATE, '%Y-%m-%d %H:%M:%S')
+        before = datetime.datetime.strptime(settings.MAX_DATE, '%Y-%m-%dT%H:%M:%S')
 
     # input is not allowed by type=inputs.datetime_from_iso8601
     if since == 'yesterday':

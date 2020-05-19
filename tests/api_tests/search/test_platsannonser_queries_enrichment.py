@@ -4,17 +4,6 @@ import pytest
 from tests.test_resources.helper import get_search, compare
 
 
-@pytest.mark.skip("Test does not find expected ad")
-@pytest.mark.integration
-@pytest.mark.parametrize("synonym", ['montessori'])
-def test_freetext_query_synonym_param(session, search_url, synonym):
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-    json_response = get_search(session, search_url, params={'q': synonym, 'limit': '1'})
-    hits_total = json_response['total']['value']
-    compare(hits_total, 1)
-    # todo: Should get hits enriched with 'montessoripedagogik'. ad 23891324 in testdata should match
-
-
 @pytest.mark.integration
 @pytest.mark.parametrize("geo, expected_number_of_hits", [
     ('kista kallhäll', 7),

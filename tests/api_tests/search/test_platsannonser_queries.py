@@ -8,21 +8,9 @@ from sokannonser import settings as search_settings
 from sokannonser.repository import taxonomy
 from sokannonser.rest.model import fields
 from tests.test_resources.settings import NUMBER_OF_ADS, TEST_USE_STATIC_DATA
-from tests.test_resources.helper import get_search, compare, _fetch_and_validate_result_old, \
-    _fetch_and_validate_result, check_len_more_than, check_value_more_than
+from tests.test_resources.helper import get_search, compare, _fetch_and_validate_result, check_value_more_than
 from tests.test_resources.concept_ids import occupation as work, occupation_field as field, \
     occupation_group as group
-
-
-@pytest.mark.skip(
-    reason="Temporarily disabled. Needs fix according to Trello Card #137, Multipla ord i ett yrke")  # Missing test data?
-@pytest.mark.integration
-def test_freetext_query_ssk(session, search_url, ):
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-    query = 'stockholm grundutbildad sjuksköterska'
-    json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})
-    expected = '???'
-    compare(json_response['total']['value'], expected=expected)
 
 
 @pytest.mark.smoke
@@ -276,20 +264,6 @@ def test_occupation_codes(session, search_url, query, path, expected, non_negati
     _fetch_and_validate_result(session, search_url, query, path, expected, non_negative)
 
 
-@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
-@pytest.mark.parametrize("query, path, expected",
-                         [({taxonomy.OCCUPATION: "D7Ns_RG6_hD2",
-                            taxonomy.MUNICIPALITY: "0180", "limit": 100},
-                           [fields.OCCUPATION + ".concept_id",
-                            fields.WORKPLACE_ADDRESS_MUNICIPALITY],
-                           ["D7Ns_RG6_hD2", "0180"]),
-                          ])
-@pytest.mark.integration
-def test_occupation_location_combo(session, search_url, query, path, expected):
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-    _fetch_and_validate_result(session, search_url, query, path, expected)
-
-
 @pytest.mark.integration
 def test_skill(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -379,27 +353,6 @@ def test_region(session, search_url):
     _fetch_and_validate_result(session, search_url, {taxonomy.REGION: '-01'},
                                [fields.WORKPLACE_ADDRESS_REGION_CODE], ['01'], False)
     # TODO: this test does not work with parametrize
-
-
-@pytest.mark.integration
-@pytest.mark.skip("app.testclient.get return 0 hits. Without len check for hits, the test pretends to pass")
-def test_country_old(session, search_url):
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    _fetch_and_validate_result_old({taxonomy.REGION: '199'},
-                                   [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'])
-    _fetch_and_validate_result_old({taxonomy.REGION: '-199'},
-                                   [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'], False)
-
-
-@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
-def test_country(session, search_url):
-    print('==================', sys._getframe().f_code.co_name, '================== ')
-
-    _fetch_and_validate_result(session, search_url, {taxonomy.REGION: '199'},
-                               [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'])
-    _fetch_and_validate_result(session, search_url, {taxonomy.REGION: '-199'},
-                               [fields.WORKPLACE_ADDRESS_REGION_CODE], ['199'], False)
 
 
 if __name__ == '__main__':

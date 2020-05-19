@@ -1,7 +1,5 @@
 import logging
-from jobtech.common.customlogging import JobtechLogFormatter
 from sokannonser import settings
-import os
 from elasticapm.contrib.flask import ElasticAPM
 
 
@@ -22,10 +20,10 @@ def configure_app(flask_app):
             # regex to ignore specific routes
             'TRANSACTIONS_IGNORE_PATTERNS': ['^OPTIONS ', '^HEAD ', '^.*\/\s*$', '.*swagger']
         }
-        apm = ElasticAPM(flask_app, logging=logging.INFO)
+        apm = ElasticAPM(flask_app, logging=settings.APM_LOG_LEVEL)
         apm.capture_message('hello, apm!')
         log.info("ElasticAPM enabled")
-        log.debug("APM details: %s" % str(apm))
+        log.debug("APM details: %s, log level: %s" % (str(apm), settings.APM_LOG_LEVEL))
     else:
         log.info("ElasticAPM is disabled")
 

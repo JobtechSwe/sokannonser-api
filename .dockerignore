@@ -11,3 +11,6 @@ __pycache__
 *.pyo
 *.pyd
 venv/
+.git
+.gitignore
+.DS_Store

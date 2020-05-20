@@ -4,16 +4,15 @@ import json
 """
 Install python packages:
 pip install requests
-pip install requests
-
 
 Add your api-key
 Add the url to the system you are running the tests against
 """
 
 api_key = ''
-headers = {'api-key': api_key, 'accept': 'application/json'}
 url = "https://"
+
+headers = {'api-key': api_key, 'accept': 'application/json'}
 url_for_search = f"{url}/search"
 
 

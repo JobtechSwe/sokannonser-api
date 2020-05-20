@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 class Ontology(object):
 
     def __init__(self, client=None, index='narvalontology',
-                 annons_index=settings.ES_INDEX, stoplist=None,
+                 annons_index='platsannons-read', stoplist=None,
                  concept_type=None, include_misspelled=False):
         self.client = client
 

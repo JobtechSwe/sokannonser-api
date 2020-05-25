@@ -1,14 +1,12 @@
-import json
 import pytest
+from tests.test_resources.helper import get_search
+
 
 @pytest.mark.integration
 def test_unspecified_sweden_workplace(session, search_url):
-    url = search_url + "/search?unspecified-sweden-workplace=true&offset=0&limit=100&stats=region"
-
-    response = session.get(url)
-    response.raise_for_status()
-    hits = json.loads(response.content.decode('utf8'))['hits']
-
+    params = {'unspecified-sweden-workplace': 'true', 'offset': 0, 'limit': 100, 'stats': 'region'}
+    result_json = get_search(session, search_url, params)
+    hits = result_json['hits']
     assert len(hits) >= 27  # for use on static test data or prod
     for hit in hits:
         assert hit['workplace_address']['region'] == 'Ospecificerad arbetsort'
@@ -23,3 +21,4 @@ def test_unspecified_sweden_workplace(session, search_url):
         assert hit['workplace_address']['city'] is None
         assert hit['workplace_address']['coordinates'] == [None, None]
         assert hit['relevance'] == 0.0
+    pass

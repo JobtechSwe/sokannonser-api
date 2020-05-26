@@ -44,7 +44,7 @@ class BulkZip(Resource):
 
 @ns_bulk.route('stream')
 class BulkLoad(Resource):
-    method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
+    method_decorators = [check_api_key_and_return_metadata('bulk', settings.API_KEY_RATE_LIMIT)]
     example_date = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M:%S")
 
     @ns_bulk.doc(
@@ -77,7 +77,7 @@ class BulkLoad(Resource):
 
 @ns_bulk.route('snapshot')
 class SnapshotLoad(Resource):
-    method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
+    method_decorators = [check_api_key_and_return_metadata('bulk', settings.API_KEY_RATE_LIMIT)]
 
     @ns_bulk.doc(
         description="Download all the ads currently published in Platsbanken. "

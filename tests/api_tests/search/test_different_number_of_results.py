@@ -1,6 +1,9 @@
+import pytest
 from tests.test_resources.helper import get_search
+from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 
+@pytest.mark.skipif(TEST_USE_STATIC_DATA)
 def test_search_relevance_multiple_times(session, search_url):
     params = {'q': 'software developer',
               'country': 'i46j_HmG_v64',
@@ -11,8 +14,9 @@ def test_search_relevance_multiple_times(session, search_url):
 
     old_total = 999999
     old_pos = 999999
+    retries = 1
 
-    for i in range(100):
+    for i in range(retries):
         result = get_search(session, search_url, params)
         total = result['total']
         pos = result['positions']

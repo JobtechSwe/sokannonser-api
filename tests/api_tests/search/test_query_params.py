@@ -91,6 +91,7 @@ def test_query_params_geo_position(session, search_url, params, expected_number_
                              ({'employer': 'Göteborgs Universitet'}, 23),
                              ({'employer': 'Blekinge Läns Landsting'}, 14),
                              ({'employer': 'Skåne Läns Landsting'}, 24),
+                             ({'employer': '"Skåne Läns Landsting"'}, 24),  # quoted string for employer
 
                          ])
 def test_query_params_employer(session, search_url, params, expected_number_of_hits):

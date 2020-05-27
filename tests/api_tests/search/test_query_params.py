@@ -22,6 +22,11 @@ from sokannonser.settings import POSITION, POSITION_RADIUS
     ({'published-after': current_time_stamp, 'published-before': DAWN_OF_TIME}, 0),
 ])
 def test_query_params_date(session, search_url, params, expected_number_of_hits):
+    """
+    Test 'published-before' and 'published-after' query parameters
+    With a narrower time span, lower number of hits are returned
+    
+    """
     result = get_search(session, search_url, params)
     compare(result['total']['value'], expected_number_of_hits)
 
@@ -43,6 +48,9 @@ def test_query_params_experience(session, search_url, params, expected_number_of
     ({'parttime.max': '20'}, 3)
 ])
 def test_query_params_part_time(session, search_url, params, expected_number_of_hits):
+    """
+    Test 'parttime.min' and 'parttime.max' query parameters
+    """
     result = get_search(session, search_url, params)
     compare(result['total']['value'], expected_number_of_hits)
 
@@ -59,6 +67,11 @@ def test_query_params_part_time(session, search_url, params, expected_number_of_
     ({POSITION: '18.0,59.3'}, 0)  # lat long reversed
 ])
 def test_query_params_geo_position(session, search_url, params, expected_number_of_hits):
+    """
+    Test 'position' query parameter along with 'position-radius'
+    With larger radius, more hits are returned
+
+    """
     result = get_search(session, search_url, params)
     compare(result['total']['value'], expected_number_of_hits)
 
@@ -66,12 +79,27 @@ def test_query_params_geo_position(session, search_url, params, expected_number_
 @pytest.mark.parametrize('params, expected_number_of_hits',
                          [
                              ({'employer': 'västra götalandsregionen'}, 14),
-                             ({'employer': 'Skåne Läns Landsting'}, 24),
-                             ({'employer': 'City Gross Sverige AB'}, 733),  # Todo: this is way too much
                              ({'employer': 'Jobtech'}, 0),
                              ({'employer': 'Region Stockholm'}, 100),
+                             # Todo: this is way too much
+                             ({'employer': 'City Gross Sverige AB'}, 733),
+                             ({'employer': 'City Dental i Stockholm AB'}, 751),
+                             ({'employer': 'Premier Service Sverige AB'}, 732),
+                             ({'employer': 'Smartbear Sweden AB'}, 734),
+                             # probably too much:
+                             ({'employer': 'Malmö Universitet'}, 25),
+                             ({'employer': 'Göteborgs Universitet'}, 23),
+                             ({'employer': 'Blekinge Läns Landsting'}, 14),
+                             ({'employer': 'Skåne Läns Landsting'}, 24),
 
                          ])
 def test_query_params_employer(session, search_url, params, expected_number_of_hits):
+    """
+
+    This test return too many hits
+    it will return hits where company name has one of the words in the employer name (e.g. 'Sverige')
+    keeping it to document current behavior
+
+    """
     result = get_search(session, search_url, params)
     compare(result['total']['value'], expected_number_of_hits)

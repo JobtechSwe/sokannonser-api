@@ -118,9 +118,9 @@ def get_complete_with_headers(session, url, params, headers):
 
 def get_search_with_headers(session, url, params, headers):
     old_headers = tests.test_resources.settings.headers_search
-    tests.test_resources.settings.headers_search = headers
+    session.headers.update(headers)
     response = session.get(f"{url}/search", params=params)
-    tests.test_resources.settings.headers_search = old_headers
+    session.headers.update(old_headers)
     return response
 
 

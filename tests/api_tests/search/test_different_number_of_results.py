@@ -1,31 +1,39 @@
+import sys
 import pytest
 from tests.test_resources.helper import get_search
 from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 
-@pytest.mark.skipif(TEST_USE_STATIC_DATA)
-def test_search_relevance_multiple_times(session, search_url):
-    params = {'q': 'software developer',
-              'country': 'i46j_HmG_v64',
-              'relevance-threshold': 1,
-              'offset': 0,
-              'limit': 10,
-              'sort': 'relevance'}
+@pytest.mark.skipif(TEST_USE_STATIC_DATA, reason="too few ads in static test data to be meaningful")
+@pytest.mark.parametrize("relevance_threshold", [-1, 0, 0.1, 0.5, 0.8, 0.99, 1, 1.11])
+def test_search_relevance_multiple_times(session, search_url, relevance_threshold):
+    """
+    This test is created to reproduce a bug where number of hits differ between queries
+    """
 
-    old_total = 999999
-    old_pos = 999999
-    retries = 1
+    old_total = sys.maxsize
+    old_pos = sys.maxsize
+    failures = []
+    params = {'q': 'software developer', 'relevance-threshold': relevance_threshold}
 
-    for i in range(retries):
+    for i in range(10):
+
         result = get_search(session, search_url, params)
         total = result['total']
         pos = result['positions']
-        print(f"Total: {total}, positions: {pos}")
+        # print(f"Total: {total}, positions: {pos}")
 
-        if i > 0:
+        if i > 0:  # comparison to previous result is pointless on first try
+            msg = f"Search {i}: Total: {total}, positions: {pos}"
             pass
-            # Todo: once bug is fixed, enable checks below
-            # assert old_total == total
-        # assert old_pos == pos
+            if old_total != total or old_pos != pos:
+                failures.append(msg)
+
         old_total = total
         old_pos = pos
+
+    if len(failures) > 0:
+        print("changes from previous searches:")
+        for f in failures:
+            print(f)
+    assert len(failures) == 0  # we don't want failing tests in the repo

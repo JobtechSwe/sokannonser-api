@@ -1,15 +1,9 @@
 import sys
-
 import pytest
-
-# from sokannonser import app
-from sokannonser.repository import taxonomy
-from sokannonser.rest.model import fields
-from tests.test_resources.helper import get_search, _fetch_and_validate_result_old, _fetch_and_validate_result, compare
+from tests.test_resources.helper import get_search, compare
 
 # The tests in this file were skipped with the messages "to be removed".
 # Needs more investigation. Do we have enough coverage of enrichement?
-from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 
 @pytest.mark.skip("lacking enrichment - does not find field 'keywords'")
@@ -60,7 +54,7 @@ def test_freetext_query_one_param_found_in_enriched_neg(session, search_url):
 @pytest.mark.skip(
     reason="Temporarily disabled. Needs fix according to Trello Card #137, Multipla ord i ett yrke")  # Missing test data?
 @pytest.mark.integration
-def test_freetext_query_ssk(session, search_url, ):
+def test_freetext_query_ssk(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     query = 'stockholm grundutbildad sjuksköterska'
     json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})

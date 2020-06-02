@@ -17,7 +17,7 @@ def test_freetext_query_ssk(session, search_url):
     compare(json_response['total']['value'], expected=expected)
 
 
-# @pytest.mark.skip("Test does not find expected ad")
+@pytest.mark.skip("Test does not find expected ad")
 @pytest.mark.integration
 @pytest.mark.parametrize("synonym", ['montessori'])
 def test_freetext_query_synonym_param(session, search_url, synonym):

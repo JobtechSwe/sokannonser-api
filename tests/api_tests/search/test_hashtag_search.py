@@ -1,7 +1,6 @@
 import pytest
 
 from tests.test_resources.helper import get_with_path_return_json, compare
-from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 
 @pytest.mark.smoke

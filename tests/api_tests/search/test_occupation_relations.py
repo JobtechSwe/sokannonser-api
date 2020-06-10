@@ -47,6 +47,7 @@ def test_search_occupation_group(session, search_url, work, group, field):
 @pytest.mark.integration
 @pytest.mark.parametrize("work, group, field", [
     ([occupation.personlig_assistent, occupation.socialsekreterare, occupation.stodassistent, occupation.komminister],
+
      [group.personliga_assistenter, group.vardare__boendestodjare, group.praster, group.socialsekreterare],
      field.socialt_arbete),
     ([occupation.akutsjukskoterska_sjukskoterska__akutmottagning, occupation.sjukskoterska__grundutbildad,
@@ -64,12 +65,8 @@ def test_search_occupation_field(session, search_url, work, group, field):
     json_response = get_search(session, search_url, {'occupation-field': field})
     hits = json_response['hits']
     for hit in hits:
-        print(f"Occ: {hit['occupation']['concept_id']}, group: {hit['occupation_group']['concept_id']}, field: {field}")
-
         assert hit['occupation']['concept_id'] in work, f"expected occ {work} but got {hit['occupation']['concept_id']}"
         assert hit['occupation_group'][
                    'concept_id'] in group, f"expected group {group} but got {hit['occupation_group']['concept_id']}"
         assert hit['occupation_field'][
                    'concept_id'] == field, f"expected field {field} but got {hit['occupation_field']['concept_id']}"
-
-# legacy id

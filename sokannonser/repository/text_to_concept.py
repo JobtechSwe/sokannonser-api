@@ -22,7 +22,7 @@ class TextToConcept(object):
     REMOVED_TAG = '<removed>'
 
     def __init__(self, ontologyhost='localhost', ontologyport=9200,
-                 ontologyindex='narvalontology', ontologyuser=None, ontologypwd=None):
+                 ontologyindex='jae-synonym-dictionary', ontologyuser=None, ontologypwd=None):
         log.info('Creating TextToConcept')
 
         self.client = self.create_elastic_client(ontologyhost, ontologyport, ontologyuser,

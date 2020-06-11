@@ -21,10 +21,12 @@ def compare_typeahead(actual_typeahead, expected_typeahead):
 
 
 def compare_suggestions(actual, expected, query):
+    if len(actual) >= 50:
+        # if 50 or more we can't be sure of order and content of suggestions
+        return
     try:
-        if len(actual) < 50:  # if 50 or more we can't be sure of order
-            msg = f"\nQuery: {query}"
-            compare(len(actual), len(expected), msg)
+        msg = f"\nQuery: {query}"
+        compare(len(actual), len(expected), msg)
         for s in expected:
             msg = f"Did not find {s} in {actual} "
             assert s in actual
@@ -170,8 +172,6 @@ def check_freetext_concepts(free_text_concepts, list_of_expected):
     assert free_text_concepts['skill_must_not'] == list_of_expected[6]
     assert free_text_concepts['occupation_must_not'] == list_of_expected[7]
     assert free_text_concepts['location_must_not'] == list_of_expected[8]
-
-
 
 
 def _fetch_and_validate_result(session, search_url, query, resultfield, expected, non_negative=True):

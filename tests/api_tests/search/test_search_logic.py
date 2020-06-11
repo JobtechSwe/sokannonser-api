@@ -30,13 +30,22 @@ def test_freetext_work_and_location_details(session, search_url, query, municipa
 
 @pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.parametrize("query, expected_ids_and_relevance", [
-    ('bagare kock Stockholm Göteborg',
-     [('23780773', 1.0), ('23578307', 1.0), ('23762170', 1.0), ('23934411', 0.897897309155177),
-      ('23918920', 0.897897309155177), ('23783846', 0.8949498104298874), ('23978318', 0.7716591497509147),
-      ('23826966', 0.7716591497509147), ('23566906', 0.7716591497509147), ('23552714', 0.7716591497509147),
-      ('23502782', 0.7716591497509147), ('23451218', 0.7716591497509147), ('23981076', 0.45415871049258943),
-      ('23978439', 0.45415871049258943), ('23550781', 0.45415871049258943),
-      ])])
+    ('bagare kock Stockholm Göteborg', [
+        ('23780773', 1.0),
+        ('23578307', 1.0),
+        ('23762170', 1.0),
+        ('23934411', 0.8918781594454271),
+        ('23918920', 0.8918781594454271),
+        ('23978318', 0.7669638018470842),
+        ('23826966', 0.7669638018470842),
+        ('23566906', 0.7669638018470842),
+        ('23552714', 0.7669638018470842),
+        ('23502782', 0.7669638018470842),
+        ('23451218', 0.7669638018470842),
+        ('23981076', 0.4527304023013858),
+        ('23978439', 0.4527304023013858),
+        ('23550781', 0.4527304023013858)
+    ])])
 def test_freetext_two_work_and_two_locations_check_order(session, search_url, query, expected_ids_and_relevance):
     """
     Tests that the sorting order of hits is as expected and that relevance value has not changed
@@ -50,16 +59,16 @@ def test_freetext_two_work_and_two_locations_check_order(session, search_url, qu
     old_relevance = 1
     for index, hit in enumerate(response_json['hits']):
         relevance = hit['relevance']
-        assert old_relevance >= relevance
+        assert old_relevance >= relevance  # check that results are presented in ascending relevance order
         assert hit['id'] == expected_ids_and_relevance[index][0]
         assert hit['relevance'] == expected_ids_and_relevance[index][1]
         old_relevance = relevance
 
 
 @pytest.mark.parametrize("query, top_id, expected_number_of_hits", [
-    ('bagare kock Stockholm Göteborg', '23780773', 15),
-    ('kock bagare Stockholm Göteborg', '23780773', 15),
-    ('kallskänka kock Stockholm Göteborg', '23552714', 13),
+    ('bagare kock Stockholm Göteborg', '23780773', 14),
+    ('kock bagare Stockholm Göteborg', '23780773', 14),
+    ('kallskänka kock Stockholm Göteborg', '23552714', 12),
     ('lärare lågstadielärare Malmö Göteborg', '23981080', 5),
 ])
 def test_freetext_two_work_and_two_locations(session, search_url, query, top_id, expected_number_of_hits):

@@ -5,8 +5,8 @@ from tests.test_resources.helper import get_with_path_return_json, compare
 
 @pytest.mark.smoke
 @pytest.mark.parametrize("query, expected_number_of_hits", [
-    ('#corona', 1),
-    ('corona', 1),
+    ('#corona', 0),
+    ('corona', 0),
     ('#jobbjustnu', 6),
     ('jobbjustnu', 1),
     ('#metoo', 1),

@@ -5,7 +5,7 @@ from sokannonser import settings
 from sokannonser.repository.text_to_concept import TextToConcept
 
 host = settings.ES_HOST
-index = 'narvalontology'
+index = 'jae-synonym-dictionary'
 user = settings.ES_USER
 pwd = settings.ES_PWD
 port = settings.ES_PORT
@@ -16,7 +16,7 @@ port = settings.ES_PORT
 
 text_to_concept = TextToConcept(ontologyhost=host,
                                 ontologyport=port,
-                                ontologyindex='narvalontology',
+                                ontologyindex='jae-synonym-dictionary',
                                 ontologyuser=user,
                                 ontologypwd=pwd)
 

@@ -88,6 +88,8 @@ LOCATION_LIST = ['region', 'city', 'country', 'municipality']
 # For all ads
 SHOW_EXPIRED = 'show-expired'
 API_KEY_RATE_LIMIT = os.getenv("API_KEY_RATE_LIMIT", 60)
+if API_KEY_RATE_LIMIT == 'UNLIMITED':
+    API_KEY_RATE_LIMIT = None
 
 result_models = [
     'pbapi', 'simple'

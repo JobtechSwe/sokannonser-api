@@ -3,22 +3,14 @@ import os
 import pytest
 from sokannonser import settings
 from sokannonser.repository.text_to_concept import TextToConcept
+from tests.test_resources.settings import INDEX
 
-host = settings.ES_HOST
-index = 'jae-synonym-dictionary'
-user = settings.ES_USER
-pwd = settings.ES_PWD
-port = settings.ES_PORT
+text_to_concept = TextToConcept(ontologyhost=settings.ES_HOST,
+                                ontologyport=settings.ES_PORT,
+                                ontologyindex=INDEX,
+                                ontologyuser=settings.ES_USER,
+                                ontologypwd=settings.ES_PWD)
 
-# protocol = 'http' if host == 'localhost' else 'https'
-# url = protocol + '://' + host + ':' + str(port)
-
-
-text_to_concept = TextToConcept(ontologyhost=host,
-                                ontologyport=port,
-                                ontologyindex='jae-synonym-dictionary',
-                                ontologyuser=user,
-                                ontologypwd=pwd)
 
 @pytest.mark.smoke
 @pytest.mark.integration

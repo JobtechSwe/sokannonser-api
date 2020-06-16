@@ -1,7 +1,7 @@
 import datetime
 import os
 
-INDEX = 'jae-synonym-dictionary'
+SYNONYM_INDEX = 'jae-synonym-dictionary'
 # environment variables must be set
 TEST_USE_STATIC_DATA = os.getenv('TEST_USE_STATIC_DATA', True)
 test_api_key_search = os.getenv('TEST_API_KEY_SEARCH')

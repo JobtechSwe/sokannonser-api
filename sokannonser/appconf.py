@@ -18,12 +18,14 @@ def configure_app(flask_app):
             'SECRET_TOKEN': settings.APM_SECRET,
             'COLLECT_LOCAL_VARIABLES': 'off',
             # regex to ignore specific routes
-            'TRANSACTIONS_IGNORE_PATTERNS': ['^OPTIONS ', '^HEAD ', '^.*\/\s*$', '.*swagger']
+            'TRANSACTIONS_IGNORE_PATTERNS': ['^OPTIONS ', '^HEAD ', '^.*\/\s*$', '.*swagger'],
+            'CAPTURE_BODY': 'errors',
+            'CAPTURE_HEADERS': 'false'
         }
         apm = ElasticAPM(flask_app, logging=settings.APM_LOG_LEVEL)
         apm.capture_message('hello, apm!')
         log.info("ElasticAPM enabled")
-        log.debug("APM details: %s, log level: %s" % (str(apm), settings.APM_LOG_LEVEL))
+        log.debug("APM details. Name: %s, log level: %s" % (settings.APM_SERVICE_NAME, settings.APM_LOG_LEVEL))
     else:
         log.info("ElasticAPM is disabled")
 

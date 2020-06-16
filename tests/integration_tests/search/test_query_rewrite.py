@@ -3,11 +3,11 @@ import os
 import pytest
 from sokannonser import settings
 from sokannonser.repository.text_to_concept import TextToConcept
-from tests.test_resources.settings import INDEX
+from tests.test_resources.settings import SYNONYM_INDEX
 
 text_to_concept = TextToConcept(ontologyhost=settings.ES_HOST,
                                 ontologyport=settings.ES_PORT,
-                                ontologyindex=INDEX,
+                                ontologyindex=SYNONYM_INDEX,
                                 ontologyuser=settings.ES_USER,
                                 ontologypwd=settings.ES_PWD)
 

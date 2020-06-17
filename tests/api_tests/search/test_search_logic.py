@@ -34,17 +34,17 @@ def test_freetext_work_and_location_details(session, search_url, query, municipa
         ('23780773', 1.0),
         ('23578307', 1.0),
         ('23762170', 1.0),
-        ('23934411', 0.8918781594454271),
-        ('23918920', 0.8918781594454271),
-        ('23978318', 0.7669638018470842),
-        ('23826966', 0.7669638018470842),
-        ('23566906', 0.7669638018470842),
-        ('23552714', 0.7669638018470842),
-        ('23502782', 0.7669638018470842),
-        ('23451218', 0.7669638018470842),
-        ('23981076', 0.4527304023013858),
-        ('23978439', 0.4527304023013858),
-        ('23550781', 0.4527304023013858)
+        ('23934411', 0.8918585379117067),  # 0.8918585379117067
+        ('23918920', 0.8918585379117067),  # Old: 0.8918781594454271
+        ('23978318', 0.7669555993474402),
+        ('23826966', 0.7669555993474402),
+        ('23566906', 0.7669555993474402),
+        ('23552714', 0.7669555993474402),
+        ('23502782', 0.7669555993474402),
+        ('23451218', 0.7669555993474402),
+        ('23981076', 0.45275073813570443),
+        ('23978439', 0.45275073813570443),
+        ('23550781', 0.45275073813570443)
     ])])
 def test_freetext_two_work_and_two_locations_check_order(session, search_url, query, expected_ids_and_relevance):
     """
@@ -61,7 +61,7 @@ def test_freetext_two_work_and_two_locations_check_order(session, search_url, qu
         relevance = hit['relevance']
         assert old_relevance >= relevance  # check that results are presented in ascending relevance order
         assert hit['id'] == expected_ids_and_relevance[index][0]
-        assert hit['relevance'] == expected_ids_and_relevance[index][1]
+        assert hit['relevance'] == expected_ids_and_relevance[index][1], hit['id']
         old_relevance = relevance
 
 

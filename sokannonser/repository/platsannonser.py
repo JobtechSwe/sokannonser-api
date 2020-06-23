@@ -152,7 +152,7 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
             max_score_result = elastic.search(index=settings.ES_INDEX, body=max_score_query)
             max_score = max_score_result.get('hits', {}).get('max_score')
             if max_score:
-                query_dsl['min_score'] = max_score * args.get(settings.MIN_RELEVANCE)
+                query_dsl['min_score'] = (max_score - 1) * args.get(settings.MIN_RELEVANCE)
         log.info("ARGS: %s" % args)
         log.info("QUERY: %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)

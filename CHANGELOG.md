@@ -1,6 +1,6 @@
 Changelog Application Jobsearch
 ===============================
-#1.13.2
+# 1.13.2
 * Fix max score bug
 * Add slack client
 

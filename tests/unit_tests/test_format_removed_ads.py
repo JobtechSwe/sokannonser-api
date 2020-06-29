@@ -51,14 +51,13 @@ ad = {'id': 24025897, 'external_id': None, 'headline': 'Sjuksköterska sökes ti
                                                     'västernorrland', 'sverige', 'sundsvall']}}}
 
 
-@pytest.mark.skip('Fails because conversion to float will add .0 to the id')
 def test_format_removed_ad():
     result = bulkloader.format_removed_ad(ad)
-    expected_id = 24025897
-    actual_id = 24025897.0
+    expected_id = '24025897'
 
+    ad_id = result['id']
+    assert isinstance(ad_id, str), f"id was of type: {type(ad_id)}"
     expected = {'id': expected_id, 'removed': False, 'removed_date': None, 'occupation': 'bXNH_MNX_dUR',
                 'occupation_group': 'Z8ci_bBE_tmx', 'occupation_field': 'NYW6_mP6_vwf', 'municipality': 'dJbx_FWY_tK6',
                 'region': 'NvUF_SP1_1zo', 'country': 'i46j_HmG_v64'}
     assert result == expected
-    assert type(result['id']) == float

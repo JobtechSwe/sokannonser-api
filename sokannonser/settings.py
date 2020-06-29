@@ -56,8 +56,6 @@ STATISTICS = 'stats'
 STAT_LMT = 'stats.limit'
 PARTTIME_MIN = 'parttime.min'
 PARTTIME_MAX = 'parttime.max'
-LONGITUDE = 'longitude'
-LATITUDE = 'latitude'
 POSITION = 'position'
 POSITION_RADIUS = 'position.radius'
 DEFAULT_POSITION_RADIUS = 5
@@ -81,7 +79,7 @@ TAX_DESCRIPTION = 'DEPRECATED, use https://taxonomy.api.jobtechdev.se/v1/taxonom
 # For Batch
 DATE = 'date'
 UPDATED_BEFORE_DATE = 'updated-before-date'
-MAX_DATE = '3000-01-01 00:00:00'
+MAX_DATE = '3000-01-01T00:00:00'
 OCCUPATION_CONCEPT_ID = 'occupation-concept-id'
 LOCATION_CONCEPT_ID = 'location-concept-id'
 OCCUPATION_LIST = ['occupation', 'occupation_field', 'occupation_group']
@@ -89,6 +87,9 @@ LOCATION_LIST = ['region', 'city', 'country', 'municipality']
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'
+API_KEY_RATE_LIMIT = os.getenv("API_KEY_RATE_LIMIT", 60)
+if API_KEY_RATE_LIMIT == 'UNLIMITED':
+    API_KEY_RATE_LIMIT = None
 
 result_models = [
     'pbapi', 'simple'
@@ -97,12 +98,21 @@ result_models = [
 # sweden country concept id: /v1/taxonomy/main/concepts?id=i46j_HmG_v64'
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
+# Slack integration
+SLACK_TOKEN = 'SLACK'
+SLACK_CHANNEL = 'test-result'
+SLACK_USERNAME = 'lina-test'
+SLACK_ENABLED = True
+SLACK_REDIRECT_CHANNEL: str = None
+PRINT_SLACK_MESSAGE = False
+SLACK_SERVER_STATISTICS = False
+SLACK_DEFAULT_TEMPLATE = 'slack/base_message.slack'
+SLACK_STORE_MESSAGE = False
+TEST_RESULT_CHANNEL = 'test-result'
 
-# for tests:
-NUMBER_OF_ADS = 1072
-DAWN_OF_TIME = '1970-01-01T00:00:01'
-test_api_key = os.getenv('TEST_API_KEY')
-headers = {'api-key': test_api_key, 'accept': 'application/json'}
+# URLs of environment
+URL_DEV = os.getenv('URL_DEV', 'localhost/')
+URL_STAGE = os.getenv('URL_STAGE', 'localhost/')
+URL_PROD = os.getenv('URL_PROD', 'https://jobsearch.api.jobtechdev.se/')
 
-API_VERSION = '1.13.1'
-current_time_stamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+API_VERSION = '1.13.2'

@@ -3,7 +3,7 @@ import time
 from datetime import datetime, timedelta
 from flask import send_file, Response
 from flask_restx import Resource
-from jobtech.common.rest.decorators import check_api_key, check_api_key_and_return_metadata
+from jobtech.common.rest.decorators import check_api_key_and_return_metadata
 from bulkloader.rest import ns_bulk, bulk_zip_query, bulk_stream_query, bulk_snapshot_query
 from bulkloader import repository
 from sokannonser import settings
@@ -44,16 +44,22 @@ class BulkZip(Resource):
 
 @ns_bulk.route('stream')
 class BulkLoad(Resource):
-    method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
+    method_decorators = [check_api_key_and_return_metadata('bulk', settings.API_KEY_RATE_LIMIT)]
     example_date = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M:%S")
-
+    """
+        settings.OCCUPATION_CONCEPT_ID: "Filter stream by one or more concept id’s for occupations. "
+                                        "(occupation_field, occupation_group, occupation)",
+        settings.LOCATION_CONCEPT_ID: "Filter stream ads by one or more locations' concept ids. "
+                                      "(concept_ids from Country, Region, Municipality)"
+    """
     @ns_bulk.doc(
         params={
             settings.DATE: "Stream ads updated since datetime. "
                            "Accepts datetime as YYYY-MM-DDTHH:MM:SS, "
                            "for example %s. Rate limit is one request per minute." % example_date,
-            settings.UPDATED_BEFORE_DATE: "Stream ads updated before datetime. Optional if you want to set a custom time span. "
-                                          "Defaults to now if not set. Accepts datetime as YYYY-MM-DDTHH:MM:SS"
+            settings.UPDATED_BEFORE_DATE: "Stream ads updated before datetime."
+                                          "Optional if you want to set a custom time span. "
+                                          "Defaults to 'now' if not set. Accepts datetime as YYYY-MM-DDTHH:MM:SS."
         },
         responses={
             200: 'OK',
@@ -66,12 +72,13 @@ class BulkLoad(Resource):
     def get(self, **kwargs):
         elasticapm.set_user_context(username=kwargs.get('key_app'), user_id=kwargs.get('key_id'))
         args = bulk_stream_query.parse_args()
+        log.info('ARGS: %s' % args)
         return Response(repository.load_all(args), mimetype='application/json')
 
 
 @ns_bulk.route('snapshot')
 class SnapshotLoad(Resource):
-    method_decorators = [check_api_key_and_return_metadata('bulk', 60)]
+    method_decorators = [check_api_key_and_return_metadata('bulk', settings.API_KEY_RATE_LIMIT)]
 
     @ns_bulk.doc(
         description="Download all the ads currently published in Platsbanken. "

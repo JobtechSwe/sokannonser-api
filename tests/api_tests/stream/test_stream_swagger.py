@@ -2,11 +2,11 @@ import json
 from sokannonser import settings
 
 
-def test_swagger(session, url):
+def test_swagger(session, stream_url):
     """
     Test Swagger info
     """
-    response = session.get(f"{url}/swagger.json")
+    response = session.get(f"{stream_url}/swagger.json")
     response.raise_for_status()
     response_json = json.loads(response.content)
     assert response_json['info']['version'] == settings.API_VERSION

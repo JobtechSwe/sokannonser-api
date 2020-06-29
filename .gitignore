@@ -4,5 +4,14 @@ build
 *.eggs
 .pytest_cache/
 .coverage
-./idea/
+.idea/
 pytest_secrets.env
+.DS_Store
+/.idea/
+/.idea/inspectionProfiles/
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/sokannonser-api.iml
+/.idea/vcs.xml
+/.idea/workspace.xml

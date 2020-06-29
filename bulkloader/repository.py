@@ -111,7 +111,7 @@ def load_all(args):
     if args.get(settings.UPDATED_BEFORE_DATE, None):
         before = args.get(settings.UPDATED_BEFORE_DATE)
     else:
-        before = datetime.datetime.strptime(settings.MAX_DATE, '%Y-%m-%d %H:%M:%S')
+        before = datetime.datetime.strptime(settings.MAX_DATE, '%Y-%m-%dT%H:%M:%S')
 
     # input is not allowed by type=inputs.datetime_from_iso8601
     if since == 'yesterday':
@@ -135,6 +135,16 @@ def load_all(args):
         }
     }]
 
+    occupation_concept_ids = args.get(settings.OCCUPATION_CONCEPT_ID)
+    if occupation_concept_ids:
+        occupation_list = [occupation + '.' + 'concept_id.keyword' for occupation in settings.OCCUPATION_LIST]
+        add_filter_query(dsl, occupation_list, occupation_concept_ids)
+
+    location_concept_ids = args.get(settings.LOCATION_CONCEPT_ID)
+    if location_concept_ids:
+        location_list = ['workplace_address.' + location + '_concept_id' for location in settings.LOCATION_LIST]
+        add_filter_query(dsl, location_list, location_concept_ids)
+
     log.debug('QUERY(load_all): %s' % json.dumps(dsl))
 
     scan_result = scan(elastic, dsl, index=index)
@@ -155,6 +165,7 @@ def load_all(args):
 
 def add_filter_query(dsl, items, concept_ids):
     # add occupation or location filter query
+
     should_query = []
     for concept_id in concept_ids:
         if concept_id:
@@ -173,18 +184,46 @@ def format_ad(ad_data):
 
 # @marshaller.marshal_with(removed_job_ad)
 def format_removed_ad(ad_data):
+    if ad_data.get('occupation', None):
+        occupation = ad_data.get('occupation', None).get('concept_id', None)
+    else:
+        occupation = None
+
+    if ad_data.get('occupation_group', None):
+        occupation_group = ad_data.get('occupation_group', None).get('concept_id', None)
+    else:
+        occupation_group = None
+
+    if ad_data.get('occupation_field', None):
+        occupation_field = ad_data.get('occupation_field', None).get('concept_id', None)
+    else:
+        occupation_field = None
+
+    if ad_data.get('workplace_address', None):
+        municipality = ad_data.get('workplace_address', None).get('municipality_concept_id', None)
+        region = ad_data.get('workplace_address', None).get('region_concept_id', None)
+        country = ad_data.get('workplace_address', None).get('country_concept_id', None)
+    else:
+        municipality = None
+        region = None
+        country = None
+
     return {
         'id': str(ad_data.get('id')),
         'removed': ad_data.get('removed'),
-        'removed_date': ad_data.get('removed_date')
+        'removed_date': ad_data.get('removed_date'),
+        'occupation': occupation,
+        'occupation_group': occupation_group,
+        'occupation_field': occupation_field,
+        'municipality': municipality,
+        'region': region,
+        'country': country
     }
 
 
 def load_snapshot():
     index = settings.ES_STREAM_INDEX if _index_exists(settings.ES_STREAM_INDEX) \
         else settings.ES_INDEX
-    log.debug("Elastic index(load_all): % s" % index)
-
     dsl = _es_dsl()
     dsl['query']['bool']['filter'].append({"term": {"removed": False}})
     log.debug('QUERY(load_all): %s' % json.dumps(dsl))

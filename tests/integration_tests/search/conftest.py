@@ -1,29 +1,28 @@
 import os
 import pytest
 import requests
-
-test_api_key = os.getenv('TEST_API_KEY')
-headers = {'api-key': test_api_key, 'accept': 'application/json'}
+from sokannonser import settings
 
 
 @pytest.fixture
-def session(scope="session"):
+def integration_session(scope="session"):
     """
     creates a Session object which will persist over the entire test run ("session").
     http connections will be reused (higher performance, less resource usage)
     Returns a Session object
     """
     s = requests.sessions.Session()
-    s.headers.update(headers)
+    s.headers.update(settings.headers_search)
     return s
 
 
 @pytest.fixture
-def url(scope="session"):
+def integration_url(scope="session"):
     """
     returns an url
-
     """
-    port = os.getenv('TEST_PORT_INTEGRATION', 5000)
 
-    return f"http://localhost:{port}"
+    test_url = os.getenv('TEST_URL_INTEGRATION', 'http://localhost')
+
+    port = os.getenv('TEST_PORT_INTEGRATION', 5000)
+    return f"{test_url}:{port}"

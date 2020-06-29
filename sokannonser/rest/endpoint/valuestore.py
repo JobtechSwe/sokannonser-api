@@ -1,6 +1,6 @@
 from flask import request
 from flask_restx import Resource, abort
-from jobtech.common.rest.decorators import check_api_key, check_api_key_and_return_metadata
+from jobtech.common.rest.decorators import check_api_key_and_return_metadata
 from sokannonser.repository import taxonomy
 from sokannonser import settings
 from sokannonser.repository import elastic, platsannonser

@@ -1,4 +1,6 @@
 import logging
+import json
+from sokannonser import settings
 from sokannonser.rest.model import fields
 from sokannonser.repository import text_to_concept as ttc
 from flashtext.keyword import KeywordProcessor
@@ -11,7 +13,7 @@ log = logging.getLogger(__name__)
 class Ontology(object):
 
     def __init__(self, client=None, index='narvalontology',
-                 annons_index='platsannons-read', stoplist=None,
+                 annons_index=settings.ES_INDEX, stoplist=None,
                  concept_type=None, include_misspelled=False):
         self.client = client
 
@@ -91,14 +93,14 @@ class Ontology(object):
                         {
                             "range": {
                                 fields.PUBLICATION_DATE: {
-                                    "lte": "now/m"
+                                    "lte": "now/m+2H/m"
                                 }
                             }
                         },
                         {
                             "range": {
                                 fields.LAST_PUBLICATION_DATE: {
-                                    "gte": "now/m"
+                                    "gte": "now/m+2H/m"
                                 }
                             }
                         },
@@ -112,6 +114,7 @@ class Ontology(object):
             },
             "size": 0
         }
+        log.info("Ontology(load_locations). Index: %s Query: %s" % (self.annons_index, json.dumps(query)))
         results = self.client.search(body=query, index=self.annons_index)
         ext_buckets = results.get('aggregations', {}).get('ext_locations', {}).get('buckets', [])
         enr_buckets = results.get('aggregations', {}).get('enr_locations', {}).get('buckets', [])
@@ -139,7 +142,7 @@ class Ontology(object):
                                        concept_type, concepts))
         return concepts
 
-    def elastic_iterator(self, maximum=None, query=None, _source=None, size=1000):
+    def elastic_iterator(self, maximum=None, query=None, _source=None, size=10000):
         if maximum:
             maximum = int(maximum)
         if query is None:
@@ -155,7 +158,7 @@ class Ontology(object):
 
         scan_result = scan(self.client, elastic_query, index=self.index,
                            size=size, _source=_source)
-
+        log.info("Ontology(elastic_iterator). Index: %s Query: %s Size: %d" % (self.index, json.dumps(elastic_query), size))
         i = 0
         try:
             for row in scan_result:

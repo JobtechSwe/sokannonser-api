@@ -1,5 +1,9 @@
 Changelog Application Jobsearch
 ===============================
+#1.13.2
+* Fix max score bug
+* Add slack client
+
 # 1.13.1
 * Set APM log level
 

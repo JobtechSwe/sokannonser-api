@@ -41,6 +41,26 @@ class QueryBuilder(object):
                 query_dsl['sort'] = [f.sort_options.get('pubdate-desc')]
             return query_dsl
 
+        # “query”: {
+        # “bool”: {
+        # “must”: [
+        #     {
+        # “bool”: {
+        # “should”: [
+        #     {
+        #         Nuvarande MUST-query
+        # },
+        # {
+        #     Ny fritext-query, exklusive orter för då blir det verkligen dåligt
+        # }
+        # ],
+        # “minimum_should_match”: 1
+        # }
+        # }
+        # ]
+        # }
+        # }
+
         must_queries = list()
 
         must_queries.append(
@@ -371,6 +391,13 @@ class QueryBuilder(object):
         self._add_phrases_query(ft_query, phrases)
 
         ft_query = self._freetext_headline(ft_query, original_querystring)
+
+        text_concepts = self.ttc.text_to_concepts(original_querystring)
+        # fetch terms from result...
+        # search in description and header...
+
+        #self._freetext_concepts(ft_query, text_concepts, querystring, queryfields, 'should')
+
         return ft_query
 
     # Add phrase queries
@@ -453,6 +480,18 @@ class QueryBuilder(object):
         if mustnts:
             ft_query['bool']['must_not'] = mustnts
         return ft_query
+
+    def _freetext_header_description(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
+        return [
+            {
+                "multi_match": {
+                    "query": searchword,
+                    "type": "cross_fields",
+                    "operator": method,
+                    "fields": [f.HEADLINE, f.DESCRIPTION_TEXT]
+                }
+            }
+        ]
 
     def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
         return [{

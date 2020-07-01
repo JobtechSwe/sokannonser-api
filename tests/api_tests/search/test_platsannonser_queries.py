@@ -59,23 +59,23 @@ def test_min_relevance_new(session, search_url, minimum_relevance, expect_to_get
 
 @pytest.mark.integration
 @pytest.mark.parametrize("query, expected", [('python', 8),
-                                             ('python php', 7),
-                                             ('+python php', 7),
-                                             ('+python -php', 7),
-                                             ('-python -php', 1065),  # of 1072
+                                             ('python php', 8),
+                                             ('+python php', 8),
+                                             ('+python -php', 8),
+                                             ('-python -php', 1064),  # of 1072
                                              ('php', 0),  # ?
                                              ('systemutvecklare +python java linux mac', 2),
                                              ('systemutvecklare +python -java linux mac', 0),
-                                             ('systemutvecklare python java php', 12),
-                                             ('systemutvecklare -python java php', 10),
-                                             ('systemutvecklare python java -php', 12),
-                                             ('lärarexamen', 6),
-                                             ('lärarexamen -lärare', 1),
+                                             ('systemutvecklare python java php', 11),
+                                             ('systemutvecklare -python java php', 9),
+                                             ('systemutvecklare python java -php', 11),
+                                             ('lärarexamen', 7),
+                                             ('lärarexamen -lärare', 2),
                                              ('sjuksköterska', 85),
-                                             ('sjuksköterska -stockholm', 77),
+                                             ('sjuksköterska -stockholm', 76),
                                              ('sjuksköterska -malmö', 82),
-                                             ('sjuksköterska -stockholm -malmö', 74),
-                                             ('sjuksköterska -stockholm -malmö -göteborg -eskilstuna', 67),
+                                             ('sjuksköterska -stockholm -malmö', 73),
+                                             ('sjuksköterska -stockholm -malmö -göteborg -eskilstuna', 66),
                                              ('sjuksköterska Helsingborg -stockholm -malmö -göteborg -eskilstuna', 1)
                                              # 3 ads with work_place.municipality Helsingborg
                                              ])
@@ -103,7 +103,7 @@ def test_freetext_query_misspelled_param(session, search_url, typo, expected_num
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("special, expected_number_of_hits", [('c++', 7), ('c#', 15)])
+@pytest.mark.parametrize("special, expected_number_of_hits", [('c++', 8), ('c#', 16)])
 def test_freetext_query_with_special_characters(session, search_url, special, expected_number_of_hits):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     json_response = get_search(session, search_url, params={'q': special, 'limit': '0'})

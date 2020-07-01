@@ -3,22 +3,14 @@ import os
 import pytest
 from sokannonser import settings
 from sokannonser.repository.text_to_concept import TextToConcept
+from tests.test_resources.settings import SYNONYM_INDEX
 
-host = settings.ES_HOST
-index = 'narvalontology'
-user = settings.ES_USER
-pwd = settings.ES_PWD
-port = settings.ES_PORT
+text_to_concept = TextToConcept(ontologyhost=settings.ES_HOST,
+                                ontologyport=settings.ES_PORT,
+                                ontologyindex=SYNONYM_INDEX,
+                                ontologyuser=settings.ES_USER,
+                                ontologypwd=settings.ES_PWD)
 
-# protocol = 'http' if host == 'localhost' else 'https'
-# url = protocol + '://' + host + ':' + str(port)
-
-
-text_to_concept = TextToConcept(ontologyhost=host,
-                                ontologyport=port,
-                                ontologyindex='narvalontology',
-                                ontologyuser=user,
-                                ontologypwd=pwd)
 
 @pytest.mark.smoke
 @pytest.mark.integration
@@ -56,9 +48,7 @@ def test_rewrite_unigram_multiple_skills():
 @pytest.mark.integration
 def test_rewrite_jobtitle_with_hyphen():
     print('\n==================', sys._getframe().f_code.co_name, '==================')
-
     concepts = text_to_concept.text_to_concepts('HR-specialister')
-    # pprint(concepts)
     assert_not_empty(concepts, 'occupation')
     assert 'hr-specialist' in [c['concept'].lower() for c in concepts['occupation']]
 
@@ -68,7 +58,6 @@ def test_rewrite_competence_special_characters():
     print('\n==================', sys._getframe().f_code.co_name, '==================')
 
     concepts = text_to_concept.text_to_concepts('java c++ .net microsoft visual c++ c-sharp c-level')
-    # pprint(concepts)
     assert_not_empty(concepts, 'skill')
     assert 'java' in [c['concept'].lower() for c in concepts['skill']]
     assert 'c++' in [c['concept'].lower() for c in concepts['skill']]
@@ -100,7 +89,7 @@ def test_rewrite_bigrams():
     concepts = text_to_concept.text_to_concepts('inhouse key account manager säljare')
     assert_not_empty(concepts, 'occupation')
     assert 'key account manager' in [c['concept'].lower() for c in concepts['occupation']]
-    assert 'säljare' in [c['concept'].lower() for c in concepts['occupation']]
+    assert 'försäljare' in [c['concept'].lower() for c in concepts['occupation']]
 
 
 @pytest.mark.integration
@@ -118,7 +107,7 @@ def test_rewrite_uppercase_input():
     assert len(concepts) > 0
     assert_not_empty(concepts, 'occupation')
     assert 'key account manager' in [c['concept'].lower() for c in concepts['occupation']]
-    assert 'säljare' in [c['concept'].lower() for c in concepts['occupation']]
+    assert 'försäljare' in [c['concept'].lower() for c in concepts['occupation']]
 
 
 @pytest.mark.integration
@@ -157,7 +146,7 @@ def test_rewrite_must_words():
     assert_not_empty(concepts, 'location_must')
     assert_not_empty(concepts, 'location_must_not')
 
-    assert 'säljare' in [c['concept'].lower() for c in concepts['occupation']]
+    assert 'försäljare' in [c['concept'].lower() for c in concepts['occupation']]
     assert 'målare' in [c['concept'].lower() for c in concepts['occupation_must']]
     assert 'key account manager' in [c['concept'].lower() for c in concepts['occupation_must']]
     assert 'c#' in [c['concept'].lower() for c in concepts['skill']]

@@ -41,26 +41,6 @@ class QueryBuilder(object):
                 query_dsl['sort'] = [f.sort_options.get('pubdate-desc')]
             return query_dsl
 
-        # “query”: {
-        # “bool”: {
-        # “must”: [
-        #     {
-        # “bool”: {
-        # “should”: [
-        #     {
-        #         Nuvarande MUST-query
-        # },
-        # {
-        #     Ny fritext-query, exklusive orter för då blir det verkligen dåligt
-        # }
-        # ],
-        # “minimum_should_match”: 1
-        # }
-        # }
-        # ]
-        # }
-        # }
-
         must_queries = list()
 
         must_queries.append(
@@ -587,7 +567,22 @@ class QueryBuilder(object):
                             }
                         }
                     )
-
+                    if base_field == f.KEYWORDS_ENRICHED and (key == 'occupation' or key == 'skill'):
+                        #Add extra search for the current known term in headline, employer and description to be sure
+                        # not to miss search hits where the term wasn't identified during enrichment. Only search
+                        # occupations and skills to avoid locations...
+                        query_dict['bool'][bool_type].append(
+                            {'multi_match': {
+                                'query': concept['term'].lower(),
+                                'type': 'cross_fields',
+                                'operator': 'and',
+                                'fields': [
+                                    'headline^0.1',
+                                    'keywords.extracted.employer^0.1',
+                                    'description.text^0.1'
+                                ]
+                            }}
+                        )
         return query_dict
 
     # Parses EMPLOYER

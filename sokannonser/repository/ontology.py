@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 class Ontology(object):
 
-    def __init__(self, client=None, index='jae-synonym-dictionary',
+    def __init__(self, client=None, index=settings.ONTOLOGY_INDEX,
                  annons_index=settings.ES_INDEX, stoplist=None,
                  concept_type=None, include_misspelled=False):
         self.client = client

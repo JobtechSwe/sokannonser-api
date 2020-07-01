@@ -1,5 +1,4 @@
 import os
-import datetime
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "localhost")
@@ -115,4 +114,4 @@ URL_DEV = os.getenv('URL_DEV', 'localhost/')
 URL_STAGE = os.getenv('URL_STAGE', 'localhost/')
 URL_PROD = os.getenv('URL_PROD', 'https://jobsearch.api.jobtechdev.se/')
 
-API_VERSION = '1.13.2'
+API_VERSION = '1.14.0.dev'

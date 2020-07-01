@@ -114,4 +114,7 @@ URL_DEV = os.getenv('URL_DEV', 'localhost/')
 URL_STAGE = os.getenv('URL_STAGE', 'localhost/')
 URL_PROD = os.getenv('URL_PROD', 'https://jobsearch.api.jobtechdev.se/')
 
+# original index: narvalontology
+ONTOLOGY_INDEX = os.getenv('ONTOLOGY_INDEX', 'jae-synonym-dictionary')
+
 API_VERSION = '1.14.0.dev'

@@ -1,7 +1,7 @@
 import os
 
 # Elasticsearch settings
-ES_HOST = os.getenv("ES_HOST", "localhost")
+ES_HOST = os.getenv("ES_HOST", "127.0.0.1")
 ES_PORT = os.getenv("ES_PORT", 9200)
 ES_USER = os.getenv("ES_USER")
 ES_PWD = os.getenv("ES_PWD")
@@ -110,8 +110,8 @@ SLACK_STORE_MESSAGE = False
 TEST_RESULT_CHANNEL = 'test-result'
 
 # URLs of environment
-URL_DEV = os.getenv('URL_DEV', 'localhost/')
-URL_STAGE = os.getenv('URL_STAGE', 'localhost/')
+URL_DEV = os.getenv('URL_DEV', '127.0.0.1/')
+URL_STAGE = os.getenv('URL_STAGE', '127.0.0.1/')
 URL_PROD = os.getenv('URL_PROD', 'https://jobsearch.api.jobtechdev.se/')
 
 # original index: narvalontology

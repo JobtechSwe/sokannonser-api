@@ -20,7 +20,7 @@ class TextToConcept(object):
     LOCATION_KEY = 'GEO'
     REMOVED_TAG = '<removed>'
 
-    def __init__(self, ontologyhost='localhost', ontologyport=9200,
+    def __init__(self, ontologyhost='127.0.0.1', ontologyport=9200,
                  ontologyindex=settings.ONTOLOGY_INDEX, ontologyuser=None, ontologypwd=None):
         log.info('Creating TextToConcept')
 
@@ -30,7 +30,7 @@ class TextToConcept(object):
 
         self.ontology = None
 
-        if settings.ES_HOST != 'localhost':
+        if settings.ES_HOST != '127.0.0.1':
             # Cache ontology directly unless it's a local call (tests or docker build)
             self.get_ontology()
 

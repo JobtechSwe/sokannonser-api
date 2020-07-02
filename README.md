@@ -13,7 +13,7 @@ Default values are provided with the listing.
 
 ### Application configuration
 
-    ES_HOST=localhost
+    ES_HOST=127.0.0.1
 
 Specifies which elastic search host to use for searching.
 
@@ -74,7 +74,7 @@ Then run the following commands.
     $ export FLASK_ENV=development
     $ flask run
 
-Go to http://localhost:5000 to access the swagger API
+Go to http://127.0.0.1:5000 to access the swagger API
 
 ## Test
 

@@ -200,3 +200,5 @@ def send_freetext_first_ten_hits_result_slack_message(result):
                     ))
             ]
         ).send()
+
+run_test_cases('q_text_cases.txt', 'dev', 'prod')

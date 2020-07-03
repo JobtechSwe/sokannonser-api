@@ -98,7 +98,7 @@ result_models = [
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
 # Slack integration
-SLACK_TOKEN = 'SLACK'
+SLACK_TOKEN = os.getenv('SLACK_TOKEN')
 SLACK_CHANNEL = 'test-result'
 SLACK_USERNAME = 'lina-test'
 SLACK_ENABLED = True

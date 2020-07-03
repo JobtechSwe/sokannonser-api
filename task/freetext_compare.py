@@ -15,8 +15,8 @@ url = {
 
 
 def run_test_cases(file_name, channel1, channel2):
-    THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
-    my_file = os.path.join(THIS_FOLDER, 'test_cases/' + file_name)
+    this_folder = os.path.dirname(os.path.abspath(__file__))
+    my_file = os.path.join(this_folder, 'test_cases/' + file_name)
 
     freetext_hits_result = list()
     freetext_first_hit_result = list()
@@ -53,11 +53,10 @@ def run_test_cases(file_name, channel1, channel2):
 
 
 def get_search_result(q, env):
-    URL = env
-    headers = {'api-key': 'narwhal', }
-    PARAMS = {'q': q}
+    headers = {'api-key': settings.APIKEY, }
+    params = {'q': q}
 
-    responses = requests.get(url=URL, params=PARAMS, headers=headers)
+    responses = requests.get(url=env, params=params, headers=headers)
     response_json = responses.json()
     return response_json
 
@@ -70,9 +69,9 @@ color = {
 
 
 def check_color(different, hits):
-    if different / hits > 0.25:
+    if abs(different) / hits > 0.25:
         return color['red']
-    elif different / hits > 0.01:
+    elif abs(different) / hits > 0.01:
         return color['yellow']
     return color['green']
 
@@ -80,11 +79,11 @@ def check_color(different, hits):
 def check_freetext_hits(channel1_result, channel2_result):
     channel1_hits = channel1_result.get('total').get('value')
     channel2_hits = channel2_result.get('total').get('value')
-    difference = abs(channel1_hits - channel2_hits)
+    difference = channel1_hits - channel2_hits
     if difference:
-        color = check_color(difference, channel1_hits) if channel2_hits > channel1_hits \
-            else check_color(difference, channel2_hits)
-        return [color, channel1_hits, channel2_hits, difference]
+        median = (channel1_hits + channel2_hits) / 2
+        colour = check_color(difference, median)
+        return [colour, channel1_hits, channel2_hits, difference]
     return difference
 
 
@@ -127,23 +126,21 @@ def check_freetext_first_ten_hits(channel1_result, channel2_result):
 def send_freetext_hits_result_slack_message(result):
     result = sorted(result, key=lambda item: item[3], reverse=True)
     SlackMessage(channel=settings.TEST_RESULT_CHANNEL,
-                 attachments=[SlackAttachment(
-                 title="Freetext hits difference",
-    )]).send()
+                 attachments=[SlackAttachment(title="Freetext hits difference",)]).send()
 
-    for color, channel1_hits, channel2_hits, difference, q, channel1, channel2 in result:
+    for colour, channel1_hits, channel2_hits, difference, q, channel1, channel2 in result:
         SlackMessage(
             channel=settings.TEST_RESULT_CHANNEL,
             attachments=[
                 SlackAttachment(
-                    color=color,
-                    text="`{q}` get `{channel1_hits}` ({channel1}) hits & `{channel2_hits}` ({channel2}) hits -diff `{difference}`".format(
+                    color=colour,
+                    text="{q}: {ch1_h} {ch1} hits & {ch2_h} {ch2} hits: {diff} diff".format(
                         q=q,
-                        channel1_hits=channel1_hits,
-                        channel1=channel1,
-                        channel2_hits=channel2_hits,
-                        channel2=channel2,
-                        difference=difference
+                        ch1_h=channel1_hits,
+                        ch1=channel1,
+                        ch2_h=channel2_hits,
+                        ch2=channel2,
+                        diff=difference
                     ))
             ]
         ).send()
@@ -152,8 +149,8 @@ def send_freetext_hits_result_slack_message(result):
 def send_freetext_hit_result_utility_slack_message(difference, all_count):
     SlackMessage(channel=settings.TEST_RESULT_CHANNEL,
                  attachments=[SlackAttachment(
-                     title="Freetext hits difference number is `{difference}` and utility is `{utility}`%".format(
-                         difference=difference,
+                     title="Freetext hits difference: {diff}, utility: {utility}%".format(
+                         diff=difference,
                          utility=round(difference/all_count*100, 2)
                      ),
                  )]).send()
@@ -171,12 +168,12 @@ def send_freetext_first_hit_result_slack_message(result):
             attachments=[
                 SlackAttachment(
                     color=color['red'],
-                    text="`{q}` get first hit -`{channel1_first_hit}` ({channel1}) & `{channel2_first_hit}` ({channel2})".format(
+                    text="{q} first hit: {ch1_hit} {ch1} & {ch2_hit} {ch2}".format(
                         q=q,
-                        channel1_first_hit=channel1_first_hit,
-                        channel1=channel1,
-                        channel2_first_hit=channel2_first_hit,
-                        channel2=channel2
+                        ch1_hit=channel1_first_hit,
+                        ch1=channel1,
+                        ch2_hit=channel2_first_hit,
+                        ch2=channel2
                     ))
             ]
         ).send()
@@ -194,12 +191,12 @@ def send_freetext_first_ten_hits_result_slack_message(result):
             attachments=[
                 SlackAttachment(
                     color=color['red'],
-                    text="`{q}` get first ten hits rank differently -`{channel1_first_ten_hit}` ({channel1}) & `{channel2_first_ten_hit}` ({channel2})".format(
+                    text="{q} first 10 hits rank diff: {ch1_hit} {ch1} & {ch2_hit} {ch2}".format(
                         q=q,
-                        channel1_first_ten_hit=str(channel1_first_ten_hit),
-                        channel1=channel1,
-                        channel2_first_ten_hit=str(channel2_first_ten_hit),
-                        channel2=channel2
+                        ch1_hit=str(channel1_first_ten_hit),
+                        ch1=channel1,
+                        ch2_hit=str(channel2_first_ten_hit),
+                        ch2=channel2
                     ))
             ]
         ).send()

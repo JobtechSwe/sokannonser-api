@@ -369,15 +369,7 @@ class QueryBuilder(object):
         # Require musts
         self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must')
         self._add_phrases_query(ft_query, phrases)
-
         ft_query = self._freetext_headline(ft_query, original_querystring)
-
-        text_concepts = self.ttc.text_to_concepts(original_querystring)
-        # fetch terms from result...
-        # search in description and header...
-
-        #self._freetext_concepts(ft_query, text_concepts, querystring, queryfields, 'should')
-
         return ft_query
 
     # Add phrase queries

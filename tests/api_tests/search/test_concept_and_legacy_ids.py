@@ -20,3 +20,4 @@ def test_all_ads_for_concept_and_legacy_ids(session, search_url, id_concept_lega
 
     assert json_response['occupation_field']['concept_id'] == id_concept_legacy['occupation_field_concept_id']
     assert json_response['occupation_field']['label'] == id_concept_legacy['occupation_field_label']
+

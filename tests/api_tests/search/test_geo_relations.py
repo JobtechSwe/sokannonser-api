@@ -34,6 +34,7 @@ def test_search_region(session, search_url, cities, region, country):
     json_response = get_search(session, search_url, {'region': region})
     hits = json_response['hits']
     for hit in hits:
+        print(hit['id'])
         assert hit['workplace_address']['municipality_concept_id'] in cities
         assert hit['workplace_address']['region_concept_id'] == region
         assert hit['workplace_address']['country_concept_id'] == country

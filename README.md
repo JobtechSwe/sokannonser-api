@@ -64,6 +64,13 @@ In order to use APM, the following environment variables must be set.
     APM_SECRET
     APM_LOG_LEVEL
     
+### Support historical ads
+
+The API can include historical ads (i.e. ads that are no longer published according to date and/or removed flag) in
+search result.
+
+    INCLUDE_HISTORICAL_ADS
+    
 ## Installation and running
 
 To start up the application, set the appropriate environment variables as described above. 

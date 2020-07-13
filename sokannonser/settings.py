@@ -40,6 +40,8 @@ X_FEATURE_SPELLCHECK_TYPEAHEAD = 'x-feature-spellcheck-typeahead'
 X_FEATURE_DISABLE_SMART_FREETEXT = 'x-feature-disable-smart-freetext'
 X_FEATURE_SUGGEST_EXTRA_WORD = 'x-feature-suggest-extra-word'
 
+INCLUDE_HISTORICAL_ADS=os.getenv('INCLUDE_HISTORICAL_ADS', 'false').lower() == 'true'
+
 # Query parameters
 OFFSET = 'offset'
 LIMIT = 'limit'

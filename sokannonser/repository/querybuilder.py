@@ -206,35 +206,44 @@ class QueryBuilder(object):
         # Remove api-key from args to make sure an empty query can occur
         if settings.APIKEY in args:
             args.pop(settings.APIKEY)
+        # Include historical ads:
+        if settings.INCLUDE_HISTORICAL_ADS:
+            query_dsl['query'] = {
+                'bool': {
+                    'must': [],
+                    'filter': []
+                }
+            }
+        # Only serve published ads
+        else:
+            offset = calculate_utc_offset()
+            query_dsl['query'] = {
+                'bool': {
+                    'must': [],
+                    'filter': [
+                        {
+                            'range': {
+                                f.PUBLICATION_DATE: {
+                                    'lte': 'now+%dH/m' % offset
+                                }
+                            }
+                        },
+                        {
+                            'range': {
+                                f.LAST_PUBLICATION_DATE: {
+                                    'gte': 'now+%dH/m' % offset
+                                }
+                            }
+                        },
+                        {
+                            'term': {
+                                f.REMOVED: False
+                            }
+                        },
+                    ]
+                },
+            }
 
-        # Make sure to only serve published ads
-        offset = calculate_utc_offset()
-        query_dsl['query'] = {
-            'bool': {
-                'must': [],
-                'filter': [
-                    {
-                        'range': {
-                            f.PUBLICATION_DATE: {
-                                'lte': 'now+%dH/m' % offset
-                            }
-                        }
-                    },
-                    {
-                        'range': {
-                            f.LAST_PUBLICATION_DATE: {
-                                'gte': 'now+%dH/m' % offset
-                            }
-                        }
-                    },
-                    {
-                        'term': {
-                            f.REMOVED: False
-                        }
-                    },
-                ]
-            },
-        }
         query_dsl['aggs'] = {
             "positions": {
                 "sum": {"field": f.NUMBER_OF_VACANCIES}

@@ -27,7 +27,7 @@ Specifies which index to search published ads from (JobSearch)
 
     ES_HISTORICAL_ADS_INDEX
     
-Specifies which index to search historical ads from (JobSearch with x-feature historical-ads)
+Specifies which index to search historical ads from (JobSearch with x-feature-historical-ads)
 
     ES_USER
     

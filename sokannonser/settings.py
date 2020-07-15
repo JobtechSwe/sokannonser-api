@@ -9,7 +9,7 @@ ES_PWD = os.getenv("ES_PWD")
 ES_INDEX = os.getenv("ES_INDEX", "platsannons-read")
 ES_STREAM_INDEX = os.getenv("ES_BULK_INDEX", "platsannons-stream")
 ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy")
-ES_HISTORICAL_ADS_INDEX = os.getenv("ES_HISTORICAL_ADS_INDEX", "historiska-platsannonser")
+ES_HISTORICAL_ADS_INDEX = os.getenv("ES_HISTORICAL_ADS_INDEX", "historical-platsannons")
 
 # APM and Debug settings
 APM_SERVICE_NAME = os.getenv("APM_SERVICE_NAME")

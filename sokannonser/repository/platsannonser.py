@@ -140,6 +140,7 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
         start_time = int(time.time() * 1000)
     if args.get(settings.X_FEATURE_HISTORICAL_ADS):
         elastic_index = settings.ES_HISTORICAL_ADS_INDEX
+        log.info(f'Historical ads mode! Index: {elastic_index}, header: {settings.X_FEATURE_HISTORICAL_ADS}')
     else:
         elastic_index = settings.ES_INDEX
     query_dsl = querybuilder.parse_args(args, x_fields)
@@ -157,12 +158,12 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
             max_score = max_score_result.get('hits', {}).get('max_score')
             if max_score:
                 query_dsl['min_score'] = (max_score - 1) * args.get(settings.MIN_RELEVANCE)
-        log.info("ARGS: %s" % args)
-        log.info("QUERY: %s" % json.dumps(query_dsl))
+        log.info(f"ARGS: {args}")
+        log.info(f"QUERY: {json.dumps(query_dsl)}")
         query_result = elastic.search(index=elastic_index, body=query_dsl)
         log.debug("Elastic results after %d milliseconds." % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
-        log.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception(f'Failed to connect to elasticsearch: {e}')
         abort(500, 'Failed to establish connection to database')
         return
 

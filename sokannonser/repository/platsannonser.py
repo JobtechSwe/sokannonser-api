@@ -138,6 +138,10 @@ def _check_search_word_type(args, search_text, querybuilder):
 def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
     if start_time == 0:
         start_time = int(time.time() * 1000)
+    if args.get(settings.X_FEATURE_HISTORICAL_ADS):
+        elastic_index = settings.ES_HISTORICAL_ADS_INDEX
+    else:
+        elastic_index = settings.ES_INDEX
     query_dsl = querybuilder.parse_args(args, x_fields)
     log.debug("Query constructed after %d milliseconds." % (int(time.time() * 1000) - start_time))
     try:
@@ -149,13 +153,13 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
             max_score_query['track_total_hits'] = False
             del max_score_query['aggs']
             del max_score_query['sort']
-            max_score_result = elastic.search(index=settings.ES_INDEX, body=max_score_query)
+            max_score_result = elastic.search(index=elastic_index, body=max_score_query)
             max_score = max_score_result.get('hits', {}).get('max_score')
             if max_score:
                 query_dsl['min_score'] = (max_score - 1) * args.get(settings.MIN_RELEVANCE)
         log.info("ARGS: %s" % args)
         log.info("QUERY: %s" % json.dumps(query_dsl))
-        query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
+        query_result = elastic.search(index=elastic_index, body=query_dsl)
         log.debug("Elastic results after %d milliseconds." % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
         log.exception('Failed to connect to elasticsearch: %s' % str(e))

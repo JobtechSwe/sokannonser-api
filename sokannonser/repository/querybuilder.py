@@ -207,7 +207,7 @@ class QueryBuilder(object):
         if settings.APIKEY in args:
             args.pop(settings.APIKEY)
         # Include historical ads:
-        if settings.INCLUDE_HISTORICAL_ADS:
+        if args.get(settings.X_FEATURE_HISTORICAL_ADS):
             query_dsl['query'] = {
                 'bool': {
                     'must': [],

@@ -9,6 +9,7 @@ ES_PWD = os.getenv("ES_PWD")
 ES_INDEX = os.getenv("ES_INDEX", "platsannons-read")
 ES_STREAM_INDEX = os.getenv("ES_BULK_INDEX", "platsannons-stream")
 ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy")
+ES_HISTORICAL_ADS_INDEX = os.getenv("ES_HISTORICAL_ADS_INDEX", "historiska-platsannonser")
 
 # APM and Debug settings
 APM_SERVICE_NAME = os.getenv("APM_SERVICE_NAME")
@@ -39,8 +40,7 @@ X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD = 'x-feature-include-synonyms-typeahead'
 X_FEATURE_SPELLCHECK_TYPEAHEAD = 'x-feature-spellcheck-typeahead'
 X_FEATURE_DISABLE_SMART_FREETEXT = 'x-feature-disable-smart-freetext'
 X_FEATURE_SUGGEST_EXTRA_WORD = 'x-feature-suggest-extra-word'
-
-INCLUDE_HISTORICAL_ADS=os.getenv('INCLUDE_HISTORICAL_ADS', 'false').lower() == 'true'
+X_FEATURE_HISTORICAL_ADS = 'x-feature-historical-ads'
 
 # Query parameters
 OFFSET = 'offset'

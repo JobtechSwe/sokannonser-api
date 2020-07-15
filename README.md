@@ -23,7 +23,11 @@ Port number to use for elastic search
 
     ES_INDEX=platsannons-read
     
-Specifies which index to search ads from (JobSearch)
+Specifies which index to search published ads from (JobSearch)
+
+    ES_HISTORICAL_ADS_INDEX
+    
+Specifies which index to search historical ads from (JobSearch with x-feature historical-ads)
 
     ES_USER
     
@@ -63,13 +67,6 @@ In order to use APM, the following environment variables must be set.
     APM_SERVICE_URL
     APM_SECRET
     APM_LOG_LEVEL
-    
-### Support historical ads
-
-The API can include historical ads (i.e. ads that are no longer published according to date and/or removed flag) in
-search result.
-
-    INCLUDE_HISTORICAL_ADS
     
 ## Installation and running
 

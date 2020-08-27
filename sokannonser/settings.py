@@ -31,7 +31,7 @@ COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
                                   'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
 COMPANY_LOGO_FETCH_DISABLED = os.getenv('COMPANY_LOGO_FETCH_DISABLED', 'false').lower() == 'true'
 # Header parameters
-APIKEY = os.getenv('APIKEY')
+#APIKEY = os.getenv('APIKEY')
 # Feature toggles
 X_FEATURE_FREETEXT_BOOL_METHOD = 'x-feature-freetext-bool-method'
 X_FEATURE_ALLOW_EMPTY_TYPEAHEAD = 'x-feature-allow-empty-typeahead'

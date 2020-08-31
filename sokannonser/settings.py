@@ -1,4 +1,5 @@
 import os
+import datetime
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "127.0.0.1")
@@ -114,7 +115,7 @@ URL_DEV = os.getenv('URL_DEV', '127.0.0.1/')
 URL_STAGE = os.getenv('URL_STAGE', '127.0.0.1/')
 URL_PROD = os.getenv('URL_PROD', 'https://jobsearch.api.jobtechdev.se/')
 
-# original index: narvalontology
-ONTOLOGY_INDEX = os.getenv('ONTOLOGY_INDEX', 'jae-synonym-dictionary')
+# original index: narvalontology, new: jae-synonym-dictionary
+ONTOLOGY_INDEX = os.getenv('ONTOLOGY_INDEX', 'narvalontology')
 
 API_VERSION = '1.14.0.dev'

@@ -25,5 +25,4 @@ def url(scope="session"):
 
     """
     port = os.getenv('TEST_PORT_INTEGRATION', 5000)
-
     return f"http://127.0.0.1:{port}"

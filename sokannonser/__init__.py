@@ -6,15 +6,14 @@ from sokannonser import appconf
 from sokannonser.rest import api
 # Import all Resources that are to be made visible for the app
 from sokannonser.rest.endpoint.platsannonser import Search, Proxy
-# from sokannonser.rest.endpoint.openapi import OpenSearch
 from sokannonser.rest.endpoint.valuestore import Valuestore
 
 app = Flask(__name__)
 CORS(app)
-configure_logging([__name__.split('.')[0], 'bulkloader', 'jobtech', 'sokannonser'])
+configure_logging([__name__.split('.')[0], 'jobtech', 'sokannonser'])
 log = logging.getLogger(__name__)
 log.info(logging.getLevelName(log.getEffectiveLevel()) + ' log level activated')
-log.info("Starting %s" % __name__)
+log.info(f"Starting {__name__}")
 
 
 if __name__ == '__main__':

@@ -1,17 +1,15 @@
 import requests
 import os
+import time
 from task.slack_tool import SlackMessage, SlackAttachment
 from sokannonser import settings
 
+# channel could be dev, stage, prod
 url = {
     'dev': settings.URL_DEV + 'search',
     'stage': settings.URL_STAGE + 'search',
     'prod': settings.URL_PROD + 'search',
 }
-
-'q_text_cases.txt'
-
-# channel could be dev, stage, prod
 
 
 def run_test_cases(file_name, channel1, channel2):
@@ -54,8 +52,7 @@ def run_test_cases(file_name, channel1, channel2):
 
 def get_search_result(q, env):
     headers = {'api-key': settings.APIKEY, }
-    params = {'q': q}
-
+    params = {'q': q, 'sort': 'pubdate-desc'}
     responses = requests.get(url=env, params=params, headers=headers)
     response_json = responses.json()
     return response_json
@@ -144,6 +141,7 @@ def send_freetext_hits_result_slack_message(result):
                     ))
             ]
         ).send()
+        time.sleep(0.5)
 
 
 def send_freetext_hit_result_utility_slack_message(difference, all_count):
@@ -177,6 +175,7 @@ def send_freetext_first_hit_result_slack_message(result):
                     ))
             ]
         ).send()
+        time.sleep(0.5)
 
 
 def send_freetext_first_ten_hits_result_slack_message(result):
@@ -200,6 +199,7 @@ def send_freetext_first_ten_hits_result_slack_message(result):
                     ))
             ]
         ).send()
+        time.sleep(0.5)
 
 
 run_test_cases('q_text_cases.txt', 'dev', 'prod')

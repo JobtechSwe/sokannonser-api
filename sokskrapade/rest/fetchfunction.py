@@ -18,10 +18,10 @@ def find_all(args, querybuilder, start_time=0):
     if start_time == 0:
         start_time = int(time.time() * 1000)
     query_dsl = querybuilder.parse_args(args)
-    log.debug('Query: %s' % json.dumps(query_dsl))
+    log.info('QUERY: %s' % json.dumps(query_dsl))
     log.debug("Query constructed after %d milliseconds." % (int(time.time() * 1000) - start_time))
     try:
-        query_result = elastic.search(index=settings.ES_SKRAPADE_INDEX, body=query_dsl)
+        query_result = elastic.search(index=settings.ES_SCRAPED_INDEX, body=query_dsl)
         log.debug("Elastic results after %d milliseconds." % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
         log.exception('Failed to connect to elasticsearch: %s' % str(e))

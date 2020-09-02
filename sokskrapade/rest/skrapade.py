@@ -1,16 +1,14 @@
 import logging
-
 from flask_restx import Resource
 
-from sokskrapade.rest import fetchfunction
 from sokskrapade.repository.querybuilder import QueryBuilder
-
+from sokskrapade.rest import fetchfunction
 from sokskrapade.rest import ns_skrapade, jl_query
 
 log = logging.getLogger(__name__)
 
 
-@ns_skrapade.route('search-job-links')
+@ns_skrapade.route('scraped')
 class SearchJobLink(Resource):
     @ns_skrapade.doc(
         description='Search scraped ads',
@@ -20,8 +18,8 @@ class SearchJobLink(Resource):
         querybuilder = QueryBuilder()
         args = jl_query.parse_args()
         result = fetchfunction.find_all(args, querybuilder)
-        log.debug('args: %s' % str(args))
-        log.debug('result %s' % str(result))
+        log.info(f'ARGS: {args}')
+        log.debug(f'Result: {result}')
         max_score = result.get('max_score', 1.0)
         hits = [dict(hit['_source'],
                      **{'relevance': (hit['_score'] / max_score)

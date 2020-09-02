@@ -45,7 +45,7 @@ class SearchJobLink(Resource):
                 "originalJobPosting": {
                     "identifier": hit.get("originalJobPosting", {}).get("identifier", ""),
                     "title": hit.get("originalJobPosting", {}).get("title", ""),
-                    "url": hit.get("originalJobPosting", {}).get("title", ""),
+                    "url": hit.get("originalJobPosting", {}).get("url", ""),
                     "sameAs": ""
                 },
                 "workplace_address": hit.get("workplace_address", ""),

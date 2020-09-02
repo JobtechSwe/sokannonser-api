@@ -38,8 +38,8 @@ class QueryBuilder(object):
         query_dsl = dict()
         query_dsl['size'] = args.pop(settings.LIMIT, 10)
         query_dsl['query'] = {
-            'bool': {
-                'must': []
+            "bool": {
+                "must": []
             },
         }
         return query_dsl
@@ -121,7 +121,7 @@ class QueryBuilder(object):
                     ft_query['bool'][bool_type] = []
                 ft_query['bool'][bool_type].append({"multi_match":
                                                     {"query": phrase,
-                                                     "fields": ["originalJobPosting.title",],
+                                                     "fields": ["originalJobPosting.title", ],
                                                      "type": "phrase"}})
 
         return ft_query
@@ -192,8 +192,7 @@ class QueryBuilder(object):
         return ft_query
 
     def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
-        return [
-            {
+        return {
                 "multi_match": {
                     "query": searchword,
                     "type": "cross_fields",
@@ -201,20 +200,17 @@ class QueryBuilder(object):
                     "fields": ["originalJobPosting.title" + "^3",
                                f.KEYWORDS_EXTRACTED + ".location^5"]
                 }
-            }
-        ]
+        }
 
     def _freetext_wildcard(self, searchword, wildcard_side, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
-        return [
-            {
+        return {
                 "multi_match": {
                     "query": searchword,
                     "type": "cross_fields",
                     "operator": method,
                     "fields": ["originalJobPosting.title" + "." + wildcard_side, ]
                 }
-            }
-        ]
+        }
 
     def _freetext_headline(self, query_dict, querystring):
         querystring = re.sub(r'(^| )[\\+]{1}', ' ', querystring)

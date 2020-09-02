@@ -9,10 +9,11 @@ PLACE = 'place'
 MUNICIPALITY = 'municipality'
 REGION = 'region'
 COUNTRY = 'country'
+API_VERSION = '1.0.0'
 
 
 def lowercase_maxlength(value):
-    if value is None:
+    if not value:
         raise ValueError('string type must be non-null')
     if len(value) > 255:
         raise ValueError('parameter can not be longer than 255 characters')
@@ -22,17 +23,19 @@ def lowercase_maxlength(value):
 
 QF_CHOICES = ['occupation', 'skill', 'location', 'employer']
 
-api = Api(version=settings.API_VERSION, title='Search Scraped Ads',
-          description='An API for searching scraped ads',
-          default='sokskrapade',
+api = Api(version=API_VERSION, title='Joblinks',
+          description="The Swedish Public Employment Service together with some of Sweden's largest "
+                      "job-board sites are maintaining this API as joint effort. The dataset that are "
+                      "searchable in this API is named Joblinks and contains references and metadata "
+                      "linked to the job-ads provided by job-boards.",
+          default='joblinks',
           default_label="An API for searching scraped ads")
 
-
-ns_skrapade = Namespace('Search scraped ads', description='Endpoint for scraped ads')
+ns_skrapade = Namespace('Joblinks', description='Endpoint for Joblinks')
 api.add_namespace(ns_skrapade, '/')
 
 jl_query = reqparse.RequestParser()
-jl_query.add_argument(settings.LIMIT, type=inputs.int_range(0, 1000), default=10)
+jl_query.add_argument(settings.LIMIT, type=inputs.int_range(0, 100), default=10)
 jl_query.add_argument(OCCUPATION, action='append')
 jl_query.add_argument(GROUP, action='append')
 jl_query.add_argument(FIELD, action='append')

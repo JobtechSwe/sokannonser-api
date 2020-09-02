@@ -8,7 +8,7 @@ from sokskrapade.rest import ns_skrapade, jl_query
 log = logging.getLogger(__name__)
 
 
-@ns_skrapade.route('scraped')
+@ns_skrapade.route('joblinks')
 class SearchJobLink(Resource):
     @ns_skrapade.doc(
         description='Search scraped ads',

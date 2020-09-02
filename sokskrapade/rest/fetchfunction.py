@@ -24,7 +24,7 @@ def find_all(args, querybuilder, start_time=0):
         query_result = elastic.search(index=settings.ES_SCRAPED_INDEX, body=query_dsl)
         log.debug("Elastic results after %d milliseconds." % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
-        log.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception(f'Failed to connect to elasticsearch: {e}')
         abort(500, 'Failed to establish connection to database')
         return
 

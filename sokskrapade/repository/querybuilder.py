@@ -361,15 +361,15 @@ class QueryBuilder(object):
                 land.append(ckod)
 
         plats_term_query = [{"term": {
-            f.WORKPLACE_ADDRESS_MUNICIPALITY_CONCEPT_ID: {
+            f.WORKPLACE_ADDRESS_MUNICIPALITY_CONCEPT_ID + ".keyword": {
                 "value": kkod, "boost": 2.0}}} for kkod in kommuner]
 
         plats_term_query += [{"term": {
-            f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID: {
+            f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID + ".keyword": {
                 "value": lkod, "boost": 1.0}}} for lkod in lan]
 
         plats_term_query += [{"term": {
-            f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+            f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID + ".keyword": {
                 "value": ckod, "boost": 1.0}}} for ckod in land]
 
         plats_bool_query = {"bool": {

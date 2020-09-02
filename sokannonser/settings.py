@@ -119,3 +119,7 @@ URL_PROD = os.getenv('URL_PROD', 'https://jobsearch.api.jobtechdev.se/')
 ONTOLOGY_INDEX = os.getenv('ONTOLOGY_INDEX', 'narvalontology')
 
 API_VERSION = '1.14.0.dev'
+
+
+# scraped endpoint
+ES_SKRAPADE_INDEX = os.getenv("ES_SKRAPADE_INDEX", "scrapedannons-read")

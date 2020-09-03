@@ -192,7 +192,7 @@ class QueryBuilder(object):
         return ft_query
 
     def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
-        return {
+        return [{
                 "multi_match": {
                     "query": searchword,
                     "type": "cross_fields",
@@ -200,17 +200,17 @@ class QueryBuilder(object):
                     "fields": ["originalJobPosting.title" + "^3",
                                f.KEYWORDS_EXTRACTED + ".location^5"]
                 }
-        }
+        }]
 
     def _freetext_wildcard(self, searchword, wildcard_side, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
-        return {
+        return [{
                 "multi_match": {
                     "query": searchword,
                     "type": "cross_fields",
                     "operator": method,
                     "fields": ["originalJobPosting.title" + "." + wildcard_side, ]
                 }
-        }
+        }]
 
     def _freetext_headline(self, query_dict, querystring):
         querystring = re.sub(r'(^| )[\\+]{1}', ' ', querystring)

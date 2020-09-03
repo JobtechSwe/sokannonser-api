@@ -455,30 +455,27 @@ class QueryBuilder(object):
         return ft_query
 
     def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
-        return [
-            {
-                "multi_match": {
-                    "query": searchword,
-                    "type": "cross_fields",
-                    "operator": method,
-                    "fields": [f.HEADLINE + "^3", f.KEYWORDS_EXTRACTED + ".employer^2",
-                               f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
-                               f.KEYWORDS_EXTRACTED + ".location^5"]
-                }
+        return [{
+            "multi_match": {
+                "query": searchword,
+                "type": "cross_fields",
+                "operator": method,
+                "fields": [f.HEADLINE + "^3", f.KEYWORDS_EXTRACTED + ".employer^2",
+                           f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
+                           f.KEYWORDS_EXTRACTED + ".location^5"]
             }
-        ]
+        }]
 
     def _freetext_wildcard(self, searchword, wildcard_side, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
-        return [
-            {
-                "multi_match": {
-                    "query": searchword,
-                    "type": "cross_fields",
-                    "operator": method,
-                    "fields": [f.HEADLINE + "." + wildcard_side, f.DESCRIPTION_TEXT + "." + wildcard_side]
-                }
+        return [{
+            "multi_match": {
+                "query": searchword,
+                "type": "cross_fields",
+                "operator": method,
+                "fields": [f.HEADLINE + "." + wildcard_side, f.DESCRIPTION_TEXT + "." + wildcard_side]
             }
-        ]
+        }]
+
 
     def _freetext_headline(self, query_dict, querystring):
         # Remove plus and minus from querystring for headline search

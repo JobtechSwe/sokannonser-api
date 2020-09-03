@@ -1,6 +1,8 @@
 import os
 import datetime
 
+API_VERSION = '1.14.0.dev'
+
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "127.0.0.1")
 ES_PORT = os.getenv("ES_PORT", 9200)
@@ -118,4 +120,5 @@ URL_PROD = os.getenv('URL_PROD', 'https://jobsearch.api.jobtechdev.se/')
 # original index: narvalontology, new: jae-synonym-dictionary
 ONTOLOGY_INDEX = os.getenv('ONTOLOGY_INDEX', 'narvalontology')
 
-API_VERSION = '1.14.0.dev'
+# scraped index
+ES_SCRAPED_INDEX = os.getenv("ES_SCRAPED_INDEX", "scrapedannons")

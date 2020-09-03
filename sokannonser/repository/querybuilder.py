@@ -455,7 +455,7 @@ class QueryBuilder(object):
         return ft_query
 
     def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
-        return [{
+        return {
             "multi_match": {
                 "query": searchword,
                 "type": "cross_fields",
@@ -464,17 +464,17 @@ class QueryBuilder(object):
                            f.DESCRIPTION_TEXT, f.ID, f.EXTERNAL_ID, f.SOURCE_TYPE,
                            f.KEYWORDS_EXTRACTED + ".location^5"]
             }
-        }]
+        }
 
     def _freetext_wildcard(self, searchword, wildcard_side, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
-        return [{
+        return {
             "multi_match": {
                 "query": searchword,
                 "type": "cross_fields",
                 "operator": method,
                 "fields": [f.HEADLINE + "." + wildcard_side, f.DESCRIPTION_TEXT + "." + wildcard_side]
             }
-        }]
+        }
 
 
     def _freetext_headline(self, query_dict, querystring):
@@ -520,7 +520,7 @@ class QueryBuilder(object):
                     value = concept['term'].lower()
                     if value not in self.ttc.ontology.extracted_locations:
                         geo_ft_query = self._freetext_fields(value)
-                        query_dict['bool'][bool_type].append(geo_ft_query[0])
+                        query_dict['bool'][bool_type].append(geo_ft_query)
                 elif key == 'occupation' and bool_type != 'must':
                     base_fields.append(f.KEYWORDS_EXTRACTED)
                     base_fields.append(f.KEYWORDS_ENRICHED)

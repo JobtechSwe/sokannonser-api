@@ -2,7 +2,7 @@ import logging
 from flask_restx import Resource
 
 from sokskrapade.repository.querybuilder import QueryBuilder
-from sokskrapade.rest import fetchfunction
+from sokskrapade.rest import fetchfunction, swagger_doc_params, swagger_filter_doc_params
 from sokskrapade.rest import ns_skrapade, jl_query
 
 log = logging.getLogger(__name__)
@@ -11,7 +11,8 @@ log = logging.getLogger(__name__)
 @ns_skrapade.route('joblinks')
 class SearchJobLink(Resource):
     @ns_skrapade.doc(
-        description='Search scraped ads',
+        description='Search scraped ads using parameters and/or freetext',
+        params={**swagger_doc_params, **swagger_filter_doc_params},
     )
     @ns_skrapade.expect(jl_query)
     def get(self, **kwargs):

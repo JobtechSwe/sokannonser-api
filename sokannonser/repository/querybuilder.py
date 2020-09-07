@@ -445,9 +445,9 @@ class QueryBuilder(object):
             ft_query['bool']['must'].append({"bool": {"should": shoulds + musts}})
         # Wildcards after shoulds so they dont end up there
         if prefix_words:
-            musts.append(self._freetext_wildcard(prefix_words, "prefix", method))
+            musts += self._freetext_wildcard(prefix_words, "prefix", method)
         if suffix_words:
-            musts.append(self._freetext_wildcard(suffix_words, "suffix", method))
+            musts += self._freetext_wildcard(suffix_words, "suffix", method)
         if musts:
             ft_query['bool']['must'].append({"bool": {"must": musts}})
         if mustnts:

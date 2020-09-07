@@ -7,11 +7,35 @@ from sokskrapade.rest import ns_skrapade, jl_query
 
 log = logging.getLogger(__name__)
 
+OCCUPATION = 'occupation-name'
+GROUP = 'occupation-group'
+FIELD = 'occupation-field'
+SKILL = 'skill'
+PLACE = 'place'
+MUNICIPALITY = 'municipality'
+REGION = 'region'
+COUNTRY = 'country'
+QUERY = 'q'
+LIMIT = 'limit'
+API_VERSION = '1.0.0'
+
 
 @ns_skrapade.route('joblinks')
 class SearchJobLink(Resource):
     @ns_skrapade.doc(
-        description='Search scraped ads',
+        description='Search scraped ads using parameters and/or freetext',
+        # params={**swagger_doc_params, **swagger_filter_doc_params},
+        params={
+            QUERY: "Fields to freetext search in, in addition to default "
+                                     "freetext search",
+            OCCUPATION: "One or more occupational concept ID according to the taxonomy",
+            GROUP: "One or more occupational group concept ID according to the taxonomy",
+            FIELD: "One or more occupational area concept ID according to the taxonomy",
+            MUNICIPALITY: "One or more municipality concept ID according to the taxonomy",
+            REGION: "One or more region concept ID according to the taxonomy",
+            COUNTRY: "One or more country concept ID according to the taxonomy",
+            LIMIT: "Number of results to fetch (0-%d)" % 100,
+        }
     )
     @ns_skrapade.expect(jl_query)
     def get(self, **kwargs):
@@ -53,4 +77,3 @@ class SearchJobLink(Resource):
                 "hashsum": hit.get("hashsum", "")
             })
         return result
-

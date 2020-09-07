@@ -87,7 +87,12 @@ def test_freetext_plus_minus(session, search_url, query, expected):
     :return: None if expected number of hits are found, AssertionError if not
     """
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})
+    json_response = get_search(session, search_url, params={'q': query, 'limit': '100'})
+    hits = []
+    for hit in json_response['hits']:
+        hits.append(hit['id'])
+    print(hits)
+    print(len(hits))
     compare(json_response['total']['value'], expected, msg=f'Query: {query}')
 
 

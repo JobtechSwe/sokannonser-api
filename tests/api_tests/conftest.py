@@ -43,7 +43,9 @@ def search_url(scope="session"):
     """
     returns an url
     """
-    test_url = os.getenv('TEST_URL_SEARCH', 'http://127.0.0.1')
+    test_url = os.getenv('TEST_URL_SEARCH', 'http://localhost')
+    #test_url = 'https://dev-testset-jobsearch.test.services.jtech.se'
     port = os.getenv('TEST_PORT_SEARCH', 5000)
+    #port = 443
     return f"{test_url}:{port}"
 

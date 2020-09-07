@@ -57,6 +57,9 @@ def test_freetext_two_work_and_two_locations_check_order(session, search_url, qu
     response = get_search_check_number_of_results(session, search_url, len(expected_ids_and_relevance), params)
     response_json = json.loads(response.content.decode('utf8'))
     old_relevance = 1
+    for hit in response_json['hits']:
+        print(hit['id'])
+
     for index, hit in enumerate(response_json['hits']):
         relevance = hit['relevance']
         assert old_relevance >= relevance  # check that results are presented in ascending relevance order

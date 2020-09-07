@@ -559,10 +559,10 @@ class QueryBuilder(object):
                             }
                         }
                     )
-                    if base_field == f.KEYWORDS_ENRICHED and (key == 'occupation' or key == 'skill'):
+                    if base_field == f.KEYWORDS_ENRICHED and (key == 'skill'):
                         #Add extra search for the current known term in headline, employer and description to be sure
                         # not to miss search hits where the term wasn't identified during enrichment. Only search
-                        # occupations and skills to avoid locations...
+                        # skills to avoid irrelevant hits on occupations and locations...
                         query_dict['bool'][bool_type].append(
                             {'multi_match': {
                                 'query': concept['term'].lower(),

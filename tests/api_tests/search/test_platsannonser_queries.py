@@ -70,7 +70,7 @@ def test_min_relevance_new(session, search_url, minimum_relevance, expect_to_get
                                              ('systemutvecklare -python java php', 9),
                                              ('systemutvecklare python java -php', 10),
                                              ('lärarexamen', 7),
-                                             ('lärarexamen -lärare', 2),
+                                             ('lärarexamen -lärare', 0),
                                              ('sjuksköterska', 87),
                                              ('sjuksköterska -stockholm', 79),
                                              ('sjuksköterska -malmö', 84),

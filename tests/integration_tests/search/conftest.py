@@ -1,7 +1,8 @@
 import os
 import pytest
 import requests
-from sokannonser import settings
+from tests.test_resources.settings import headers_search
+
 
 
 @pytest.fixture
@@ -12,7 +13,7 @@ def integration_session(scope="session"):
     Returns a Session object
     """
     s = requests.sessions.Session()
-    s.headers.update(settings.headers_search)
+    s.headers.update(headers_search)
     return s
 
 

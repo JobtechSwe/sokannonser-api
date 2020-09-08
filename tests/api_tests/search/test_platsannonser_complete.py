@@ -151,6 +151,7 @@ def test_suggest_extra_word_and_allow_empty(session, search_url, query, expected
     json_response = json.loads(response.content.decode('utf8'))
     assert 'typeahead' in json_response
     actual_suggestions = [suggest.get('value') for suggest in json_response.get('typeahead')]
+    print(f"\nactual suggestions: {actual_suggestions}")
     compare_suggestions(actual_suggestions, expected_suggestions, query)
 
 

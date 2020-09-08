@@ -22,7 +22,7 @@ def test_freetext_work_and_location_details(session, search_url, query, municipa
     response_json = json.loads(response.content.decode('utf8'))
 
     for ad in response_json['hits']:
-        print(ad)
+        print(ad['id'])
         assert ad['workplace_address']['municipality'] == municipality
         assert ad['workplace_address']['municipality_code'] == code
         assert ad['workplace_address']['municipality_concept_id'] == municipality_concept_id

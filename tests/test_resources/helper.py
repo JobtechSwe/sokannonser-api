@@ -143,6 +143,8 @@ def _check_ok_response_and_number_of_ads(response, expected_number):
     list_of_ads = json.loads(response.content.decode('utf8'))
     if '/search' in response.url:
         list_of_ads = list_of_ads['hits']
+    for hit in list_of_ads:
+        print(hit['id'])
     if expected_number is not None:
         compare(len(list_of_ads), expected_number)
     _check_list_of_ads(list_of_ads)

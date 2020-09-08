@@ -20,6 +20,7 @@ def get_correct_logo_url_for_any_ad(list_of_ads):
     return False  # if no logo_url is found in list_of_ads
 
 
+@pytest.mark.skip("need configuration for CI")
 @pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.integration
 def test_fetch_org_logo_url_by_ad_id(integration_session, integration_url):
@@ -30,6 +31,7 @@ def test_fetch_org_logo_url_by_ad_id(integration_session, integration_url):
     assert get_correct_logo_url_for_any_ad(hits)
 
 
+@pytest.mark.skip("need configuration for CI")
 @pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.integration
 def test_fetch_ad_logo_by_id(integration_session, integration_url):

@@ -64,16 +64,14 @@ class SearchJobLink(Resource):
         for hit in hits:
             result.append({
                 "id": hit.get('id', ""),
-                "originalJobPosting": {
-                    "identifier": hit.get("originalJobPosting", {}).get("identifier", ""),
-                    "title": hit.get("originalJobPosting", {}).get("title", ""),
-                    "url": hit.get("originalJobPosting", {}).get("url", ""),
-                    "sameAs": ""
-                },
+                "external_id": hit.get("originalJobPosting", {}).get("identifier", ""),
+                "webpage_url": hit.get("originalJobPosting", {}).get("url", ""),
+                "headline": hit.get("originalJobPosting", {}).get("title", ""),
                 "workplace_address": hit.get("workplace_address", ""),
                 "occupation": hit.get("occupation", ""),
                 "occupation_group": hit.get("occupation_group", ""),
                 "occupation_field": hit.get("occupation_field", ""),
+                "sameAs": "",
                 "hashsum": hit.get("hashsum", "")
             })
         return result

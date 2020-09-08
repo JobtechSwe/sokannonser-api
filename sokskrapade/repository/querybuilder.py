@@ -269,7 +269,7 @@ class QueryBuilder(object):
                         value = concept['concept'].lower()
                         boost_value = 9
 
-                    field = "%s.%s.raw" % (base_field, key)
+                    field = "%s.%s" % (base_field, key)
                     query_dict['bool'][bool_type].append(
                         {
                             "term": {

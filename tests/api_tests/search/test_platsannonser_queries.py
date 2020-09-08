@@ -64,19 +64,19 @@ def test_min_relevance_new(session, search_url, minimum_relevance, expect_to_get
                                              ('+python -php', 8),
                                              ('-python -php', 1064),  # of 1072
                                              ('php', 0),  # ?
-                                             ('systemutvecklare +python java linux mac', 2),
+                                             ('systemutvecklare +python java linux mac', 1),
                                              ('systemutvecklare +python -java linux mac', 0),
-                                             ('systemutvecklare python java php', 11),
+                                             ('systemutvecklare python java php', 10),
                                              ('systemutvecklare -python java php', 9),
-                                             ('systemutvecklare python java -php', 11),
+                                             ('systemutvecklare python java -php', 10),
                                              ('lärarexamen', 7),
                                              ('lärarexamen -lärare', 2),
-                                             ('sjuksköterska', 85),
-                                             ('sjuksköterska -stockholm', 76),
-                                             ('sjuksköterska -malmö', 82),
-                                             ('sjuksköterska -stockholm -malmö', 73),
-                                             ('sjuksköterska -stockholm -malmö -göteborg -eskilstuna', 66),
-                                             ('sjuksköterska Helsingborg -stockholm -malmö -göteborg -eskilstuna', 1)
+                                             ('sjuksköterska', 87),
+                                             ('sjuksköterska -stockholm', 79),
+                                             ('sjuksköterska -malmö', 84),
+                                             ('sjuksköterska -stockholm -malmö', 76),
+                                             ('sjuksköterska -stockholm -malmö -göteborg -eskilstuna', 69),
+                                             ('sjuksköterska Helsingborg -stockholm -malmö -göteborg -eskilstuna', 2)
                                              # 3 ads with work_place.municipality Helsingborg
                                              ])
 def test_freetext_plus_minus(session, search_url, query, expected):
@@ -94,7 +94,7 @@ def test_freetext_plus_minus(session, search_url, query, expected):
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("typo, expected_number_of_hits", [('sjukssköterska', 85),
+@pytest.mark.parametrize("typo, expected_number_of_hits", [('sjukssköterska', 87),
                                                            ('javasscript', 10)
                                                            # 'montesori' # todo: no match for 'montesori'
                                                            ])

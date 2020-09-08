@@ -12,7 +12,7 @@ from tests.test_resources.settings import TEST_USE_STATIC_DATA
 @pytest.mark.parametrize("query, municipality, code, municipality_concept_id, expected_number_of_hits", [
     ('bagare stockholm', 'Stockholm', '0180', geo.stockholm, 3),
     ('lärare stockholm', 'Stockholm', '0180', geo.stockholm, 4),
-    ('lärare göteborg', 'Göteborg', '1480', geo.goteborg, 4),
+    ('lärare göteborg', 'Göteborg', '1480', geo.goteborg, 5),
 ])
 def test_freetext_work_and_location_details(session, search_url, query, municipality, code, municipality_concept_id,
                                             expected_number_of_hits):
@@ -34,17 +34,18 @@ def test_freetext_work_and_location_details(session, search_url, query, municipa
         ('23780773', 1.0),
         ('23578307', 1.0),
         ('23762170', 1.0),
-        ('23934411', 0.8918585379117067),  # 0.8918585379117067
-        ('23918920', 0.8918585379117067),  # Old: 0.8918781594454271
-        ('23978318', 0.7669555993474402),
-        ('23826966', 0.7669555993474402),
-        ('23566906', 0.7669555993474402),
-        ('23552714', 0.7669555993474402),
-        ('23502782', 0.7669555993474402),
-        ('23451218', 0.7669555993474402),
-        ('23981076', 0.45275073813570443),
-        ('23978439', 0.45275073813570443),
-        ('23550781', 0.45275073813570443)
+        ('23934411', 0.8980545961300535),
+        ('23918920', 0.8980545961300535),
+        ('23783846', 0.8942954524344648),
+        ('23978318', 0.7717334031001554),
+        ('23826966', 0.7717334031001554),
+        ('23566906', 0.7717334031001554),
+        ('23552714', 0.7717334031001554),
+        ('23502782', 0.7717334031001554),
+        ('23451218', 0.7717334031001554),
+        ('23981076', 0.45396117079818865),
+        ('23978439', 0.45396117079818865),
+        ('23550781', 0.45396117079818865)
     ])])
 def test_freetext_two_work_and_two_locations_check_order(session, search_url, query, expected_ids_and_relevance):
     """
@@ -57,8 +58,6 @@ def test_freetext_two_work_and_two_locations_check_order(session, search_url, qu
     response = get_search_check_number_of_results(session, search_url, len(expected_ids_and_relevance), params)
     response_json = json.loads(response.content.decode('utf8'))
     old_relevance = 1
-    for hit in response_json['hits']:
-        print(hit['id'])
 
     for index, hit in enumerate(response_json['hits']):
         relevance = hit['relevance']
@@ -69,10 +68,10 @@ def test_freetext_two_work_and_two_locations_check_order(session, search_url, qu
 
 
 @pytest.mark.parametrize("query, top_id, expected_number_of_hits", [
-    ('bagare kock Stockholm Göteborg', '23780773', 14),
-    ('kock bagare Stockholm Göteborg', '23780773', 14),
-    ('kallskänka kock Stockholm Göteborg', '23552714', 12),
-    ('lärare lågstadielärare Malmö Göteborg', '23981080', 5),
+    ('bagare kock Stockholm Göteborg', '23780773', 15),
+    ('kock bagare Stockholm Göteborg', '23780773', 15),
+    ('kallskänka kock Stockholm Göteborg', '23552714', 13),
+    ('lärare lågstadielärare Malmö Göteborg', '23981080', 6),
 ])
 def test_freetext_two_work_and_two_locations(session, search_url, query, top_id, expected_number_of_hits):
     """

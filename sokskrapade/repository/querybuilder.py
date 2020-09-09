@@ -5,6 +5,7 @@ from sokannonser import settings
 from sokannonser.repository import taxonomy, TextToConcept
 from sokannonser.rest.model import queries
 from sokannonser.rest.model import fields as f
+from sokskrapade.rest import LIMIT, OFFSET
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +37,8 @@ class QueryBuilder(object):
 
     def _bootstrap_query(self, args):
         query_dsl = dict()
-        query_dsl['size'] = args.pop(settings.LIMIT, 10)
+        query_dsl['size'] = args.pop(LIMIT, 10)
+        query_dsl['from'] = args.pop(OFFSET, 10)
         query_dsl['query'] = {
             "bool": {
                 "must": []

@@ -17,6 +17,7 @@ REGION = 'region'
 COUNTRY = 'country'
 QUERY = 'q'
 LIMIT = 'limit'
+OFFSET = 'offset'
 API_VERSION = '1.0.0'
 
 
@@ -24,17 +25,17 @@ API_VERSION = '1.0.0'
 class SearchJobLink(Resource):
     @ns_skrapade.doc(
         description='Search scraped ads using parameters and/or freetext',
-        # params={**swagger_doc_params, **swagger_filter_doc_params},
         params={
-            QUERY: "Fields to freetext search in, in addition to default "
-                                     "freetext search",
+            QUERY: "Fields to freetext search in, in addition to default freetext search",
             OCCUPATION: "One or more occupational concept ID according to the taxonomy",
             GROUP: "One or more occupational group concept ID according to the taxonomy",
             FIELD: "One or more occupational area concept ID according to the taxonomy",
             MUNICIPALITY: "One or more municipality concept ID according to the taxonomy",
             REGION: "One or more region concept ID according to the taxonomy",
             COUNTRY: "One or more country concept ID according to the taxonomy",
-            LIMIT: "Number of results to fetch (0-%d)" % 100,
+            OFFSET: "The offset parameter defines the offset "
+                    "from the first result you want to fetch. Valid range: (0-%d)" % 2000,
+            LIMIT: "Number of results to fetch. Valid range: (0-%d)" % 100,
         }
     )
     @ns_skrapade.expect(jl_query)

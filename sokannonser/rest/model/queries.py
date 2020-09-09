@@ -67,9 +67,8 @@ swagger_filter_doc_params = {
     settings.MIN_RELEVANCE: "Set a result relevance threshold between 0 and 1",
     settings.DETAILS: "Show 'full' (default) or 'brief' results details",
     settings.OFFSET: "The offset parameter defines the offset from the first result you "
-    "want to fetch"
-    "Valid range is (0-%d)" % settings.MAX_OFFSET,
-    settings.LIMIT: "Number of results to fetch (0-%d)" % settings.MAX_LIMIT,
+    "want to fetch. Valid range is (0-%d)" % settings.MAX_OFFSET,
+    settings.LIMIT: "Number of results to fetch. Valid range is (0-%d)" % settings.MAX_LIMIT,
     settings.SORT: "Sorting.\n"
     "relevance: relevance (points) (default sorting)\n"
     "pubdate-desc: published date, descending (newest job ad first)\n"

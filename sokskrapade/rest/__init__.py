@@ -9,6 +9,9 @@ PLACE = 'place'
 MUNICIPALITY = 'municipality'
 REGION = 'region'
 COUNTRY = 'country'
+FREETEXT_QUERY = 'q'
+OFFSET = 'offset'
+LIMIT = 'limit'
 API_VERSION = '1.0.0'
 
 
@@ -41,5 +44,6 @@ jl_query.add_argument(FIELD, action='append')
 jl_query.add_argument(MUNICIPALITY, action='append')
 jl_query.add_argument(REGION, action='append')
 jl_query.add_argument(COUNTRY, action='append')
-jl_query.add_argument(settings.FREETEXT_QUERY, type=lowercase_maxlength)
-jl_query.add_argument(settings.LIMIT, type=inputs.int_range(0, 100), default=10)
+jl_query.add_argument(FREETEXT_QUERY, type=lowercase_maxlength)
+jl_query.add_argument(OFFSET, type=inputs.int_range(0, 100), default=0)
+jl_query.add_argument(LIMIT, type=inputs.int_range(0, 100), default=10)

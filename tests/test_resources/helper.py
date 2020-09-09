@@ -1,8 +1,7 @@
 import json
 import logging
 import tests.test_resources.settings
-from tests.test_resources.settings import TEST_USE_STATIC_DATA, headers_search
-from tests.test_resources.check_response import check_response_return_json
+from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 log = logging.getLogger(__name__)
 

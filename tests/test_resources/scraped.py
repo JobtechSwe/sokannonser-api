@@ -1,10 +1,12 @@
 import json
 
 
-def get_scraped(session, url, params):
+def get_scraped(session, url, params, check_for_http_error=True):
     response = session.get(f"{url}/joblinks", params=params)
-    response.raise_for_status()
-    return json.loads(response.content.decode('utf8'))
+    if check_for_http_error:
+        response.raise_for_status()
+        return json.loads(response.content.decode('utf8'))
+    return response
 
 
 def check_required_ad_fields_not_none(hit):

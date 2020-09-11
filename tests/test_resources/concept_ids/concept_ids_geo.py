@@ -191,6 +191,7 @@ simrishamn = "dLxo_EpC_oPe"
 ornskoldsvik = "zBmE_n6s_MnQ"
 are = "D7ax_CXP_6r1"
 kalix = "cUyN_C9V_HLU"
+tomelilla = "UMev_wGs_9bg"
 
 #  ["region"]
 stockholms_lan = "CifL_Rzy_Mku"
@@ -222,3 +223,4 @@ norge = "QJgN_Zge_BzJ"
 aland_tillhor_finland = "bUNp_6HW_Vbn"
 malta = "u8qF_qpq_R5W"
 schweiz = "Q78b_oCw_Yq2"
+estland = "EtpD_2Kn_dEP"

@@ -8,6 +8,7 @@ from tests.test_resources.scraped import get_scraped, check_required_ad_fields_n
 @pytest.mark.parametrize("query, expected_ids", [
     ('barnmorska', [19769, 43643, 19764, 43645, 19765, 43655]),
     ('tandsköterska', [14662, 14171, 45671, 49580]),
+    ('kock', [14662, 14171, 45671, 49580]),
     ('Sjuksköterskor',
      [17507, 43518, 17901, 43507, 18944, 43636, 16674, 43619, 18921, 43281, 18924, 43280, 18922, 43278, 17136, 43605,
       17181]),
@@ -41,10 +42,11 @@ def test_freetext_query_check_fields(session_scraped, scraped_url):
         print(hit['headline'])
 
 
-
 @pytest.mark.parametrize("query, expected_ids", [
-    ('barnmorska tandsköterska', [45671, 14662, 19769, 43643, 19764, 43645, 19765, 43655, 14171, 49580]),  # 49580 missing
-    ('tandsköterska barnmorska', [45671, 14662, 19769, 43643, 19764, 43645, 19765, 43655, 14171, 49580]),  # 49580 missing
+    ('barnmorska tandsköterska', [45671, 14662, 19769, 43643, 19764, 43645, 19765, 43655, 14171, 49580]),
+    # 49580 missing
+    ('tandsköterska barnmorska', [45671, 14662, 19769, 43643, 19764, 43645, 19765, 43655, 14171, 49580]),
+    # 49580 missing
     ('barnmorska', [19769, 43643, 19764, 43645, 19765, 43655]),
     ('tandsköterska', [14662, 14171, 45671, 49580]),
     ('lärare', [10709, 10710, 46507, 46503, 47157, 47325, 46807]),
@@ -52,17 +54,24 @@ def test_freetext_query_check_fields(session_scraped, scraped_url):
     ('lärare kock', [20208, 20352, 10709, 10710, 46507, 46503, 47157, 47325, 46807]),
     ('engineer', [24209, 24067, 24968, 24234, 49736]),
     ('developer', [24773, 25031, 25088, 49954]),
-    ('developer engineer', [24773, 25031, 25088, 49954,24209, 24067, 24968, 24234, 49736]),
-    ('engineer developer', [24773, 25031, 25088, 49954,24209, 24067, 24968, 24234, 49736]),
-    ('engineer developer kock', [24773, 25031, 25088, 49954,24209, 24067, 24968, 24234, 49736, 20208, 20352]),  # zero hits
+    ('developer engineer', [24773, 25031, 25088, 49954, 24209, 24067, 24968, 24234, 49736]),
+    ('engineer developer', [24773, 25031, 25088, 49954, 24209, 24067, 24968, 24234, 49736]),
+    ('engineer developer kock', [24773, 25031, 25088, 49954, 24209, 24067, 24968, 24234, 49736, 20208, 20352]),
+    # zero hits
     ('Umeå', [2261, 46272, 45671, 22148]),
     ('Harstena', [20352, 19927]),
-    ('Harstena Umeå', [20352, 19927, 2261, 46272, 45671, 22148]), # zero hits
-    ('Harstena sjuksköterska', [20352, 19927, 18924, 43280, 18922, 43278, 43619, 18921, 43281, 17136, 43605, 17181, 17507, 43518, 17901, 43507, 43636, 18944,
-      16674, 16393, 43621]), # zero hits
-    ('sjuksköterskor', [17507, 43518, 17901, 43507, 18944, 43636, 16674, 43619, 18921, 43281, 18924, 43280, 18922, 43278, 17136, 43605, 17181]),
+    ('Harstena Umeå', [20352, 19927, 2261, 46272, 45671, 22148]),  # zero hits
+    ('Harstena sjuksköterska',
+     [20352, 19927, 18924, 43280, 18922, 43278, 43619, 18921, 43281, 17136, 43605, 17181, 17507, 43518, 17901, 43507,
+      43636, 18944,
+      16674, 16393, 43621]),  # zero hits
+    ('sjuksköterskor',
+     [17507, 43518, 17901, 43507, 18944, 43636, 16674, 43619, 18921, 43281, 18924, 43280, 18922, 43278, 17136, 43605,
+      17181]),
     ('Uppsala', [19433, 43653, 17507, 43518, 19765, 43655, 17901, 43507]),
-    ('sjuksköterskor Uppsala', [19433, 43653, 17507, 43518, 19765, 43655, 17901, 43507, 17507, 43518, 17901, 43507, 18944, 43636, 16674, 43619, 18921, 43281, 18924, 43280, 18922, 43278, 17136, 43605, 17181]),
+    ('sjuksköterskor Uppsala',
+     [19433, 43653, 17507, 43518, 19765, 43655, 17901, 43507, 17507, 43518, 17901, 43507, 18944, 43636, 16674, 43619,
+      18921, 43281, 18924, 43280, 18922, 43278, 17136, 43605, 17181]),
 
 ])
 def test_freetext_query_multiple_search_terms(session_scraped, scraped_url, query, expected_ids):
@@ -87,6 +96,7 @@ def test_freetext_query_multiple_search_terms(session_scraped, scraped_url, quer
                                                         'country_concept_id': 'i46j_HmG_v64', 'country': 'Sverige'},
                                   'occupation': {'label': None, 'concept_id': None},
                                   'occupation_group': {'label': None, 'concept_id': None},
-                                  'occupation_field': {'label': None, 'concept_id': None}, 'sameAs': '',
+                                  'occupation_field': {'label': None, 'concept_id': None}, 
+                                  'sameAs': '',
                                   'hashsum': 'A1RGeQAS8gQwHifChy4=CMOBVMOkAMOkwoxWAcODEMKkBDzCksOfCcKewrTDsA+6d71c31c6b1af361e90beb534666a0a6'}
 """

@@ -385,3 +385,4 @@ chefskock = "otpy_PEs_Cjn"
 maskinoperator__kott = "Bb6j_vmM_vFp"
 drifttekniker__data = "Cb5F_v1d_4qK"
 instruktor_tranare_inom_specialidrott = "PXPJ_LKH_pmy"
+kock_fartyg = 'Ki3J_DNi_7Hi'

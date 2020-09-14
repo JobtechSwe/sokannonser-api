@@ -85,7 +85,7 @@ MAX_DATE = '3000-01-01T00:00:00'
 OCCUPATION_CONCEPT_ID = 'occupation-concept-id'
 LOCATION_CONCEPT_ID = 'location-concept-id'
 OCCUPATION_LIST = ['occupation', 'occupation_field', 'occupation_group']
-LOCATION_LIST = ['region', 'city', 'country', 'municipality']
+LOCATION_LIST = ['region', 'country', 'municipality']
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'

@@ -27,9 +27,7 @@ class SearchJobLink(Resource):
         description='Search scraped ads using parameters and/or freetext',
         params={
             QUERY: "Fields to freetext search in, in addition to default freetext search",
-            OCCUPATION: "One or more occupational concept ID according to the taxonomy",
             GROUP: "One or more occupational group concept ID according to the taxonomy",
-            FIELD: "One or more occupational area concept ID according to the taxonomy",
             MUNICIPALITY: "One or more municipality concept ID according to the taxonomy",
             REGION: "One or more region concept ID according to the taxonomy",
             COUNTRY: "One or more country concept ID according to the taxonomy",
@@ -69,9 +67,7 @@ class SearchJobLink(Resource):
                 "webpage_url": hit.get("originalJobPosting", {}).get("url", ""),
                 "headline": hit.get("originalJobPosting", {}).get("title", ""),
                 "workplace_address": hit.get("workplace_address", ""),
-                "occupation": hit.get("occupation", ""),
                 "occupation_group": hit.get("occupation_group", ""),
-                "occupation_field": hit.get("occupation_field", ""),
                 "sameAs": "",
                 "hashsum": hit.get("hashsum", "")
             })

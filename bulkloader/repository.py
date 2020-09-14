@@ -142,7 +142,7 @@ def load_all(args):
 
     location_concept_ids = args.get(settings.LOCATION_CONCEPT_ID)
     if location_concept_ids:
-        location_list = ['workplace_address.' + location + '_concept_id.keyword' for location in settings.LOCATION_LIST]
+        location_list = ['workplace_address.' + location + '_concept_id' for location in settings.LOCATION_LIST]
         add_filter_query(dsl, location_list, location_concept_ids)
 
     log.debug('QUERY(load_all): %s' % json.dumps(dsl))

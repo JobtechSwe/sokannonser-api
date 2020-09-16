@@ -62,7 +62,7 @@ class SearchJobLink(Resource):
         result = []
         for hit in hits:
             result.append({
-                "id": hit.get('id', ""),
+                "id": str(hit.get('id', "")),
                 "external_id": hit.get("originalJobPosting", {}).get("identifier", ""),
                 "webpage_url": hit.get("originalJobPosting", {}).get("url", ""),
                 "headline": hit.get("originalJobPosting", {}).get("title", ""),

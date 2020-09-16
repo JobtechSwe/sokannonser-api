@@ -7,14 +7,16 @@ from tests.test_resources.scraped import get_scraped, get_actual_ad_ids
 from tests.test_resources.settings import NUMBER_OF_SCRAPED_ADS
 
 
-@pytest.mark.parametrize("expected_number_of_hits", [0, 1, 18, 19])
+@pytest.mark.parametrize("expected_number_of_hits", [0, 1, 18, 19, 35, 36, 100])
 def test_limit_with_query(session_scraped, scraped_url, expected_number_of_hits):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     q = 'Sjuksköterska'
-    actual_hits = 19
+    hits_in_test_data = 35
     json_response = get_scraped(session_scraped, scraped_url,
                                 params={'q': q, 'limit': expected_number_of_hits})
-    assert json_response['total']['value'] == actual_hits
+    assert json_response['total']['value'] == hits_in_test_data
+    if expected_number_of_hits > hits_in_test_data:
+        expected_number_of_hits = hits_in_test_data
     assert len(json_response['hits']) == expected_number_of_hits
 
 

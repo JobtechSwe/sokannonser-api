@@ -21,6 +21,12 @@ def test_freetext_query_one_param(session, search_url):
     json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})
     compare(json_response['total']['value'], expected=18)
 
+def test_enrich(session, search_url):
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    query = 'stresstålig'
+    json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})
+    compare(json_response['total']['value'], expected=18)
+
 
 @pytest.mark.smoke
 @pytest.mark.integration
@@ -187,13 +193,18 @@ def test_find_all_ads_check_removed_is_false(session, search_url):
     for offset in range(0, NUMBER_OF_ADS, limit):
         json_response = get_search(session, search_url, params={'offset': offset, 'limit': limit})
         hits = json_response['hits']
+        print()
+        print("all_ads = [ ")
         for hit in hits:
             assert hit['removed'] is False
+            print(f"{hit}, ")
         if NUMBER_OF_ADS - offset > limit:
             expected = limit
         else:
             expected = NUMBER_OF_ADS % limit
         compare(len(hits), expected)
+        print("]")
+        print()
 
 
 @pytest.mark.integration

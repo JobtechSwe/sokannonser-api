@@ -192,6 +192,13 @@ ornskoldsvik = "zBmE_n6s_MnQ"
 are = "D7ax_CXP_6r1"
 kalix = "cUyN_C9V_HLU"
 tomelilla = "UMev_wGs_9bg"
+sorsele = 'VM7L_yJK_Doo'
+dorotea = 'tSkf_Tbn_rHk'
+trelleborg = 'STvk_dra_M1X'
+perstorp = 'BN7r_iPV_F9p'
+bromolla = "WMNK_PXa_Khm"
+danderyd = "E4CV_a5E_ucX"
+upplands_bro = "w6yq_CGR_Fiv"
 
 #  ["region"]
 stockholms_lan = "CifL_Rzy_Mku"
@@ -224,3 +231,4 @@ aland_tillhor_finland = "bUNp_6HW_Vbn"
 malta = "u8qF_qpq_R5W"
 schweiz = "Q78b_oCw_Yq2"
 estland = "EtpD_2Kn_dEP"
+grekland = 'BRi4_in4_xLc'

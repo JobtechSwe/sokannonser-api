@@ -21,11 +21,12 @@ def check_required_ad_fields_not_none(hit):
 def check_ids(actual, expected):
     assert len(actual) == len(expected)
     for ad_id in expected:
-        assert ad_id in actual, f"id {ad_id} was not found in the query result"
+        assert ad_id in actual, f"expected id {ad_id} was not found in the query result"
 
 def get_actual_ad_ids(json_response):
     actual_ids = []
     for hit in json_response['hits']:
         actual_ids.append(hit['id'])
+    print(actual_ids)
     return actual_ids
 

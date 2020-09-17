@@ -28,6 +28,7 @@ class SearchJobLink(Resource):
         params={
             QUERY: "Fields to freetext search in, in addition to default freetext search",
             GROUP: "One or more occupational group concept ID according to the taxonomy",
+            FIELD: "One or more occupational area concept ID according to the taxonomy",
             MUNICIPALITY: "One or more municipality concept ID according to the taxonomy",
             REGION: "One or more region concept ID according to the taxonomy",
             COUNTRY: "One or more country concept ID according to the taxonomy",
@@ -68,6 +69,7 @@ class SearchJobLink(Resource):
                 "headline": hit.get("originalJobPosting", {}).get("title", ""),
                 "workplace_address": hit.get("workplace_address", ""),
                 "occupation_group": hit.get("occupation_group", ""),
+                "occupation_field": hit.get("occupation_field", ""),
                 "sameAs": "",
                 "hashsum": hit.get("hashsum", "")
             })

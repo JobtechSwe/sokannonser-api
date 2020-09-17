@@ -39,6 +39,7 @@ api.add_namespace(ns_skrapade, '/')
 
 jl_query = reqparse.RequestParser()
 jl_query.add_argument(GROUP, action='append')
+jl_query.add_argument(FIELD, action='append')
 jl_query.add_argument(MUNICIPALITY, action='append')
 jl_query.add_argument(REGION, action='append')
 jl_query.add_argument(COUNTRY, action='append')

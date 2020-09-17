@@ -118,7 +118,7 @@ URL_STAGE = os.getenv('URL_STAGE', '127.0.0.1/')
 URL_PROD = os.getenv('URL_PROD', 'https://jobsearch.api.jobtechdev.se/')
 
 # original index: narvalontology, new: jae-synonym-dictionary
-ONTOLOGY_INDEX = os.getenv('ONTOLOGY_INDEX', 'narvalontology')
+ONTOLOGY_INDEX = os.getenv('ONTOLOGY_INDEX', 'jae-synonym-dictionary')
 
 # scraped index
 ES_SCRAPED_INDEX = os.getenv("ES_SCRAPED_INDEX", "scrapedannons")

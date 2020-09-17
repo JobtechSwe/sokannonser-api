@@ -27,10 +27,10 @@ def lowercase_maxlength(value):
 QF_CHOICES = ['occupation', 'skill', 'location', 'employer']
 
 api = Api(version=API_VERSION, title='Joblinks',
-          description="The Swedish Public Employment Service together with some of Sweden's largest "
-                      "job-board sites are maintaining this API as joint effort. The dataset that are "
-                      "searchable in this API is named Joblinks and contains references and metadata "
-                      "linked to the job-ads provided by job-boards.",
+          description="This API is a joint effort between The Swedish Public Employment Service "
+                      "and some of Sweden's largest job-board sites. The dataset that is searchable "
+                      "in this API is named Joblinks and contains references and "
+                      "metadata linked to the job-ads provided by job-boards.",
           default='joblinks',
           default_label="An API for searching scraped ads")
 

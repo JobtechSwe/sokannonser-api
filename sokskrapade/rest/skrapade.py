@@ -26,7 +26,7 @@ class SearchJobLink(Resource):
     @ns_skrapade.doc(
         description='Search scraped ads using parameters and/or freetext',
         params={
-            QUERY: "Fields to freetext search in, in addition to default freetext search",
+            QUERY: "Freetext query",
             GROUP: "One or more occupational group concept ID according to the taxonomy",
             FIELD: "One or more occupational area concept ID according to the taxonomy",
             MUNICIPALITY: "One or more municipality concept ID according to the taxonomy",

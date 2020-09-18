@@ -22,7 +22,7 @@ from tests.test_resources.scraped import get_scraped, get_actual_ad_ids, check_i
     (' distributör', ['1301', '1201', '601']),
     ('konsekvensanalyser', ['1']),
 ])
-def test_enrichment(session_scraped, scraped_url, query, expected_ids):
+def test_enrichment_skill(session_scraped, scraped_url, query, expected_ids):
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     json_response = get_scraped(session_scraped, scraped_url, params={'q': query, 'limit': '100'})

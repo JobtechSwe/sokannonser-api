@@ -18,9 +18,10 @@ def check_required_ad_fields_not_none(hit):
     assert len(hit) == 10
 
 
-def check_ids(actual, expected):
-    print(f"Ids from response: {actual}")
-    print(f"Expected ids: {expected}")
+def check_ids(actual, expected, printout=False):
+    if printout:
+        print(f"Ids from response: {actual}")
+        print(f"Expected ids: {expected}")
     assert len(actual) == len(expected)
     for ad_id in expected:
         assert ad_id in actual, f"expected id {ad_id} was not found in the query result"

@@ -40,7 +40,7 @@ def test_occupation_group(session_scraped, scraped_url, occupation, expected_ids
     (field.kultur__media__design, ['12201', '12401']),
     (field.militart_arbete, []),  # OK
 ])
-def test_occupation_field_2(session_scraped, scraped_url, occupation, expected_ids):
+def test_occupation_field(session_scraped, scraped_url, occupation, expected_ids):
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
     json_response = get_scraped(session_scraped, scraped_url, params={'occupation-field': occupation, 'limit': '100'})

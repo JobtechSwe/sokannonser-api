@@ -70,6 +70,7 @@ class SearchJobLink(Resource):
                 "external_id": hit.get("originalJobPosting", {}).get("identifier", ""),
                 "webpage_url": hit.get("originalJobPosting", {}).get("url", ""),
                 "headline": hit.get("originalJobPosting", {}).get("title", ""),
+                "brief": hit.get("originalJobPosting", {}).get("brief", ""),
                 "workplace_address": hit.get("workplace_address", ""),
                 "occupation_group": hit.get("occupation_group", ""),
                 "occupation_field": hit.get("occupation_field", ""),

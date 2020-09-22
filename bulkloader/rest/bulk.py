@@ -55,9 +55,9 @@ class BulkLoad(Resource):
             settings.UPDATED_BEFORE_DATE: "Stream ads updated before datetime."
                                           "Optional if you want to set a custom time span. "
                                           "Defaults to 'now' if not set. Accepts datetime as YYYY-MM-DDTHH:MM:SS.",
-            settings.OCCUPATION_CONCEPT_ID: "Filter stream ads by one or more occupations' concept ids. "
+            settings.OCCUPATION_CONCEPT_ID: "Filter stream ads by one or more occupation concept ids. "
                                             "(concept_ids from occupation, occupation_field, occupation_group)",
-            settings.LOCATION_CONCEPT_ID: "Filter stream ads by one or more locations' concept ids. "
+            settings.LOCATION_CONCEPT_ID: "Filter stream ads by one or more location concept ids. "
                                           "(concept_ids from Country, Region, Municipality)"
         },
         responses={

@@ -1,7 +1,7 @@
 import os
 import datetime
 
-API_VERSION = '1.14.0.dev'
+API_VERSION = '1.14.0'
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "127.0.0.1")

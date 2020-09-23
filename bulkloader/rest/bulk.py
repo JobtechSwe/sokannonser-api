@@ -48,13 +48,16 @@ class BulkLoad(Resource):
     example_date = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M:%S")
 
     @ns_bulk.doc(
+        description="Download all the ads that has been changed (e.g. added, updated, unpublished) during requested time interval. "
+                    "Rate limit is one request per minute.",
         params={
-            settings.DATE: "Stream ads updated since datetime. "
+            settings.DATE: "Stream ads changed since datetime. "
                            "Accepts datetime as YYYY-MM-DDTHH:MM:SS, "
-                           "for example %s. Rate limit is one request per minute." % example_date,
-            settings.UPDATED_BEFORE_DATE: "Stream ads updated before datetime."
+                           "for example %s." % example_date,
+            settings.UPDATED_BEFORE_DATE: "Stream ads changed before datetime. "
+                                          "Accepts datetime as YYYY-MM-DDTHH:MM:SS. "
                                           "Optional if you want to set a custom time span. "
-                                          "Defaults to 'now' if not set. Accepts datetime as YYYY-MM-DDTHH:MM:SS.",
+                                          "Defaults to 'now' if not set.",
             settings.OCCUPATION_CONCEPT_ID: "Filter stream ads by one or more occupation concept ids "
                                             "(from occupation, occupation_group, occupation_field).",
             settings.LOCATION_CONCEPT_ID: "Filter stream ads by one or more location concept ids "

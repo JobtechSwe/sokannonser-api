@@ -3,7 +3,6 @@ import re
 import certifi
 from ssl import create_default_context
 from elasticsearch import Elasticsearch
-from copy import copy
 from sokannonser import settings
 from sokannonser.repository.ontology import Ontology
 
@@ -21,8 +20,8 @@ class TextToConcept(object):
     LOCATION_KEY = 'GEO'
     REMOVED_TAG = '<removed>'
 
-    def __init__(self, ontologyhost='localhost', ontologyport=9200,
-                 ontologyindex='narvalontology', ontologyuser=None, ontologypwd=None):
+    def __init__(self, ontologyhost='127.0.0.1', ontologyport=9200,
+                 ontologyindex=settings.ONTOLOGY_INDEX, ontologyuser=None, ontologypwd=None):
         log.info('Creating TextToConcept')
 
         self.client = self.create_elastic_client(ontologyhost, ontologyport, ontologyuser,
@@ -31,7 +30,7 @@ class TextToConcept(object):
 
         self.ontology = None
 
-        if settings.ES_HOST != 'localhost':
+        if settings.ES_HOST != '127.0.0.1':
             # Cache ontology directly unless it's a local call (tests or docker build)
             self.get_ontology()
 

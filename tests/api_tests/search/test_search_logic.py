@@ -12,7 +12,7 @@ from tests.test_resources.settings import TEST_USE_STATIC_DATA
 @pytest.mark.parametrize("query, municipality, code, municipality_concept_id, expected_number_of_hits", [
     ('bagare stockholm', 'Stockholm', '0180', geo.stockholm, 3),
     ('lärare stockholm', 'Stockholm', '0180', geo.stockholm, 4),
-    ('lärare göteborg', 'Göteborg', '1480', geo.goteborg, 4),
+    ('lärare göteborg', 'Göteborg', '1480', geo.goteborg, 5),
 ])
 def test_freetext_work_and_location_details(session, search_url, query, municipality, code, municipality_concept_id,
                                             expected_number_of_hits):
@@ -22,7 +22,7 @@ def test_freetext_work_and_location_details(session, search_url, query, municipa
     response_json = json.loads(response.content.decode('utf8'))
 
     for ad in response_json['hits']:
-        print(ad)
+        print(ad['id'])
         assert ad['workplace_address']['municipality'] == municipality
         assert ad['workplace_address']['municipality_code'] == code
         assert ad['workplace_address']['municipality_concept_id'] == municipality_concept_id
@@ -30,13 +30,23 @@ def test_freetext_work_and_location_details(session, search_url, query, municipa
 
 @pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.parametrize("query, expected_ids_and_relevance", [
-    ('bagare kock Stockholm Göteborg',
-     [('23780773', 1.0), ('23578307', 1.0), ('23762170', 1.0), ('23934411', 0.897897309155177),
-      ('23918920', 0.897897309155177), ('23783846', 0.8949498104298874), ('23978318', 0.7716591497509147),
-      ('23826966', 0.7716591497509147), ('23566906', 0.7716591497509147), ('23552714', 0.7716591497509147),
-      ('23502782', 0.7716591497509147), ('23451218', 0.7716591497509147), ('23981076', 0.45415871049258943),
-      ('23978439', 0.45415871049258943), ('23550781', 0.45415871049258943),
-      ])])
+    ('bagare kock Stockholm Göteborg', [
+        ('23780773', 1.0),
+        ('23578307', 1.0),
+        ('23762170', 1.0),
+        ('23934411', 0.8980545961300535),
+        ('23918920', 0.8980545961300535),
+        ('23783846', 0.8942954524344648),
+        ('23978318', 0.7717334031001554),
+        ('23826966', 0.7717334031001554),
+        ('23566906', 0.7717334031001554),
+        ('23552714', 0.7717334031001554),
+        ('23502782', 0.7717334031001554),
+        ('23451218', 0.7717334031001554),
+        ('23981076', 0.45396117079818865),
+        ('23978439', 0.45396117079818865),
+        ('23550781', 0.45396117079818865)
+    ])])
 def test_freetext_two_work_and_two_locations_check_order(session, search_url, query, expected_ids_and_relevance):
     """
     Tests that the sorting order of hits is as expected and that relevance value has not changed
@@ -48,11 +58,12 @@ def test_freetext_two_work_and_two_locations_check_order(session, search_url, qu
     response = get_search_check_number_of_results(session, search_url, len(expected_ids_and_relevance), params)
     response_json = json.loads(response.content.decode('utf8'))
     old_relevance = 1
+
     for index, hit in enumerate(response_json['hits']):
         relevance = hit['relevance']
-        assert old_relevance >= relevance
+        assert old_relevance >= relevance  # check that results are presented in ascending relevance order
         assert hit['id'] == expected_ids_and_relevance[index][0]
-        assert hit['relevance'] == expected_ids_and_relevance[index][1]
+        assert hit['relevance'] == expected_ids_and_relevance[index][1], hit['id']
         old_relevance = relevance
 
 
@@ -60,7 +71,7 @@ def test_freetext_two_work_and_two_locations_check_order(session, search_url, qu
     ('bagare kock Stockholm Göteborg', '23780773', 15),
     ('kock bagare Stockholm Göteborg', '23780773', 15),
     ('kallskänka kock Stockholm Göteborg', '23552714', 13),
-    ('lärare lågstadielärare Malmö Göteborg', '23981080', 5),
+    ('lärare lågstadielärare Malmö Göteborg', '23981080', 6),
 ])
 def test_freetext_two_work_and_two_locations(session, search_url, query, top_id, expected_number_of_hits):
     """

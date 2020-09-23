@@ -24,7 +24,7 @@ def test_search_relevance_multiple_times(session, search_url, relevance_threshol
         # print(f"Total: {total}, positions: {pos}")
 
         if i > 0:  # comparison to previous result is pointless on first try
-            msg = f"Search {i}: Total: {total}, positions: {pos}"
+            msg = f"relevance-threshold: {relevance_threshold} search {i}: Total: {total}, positions: {pos}"
             pass
             if old_total != total or old_pos != pos:
                 failures.append(msg)

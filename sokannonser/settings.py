@@ -1,8 +1,10 @@
 import os
 import datetime
 
+API_VERSION = '1.14.0'
+
 # Elasticsearch settings
-ES_HOST = os.getenv("ES_HOST", "localhost")
+ES_HOST = os.getenv("ES_HOST", "127.0.0.1")
 ES_PORT = os.getenv("ES_PORT", 9200)
 ES_USER = os.getenv("ES_USER")
 ES_PWD = os.getenv("ES_PWD")
@@ -83,7 +85,7 @@ MAX_DATE = '3000-01-01T00:00:00'
 OCCUPATION_CONCEPT_ID = 'occupation-concept-id'
 LOCATION_CONCEPT_ID = 'location-concept-id'
 OCCUPATION_LIST = ['occupation', 'occupation_field', 'occupation_group']
-LOCATION_LIST = ['region', 'city', 'country', 'municipality']
+LOCATION_LIST = ['region', 'country', 'municipality']
 
 # For all ads
 SHOW_EXPIRED = 'show-expired'
@@ -99,7 +101,7 @@ result_models = [
 SWEDEN_CONCEPT_ID = 'i46j_HmG_v64'
 
 # Slack integration
-SLACK_TOKEN = 'SLACK'
+SLACK_TOKEN = os.getenv('SLACK_TOKEN')
 SLACK_CHANNEL = 'test-result'
 SLACK_USERNAME = 'lina-test'
 SLACK_ENABLED = True
@@ -111,8 +113,12 @@ SLACK_STORE_MESSAGE = False
 TEST_RESULT_CHANNEL = 'test-result'
 
 # URLs of environment
-URL_DEV = os.getenv('URL_DEV', 'localhost/')
-URL_STAGE = os.getenv('URL_STAGE', 'localhost/')
+URL_DEV = os.getenv('URL_DEV', '127.0.0.1/')
+URL_STAGE = os.getenv('URL_STAGE', '127.0.0.1/')
 URL_PROD = os.getenv('URL_PROD', 'https://jobsearch.api.jobtechdev.se/')
 
-API_VERSION = '1.13.2'
+# original index: narvalontology, new: jae-synonym-dictionary
+ONTOLOGY_INDEX = os.getenv('ONTOLOGY_INDEX', 'jae-synonym-dictionary')
+
+# scraped index
+ES_SCRAPED_INDEX = os.getenv("ES_SCRAPED_INDEX", "scrapedannons")

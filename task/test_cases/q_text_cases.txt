@@ -21,6 +21,8 @@ Skåne län svenska
 huvudkontor
 Lärare Utvecklare
 Lärare
+engineer
+engineer kock
 CAD gymnasieutbildning
 gymnasieutbildning kandidatexamen
 SFI gymnasieutbildning
@@ -48,7 +50,6 @@ Trelleborg Luleå
 Trelleborg Halmstad
 Utvecklare Specialpedagog
 Piteå Halmstad
-Utvecklare
 Piteå Luleå
 Halmstad Bromma
 Luleå Bromma
@@ -58,9 +59,12 @@ Järfälla Falun
 Gotland Järfälla
 Halmstad Hisingen
 Luleå Hisingen
+Utvecklare
 Utvecklare Mjukvaruutvecklare
-Falu Halmstad
 Utvecklare Intensivvårdssjuksköterska
+c#
+.net
+CAD
 Falu Luleå
 Sigtuna Falun
 Stockholms län huvudkontor
@@ -90,7 +94,6 @@ Norrbotten Järfälla
 Gotland Bromma
 Stockholms län Sjuksköterska
 Skåne län produkter
-.net
 Norrbotten Sigtuna
 Falun Hisingen
 Järfälla Sigtuna
@@ -169,9 +172,7 @@ Stockholms län undervisning
 sjuksköterskeexamen kandidatexamen
 Södermanland Trelleborg
 kandidatexamen masterexamen
-Falu Piteå
 Sigtuna
-CAD
 Falu Bromma
 Södermanland Piteå
 Trelleborg Kungsängen
@@ -187,7 +188,6 @@ Utvecklare .net
 Gnesta Piteå
 Bromma Kungsängen
 Märsta Bromma
-Falu Hisingen
 Piteå Bålsta
 Gnesta Bromma
 Piteå Västra hamnen
@@ -223,7 +223,6 @@ Skåne län lager
 Gnesta Falu
 Södermanland Kungsängen
 Södermanland Märsta
-Falu Bålsta
 Stockholms län utredning
 Stockholms län ica
 Falu Västra hamnen
@@ -337,14 +336,9 @@ dkhjwtbopt Trelleborg
 ekrccsykeq ica
 fbmpmghcpj Specialpedagog
 gifrrcdjsu Kungsängen
-jkudgchjsh Märsta
 jpqgkssaku .net
-juljzmfucj Hisingen
-livouvtqrr Gotland
-lqxffufqrr Halmstad
 mebdwxawkv masterexamen
 mqihoxjiul Sjuksköterska
 myykioegcb gymnasieutbildning
 nwswkfjhlz CAD
-paiyohnhiq Gnesta
 pbrvzzrdln SFI

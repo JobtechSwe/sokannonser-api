@@ -46,20 +46,22 @@ class BulkZip(Resource):
 class BulkLoad(Resource):
     method_decorators = [check_api_key_and_return_metadata('bulk', settings.API_KEY_RATE_LIMIT)]
     example_date = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M:%S")
-    """
-        settings.OCCUPATION_CONCEPT_ID: "Filter stream by one or more concept id’s for occupations. "
-                                        "(occupation_field, occupation_group, occupation)",
-        settings.LOCATION_CONCEPT_ID: "Filter stream ads by one or more locations' concept ids. "
-                                      "(concept_ids from Country, Region, Municipality)"
-    """
+
     @ns_bulk.doc(
+        description="Download all the ads that has been changed (e.g. added, updated, unpublished) during requested time interval. "
+                    "Rate limit is one request per minute.",
         params={
-            settings.DATE: "Stream ads updated since datetime. "
+            settings.DATE: "Stream ads changed since datetime. "
                            "Accepts datetime as YYYY-MM-DDTHH:MM:SS, "
-                           "for example %s. Rate limit is one request per minute." % example_date,
-            settings.UPDATED_BEFORE_DATE: "Stream ads updated before datetime."
+                           "for example %s." % example_date,
+            settings.UPDATED_BEFORE_DATE: "Stream ads changed before datetime. "
+                                          "Accepts datetime as YYYY-MM-DDTHH:MM:SS. "
                                           "Optional if you want to set a custom time span. "
-                                          "Defaults to 'now' if not set. Accepts datetime as YYYY-MM-DDTHH:MM:SS."
+                                          "Defaults to 'now' if not set.",
+            settings.OCCUPATION_CONCEPT_ID: "Filter stream ads by one or more occupation concept ids "
+                                            "(from occupation, occupation_group, occupation_field).",
+            settings.LOCATION_CONCEPT_ID: "Filter stream ads by one or more location concept ids "
+                                          "(from municipality_concept_id, region_concept_id, country_concept_id)."
         },
         responses={
             200: 'OK',

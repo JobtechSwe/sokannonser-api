@@ -47,35 +47,27 @@ def test_complete_endpoint_synonyms_typeahead(session, search_url, query, synony
     ('systemutvecklare angu', ['systemutvecklare angularjs']),
     ('angu', ['angularjs']),
     ('pyth', ['python']),
-    ('#coro', ['corona']),
-    ('#coron', ['corona']),
+    ('#coro', ['creo', 'foto', 'core', 'code', 'cura']),
+    ('#coron', ['fordon', 'core']),
     ('c#', ['c#']),
     ('c+', ['c++']),
     ('ang', ['angularjs', 'angered']),
-    ('c', ['civilingenjör', 'c#', 'c', 'can', 'c körkort', 'cnc- operatör', 'c++', 'cad', 'cloud', 'css', 'chaufför',
-           'certifikat', 'ci/cd', 'citrix', 'civilingenjörsutbildning', 'continuous integration', 'cnc', 'coachning',
-           'cykling', 'c-chaufför', 'c-kort', 'cellbiologi', 'cisco', 'confluence', 'controller', 'copy', 'ce-chaufför',
-           'cheerleadingtränare', 'chefskock', 'civilekonom', 'cnc-svarvare', 'coach', 'consultant manager',
-           'copywriter', 'customer success manager', 'cykelbud', 'cykelsäljare']),
+    ('c',
+     ['can', 'civilingenjör', 'c#', 'c-körkort', 'c++', 'cnc- operatör', 'cloud', 'continuous integration', 'chaufför',
+      'cad', 'cafeteria', 'ci/cd', 'citrix', 'civilingenjörsutbildning', 'css', 'c-kort', 'certifieringar',
+      'certifikat', 'coachning', 'cykling', 'c-chaufför', 'cancer', 'cisco', 'civilingenjörsexamen', 'cafébiträde',
+      'controller', 'ce-chaufför', 'cheerleadingtränare', 'chefskock', 'civilekonom', 'cnc-svarvare', 'co',
+      'copywriter', 'customer success manager', 'cykelbud', 'cykelsäljare']),
     ('uppd', ['uppdragsutbildning', 'uppdukning', 'uppdragsledare']),
     ('underh',
      ['underhållsmekaniker', 'underhållsarbete', 'underhållstekniker', 'underhållssystem', 'underhållsrutiner',
-      'underhållsarbetare', 'underhållsingenjör']),
-    ('sjuks', ['sjuksköterska', 'sjuksköterskeuppgifter', 'sjuksköterskeutbildning', 'sjuksköterskelegitimation']),
+      'underhållsingenjör', 'underhållspersonal']),
+    ('sjuks', ['sjuksköterska', 'sjuksköterskeuppgifter', 'sjuksköterskeexamen', 'sjuksköterskelegitimation',
+               'sjuksköterskeutbildning']),
     ('arbetsl', ['arbetslivserfarenhet', 'arbetsledning', 'arbetsledare', 'arbetsliv', 'arbetslivspsykologi',
                  'arbetsledarutbildning', 'arbetslivsfrågor']),
     ('servitr', ['server', 'service', 'servrar']),
 
-    # Failing
-    # ('servit', ['servicetekniker', 'servicearbete', 'service och underhåll', 'servicedesk', 'servicehandläggare',
-    #               'servicemedarbetare', 'servicetjänster', 'serviceyrke', 'service manager', 'servicebiträde',
-    #              'serviceelektriker', 'serviceinsatser', 'servicerådgivare']),
-    # ('servitr', ['servitris', 'servitör', 'servitriser', 'servitörer']),
-
-    # ('servi', ['servicetekniker', 'servicearbete', 'service och underhåll', 'servicedesk', 'servicehandläggare',
-    #           'servicemedarbetare', 'serviceyrke', 'service manager', 'servicebiträde', 'serviceelektriker']),
-    # ('angu', ['angular', 'angularjs']),  # actual ['angularjs']
-    # ('ang', ['angular', 'angularjs', 'angered'])  # actual ['angularjs', 'angered']
 ])
 def test_complete_endpoint_with_spellcheck_typeahead(session, search_url, query, expected_suggestions):
     """
@@ -95,36 +87,43 @@ def test_complete_endpoint_with_spellcheck_typeahead(session, search_url, query,
 @pytest.mark.parametrize("query, expected_suggestions", [
     ('lärare', ['lärare', 'lärare i grundskolan', 'lärare i förskola', 'lärare i fritidshem', 'lärarexamen',
                 'lärare i förskoleklass', 'lärare i praktiska och estetiska ämnen']),
-    ('lärare ',
-     ['sverige', 'i grundskolan', 'undervisning', 'lärarlegitimation', 'svenska', 'skola', 'stockholms län', 'verktyg',
-      'västra götaland', 'gymnasielärare']),
-    ('lärare i', ['i grundskolan', 'idrott', 'i fritidshem', 'idrott och hälsa', 'it-kunskaper', 'i förskoleklass',
-                  'informationsteknik', 'insatser', 'integration', 'intellektuell funktionsnedsättning',
-                  'introduktionsprogram', 'i praktiska och estetiska ämnen', 'industrilärare', 'instrumentalpedagog']),
-    ('lärare i ',
-     ['sverige', 'grundskolan', 'undervisning', 'lärarlegitimation', 'svenska', 'skola', 'stockholms län', 'verktyg',
-      'västra götaland', 'gymnasielärare']),
-    ('lärare fr', ['fritidshem', 'fritidspedagog', 'franska', 'friluftsaktiviteter', 'fritidspedagogutbildning']),
-    ('lärare i fr', ['fritidshem', 'fritidspedagog', 'franska', 'friluftsaktiviteter', 'fritidspedagogutbildning']),
-    ('lärare i fö', ['förskola', 'förskoleklass', 'förskollärarexamen', 'förskollärare']),
-    ('gymnas', ['gymnasieutbildning', 'gymnasielärare', 'gymnasiekompetens', 'gymnasium', 'gymnasieexamen', 'gymnastik',
-                'gymnasieprogram', 'gymnasieskola', 'gymnasieskolekompetens']),
-    ('gymnasie',
-     ['gymnasieutbildning', 'gymnasielärare', 'gymnasiekompetens', 'gymnasieexamen', 'gymnasieprogram', 'gymnasieskola',
-      'gymnasieskolekompetens']),
-    ('bygg', ['byggbranschen', 'byggteknik', 'byggproduktion', 'byggnadsingenjör', 'byggprojektledare', 'byggprojekt',
-              'byggarbetsplats', 'bygghandlingar', 'byggledning', 'bygglov', 'bygglovshandläggning', 'byggmaterial',
-              'byggnadsställningar', 'byggnadsverksamhet', 'byggnationer', 'byggplatsuppföljning', 'byggprocesser',
-              'byggtjänster', 'byggförare', 'byggingenjör', 'byggledare', 'byggmästare', 'byggnadsarbetare',
-              'byggnadskonstruktör', 'byggnadsplåtslagare']),
+    ('lärare ', ['will get too many hits, only number of hits is checked']),
+    ('lärare i',
+     ['i grundskolan', 'idrott', 'i fritidshem', 'idrott och hälsa', 'ikt', 'it-kunskaper', 'its', 'i förskoleklass',
+      'informationsteknik', 'insatser', 'intellektuell funktionsnedsättning', 'introduktionsprogram',
+      'i praktiska och estetiska ämnen']
+     ),
+    ('lärare i ', ['will get too many hits, only number of hits is checked']),
+    ('lärare fr', ['fritidspedagog', 'fritids', 'fritidshem', 'franska', 'friluftsaktiviteter', 'fritidsanläggningar',
+                   'fritidspedagogutbildning']),
+    ('lärare i fr', ['fritidshem', 'fritidspedagog', 'fritids', 'franska', 'friluftsaktiviteter', 'fritidsanläggningar',
+                     'fritidspedagogutbildning']),
+    ('lärare i fö', ['förskoleklass', 'företrädesrätt', 'förskola', 'förskollärarexamen', 'förskollärare']),
+    ('gymnas',
+     ['gymnasieutbildning', 'gymnasielärare', 'gymnasiekompetens', 'gymnasieexamen', 'gymnasium', 'gymnasieskola',
+      'gymnastik', 'gymnasiesärskola', 'gymnasiebehörighet', 'gymnasieprogram', 'gymnasieskolekompetens']),
+    ('gymnasie', ['gymnasieutbildning', 'gymnasielärare', 'gymnasiekompetens', 'gymnasieexamen', 'gymnasieskola',
+                  'gymnasiesärskola', 'gymnasiebehörighet', 'gymnasieprogram', 'gymnasieskolekompetens']),
+    ('bygg',
+     ['byggbranschen', 'byggproduktion', 'byggnadsingenjör', 'byggprojektledare', 'byggteknik', 'bygghandlingar',
+      'bygglov', 'bygglovshandläggning', 'byggnadsmaterial', 'byggnadsställningar', 'byggnationer',
+      'byggplatsuppföljning', 'byggprocesser', 'byggprojekt', 'byggprojektering', 'byggtjänster', 'byggverksamhet',
+      'byggförare', 'byggingenjör', 'byggledare', 'byggmästare', 'byggnadsarbetare', 'byggnadskonstruktör',
+      'byggnadsplåtslagare']),
     ('bygg ', ['will get too many hits, only number of hits is checked']),
-    ('kock', ['kock', 'kockerfarenheter', 'kockutbildning', 'kockutbildare']),
-    ('kock ', ['will get too many hits, only number of hits is checked']),
+    ('kock', ['kock', 'kockutbildning', 'kockutbildare']),
+    ('kock ',
+     ['sverige', 'stockholms län', 'mat', 'stockholm', 'kök', 'matlagning', 'svenska', 'à la carte', 'tillagning',
+      'specialkock', 'engelska', 'specialkost', 'storkök', 'städning', 'västra götaland', 'beställningar',
+      'egenkontroll', 'servering', 'barn', 'datorvana', 'dietmatlagning', 'diskning', 'dokumentation', 'frukost',
+      'haccp', 'hotell', 'bandhagen', 'dalarna', 'göteborg', 'jönköping', 'jönköpings län', 'skåne', 'kallskänka',
+      'blekinge', 'borlänge', 'falköping', 'gotland', 'heby', 'hällefors', 'idre', 'järfälla', 'karlshamn',
+      'karlskrona', 'chefskock', 'kokerska', 'köksbiträde', 'matlagare', 'pizzabagare']),
     ('stockholm  ',
      ['will get too many hits, only number of hits is checked']),
-    ('malmö ',
-     ['malmö butikssäljare', 'malmö sjuksköterska', 'malmö civilingenjör', 'malmö högskoleingenjör',
-      'malmö lagerarbetare', 'malmö redovisningsekonom']),
+    ('malmö ', ['malmö butikssäljare', 'malmö sjuksköterska', 'malmö civilingenjör', 'malmö högskoleingenjör',
+                'malmö lagerarbetare', 'malmö redovisningsekonom']),
+
     ('upplands ',
      ['upplands väsby', 'upplands väsby bemanningssjuksköterska', 'upplands väsby handledare',
       'upplands väsby javautvecklare', 'upplands väsby mjukvaruutvecklare', 'upplands väsby personlig assistent',
@@ -133,10 +132,10 @@ def test_complete_endpoint_with_spellcheck_typeahead(session, search_url, query,
      ['väsby', 'väsby bemanningssjuksköterska', 'väsby sjuksköterska']),
     ('sverige ',
      ['sverige sjuksköterska', 'sverige lärare', 'sverige personlig assistent', 'sverige lärare i grundskolan',
-      'sverige säljare', 'sverige butikssäljare']),
+      'sverige försäljare', 'sverige butikssäljare']),
     ('sverige',
      ['sverige', 'sverige sjuksköterska', 'sverige lärare', 'sverige personlig assistent',
-      'sverige lärare i grundskolan', 'sverige säljare', 'sverige butikssäljare']),
+      'sverige lärare i grundskolan', 'sverige försäljare', 'sverige butikssäljare']),
 ])
 def test_suggest_extra_word_and_allow_empty(session, search_url, query, expected_suggestions):
     """
@@ -153,9 +152,8 @@ def test_suggest_extra_word_and_allow_empty(session, search_url, query, expected
     json_response = json.loads(response.content.decode('utf8'))
     assert 'typeahead' in json_response
     actual_suggestions = [suggest.get('value') for suggest in json_response.get('typeahead')]
-    # compare(len(actual_suggestions), len(expected_suggestions))
-    if len(actual_suggestions) < 50:
-        compare_suggestions(actual_suggestions, expected_suggestions, query)
+    print(f"\nactual suggestions: {actual_suggestions}")
+    compare_suggestions(actual_suggestions, expected_suggestions, query)
 
 
 def test_check_400_bad_request_when_limit_is_greater_than_allowed(session, search_url):
@@ -172,10 +170,10 @@ def test_check_400_bad_request_when_limit_is_greater_than_allowed(session, searc
 
 
 @pytest.mark.parametrize("query, query_2, expected_typeahead", [
-    ("stor", "", ['storkök', 'storhushåll', 'storstädning', 'storage', 'stored procedures', 'storuman']),
+    ("stor", "", ['storkök', 'storstädning', 'storage', 'stored procedures', 'storhushåll', 'storuman']),
     ("stor", "s",
      ['sverige', 'svenska', 'stockholms län', 'stockholm', 'skåne', 'sjuksköterska', 'sjukvård', 'språkkunskaper',
-      'städning', 'skola']),
+      'städning', 'södermanland']),
     ("storage", "", ['storage', 'storage solna', 'storage stockholms län']),
     ("storage", "s", ['servrar', 'säkerhet', 'solna', 'stockholms län', 'sverige']),
 

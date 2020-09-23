@@ -21,4 +21,4 @@ def test_unspecified_sweden_workplace(session, search_url):
         assert hit['workplace_address']['city'] is None
         assert hit['workplace_address']['coordinates'] == [None, None]
         assert hit['relevance'] == 0.0
-    pass
+

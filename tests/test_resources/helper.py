@@ -1,8 +1,7 @@
 import json
 import logging
 import tests.test_resources.settings
-from tests.test_resources.settings import TEST_USE_STATIC_DATA, headers_search
-from tests.test_resources.check_response import check_response_return_json
+from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 log = logging.getLogger(__name__)
 
@@ -21,10 +20,12 @@ def compare_typeahead(actual_typeahead, expected_typeahead):
 
 
 def compare_suggestions(actual, expected, query):
+    if len(actual) >= 50:
+        # if 50 or more we can't be sure of order and content of suggestions
+        return
     try:
-        if len(actual) < 50:  # if 50 or more we can't be sure of order
-            msg = f"\nQuery: {query}"
-            compare(len(actual), len(expected), msg)
+        msg = f"\nQuery: {query}"
+        compare(len(actual), len(expected), msg)
         for s in expected:
             msg = f"Did not find {s} in {actual} "
             assert s in actual
@@ -141,6 +142,8 @@ def _check_ok_response_and_number_of_ads(response, expected_number):
     list_of_ads = json.loads(response.content.decode('utf8'))
     if '/search' in response.url:
         list_of_ads = list_of_ads['hits']
+    for hit in list_of_ads:
+        print(hit['id'])
     if expected_number is not None:
         compare(len(list_of_ads), expected_number)
     _check_list_of_ads(list_of_ads)
@@ -170,8 +173,6 @@ def check_freetext_concepts(free_text_concepts, list_of_expected):
     assert free_text_concepts['skill_must_not'] == list_of_expected[6]
     assert free_text_concepts['occupation_must_not'] == list_of_expected[7]
     assert free_text_concepts['location_must_not'] == list_of_expected[8]
-
-
 
 
 def _fetch_and_validate_result(session, search_url, query, resultfield, expected, non_negative=True):

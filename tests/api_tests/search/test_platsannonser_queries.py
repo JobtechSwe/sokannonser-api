@@ -21,6 +21,12 @@ def test_freetext_query_one_param(session, search_url):
     json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})
     compare(json_response['total']['value'], expected=18)
 
+def test_enrich(session, search_url):
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    query = 'stresstålig'
+    json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})
+    compare(json_response['total']['value'], expected=18)
+
 
 @pytest.mark.smoke
 @pytest.mark.integration
@@ -59,24 +65,24 @@ def test_min_relevance_new(session, search_url, minimum_relevance, expect_to_get
 
 @pytest.mark.integration
 @pytest.mark.parametrize("query, expected", [('python', 8),
-                                             ('python php', 7),
-                                             ('+python php', 7),
-                                             ('+python -php', 7),
-                                             ('-python -php', 1065),  # of 1072
+                                             ('python php', 8),
+                                             ('+python php', 8),
+                                             ('+python -php', 8),
+                                             ('-python -php', 1064),  # of 1072
                                              ('php', 0),  # ?
-                                             ('systemutvecklare +python java linux mac', 2),
+                                             ('systemutvecklare +python java linux mac', 1),
                                              ('systemutvecklare +python -java linux mac', 0),
-                                             ('systemutvecklare python java php', 12),
-                                             ('systemutvecklare -python java php', 10),
-                                             ('systemutvecklare python java -php', 12),
-                                             ('lärarexamen', 6),
-                                             ('lärarexamen -lärare', 1),
-                                             ('sjuksköterska', 85),
-                                             ('sjuksköterska -stockholm', 77),
-                                             ('sjuksköterska -malmö', 82),
-                                             ('sjuksköterska -stockholm -malmö', 74),
-                                             ('sjuksköterska -stockholm -malmö -göteborg -eskilstuna', 67),
-                                             ('sjuksköterska Helsingborg -stockholm -malmö -göteborg -eskilstuna', 1)
+                                             ('systemutvecklare python java php', 10),
+                                             ('systemutvecklare -python java php', 9),
+                                             ('systemutvecklare python java -php', 10),
+                                             ('lärarexamen', 7),
+                                             ('lärarexamen -lärare', 0),
+                                             ('sjuksköterska', 87),
+                                             ('sjuksköterska -stockholm', 79),
+                                             ('sjuksköterska -malmö', 84),
+                                             ('sjuksköterska -stockholm -malmö', 76),
+                                             ('sjuksköterska -stockholm -malmö -göteborg -eskilstuna', 69),
+                                             ('sjuksköterska Helsingborg -stockholm -malmö -göteborg -eskilstuna', 2)
                                              # 3 ads with work_place.municipality Helsingborg
                                              ])
 def test_freetext_plus_minus(session, search_url, query, expected):
@@ -87,12 +93,14 @@ def test_freetext_plus_minus(session, search_url, query, expected):
     :return: None if expected number of hits are found, AssertionError if not
     """
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})
+    json_response = get_search(session, search_url, params={'q': query, 'limit': '100'})
+    for hit in json_response['hits']:
+        print(hit['id'])
     compare(json_response['total']['value'], expected, msg=f'Query: {query}')
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("typo, expected_number_of_hits", [('sjukssköterska', 85),
+@pytest.mark.parametrize("typo, expected_number_of_hits", [('sjukssköterska', 87),
                                                            ('javasscript', 10)
                                                            # 'montesori' # todo: no match for 'montesori'
                                                            ])
@@ -103,7 +111,7 @@ def test_freetext_query_misspelled_param(session, search_url, typo, expected_num
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("special, expected_number_of_hits", [('c++', 7), ('c#', 15)])
+@pytest.mark.parametrize("special, expected_number_of_hits", [('c++', 8), ('c#', 16)])
 def test_freetext_query_with_special_characters(session, search_url, special, expected_number_of_hits):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     json_response = get_search(session, search_url, params={'q': special, 'limit': '0'})
@@ -185,13 +193,18 @@ def test_find_all_ads_check_removed_is_false(session, search_url):
     for offset in range(0, NUMBER_OF_ADS, limit):
         json_response = get_search(session, search_url, params={'offset': offset, 'limit': limit})
         hits = json_response['hits']
+        print()
+        print("all_ads = [ ")
         for hit in hits:
             assert hit['removed'] is False
+            print(f"{hit}, ")
         if NUMBER_OF_ADS - offset > limit:
             expected = limit
         else:
             expected = NUMBER_OF_ADS % limit
         compare(len(hits), expected)
+        print("]")
+        print()
 
 
 @pytest.mark.integration

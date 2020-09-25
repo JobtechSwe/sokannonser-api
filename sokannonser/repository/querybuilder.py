@@ -454,18 +454,6 @@ class QueryBuilder(object):
             ft_query['bool']['must_not'] = mustnts
         return ft_query
 
-    def _freetext_header_description(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
-        return [
-            {
-                "multi_match": {
-                    "query": searchword,
-                    "type": "cross_fields",
-                    "operator": method,
-                    "fields": [f.HEADLINE, f.DESCRIPTION_TEXT]
-                }
-            }
-        ]
-
     def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
         return [{
             "multi_match": {

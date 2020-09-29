@@ -1,5 +1,9 @@
 Changelog Application Jobsearch
 ===============================
+# 1.14.1
+* Enable "false negative" (i.e. free text search in ad text). 
+  Toggled by new x-feature parameter where disabled is default.
+
 # 1.14.0
 * Use new version of jae elasticsearch index (i.e. v-2.0.1.210) for Ontology dictionary. 
   This is dependent on calling the new enrichment endpoint from the elastic importer, that should correspond.

@@ -47,7 +47,8 @@ class QueryBuilder(object):
             self._build_freetext_query(args.get(settings.FREETEXT_QUERY),
                                        args.get(settings.FREETEXT_FIELDS),
                                        args.get(settings.X_FEATURE_FREETEXT_BOOL_METHOD),
-                                       args.get(settings.X_FEATURE_DISABLE_SMART_FREETEXT))
+                                       args.get(settings.X_FEATURE_DISABLE_SMART_FREETEXT),
+                                       args.get(settings.X_FEATURE_ENABLE_FALSE_NEGATIVE, False))
         )
         must_queries.append(self._build_employer_query(args.get(settings.EMPLOYER)))
         must_queries.append(self._build_yrkes_query(args.get(taxonomy.OCCUPATION),
@@ -339,7 +340,7 @@ class QueryBuilder(object):
 
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
     def _build_freetext_query(self, querystring, queryfields, freetext_bool_method,
-                              disable_smart_freetext):
+                              disable_smart_freetext, enable_false_negative=False):
         if not querystring:
             return None
         if not queryfields:
@@ -359,17 +360,16 @@ class QueryBuilder(object):
         # Add concepts to query
         for concept_type in queryfields:
             sub_should = self._freetext_concepts({"bool": {}}, concepts,
-                                                 querystring, [concept_type], "should")
+                                                 querystring, [concept_type], "should", enable_false_negative)
             if 'should' in sub_should['bool']:
                 if 'must' not in ft_query['bool']:
                     ft_query['bool']['must'] = []
                 ft_query['bool']['must'].append(sub_should)
         # Remove unwanted concepts from query
-        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must_not')
+        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must_not', enable_false_negative)
         # Require musts
-        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must')
+        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must', enable_false_negative)
         self._add_phrases_query(ft_query, phrases)
-
         ft_query = self._freetext_headline(ft_query, original_querystring)
         return ft_query
 
@@ -503,7 +503,7 @@ class QueryBuilder(object):
         return query_dict
 
     def _freetext_concepts(self, query_dict, concepts,
-                           querystring, concept_keys, bool_type):
+                           querystring, concept_keys, bool_type, enable_false_negative=False):
         for key in concept_keys:
             dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
             current_concepts = [c for c in concepts.get(dict_key, []) if c]
@@ -548,7 +548,22 @@ class QueryBuilder(object):
                             }
                         }
                     )
-
+                    if enable_false_negative and base_field == f.KEYWORDS_ENRICHED and (key == 'skill'):
+                        # Add extra search for the current known term in headline, employer and description to be sure
+                        # not to miss search hits where the term wasn't identified during enrichment. Only search
+                        # skills to avoid irrelevant hits on occupations and locations...
+                        query_dict['bool'][bool_type].append(
+                            {'multi_match': {
+                                'query': concept['term'].lower(),
+                                'type': 'cross_fields',
+                                'operator': 'and',
+                                'fields': [
+                                    'headline^0.1',
+                                    'keywords.extracted.employer^0.1',
+                                    'description.text^0.1'
+                                ]
+                            }}
+                        )
         return query_dict
 
     # Parses EMPLOYER

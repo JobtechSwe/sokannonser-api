@@ -1,7 +1,7 @@
 import os
 import datetime
 
-API_VERSION = '1.14.0'
+API_VERSION = '1.14.1'
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "127.0.0.1")
@@ -41,6 +41,7 @@ X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD = 'x-feature-include-synonyms-typeahead'
 X_FEATURE_SPELLCHECK_TYPEAHEAD = 'x-feature-spellcheck-typeahead'
 X_FEATURE_DISABLE_SMART_FREETEXT = 'x-feature-disable-smart-freetext'
 X_FEATURE_SUGGEST_EXTRA_WORD = 'x-feature-suggest-extra-word'
+X_FEATURE_ENABLE_FALSE_NEGATIVE = 'x-feature-enable-false-negative'
 
 # Query parameters
 OFFSET = 'offset'

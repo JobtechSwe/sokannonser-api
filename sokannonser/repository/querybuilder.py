@@ -15,13 +15,13 @@ from sokannonser.rest.model import fields as f
 
 log = logging.getLogger(__name__)
 
-
 class QueryBuilder(object):
     def __init__(self, text_to_concept=TextToConcept(ontologyhost=settings.ES_HOST,
                                                      ontologyport=settings.ES_PORT,
                                                      ontologyuser=settings.ES_USER,
                                                      ontologypwd=settings.ES_PWD)):
         self.ttc = text_to_concept
+        self.occupation_collections = taxonomy.fetch_occupation_collections()
 
     def parse_args(self, args, x_fields=None):
         """

@@ -2,10 +2,15 @@ import logging
 import os
 import json
 from elasticsearch.exceptions import RequestError
+import time
+import sys
+import requests
+from sokannonser import settings
 
 log = logging.getLogger(__name__)
 
-ES_TAX_INDEX = os.getenv('ES_TAX_INDEX', 'taxonomy')
+ES_TAX_INDEX \
+    = os.getenv('ES_TAX_INDEX', 'taxonomy')
 taxonomy_cache = {}
 
 # Swedish Constants (not used)
@@ -50,7 +55,6 @@ EDUCATION_FIELD = 'educationfield'
 DEPRECATED_EDUCATION_FIELD = 'deprecated_educationfield'
 DURATION = 'employment-duration'
 OCCUPATION_EXPERIENCE = 'experience'
-
 
 class JobtechTaxonomy:
     REGION = 'region'
@@ -181,10 +185,10 @@ def _build_query(query_string, taxonomy_code, entity_type, offset, limit):
         terms = [{"term": {"parent.legacy_ams_taxonomy_id": t}} for t in taxonomy_code]
         terms += [{"term": {"parent.concept_id.keyword": t}} for t in taxonomy_code]
         terms += [{"term":
-                   {"parent.parent.legacy_ams_taxonomy_id": t}
+                       {"parent.parent.legacy_ams_taxonomy_id": t}
                    } for t in taxonomy_code]
         terms += [{"term":
-                   {"parent.parent.concept_id.keyword": t}
+                       {"parent.parent.concept_id.keyword": t}
                    } for t in taxonomy_code]
         parent_or_grandparent = {"bool": {"should": terms}}
         # musts.append({"term": {"parent.id": taxonomy_code}})
@@ -197,14 +201,14 @@ def _build_query(query_string, taxonomy_code, entity_type, offset, limit):
         query_dsl = {"query": {"match_all": {}}, "from": offset, "size": limit}
     else:
         query_dsl = {
-                "query": {
-                    "bool": {
-                        "must": musts
-                    }
-                },
-                "from": offset,
-                "size": limit
-            }
+            "query": {
+                "bool": {
+                    "must": musts
+                }
+            },
+            "from": offset,
+            "size": limit
+        }
     if sort:
         query_dsl['sort'] = sort
 
@@ -236,7 +240,6 @@ def get_concept_id(elastic_client, taxtype, taxid):
 
 
 def get_entity(elastic_client, taxtype, taxid, not_found_response=None):
-
     # old version doc_id = "%s-%s" % (taxtype_legend.get(taxtype, ''), taxid)
     doc_id = taxid  # document id changed from type-id format to just the concept_id
     taxonomy_entity = elastic_client.get_source(index=ES_TAX_INDEX,
@@ -300,9 +303,9 @@ def find_concepts(elastic_client, query_string=None, taxonomy_code=[], entity_ty
 
 def format_response(elastic_response):
     response = {
-            "antal": elastic_response.get('hits', {}).get('total'),
-            "entiteter": []
-            }
+        "antal": elastic_response.get('hits', {}).get('total'),
+        "entiteter": []
+    }
     for sourcehit in elastic_response.get('hits', {}).get('hits', []):
         hit = sourcehit['_source']
         response['entiteter'].append({"kod": hit['legacy_ams_taxonomy_id'],
@@ -310,3 +313,48 @@ def format_response(elastic_response):
                                       "typ": hit['type']})
 
     return response
+
+def fetch_occupation_collections():
+    log.info("fetching occupation collections...")
+    # TODO Included preferred_label for logging issues. Remove if unnecessary...
+    taxonomy_endpoint = settings.BASE_TAXONOMY_URL + 'graphql?query={concepts(type:\"occupation-collection\"){id,preferred_label,related{id,preferred_label}}}'
+    headers = {"Accept": "application/json", "api-key": settings.TAXONOMY_APIKEY}
+    fail_count = 0
+    fail_max = settings.TAXONOMY_MAX_TRY
+    occupation_collections = []
+    while True:
+        try:
+            r = requests.get(taxonomy_endpoint, headers=headers)
+            r.raise_for_status()
+            response = r.json()
+            data = response['data']
+            if data:
+                concepts = data['concepts']
+                if concepts:
+                    for concept in concepts:
+                        if concept:
+                            # TODO Store each field more explicit or good enough to append what you get from the concept?
+                            occupation_collections.append(concept)
+            return occupation_collections
+                # On fail, try again 10 times with 0.3 second delay
+        except requests.exceptions.ConnectionError as e:
+            fail_count += 1
+            time.sleep(0.3)
+            log.warning(f"Unable to load data from: {taxonomy_endpoint} Connection error, try: {fail_count}")
+            if fail_count >= fail_max:
+                log.error(f"Failed to load data from: {taxonomy_endpoint} after: {fail_max}. {e} Exit!")
+                sys.exit(1)
+        except requests.exceptions.Timeout as e:
+            fail_count += 1
+            time.sleep(0.3)
+            log.warning(f"Unable to load data from: {taxonomy_endpoint} Timeout, try: {fail_count}")
+            if fail_count >= fail_max:
+                log.error(f"Failed to load data from: {taxonomy_endpoint} after: {fail_max}. {e} Exit!")
+                sys.exit(1)
+        except requests.exceptions.RequestException as e:
+            fail_count += 1
+            time.sleep(0.3)
+            log.warning(f"Unable to fetch data at: {taxonomy_endpoint}, try: {fail_count}, {e}")
+            if fail_count >= fail_max:
+                log.error(f"Failed to fetch: {taxonomy_endpoint} after: {fail_max}, skipping. {e}")
+                raise e

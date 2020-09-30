@@ -53,7 +53,8 @@ class QueryBuilder(object):
         must_queries.append(self._build_employer_query(args.get(settings.EMPLOYER)))
         must_queries.append(self._build_yrkes_query(args.get(taxonomy.OCCUPATION),
                                                     args.get(taxonomy.GROUP),
-                                                    args.get(taxonomy.FIELD)))
+                                                    args.get(taxonomy.FIELD),
+                                                    args.get(taxonomy.COLLECTION)))
         must_queries.append(self._filter_timeframe(args.get(settings.PUBLISHED_AFTER),
                                                    args.get(settings.PUBLISHED_BEFORE)))
         must_queries.append(self._build_parttime_query(args.get(settings.PARTTIME_MIN),
@@ -595,11 +596,22 @@ class QueryBuilder(object):
             return bool_segment
         return None
 
-    # Parses OCCUPATION, FIELD and GROUP
-    def _build_yrkes_query(self, yrkesroller, yrkesgrupper, yrkesomraden):
+    # Parses OCCUPATION, FIELD, GROUP and COLLECTIONS
+    def _build_yrkes_query(self, yrkesroller, yrkesgrupper, yrkesomraden, yrkessamlingar):
         yrken = yrkesroller or []
         yrkesgrupper = yrkesgrupper or []
         yrkesomraden = yrkesomraden or []
+        yrkessamlingar = yrkessamlingar or []
+
+        # Parse yrkessamlingar from search input and add the occupations that is included to the yrken array...
+        for yrkessamling in yrkessamlingar:
+            for occupation_collection in self.occupation_collections:
+                if str(yrkessamling) == str(occupation_collection["id"]):
+                    if "related" in occupation_collection:
+                        related = occupation_collection["related"]
+                        for occupation in related:
+                            if "id" in occupation:
+                                yrken.append(occupation["id"])
 
         yrke_term_query = [{
             "term": {

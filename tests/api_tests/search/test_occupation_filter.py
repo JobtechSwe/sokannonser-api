@@ -2,7 +2,7 @@ import pytest
 from tests.test_resources.helper import get_search
 from tests.test_resources.concept_ids import occupation_collections
 
-
+@pytest.mark.smoke
 @pytest.mark.parametrize("collection_info", occupation_collections.collections_info)
 def test_occupation_filter(session, search_url, collection_info):
     """

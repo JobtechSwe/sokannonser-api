@@ -15,6 +15,7 @@ from sokannonser.rest.model import fields as f
 
 log = logging.getLogger(__name__)
 
+
 class QueryBuilder(object):
     def __init__(self, text_to_concept=TextToConcept(ontologyhost=settings.ES_HOST,
                                                      ontologyport=settings.ES_PORT,
@@ -477,7 +478,6 @@ class QueryBuilder(object):
             }
         }]
 
-
     def _freetext_headline(self, query_dict, querystring):
         # Remove plus and minus from querystring for headline search
         querystring = re.sub(r'(^| )[\\+]{1}', ' ', querystring)
@@ -504,7 +504,7 @@ class QueryBuilder(object):
         return query_dict
 
     def _freetext_concepts(self, query_dict, concepts,
-                           querystring, concept_keys, bool_type, enable_false_negative=False):
+                           concept_keys, bool_type, enable_false_negative=False):
         for key in concept_keys:
             dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
             current_concepts = [c for c in concepts.get(dict_key, []) if c]

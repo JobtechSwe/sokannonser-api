@@ -314,6 +314,7 @@ def format_response(elastic_response):
 
     return response
 
+
 # Fetch all occupation collections and matching occupations from Taxonomy endpoint
 def fetch_occupation_collections():
     log.info("fetching occupation collections...")

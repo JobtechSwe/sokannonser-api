@@ -11,7 +11,7 @@ def test_occupation_filter(session, search_url, collection_info):
     Does a query with 'occupation-filter' for each of the collection and checks that
     actual hits are as many as expected
     """
-    params = {'occupation-filter': collection_info['id'], 'offset': 0, 'limit': 100}
+    params = {'occupation-collection': collection_info['id'], 'offset': 0, 'limit': 100}
     result_json = get_search(session, search_url, params)
     assert result_json['total']['value'] == collection_info[
         'expected'], f"collection id: {collection_info['id']}, label: {collection_info['label']}"

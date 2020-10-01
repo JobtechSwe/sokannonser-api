@@ -319,7 +319,7 @@ def format_response(elastic_response):
 def fetch_occupation_collections():
     log.info("fetching occupation collections...")
     # TODO Included preferred_label for logging issues. Remove if unnecessary...
-    taxonomy_endpoint = settings.BASE_TAXONOMY_URL + 'graphql?query={concepts(type:\"occupation-collection\"){id,preferred_label,related{id,preferred_label}}}'
+    taxonomy_endpoint = settings.BASE_TAXONOMY_URL + 'graphql?query={concepts(type:\"occupation-collection\"){id,related{id}}}'
     headers = {"Accept": "application/json", "api-key": settings.TAXONOMY_APIKEY}
     fail_count = 0
     fail_max = settings.TAXONOMY_MAX_TRY

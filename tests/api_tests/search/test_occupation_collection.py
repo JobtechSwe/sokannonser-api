@@ -62,12 +62,12 @@ def test_name_and_collection_param_compare_ids(session, search_url, collection):
         for hit in json_response_coll['hits']:
             list_of_ad_ids_coll.append(hit['id'])
 
-    assert number_of_ads_collection == number_of_ads_name, collection['preferred_label']
-    assert list_of_ad_ids_name.sort() == list_of_ad_ids_coll.sort(), collection['preferred_label']
+    # results should be identical
+    assert list_of_ad_ids_name == list_of_ad_ids_coll, collection['preferred_label']
 
 
 @pytest.mark.slow
-def test_name_and_collection_param_multiple_collections(session, search_url):
+def test_name_and_collection_param_multiple_collections(session, search_url, x):
     """
     Fetch collections from Taxonomy and select 1 or more randomly
 
@@ -105,11 +105,10 @@ def test_name_and_collection_param_multiple_collections(session, search_url):
             list_of_ad_ids_coll.append(hit['id'])
     # results should identical regardless of which param is used
     assert list_of_ad_ids_name.sort() == list_of_ad_ids_coll.sort()
+    assert list_of_ad_ids_name == list_of_ad_ids_coll
 
 
 def test_empty_collection(session, search_url):
     params = {'occupation-collection': []}
     result_json = get_search(session, search_url, params)
     assert result_json['total']['value'] > 1000  # should return all ads
-
-

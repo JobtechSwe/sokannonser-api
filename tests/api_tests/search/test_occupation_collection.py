@@ -46,8 +46,8 @@ def test_name_and_collection_param_compare_ids(session, search_url, collection):
     number_of_ads_name = result_json_name['total']['value']
 
     for offset in range(0, number_of_ads_name, limit):
-        json_response = get_search(session, search_url,
-                                   params={'occupation-name': list_of_concept_ids, 'offset': offset, 'limit': limit})
+        params = {'occupation-name': list_of_concept_ids, 'offset': offset, 'limit': limit}
+        json_response = get_search(session, search_url, params)
         for hit in json_response['hits']:
             list_of_ad_ids_name.append(hit['id'])
 
@@ -56,9 +56,8 @@ def test_name_and_collection_param_compare_ids(session, search_url, collection):
     result_json_collection = get_search(session, search_url, params)
     number_of_ads_collection = result_json_collection['total']['value']
     for offset in range(0, number_of_ads_collection, limit):
-        json_response_coll = get_search(session, search_url,
-                                        params={'occupation-collection': collection['id'], 'offset': offset,
-                                                'limit': limit})
+        params = {'occupation-collection': collection['id'], 'offset': offset, 'limit': limit}
+        json_response_coll = get_search(session, search_url, params)
         for hit in json_response_coll['hits']:
             list_of_ad_ids_coll.append(hit['id'])
 

@@ -1,6 +1,9 @@
 import json
 import logging
+import random
+
 import tests.test_resources.settings
+from sokannonser.repository.taxonomy import fetch_occupation_collections
 from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 log = logging.getLogger(__name__)
@@ -142,8 +145,6 @@ def _check_ok_response_and_number_of_ads(response, expected_number):
     list_of_ads = json.loads(response.content.decode('utf8'))
     if '/search' in response.url:
         list_of_ads = list_of_ads['hits']
-    for hit in list_of_ads:
-        print(hit['id'])
     if expected_number is not None:
         compare(len(list_of_ads), expected_number)
     _check_list_of_ads(list_of_ads)
@@ -155,12 +156,13 @@ def _check_list_of_ads(list_of_ads):
         assert isinstance(ad['id'], str)
         checks = []
         checks.append(ad['id'])
-        checks.append(ad['headline'])
-        checks.append(ad['description'])
-        checks.append(ad['occupation'])
-        checks.append(ad['workplace_address']['country'])
-        for c in checks:
-            assert c is not None, ad
+        if not ad['removed']:
+            checks.append(ad['headline'])
+            checks.append(ad['description'])
+            checks.append(ad['occupation'])
+            checks.append(ad['workplace_address']['country'])
+            for c in checks:
+                assert c is not None, ad
 
 
 def check_freetext_concepts(free_text_concepts, list_of_expected):
@@ -198,3 +200,31 @@ def _get_nested_value(path, dictionary):
             value = element
             break
     return value
+
+
+def get_concept_ids_from_random_collection_with_check():
+    """
+    Returns a random combination of collections and concept ids
+    where the sum of concept ids for the collections is lower than 500
+    because it's not possible to search with too many clauses
+    """
+    all_collections = fetch_occupation_collections()
+
+    while True:
+        list_of_concept_ids = []
+        list_of_collection_ids = []
+        random_collections = random.sample(all_collections, random.randint(1, len(all_collections)))
+        for c in random_collections:
+            for tmp in list_of_concept_ids_from_collection_concept(c):
+                list_of_concept_ids.append(tmp)
+            list_of_collection_ids.append(c['id'])
+
+        if len(list_of_concept_ids) < 500:
+            return list_of_concept_ids, list_of_collection_ids
+
+
+def list_of_concept_ids_from_collection_concept(concept):
+    list_of_ids = []
+    for item in concept['related']:
+        list_of_ids.append(item['id'])
+    return list_of_ids

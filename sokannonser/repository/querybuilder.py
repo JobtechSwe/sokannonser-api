@@ -362,15 +362,15 @@ class QueryBuilder(object):
         # Add concepts to query
         for concept_type in queryfields:
             sub_should = self._freetext_concepts({"bool": {}}, concepts,
-                                                 querystring, [concept_type], "should", enable_false_negative)
+                                                 [concept_type], "should", enable_false_negative)
             if 'should' in sub_should['bool']:
                 if 'must' not in ft_query['bool']:
                     ft_query['bool']['must'] = []
                 ft_query['bool']['must'].append(sub_should)
         # Remove unwanted concepts from query
-        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must_not', enable_false_negative)
+        self._freetext_concepts(ft_query, concepts, queryfields, 'must_not', enable_false_negative)
         # Require musts
-        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must', enable_false_negative)
+        self._freetext_concepts(ft_query, concepts, queryfields, 'must', enable_false_negative)
         self._add_phrases_query(ft_query, phrases)
         ft_query = self._freetext_headline(ft_query, original_querystring)
         return ft_query

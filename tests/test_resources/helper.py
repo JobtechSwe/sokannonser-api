@@ -1,6 +1,7 @@
 import json
 import logging
 import random
+import pytest
 
 import tests.test_resources.settings
 from sokannonser.repository.taxonomy import fetch_occupation_collections
@@ -210,17 +211,36 @@ def get_concept_ids_from_random_collection_with_check():
     """
     all_collections = fetch_occupation_collections()
 
-    while True:
+    for i in range(1000):
         list_of_concept_ids = []
         list_of_collection_ids = []
         random_collections = random.sample(all_collections, random.randint(1, len(all_collections)))
         for c in random_collections:
+            list_of_collection_ids.append(c['id'])
             for tmp in list_of_concept_ids_from_collection_concept(c):
                 list_of_concept_ids.append(tmp)
-            list_of_collection_ids.append(c['id'])
 
         if len(list_of_concept_ids) < 500:
             return list_of_concept_ids, list_of_collection_ids
+    pytest.fail("no collection combination with < 500 concept ids found after 1000 retries")
+
+
+def get_concept_ids_from_collection():
+    """
+    Returns a random combination of collections and associated concept ids
+    where the sum of concept ids for the collections is lower than 500
+    because it's not possible to search with too many clauses
+    """
+    all_collections = fetch_occupation_collections()
+
+    list_of_concept_ids = []
+    list_of_collection_ids = []
+    for c in all_collections:
+        list_of_collection_ids.append(c['id'])
+        for tmp in list_of_concept_ids_from_collection_concept(c):
+            list_of_concept_ids.append(tmp)
+
+    return list_of_concept_ids, list_of_collection_ids
 
 
 def list_of_concept_ids_from_collection_concept(concept):

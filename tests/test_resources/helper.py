@@ -204,7 +204,7 @@ def _get_nested_value(path, dictionary):
 
 def get_concept_ids_from_random_collection_with_check():
     """
-    Returns a random combination of collections and concept ids
+    Returns a random combination of collections and associated concept ids
     where the sum of concept ids for the collections is lower than 500
     because it's not possible to search with too many clauses
     """

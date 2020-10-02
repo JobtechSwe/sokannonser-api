@@ -40,7 +40,8 @@ swagger_doc_params = {
     taxonomy.OCCUPATION: "One or more occupational codes according to the taxonomy",
     taxonomy.GROUP: "One or more occupational group codes according to the taxonomy",
     taxonomy.FIELD: "One or more occupational area codes according to the taxonomy",
-    taxonomy.COLLECTION: "One or more occupational collections according to the taxonomy",
+    taxonomy.COLLECTION: "One or more occupational collections according to the taxonomy. "
+                         "Excludes not matching occupations, groups, fields",
     taxonomy.SKILL: "One or more competency codes according to the taxonomy",
     taxonomy.LANGUAGE: "One or more language codes according to the taxonomy",
     taxonomy.DRIVING_LICENCE_REQUIRED: "Set to true if driving licence required"

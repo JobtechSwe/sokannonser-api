@@ -243,47 +243,47 @@ class QueryBuilder(object):
         }
         complete_string = args.get(settings.TYPEAHEAD_QUERY)
         complete_fields = args.get(settings.FREETEXT_FIELDS)
+
         if not complete_fields:
             complete_fields = queries.QF_CHOICES.copy()
             complete_fields.remove('employer')
-        if complete_string or args.get(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD):
-            complete_string = self._rewrite_word_for_regex(complete_string)
-            word_list = complete_string.split(' ')
-            complete = word_list[-1]
 
-            ngrams_complete = []
-            for n in list(range(len(word_list) - 1)):
-                ngrams_complete.append(' '.join(word_list[n:]))
+        complete_string = self._rewrite_word_for_regex(complete_string)
+        word_list = complete_string.split(' ')
+        complete = word_list[-1]
 
-            size = 60 / len(complete_fields)
+        ngrams_complete = []
+        for n in list(range(len(word_list) - 1)):
+            ngrams_complete.append(' '.join(word_list[n:]))
 
-            enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
-                settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+        size = 60 / len(complete_fields)
 
-            for field in complete_fields:
-                base_field = f.KEYWORDS_EXTRACTED \
-                    if field in ['employer'] else enriched_typeahead_field
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
+            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
 
-                if complete or args.get(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD):
-                    query_dsl['aggs']["complete_00_%s" % field] = {
+        for field in complete_fields:
+            base_field = f.KEYWORDS_EXTRACTED \
+                if field in ['employer'] else enriched_typeahead_field
+
+            query_dsl['aggs']["complete_00_%s" % field] = {
+                "terms": {
+                    "field": "%s.%s.raw" % (base_field, field),
+                    "size": size,
+                    "include": "%s.*" % self._escape_special_chars_for_complete(complete)
+                }
+            }
+            x = 1
+            for ngram in ngrams_complete:
+                if ngram != complete:
+                    query_dsl['aggs']["complete_%s_%s_remainder"
+                                      % (str(x).zfill(2), field)] = {
                         "terms": {
                             "field": "%s.%s.raw" % (base_field, field),
                             "size": size,
-                            "include": "%s.*" % self._escape_special_chars_for_complete(complete)
+                            "include": "%s.*" % self._escape_special_chars_for_complete(ngram)
                         }
                     }
-                x = 1
-                for ngram in ngrams_complete:
-                    if ngram != complete:
-                        query_dsl['aggs']["complete_%s_%s_remainder"
-                                          % (str(x).zfill(2), field)] = {
-                            "terms": {
-                                "field": "%s.%s.raw" % (base_field, field),
-                                "size": size,
-                                "include": "%s.*" % self._escape_special_chars_for_complete(ngram)
-                            }
-                        }
-                        x += 1
+                    x += 1
         if args.get(settings.SORT) and args.get(settings.SORT) in f.sort_options.keys():
             query_dsl['sort'] = f.sort_options.get(args.pop(settings.SORT))
         else:

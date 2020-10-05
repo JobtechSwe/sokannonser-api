@@ -1,5 +1,4 @@
 import pytest
-import requests
 from tests.test_resources.helper import get_search, get_concept_ids_from_random_collection_with_check, \
     get_concept_ids_from_collection, list_of_concept_ids_from_collection_concept
 from sokannonser.repository.taxonomy import fetch_occupation_collections
@@ -104,9 +103,8 @@ def test_name_and_collection_param_multiple_collections(session, search_url):
         json_response_coll = get_search(session, search_url, params)
         for hit in json_response_coll['hits']:
             list_of_ad_ids_coll.append(hit['id'])
-    # results should identical regardless of which param is used
+    # results should identical (but might be sorted differently) regardless of which param is used
     assert list_of_ad_ids_name.sort() == list_of_ad_ids_coll.sort()
-    assert list_of_ad_ids_name == list_of_ad_ids_coll
 
 
 def test_empty_collection(session, search_url):

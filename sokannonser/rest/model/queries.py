@@ -155,9 +155,6 @@ annons_complete_query.add_argument(settings.LIMIT, type=inputs.int_range(0, sett
                                    default=10)
 annons_complete_query.add_argument(settings.CONTEXTUAL_TYPEAHEAD, type=inputs.boolean,
                                    default=True)
-annons_complete_query.add_argument(settings.X_FEATURE_SPELLCHECK_TYPEAHEAD,
-                                   type=inputs.boolean, location='headers',
-                                   required=False)
 
 annons_complete_query.add_argument(settings.X_FEATURE_SUGGEST_EXTRA_WORD,
                                    type=inputs.boolean, location='headers',

@@ -101,7 +101,6 @@ class Complete(Resource):
         params={
             settings.CONTEXTUAL_TYPEAHEAD: "Set to false to disable contextual typeahead"
                                            " (default: true)",
-            settings.X_FEATURE_SPELLCHECK_TYPEAHEAD: "Use spellchecking in typeahead. Disables contextual typeahead.",
             settings.X_FEATURE_SUGGEST_EXTRA_WORD: "Suggest extra word in autocomplete",
             **swagger_doc_params
         }
@@ -121,20 +120,13 @@ class Complete(Resource):
         if not freetext_query.split(' ')[-1] and args[settings.X_FEATURE_SUGGEST_EXTRA_WORD]:
             args[settings.TYPEAHEAD_QUERY] = freetext_query.strip()
             args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.strip().split(' ')[0:-1])
-
-            if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
-                result = platsannonser.suggest(args, self.querybuilder)
-            else:
-                result = platsannonser.find_platsannonser(args, self.querybuilder)
+            result = platsannonser.suggest(args, self.querybuilder)
 
         # have not get result or suggest have not get one suggest
         if not result or len(result.get('aggs')) != 1:
             args[settings.TYPEAHEAD_QUERY] = freetext_query
             args[settings.FREETEXT_QUERY] = ' '.join(freetext_query.split(' ')[0:-1])
-            if args[settings.X_FEATURE_SPELLCHECK_TYPEAHEAD]:
-                result = platsannonser.suggest(args, self.querybuilder)
-            else:
-                result = platsannonser.find_platsannonser(args, self.querybuilder)
+            result = platsannonser.suggest(args, self.querybuilder)
 
         # only get one suggestion
         if args[settings.X_FEATURE_SUGGEST_EXTRA_WORD] and len(result.get('aggs')) == 1:

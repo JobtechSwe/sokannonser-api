@@ -37,7 +37,6 @@ APIKEY = 'api-key'
 # Feature toggles
 X_FEATURE_FREETEXT_BOOL_METHOD = 'x-feature-freetext-bool-method'
 X_FEATURE_DISABLE_SMART_FREETEXT = 'x-feature-disable-smart-freetext'
-X_FEATURE_SUGGEST_EXTRA_WORD = 'x-feature-suggest-extra-word'
 X_FEATURE_ENABLE_FALSE_NEGATIVE = 'x-feature-enable-false-negative'
 
 # Query parameters

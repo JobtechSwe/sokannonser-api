@@ -713,8 +713,7 @@ class QueryBuilder(object):
                 query['bool']['must_not'] = {
                     "terms": {
                         f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
-                            neg_yrken_in_yrkessamlingar,
-                        "boost": 2.0}
+                            neg_yrken_in_yrkessamlingar}
                 }
             return query
         else:

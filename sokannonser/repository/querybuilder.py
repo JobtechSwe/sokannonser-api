@@ -671,33 +671,54 @@ class QueryBuilder(object):
         # Parses OCCUPATION, FIELD, GROUP and COLLECTIONS
     def _build_yrkessamlingar_query(self, yrkessamlingar=[]):
         yrken_in_yrkessamlingar = []
+        neg_yrken_in_yrkessamlingar = []
 
         # Parse yrkessamlingar from search input and add the occupations that is included to yrken_in_yrkessamlingar...
         for yrkessamling in yrkessamlingar:
-            for occupation_collection in self.occupation_collections:
-                if str(yrkessamling) == str(occupation_collection["id"]):
-                    if "related" in occupation_collection:
-                        related = occupation_collection["related"]
-                        for occupation in related:
-                            if "id" in occupation:
-                                yrken_in_yrkessamlingar.append(occupation["id"])
+            # If negative filter on yrkessamling:
+            if str(yrkessamling).startswith('-'):
+                neg_yrkessamling =  yrkessamling[1:]
+                for occupation_collection in self.occupation_collections:
+                    if str(neg_yrkessamling) == str(occupation_collection["id"]):
+                        if "related" in occupation_collection:
+                            related = occupation_collection["related"]
+                            for occupation in related:
+                                # Negative filter on yrkessamling...
+                                if "id" in occupation:
+                                    neg_yrken_in_yrkessamlingar.append(occupation["id"])
+            # If positive filter on yrkessamling:
+            else:
+                for occupation_collection in self.occupation_collections:
+                    if str(yrkessamling) == str(occupation_collection["id"]):
+                        if "related" in occupation_collection:
+                            related = occupation_collection["related"]
+                            for occupation in related:
+                                # Positive filter on yrkessamling...
+                                if "id" in occupation:
+                                    yrken_in_yrkessamlingar.append(occupation["id"])
 
-        if not yrken_in_yrkessamlingar:
-            return None
 
-        yrkessamling_terms_query = {
-                "bool": {
-                    "should": [
-                        {
-                        "terms": {
-                            f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
-                                yrken_in_yrkessamlingar,
-                            "boost": 2.0}
-                        }
-                    ]
+
+
+        if yrken_in_yrkessamlingar or neg_yrken_in_yrkessamlingar:
+            query = {'bool': {}}
+            if yrken_in_yrkessamlingar:
+                query['bool']['should'] = {
+                                "terms": {
+                                    f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
+                                        yrken_in_yrkessamlingar,
+                                    "boost": 2.0}
+                                }
+            if neg_yrken_in_yrkessamlingar:
+                query['bool']['must_not'] = {
+                    "terms": {
+                        f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
+                            neg_yrken_in_yrkessamlingar,
+                        "boost": 2.0}
                 }
-        }
-        return yrkessamling_terms_query
+            return query
+        else:
+            return None
 
     # Parses MUNICIPALITY and REGION
     def _build_plats_query(self, kommunkoder, lanskoder, landskoder, unspecify):

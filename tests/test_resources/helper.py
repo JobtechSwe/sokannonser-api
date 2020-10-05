@@ -108,13 +108,10 @@ def get_raw(session, url, path, params):
     response.raise_for_status()
 
 
-def get_complete_with_headers(session, url, params, headers):
-    old_headers = tests.test_resources.settings.headers_search
-    session.headers.update(headers)
+def get_complete(session, url, params):
     response = session.get(f"{url}/complete", params=params)
     response.raise_for_status()
-    session.headers.update(old_headers)
-    return response
+    return json.loads(response.content.decode('utf8'))
 
 
 def get_search_with_headers(session, url, params, headers):

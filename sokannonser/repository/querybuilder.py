@@ -670,6 +670,10 @@ class QueryBuilder(object):
 
         # Parses OCCUPATION, FIELD, GROUP and COLLECTIONS
     def _build_yrkessamlingar_query(self, yrkessamlingar=[]):
+
+        if not yrkessamlingar:
+            return None
+        
         yrken_in_yrkessamlingar = []
         neg_yrken_in_yrkessamlingar = []
 

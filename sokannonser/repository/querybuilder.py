@@ -673,7 +673,7 @@ class QueryBuilder(object):
 
         if not yrkessamlingar:
             return None
-        
+
         yrken_in_yrkessamlingar = []
         neg_yrken_in_yrkessamlingar = []
 
@@ -710,8 +710,7 @@ class QueryBuilder(object):
                 query['bool']['should'] = {
                                 "terms": {
                                     f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
-                                        yrken_in_yrkessamlingar,
-                                    "boost": 2.0}
+                                        yrken_in_yrkessamlingar}
                                 }
             if neg_yrken_in_yrkessamlingar:
                 query['bool']['must_not'] = {

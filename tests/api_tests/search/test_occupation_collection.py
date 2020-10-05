@@ -26,7 +26,7 @@ def test_name_and_collection_param(session, search_url, collection):
     result_json_collection = get_search(session, search_url, params)
     number_of_ads_collection = result_json_collection['total']['value']
 
-    assert number_of_ads_collection == number_of_ads_name, collection['preferred_label']
+    assert number_of_ads_collection == number_of_ads_name
 
 
 @pytest.mark.slow
@@ -63,8 +63,9 @@ def test_name_and_collection_param_compare_ids(session, search_url, collection):
         for hit in json_response_coll['hits']:
             list_of_ad_ids_coll.append(hit['id'])
 
-    # results should be identical
-    assert list_of_ad_ids_name == list_of_ad_ids_coll, collection['preferred_label']
+    # all ids should be presewnt regardless och which param is used in search
+    assert list_of_ad_ids_name.sort() == list_of_ad_ids_coll.sort()
+
 
 
 @pytest.mark.slow
@@ -143,7 +144,7 @@ def test_collection_and_freetext(session, search_url):
     assert number_of_ads_collection > number_of_ads_q  # assumption that a collection should return more hits than a query
 
 
-def test_too_many_collections(session, search_url):
+def test_all_collections(session, search_url):
     """
     Do a search with too many 'occupation-collection'
     There should be a "500 Internal server error" caused by
@@ -152,9 +153,21 @@ def test_too_many_collections(session, search_url):
     """
     list_of_concept_ids, list_of_collection_ids = get_concept_ids_from_collection()
     params = {'occupation-collection': list_of_collection_ids}
-    try:
-        r = get_search(session, search_url, params)
-    except requests.exceptions.HTTPError as e:
-        assert e.response.status_code == requests.codes.internal_server_error
-    else:
-        pytest.fail(f"should have failed with http 500 INTERNAL SERVER ERROR. Response: {r}")
+    r = get_search(session, search_url, params)
+
+
+
+def test_plus_minus(session, search_url):
+    """
+    Do a query with two occupation collections and save the number of hits in the results
+    Do a new search with minus in front of one of the params sand save the number of hits
+    Check that the first search have more hits than the second search (the one with minus)
+    """
+    results = []
+    occupation_collections = [['UdVa_jRr_9DE', 'ja7J_P8X_YC9'], ['UdVa_jRr_9DE', '-ja7J_P8X_YC9']]
+    for collections in occupation_collections:
+        params = {'occupation-collection': collections}
+        response_json = get_search(session, search_url, params)
+        ads = response_json['total']['value']
+        results.append(ads)
+    assert results[0] > results[1]

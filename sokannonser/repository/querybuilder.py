@@ -122,15 +122,15 @@ class QueryBuilder(object):
 
         for stat in args.get(settings.STATISTICS) or []:
             query_dsl['aggs'][stat] = {
-                 "terms": {
-                     "field": f.stats_options[stat],
-                     "size": args.get(settings.STAT_LMT) or 5
-                 }
+                "terms": {
+                    "field": f.stats_options[stat],
+                    "size": args.get(settings.STAT_LMT) or 5
+                }
             }
         return query_dsl
 
     def filter_aggs(self, aggs, freetext):
-        #will not use in future
+        # will not use in future
         fwords = freetext.split(' ') if freetext else []
         value_dicts = []
         for agg in aggs:
@@ -384,9 +384,9 @@ class QueryBuilder(object):
                 if bool_type not in ft_query['bool']:
                     ft_query['bool'][bool_type] = []
                 ft_query['bool'][bool_type].append({"multi_match":
-                                                    {"query": phrase,
-                                                     "fields": ["headline", "description.text"],
-                                                     "type": "phrase"}})
+                                                        {"query": phrase,
+                                                         "fields": ["headline", "description.text"],
+                                                         "type": "phrase"}})
 
         return ft_query
 
@@ -669,6 +669,7 @@ class QueryBuilder(object):
             return None
 
         # Parses OCCUPATION, FIELD, GROUP and COLLECTIONS
+
     def _build_yrkessamlingar_query(self, yrkessamlingar=[]):
 
         if not yrkessamlingar:
@@ -681,7 +682,7 @@ class QueryBuilder(object):
         for yrkessamling in yrkessamlingar:
             # If negative filter on yrkessamling:
             if str(yrkessamling).startswith('-'):
-                neg_yrkessamling =  yrkessamling[1:]
+                neg_yrkessamling = yrkessamling[1:]
                 for occupation_collection in self.occupation_collections:
                     if str(neg_yrkessamling) == str(occupation_collection["id"]):
                         if "related" in occupation_collection:
@@ -701,17 +702,14 @@ class QueryBuilder(object):
                                 if "id" in occupation:
                                     yrken_in_yrkessamlingar.append(occupation["id"])
 
-
-
-
         if yrken_in_yrkessamlingar or neg_yrken_in_yrkessamlingar:
             query = {'bool': {}}
             if yrken_in_yrkessamlingar:
                 query['bool']['should'] = {
-                                "terms": {
-                                    f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
-                                        yrken_in_yrkessamlingar}
-                                }
+                    "terms": {
+                        f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
+                            yrken_in_yrkessamlingar}
+                }
             if neg_yrken_in_yrkessamlingar:
                 query['bool']['must_not'] = {
                     "terms": {

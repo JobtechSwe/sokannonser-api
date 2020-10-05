@@ -93,7 +93,7 @@ class Search(Resource):
 
 @ns_platsannons.route('complete')
 class Complete(Resource):
-    #method_decorators = [check_api_key_and_return_metadata('pb')]
+    method_decorators = [check_api_key_and_return_metadata('pb')]
     querybuilder = QueryBuilder()
 
     @ns_platsannons.doc(
@@ -101,7 +101,6 @@ class Complete(Resource):
         params={
             settings.CONTEXTUAL_TYPEAHEAD: "Set to false to disable contextual typeahead"
                                            " (default: true)",
-            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD: "Include enriched synonyms in typeahead.",
             settings.X_FEATURE_SPELLCHECK_TYPEAHEAD: "Use spellchecking in typeahead. Disables contextual typeahead.",
             settings.X_FEATURE_SUGGEST_EXTRA_WORD: "Suggest extra word in autocomplete",
             **swagger_doc_params

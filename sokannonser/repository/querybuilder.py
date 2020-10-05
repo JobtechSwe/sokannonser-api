@@ -258,8 +258,7 @@ class QueryBuilder(object):
 
         size = 60 / len(complete_fields)
 
-        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
-            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS
 
         for field in complete_fields:
             base_field = f.KEYWORDS_EXTRACTED \
@@ -900,8 +899,7 @@ class QueryBuilder(object):
         """"
         parse args and create auto complete suggester
         """
-        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
-            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS
 
         fields = ['compound', ]
         search = elasticsearch_dsl.Search()
@@ -926,8 +924,7 @@ class QueryBuilder(object):
         """"
         parse args and create phrase suggester
         """
-        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
-            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS
 
         field = '%s.compound' % enriched_typeahead_field
         search = elasticsearch_dsl.Search()
@@ -955,8 +952,7 @@ class QueryBuilder(object):
         return search.to_dict()
 
     def create_suggest_search(self, suggest, args):
-        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
-            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS
 
         field = '%s.compound' % enriched_typeahead_field
         search = defaultdict(dict)
@@ -972,8 +968,7 @@ class QueryBuilder(object):
         """"
             Create check search word type query
         """
-        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
-            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS
         search = defaultdict(dict)
         aggs = search.setdefault('aggs', {})
         for field in ('location', 'skill', 'occupation'):
@@ -989,8 +984,7 @@ class QueryBuilder(object):
         """"
            Create suggest extra word query
         """
-        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS if args.get(
-            settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD) else f.KEYWORDS_ENRICHED
+        enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS
         search = defaultdict(dict)
         aggs = search.setdefault('aggs', {})
         first_word = aggs.setdefault('first_word', {})

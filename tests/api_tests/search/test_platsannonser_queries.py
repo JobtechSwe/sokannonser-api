@@ -25,7 +25,7 @@ def test_enrich(session, search_url):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     query = 'stresstålig'
     json_response = get_search(session, search_url, params={'q': query, 'limit': '0'})
-    compare(json_response['total']['value'], expected=18)
+    compare(json_response['total']['value'], expected=43)
 
 
 @pytest.mark.smoke

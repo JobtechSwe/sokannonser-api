@@ -671,37 +671,21 @@ class QueryBuilder(object):
         # Parses OCCUPATION, FIELD, GROUP and COLLECTIONS
 
     def build_yrkessamlingar_query(self, yrkessamlingar):
-
+        start_time = int(time.time() * 1000)
         if not yrkessamlingar:
             return None
 
         yrken_in_yrkessamlingar_id = []
         neg_yrken_in_yrkessamlingar_id = []
-
         # Parse yrkessamlingar from search input and add the occupations that is included to yrken_in_yrkessamlingar_id...
         for yrkessamling in yrkessamlingar:
             # If negative filter on yrkessamling:
             if str(yrkessamling).startswith('-'):
                 neg_yrkessamling = yrkessamling[1:]
-                for occupation_collection in self.occupation_collections:
-                    if str(neg_yrkessamling) == str(occupation_collection["id"]):
-                        if "related" in occupation_collection:
-                            related = occupation_collection["related"]
-                            for occupation in related:
-                                # Negative filter on yrkessamling...
-                                if "id" in occupation:
-                                    neg_yrken_in_yrkessamlingar_id.append(occupation["id"])
+                neg_yrken_in_yrkessamlingar_id += self.occupation_collections.get(neg_yrkessamling)
             # If positive filter on yrkessamling:
             else:
-                for occupation_collection in self.occupation_collections:
-                    if str(yrkessamling) == str(occupation_collection["id"]):
-                        if "related" in occupation_collection:
-                            related = occupation_collection["related"]
-                            for occupation in related:
-                                # Positive filter on yrkessamling...
-                                if "id" in occupation:
-                                    yrken_in_yrkessamlingar_id.append(occupation["id"])
-
+                yrken_in_yrkessamlingar_id += self.occupation_collections.get(yrkessamling)
         if yrken_in_yrkessamlingar_id or neg_yrken_in_yrkessamlingar_id:
             query = {'bool': {}}
             if yrken_in_yrkessamlingar_id:
@@ -716,6 +700,8 @@ class QueryBuilder(object):
                         f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
                             neg_yrken_in_yrkessamlingar_id}
                 }
+            log.debug("Occupation-collections Query results after %d milliseconds."
+                      % (int(time.time() * 1000) - start_time))
             return query
         else:
             return None

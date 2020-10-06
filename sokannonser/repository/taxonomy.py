@@ -322,19 +322,15 @@ def fetch_occupation_collections():
     headers = {"Accept": "application/json", "api-key": settings.TAXONOMY_APIKEY}
     fail_count = 0
     fail_max = settings.TAXONOMY_MAX_TRY
-    occupation_collections = []
+    occupation_collections = {}
     while True:
         try:
             r = requests.get(taxonomy_endpoint, headers=headers)
             r.raise_for_status()
             response = r.json()
-            data = response['data']
-            if data:
-                concepts = data['concepts']
-                if concepts:
-                    for concept in concepts:
-                        if concept:
-                            occupation_collections.append(concept)
+            concepts = response.get('data', {}).get('concepts', {})
+            for concept in concepts:
+                occupation_collections[concept.get('id')] = [occupation_name.get('id') for occupation_name in concept.get('related')]
             return occupation_collections
         # On fail, try again 10 times with 0.3 second delay
         except requests.exceptions.ConnectionError as e:

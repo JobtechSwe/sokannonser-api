@@ -9,8 +9,7 @@ from sokannonser import settings
 
 log = logging.getLogger(__name__)
 
-ES_TAX_INDEX \
-    = os.getenv('ES_TAX_INDEX', 'taxonomy')
+ES_TAX_INDEX = os.getenv('ES_TAX_INDEX', 'taxonomy')
 taxonomy_cache = {}
 
 # Swedish Constants (not used)
@@ -55,6 +54,7 @@ EDUCATION_FIELD = 'educationfield'
 DEPRECATED_EDUCATION_FIELD = 'deprecated_educationfield'
 DURATION = 'employment-duration'
 OCCUPATION_EXPERIENCE = 'experience'
+
 
 class JobtechTaxonomy:
     REGION = 'region'
@@ -336,7 +336,7 @@ def fetch_occupation_collections():
                         if concept:
                             occupation_collections.append(concept)
             return occupation_collections
-                # On fail, try again 10 times with 0.3 second delay
+        # On fail, try again 10 times with 0.3 second delay
         except requests.exceptions.ConnectionError as e:
             fail_count += 1
             time.sleep(0.3)

@@ -79,7 +79,6 @@ def test_different_results(session, search_url, retries):
     A case where the number of results were not as expected.
     Not reproduced by tests
     """
-    print(retries)
     params_group = {'occupation-group': 'DJh5_yyF_hEM'}
     result_group = get_search(session, search_url, params_group)
     n_group = result_group['total']['value']  # 57

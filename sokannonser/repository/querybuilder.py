@@ -55,7 +55,7 @@ class QueryBuilder(object):
         must_queries.append(self._build_yrkes_query(args.get(taxonomy.OCCUPATION),
                                                     args.get(taxonomy.GROUP),
                                                     args.get(taxonomy.FIELD)))
-        must_queries.append(self._build_yrkessamlingar_query(args.get(taxonomy.COLLECTION)))
+        must_queries.append(self.build_yrkessamlingar_query(args.get(taxonomy.COLLECTION)))
         must_queries.append(self._filter_timeframe(args.get(settings.PUBLISHED_AFTER),
                                                    args.get(settings.PUBLISHED_BEFORE)))
         must_queries.append(self._build_parttime_query(args.get(settings.PARTTIME_MIN),
@@ -670,15 +670,15 @@ class QueryBuilder(object):
 
         # Parses OCCUPATION, FIELD, GROUP and COLLECTIONS
 
-    def _build_yrkessamlingar_query(self, yrkessamlingar=[]):
+    def build_yrkessamlingar_query(self, yrkessamlingar):
 
         if not yrkessamlingar:
             return None
 
-        yrken_in_yrkessamlingar = []
-        neg_yrken_in_yrkessamlingar = []
+        yrken_in_yrkessamlingar_id = []
+        neg_yrken_in_yrkessamlingar_id = []
 
-        # Parse yrkessamlingar from search input and add the occupations that is included to yrken_in_yrkessamlingar...
+        # Parse yrkessamlingar from search input and add the occupations that is included to yrken_in_yrkessamlingar_id...
         for yrkessamling in yrkessamlingar:
             # If negative filter on yrkessamling:
             if str(yrkessamling).startswith('-'):
@@ -690,7 +690,7 @@ class QueryBuilder(object):
                             for occupation in related:
                                 # Negative filter on yrkessamling...
                                 if "id" in occupation:
-                                    neg_yrken_in_yrkessamlingar.append(occupation["id"])
+                                    neg_yrken_in_yrkessamlingar_id.append(occupation["id"])
             # If positive filter on yrkessamling:
             else:
                 for occupation_collection in self.occupation_collections:
@@ -700,21 +700,21 @@ class QueryBuilder(object):
                             for occupation in related:
                                 # Positive filter on yrkessamling...
                                 if "id" in occupation:
-                                    yrken_in_yrkessamlingar.append(occupation["id"])
+                                    yrken_in_yrkessamlingar_id.append(occupation["id"])
 
-        if yrken_in_yrkessamlingar or neg_yrken_in_yrkessamlingar:
+        if yrken_in_yrkessamlingar_id or neg_yrken_in_yrkessamlingar_id:
             query = {'bool': {}}
-            if yrken_in_yrkessamlingar:
+            if yrken_in_yrkessamlingar_id:
                 query['bool']['should'] = {
                     "terms": {
                         f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
-                            yrken_in_yrkessamlingar}
+                            yrken_in_yrkessamlingar_id}
                 }
-            if neg_yrken_in_yrkessamlingar:
+            if neg_yrken_in_yrkessamlingar_id:
                 query['bool']['must_not'] = {
                     "terms": {
                         f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
-                            neg_yrken_in_yrkessamlingar}
+                            neg_yrken_in_yrkessamlingar_id}
                 }
             return query
         else:

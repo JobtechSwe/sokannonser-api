@@ -318,7 +318,6 @@ def format_response(elastic_response):
 # Fetch all occupation collections and matching occupations from Taxonomy endpoint
 def fetch_occupation_collections():
     log.info("fetching occupation collections...")
-    # TODO Included preferred_label for logging issues. Remove if unnecessary...
     taxonomy_endpoint = settings.BASE_TAXONOMY_URL + 'graphql?query={concepts(type:\"occupation-collection\"){id,related{id}}}'
     headers = {"Accept": "application/json", "api-key": settings.TAXONOMY_APIKEY}
     fail_count = 0
@@ -335,7 +334,6 @@ def fetch_occupation_collections():
                 if concepts:
                     for concept in concepts:
                         if concept:
-                            # TODO Store each field more explicit or good enough to append what you get from the concept?
                             occupation_collections.append(concept)
             return occupation_collections
                 # On fail, try again 10 times with 0.3 second delay
@@ -345,14 +343,14 @@ def fetch_occupation_collections():
             log.warning(f"Unable to load data from: {taxonomy_endpoint} Connection error, try: {fail_count}")
             if fail_count >= fail_max:
                 log.error(f"Failed to load data from: {taxonomy_endpoint} after: {fail_max}. {e} Exit!")
-                sys.exit(1)
+                raise e
         except requests.exceptions.Timeout as e:
             fail_count += 1
             time.sleep(0.3)
             log.warning(f"Unable to load data from: {taxonomy_endpoint} Timeout, try: {fail_count}")
             if fail_count >= fail_max:
                 log.error(f"Failed to load data from: {taxonomy_endpoint} after: {fail_max}. {e} Exit!")
-                sys.exit(1)
+                raise e
         except requests.exceptions.RequestException as e:
             fail_count += 1
             time.sleep(0.3)

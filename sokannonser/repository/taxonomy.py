@@ -317,15 +317,15 @@ def format_response(elastic_response):
 
 # Fetch all occupation collections and matching occupations from Taxonomy endpoint
 def fetch_occupation_collections():
-    log.info("fetching occupation collections...")
     taxonomy_endpoint = settings.BASE_TAXONOMY_URL + 'graphql?query={concepts(type:\"occupation-collection\"){id,related{id}}}'
     headers = {"Accept": "application/json", "api-key": settings.TAXONOMY_APIKEY}
+    log.info(f"Fetching collections: {taxonomy_endpoint} Api-key: {settings.TAXONOMY_APIKEY}")
     fail_count = 0
     fail_max = settings.TAXONOMY_MAX_TRY
     occupation_collections = {}
     while True:
         try:
-            r = requests.get(taxonomy_endpoint, headers=headers)
+            r = requests.get(taxonomy_endpoint, headers=headers, timeout=10)
             r.raise_for_status()
             response = r.json()
             concepts = response.get('data', {}).get('concepts', {})
@@ -338,19 +338,19 @@ def fetch_occupation_collections():
             time.sleep(0.3)
             log.warning(f"Unable to load data from: {taxonomy_endpoint} Connection error, try: {fail_count}")
             if fail_count >= fail_max:
-                log.error(f"Failed to load data from: {taxonomy_endpoint} after: {fail_max}. {e} Exit!")
+                log.error(f"Failed to load data from: {taxonomy_endpoint} after: {fail_max}.")
                 raise e
         except requests.exceptions.Timeout as e:
             fail_count += 1
             time.sleep(0.3)
             log.warning(f"Unable to load data from: {taxonomy_endpoint} Timeout, try: {fail_count}")
             if fail_count >= fail_max:
-                log.error(f"Failed to load data from: {taxonomy_endpoint} after: {fail_max}. {e} Exit!")
+                log.error(f"Failed to load data from: {taxonomy_endpoint} after: {fail_max}.")
                 raise e
         except requests.exceptions.RequestException as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning(f"Unable to fetch data at: {taxonomy_endpoint}, try: {fail_count}, {e}")
+            log.warning(f"Unable to fetch data at: {taxonomy_endpoint} Request error, try: {fail_count}")
             if fail_count >= fail_max:
-                log.error(f"Failed to fetch: {taxonomy_endpoint} after: {fail_max}, skipping. {e}")
+                log.error(f"Failed to fetch: {taxonomy_endpoint} after: {fail_max}, skipping.")
                 raise e

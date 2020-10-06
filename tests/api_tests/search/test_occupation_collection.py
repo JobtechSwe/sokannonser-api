@@ -66,7 +66,6 @@ def test_name_and_collection_param_compare_ids(session, search_url, collection):
     assert list_of_ad_ids_name.sort() == list_of_ad_ids_coll.sort()
 
 
-
 @pytest.mark.slow
 def test_name_and_collection_param_multiple_collections(session, search_url):
     """
@@ -152,7 +151,6 @@ def test_all_collections(session, search_url):
     list_of_concept_ids, list_of_collection_ids = get_concept_ids_from_collection()
     params = {'occupation-collection': list_of_collection_ids}
     r = get_search(session, search_url, params)
-
 
 
 def test_plus_minus(session, search_url):

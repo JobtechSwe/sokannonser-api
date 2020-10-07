@@ -203,48 +203,30 @@ def _get_nested_value(path, dictionary):
     return value
 
 
-def get_concept_ids_from_random_collection_with_check():
+def get_random_occupation_collection_id_and_concept_ids():
+    # returns a randomized list of collection ids and and a list of all the related concept ids
+    collections = get_occupation_collection_id_and_concept_ids()
+    random_collections = random.sample(collections, random.randint(1, len(collections)))
+
+    all_collection_ids = []
+    all_concept_ids = []
+    for c in random_collections:
+        all_collection_ids.append(c[0])
+        for c_id in c[1]:
+            all_concept_ids.append(c_id)
+    return all_collection_ids, all_collection_ids
+
+
+def get_occupation_collection_id_and_concept_ids():
     """
-    Returns a random combination of collections and associated concept ids
-    where the sum of concept ids for the collections is lower than 500
-    because it's not possible to search with too many clauses
+    returns a list of tuples
+    first element: collection id
+    second element: a list of concept ids related to the collection id
     """
-    all_collections = fetch_occupation_collections()
+    list_of_collections_with_id = []
+    collection = fetch_occupation_collections()
+    all_keys = list(collection.keys())
+    for k in all_keys:
+        list_of_collections_with_id.append((k, collection[k]))
 
-    for i in range(1000):
-        list_of_concept_ids = []
-        list_of_collection_ids = []
-        random_collections = random.sample(all_collections, random.randint(1, len(all_collections)))
-        for c in random_collections:
-            list_of_collection_ids.append(c['id'])
-            for tmp in list_of_concept_ids_from_collection_concept(c):
-                list_of_concept_ids.append(tmp)
-
-        if len(list_of_concept_ids) < 500:
-            return list_of_concept_ids, list_of_collection_ids
-    pytest.fail("no collection combination with < 500 concept ids found after 1000 retries")
-
-
-def get_concept_ids_from_collection():
-    """
-    Returns a random combination of collections and associated concept ids
-    where the sum of concept ids for the collections is lower than 500
-    because it's not possible to search with too many clauses
-    """
-    all_collections = fetch_occupation_collections()
-
-    list_of_concept_ids = []
-    list_of_collection_ids = []
-    for c in all_collections:
-        list_of_collection_ids.append(c['id'])
-        for tmp in list_of_concept_ids_from_collection_concept(c):
-            list_of_concept_ids.append(tmp)
-
-    return list_of_concept_ids, list_of_collection_ids
-
-
-def list_of_concept_ids_from_collection_concept(concept):
-    list_of_ids = []
-    for item in concept['related']:
-        list_of_ids.append(item['id'])
-    return list_of_ids
+    return list_of_collections_with_id

@@ -16,8 +16,7 @@ tax_stat = [[t.OCCUPATION], [t.GROUP], [t.FIELD], [t.SKILL]]
 tax_other = [[t.MUNICIPALITY], [t.REGION]]
 tax_noexist = [['  ', 'blabla', '']]
 
-@pytest.mark.smoke
-@pytest.mark.integration
+@pytest.mark.unit
 @pytest.mark.parametrize("taxonomy_type", tax_stat + tax_other + tax_noexist)
 def test_get_stats_for_taxonomy_type(taxonomy_type):
     print('==================', sys._getframe().f_code.co_name, '================== ')
@@ -37,4 +36,4 @@ def test_get_stats_for_taxonomy_type(taxonomy_type):
 
 
 if __name__ == '__main__':
-    pytest.main([os.path.realpath(__file__), '-svv', '-ra', '-m integration'])
+    pytest.main([os.path.realpath(__file__), '-svv', '-ra', '-m unit'])

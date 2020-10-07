@@ -22,6 +22,7 @@ class QueryBuilder(object):
                                                      ontologyuser=settings.ES_USER,
                                                      ontologypwd=settings.ES_PWD)):
         self.ttc = text_to_concept
+        self.occupation_collections = taxonomy.fetch_occupation_collections()
 
     def parse_args(self, args, x_fields=None):
         """
@@ -54,6 +55,7 @@ class QueryBuilder(object):
         must_queries.append(self._build_yrkes_query(args.get(taxonomy.OCCUPATION),
                                                     args.get(taxonomy.GROUP),
                                                     args.get(taxonomy.FIELD)))
+        must_queries.append(self.build_yrkessamlingar_query(args.get(taxonomy.COLLECTION)))
         must_queries.append(self._filter_timeframe(args.get(settings.PUBLISHED_AFTER),
                                                    args.get(settings.PUBLISHED_BEFORE)))
         must_queries.append(self._build_parttime_query(args.get(settings.PARTTIME_MIN),
@@ -120,15 +122,15 @@ class QueryBuilder(object):
 
         for stat in args.get(settings.STATISTICS) or []:
             query_dsl['aggs'][stat] = {
-                 "terms": {
-                     "field": f.stats_options[stat],
-                     "size": args.get(settings.STAT_LMT) or 5
-                 }
+                "terms": {
+                    "field": f.stats_options[stat],
+                    "size": args.get(settings.STAT_LMT) or 5
+                }
             }
         return query_dsl
 
     def filter_aggs(self, aggs, freetext):
-        #will not use in future
+        # will not use in future
         fwords = freetext.split(' ') if freetext else []
         value_dicts = []
         for agg in aggs:
@@ -360,15 +362,15 @@ class QueryBuilder(object):
         # Add concepts to query
         for concept_type in queryfields:
             sub_should = self._freetext_concepts({"bool": {}}, concepts,
-                                                 querystring, [concept_type], "should", enable_false_negative)
+                                                 [concept_type], "should", enable_false_negative)
             if 'should' in sub_should['bool']:
                 if 'must' not in ft_query['bool']:
                     ft_query['bool']['must'] = []
                 ft_query['bool']['must'].append(sub_should)
         # Remove unwanted concepts from query
-        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must_not', enable_false_negative)
+        self._freetext_concepts(ft_query, concepts, queryfields, 'must_not', enable_false_negative)
         # Require musts
-        self._freetext_concepts(ft_query, concepts, querystring, queryfields, 'must', enable_false_negative)
+        self._freetext_concepts(ft_query, concepts, queryfields, 'must', enable_false_negative)
         self._add_phrases_query(ft_query, phrases)
         ft_query = self._freetext_headline(ft_query, original_querystring)
         return ft_query
@@ -382,9 +384,9 @@ class QueryBuilder(object):
                 if bool_type not in ft_query['bool']:
                     ft_query['bool'][bool_type] = []
                 ft_query['bool'][bool_type].append({"multi_match":
-                                                    {"query": phrase,
-                                                     "fields": ["headline", "description.text"],
-                                                     "type": "phrase"}})
+                                                        {"query": phrase,
+                                                         "fields": ["headline", "description.text"],
+                                                         "type": "phrase"}})
 
         return ft_query
 
@@ -476,7 +478,6 @@ class QueryBuilder(object):
             }
         }]
 
-
     def _freetext_headline(self, query_dict, querystring):
         # Remove plus and minus from querystring for headline search
         querystring = re.sub(r'(^| )[\\+]{1}', ' ', querystring)
@@ -503,7 +504,7 @@ class QueryBuilder(object):
         return query_dict
 
     def _freetext_concepts(self, query_dict, concepts,
-                           querystring, concept_keys, bool_type, enable_false_negative=False):
+                           concept_keys, bool_type, enable_false_negative=False):
         for key in concept_keys:
             dict_key = "%s_%s" % (key, bool_type) if bool_type != 'should' else key
             current_concepts = [c for c in concepts.get(dict_key, []) if c]
@@ -595,7 +596,7 @@ class QueryBuilder(object):
             return bool_segment
         return None
 
-    # Parses OCCUPATION, FIELD and GROUP
+    # Parses OCCUPATION, FIELD, GROUP and COLLECTIONS
     def _build_yrkes_query(self, yrkesroller, yrkesgrupper, yrkesomraden):
         yrken = yrkesroller or []
         yrkesgrupper = yrkesgrupper or []
@@ -662,6 +663,48 @@ class QueryBuilder(object):
                 query['bool']['should'] = yrke_term_query
             if neg_yrke_term_query:
                 query['bool']['must_not'] = neg_yrke_term_query
+            return query
+
+        else:
+            return None
+
+        # Parses OCCUPATION, FIELD, GROUP and COLLECTIONS
+
+    def build_yrkessamlingar_query(self, yrkessamlingar):
+        start_time = int(time.time() * 1000)
+        if not yrkessamlingar:
+            return None
+
+        yrken_in_yrkessamlingar_id = []
+        neg_yrken_in_yrkessamlingar_id = []
+        # Parse yrkessamlingar from search input and add the occupations that is included to yrken_in_yrkessamlingar_id...
+        for yrkessamling in yrkessamlingar:
+            if yrkessamling:
+                # If negative filter on yrkessamling:
+                if str(yrkessamling).startswith('-'):
+                    neg_yrkessamling = yrkessamling[1:]
+                    if neg_yrkessamling in self.occupation_collections:
+                        neg_yrken_in_yrkessamlingar_id += self.occupation_collections.get(neg_yrkessamling)
+                # If positive filter on yrkessamling:
+                else:
+                    if yrkessamling in self.occupation_collections:
+                        yrken_in_yrkessamlingar_id += self.occupation_collections.get(yrkessamling)
+        if yrken_in_yrkessamlingar_id or neg_yrken_in_yrkessamlingar_id:
+            query = {'bool': {}}
+            if yrken_in_yrkessamlingar_id:
+                query['bool']['should'] = {
+                    "terms": {
+                        f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
+                            yrken_in_yrkessamlingar_id}
+                }
+            if neg_yrken_in_yrkessamlingar_id:
+                query['bool']['must_not'] = {
+                    "terms": {
+                        f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword":
+                            neg_yrken_in_yrkessamlingar_id}
+                }
+            log.debug("Occupation-collections Query results after %d milliseconds."
+                      % (int(time.time() * 1000) - start_time))
             return query
         else:
             return None

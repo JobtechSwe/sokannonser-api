@@ -70,3 +70,29 @@ def test_search_occupation_field(session, search_url, work, group, field):
                    'concept_id'] in group, f"expected group {group} but got {hit['occupation_group']['concept_id']}"
         assert hit['occupation_field'][
                    'concept_id'] == field, f"expected field {field} but got {hit['occupation_field']['concept_id']}"
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("retries", range(10))
+def test_different_results(session, search_url, retries):
+    """
+    A case where the number of results were not as expected.
+    Not reproduced by tests
+    """
+    params_group = {'occupation-group': 'DJh5_yyF_hEM'}
+    result_group = get_search(session, search_url, params_group)
+    n_group = result_group['total']['value']  # 57
+
+    params_group_field = {'occupation-group': 'DJh5_yyF_hEM', 'occupation-field': 'apaJ_2ja_LuF'}
+    result_group_field_1 = get_search(session, search_url, params_group_field)
+    n_group_field = result_group_field_1['total']['value']  # 85
+
+    params_field = {'occupation-field': 'apaJ_2ja_LuF'}
+    result_field = get_search(session, search_url, params_field)
+    n_field = result_field['total']['value']  # 85
+
+    result_group_field_2 = get_search(session, search_url, params_group_field)
+    n_group_field_2 = result_group_field_2['total']['value']  # 85
+
+    assert n_group_field == n_group_field_2 == n_field
+    assert n_group_field > n_group

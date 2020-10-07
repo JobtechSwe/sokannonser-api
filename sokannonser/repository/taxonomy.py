@@ -330,27 +330,17 @@ def fetch_occupation_collections():
             response = r.json()
             concepts = response.get('data', {}).get('concepts', {})
             for concept in concepts:
-                occupation_collections[concept.get('id')] = [occupation_name.get('id') for occupation_name in concept.get('related')]
+                occupation_collections[concept.get('id')] = [occupation_name.get('id') for occupation_name in
+                                                             concept.get('related')]
             return occupation_collections
         # On fail, try again 10 times with 0.3 second delay
-        except requests.exceptions.ConnectionError as e:
+        except (
+                requests.exceptions.ConnectionError, requests.exceptions.Timeout,
+                requests.exceptions.RequestException) as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning(f"Unable to load data from: {taxonomy_endpoint} Connection error, try: {fail_count}")
+            log.warning(
+                f"Unable to load data from: {taxonomy_endpoint} Exception: {type(e).__name__} , try: {fail_count}")
             if fail_count >= fail_max:
                 log.error(f"Failed to load data from: {taxonomy_endpoint} after: {fail_max}.")
-                raise e
-        except requests.exceptions.Timeout as e:
-            fail_count += 1
-            time.sleep(0.3)
-            log.warning(f"Unable to load data from: {taxonomy_endpoint} Timeout, try: {fail_count}")
-            if fail_count >= fail_max:
-                log.error(f"Failed to load data from: {taxonomy_endpoint} after: {fail_max}.")
-                raise e
-        except requests.exceptions.RequestException as e:
-            fail_count += 1
-            time.sleep(0.3)
-            log.warning(f"Unable to fetch data at: {taxonomy_endpoint} Request error, try: {fail_count}")
-            if fail_count >= fail_max:
-                log.error(f"Failed to fetch: {taxonomy_endpoint} after: {fail_max}, skipping.")
                 raise e

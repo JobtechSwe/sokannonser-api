@@ -105,15 +105,12 @@ def get_search(session, url, params):
 def get_search_check_number_of_results(session, url, expected_number, params):
     response = session.get(f"{url}/search", params=params)
     return _check_ok_response_and_number_of_ads(response, expected_number)
+  
 
-
-def get_complete_with_headers(session, url, params, headers):
-    old_headers = tests.test_resources.settings.headers_search
-    session.headers.update(headers)
+def get_complete(session, url, params):
     response = session.get(f"{url}/complete", params=params)
     response.raise_for_status()
-    session.headers.update(old_headers)
-    return response
+    return json.loads(response.content.decode('utf8'))
 
 
 def get_search_with_headers(session, url, params, headers):

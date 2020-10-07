@@ -107,11 +107,6 @@ def get_search_check_number_of_results(session, url, expected_number, params):
     return _check_ok_response_and_number_of_ads(response, expected_number)
 
 
-def get_raw(session, url, path, params):
-    response = session.get(f"{url}{path}", params=params)
-    response.raise_for_status()
-
-
 def get_complete_with_headers(session, url, params, headers):
     old_headers = tests.test_resources.settings.headers_search
     session.headers.update(headers)

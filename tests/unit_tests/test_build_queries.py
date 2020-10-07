@@ -17,21 +17,11 @@ import pytest
                                                      (["None_existing_concept_id"], None)])
 def test_build_occupation_collection_query(collection_id, expected):
     querybuilder = QueryBuilder()
-    querybuilder.occupation_collections = [
-        {
-            "id": "UdVa_jRr_9DE",
-            "related": [
-                {
-                    "id": "fFkk_8X8_pym"
-                },
-                {
-                    "id": "4zLr_jP5_peZ"
-                },
-                {
-                    "id": "5NxT_WeC_C31"
-                }
-            ]
-        }
-    ]
+    querybuilder.occupation_collections = {
+        "UdVa_jRr_9DE": [
+            "fFkk_8X8_pym",
+            "4zLr_jP5_peZ",
+            "5NxT_WeC_C31"]
+    }
     query_result = querybuilder.build_yrkessamlingar_query(collection_id)
     assert query_result == expected

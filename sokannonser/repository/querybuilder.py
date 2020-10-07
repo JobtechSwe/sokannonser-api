@@ -679,13 +679,16 @@ class QueryBuilder(object):
         neg_yrken_in_yrkessamlingar_id = []
         # Parse yrkessamlingar from search input and add the occupations that is included to yrken_in_yrkessamlingar_id...
         for yrkessamling in yrkessamlingar:
-            # If negative filter on yrkessamling:
-            if str(yrkessamling).startswith('-'):
-                neg_yrkessamling = yrkessamling[1:]
-                neg_yrken_in_yrkessamlingar_id += self.occupation_collections.get(neg_yrkessamling)
-            # If positive filter on yrkessamling:
-            else:
-                yrken_in_yrkessamlingar_id += self.occupation_collections.get(yrkessamling)
+            if yrkessamling:
+                # If negative filter on yrkessamling:
+                if str(yrkessamling).startswith('-'):
+                    neg_yrkessamling = yrkessamling[1:]
+                    if neg_yrkessamling in self.occupation_collections:
+                        neg_yrken_in_yrkessamlingar_id += self.occupation_collections.get(neg_yrkessamling)
+                # If positive filter on yrkessamling:
+                else:
+                    if yrkessamling in self.occupation_collections:
+                        yrken_in_yrkessamlingar_id += self.occupation_collections.get(yrkessamling)
         if yrken_in_yrkessamlingar_id or neg_yrken_in_yrkessamlingar_id:
             query = {'bool': {}}
             if yrken_in_yrkessamlingar_id:

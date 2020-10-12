@@ -1,9 +1,9 @@
 import json
 import logging
 import random
-import pytest
 
-import tests.test_resources.settings
+import requests
+
 from sokannonser.repository.taxonomy import fetch_occupation_collections
 from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
@@ -105,20 +105,12 @@ def get_search(session, url, params):
 def get_search_check_number_of_results(session, url, expected_number, params):
     response = session.get(f"{url}/search", params=params)
     return _check_ok_response_and_number_of_ads(response, expected_number)
-  
+
 
 def get_complete(session, url, params):
     response = session.get(f"{url}/complete", params=params)
     response.raise_for_status()
     return json.loads(response.content.decode('utf8'))
-
-
-def get_search_with_headers(session, url, params, headers):
-    old_headers = tests.test_resources.settings.headers_search
-    session.headers.update(headers)
-    response = session.get(f"{url}/search", params=params)
-    session.headers.update(old_headers)
-    return response
 
 
 def get_stream_expect_error(session, url, path, params, expected_http_code):
@@ -222,3 +214,10 @@ def get_occupation_collection_id_and_concept_ids():
         list_of_collections_with_id.append((k, collection[k]))
 
     return list_of_collections_with_id
+
+
+def get_search_with_headers(url, params, headers):
+
+    r = requests.get(url + '/search', params, headers=headers)
+    r.raise_for_status()
+    return json.loads(r.content.decode('utf8'))

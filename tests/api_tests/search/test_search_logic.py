@@ -89,14 +89,16 @@ def test_freetext_two_work_and_two_locations(session, search_url, query, top_id,
 
 @pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.integration
-@pytest.mark.parametrize("query, expected_id", [
-    ('Bauhaus Kundtjänst', '23783146'),
-    ('Sirius crew', '10537882'),
-    ('super', '23801747'),
-    ('Säsongande', '23437355'),
-    ('Diskretessen', '23396767'),
+@pytest.mark.parametrize("query, expected_number, expected_id", [
+    ('Bauhaus Kundtjänst', 1, '23783146'),
+  #  ('Bauhaus Kundtjänst', 33, '23783146'), # when default is changed to 'or'
+    ('Sirius crew', 1, '10537882'),
+ #   ('Sirius crew', 2, '10537882'), # when default is changed to 'or'
+    ('super', 1, '23801747'),
+    ('Säsongande', 1, '23437355'),
+    ('Diskretessen', 1, '23396767'),
 ])
-def test_freetext_search(session, search_url, query, expected_id):
+def test_freetext_search(session, search_url, query, expected_number, expected_id):
     """
     Tests from examples
     Test that specific queries should return only one hit (identified by id)
@@ -104,7 +106,7 @@ def test_freetext_search(session, search_url, query, expected_id):
     """
     print('==================', sys._getframe().f_code.co_name, '================== ')
     params = {'q': query, 'limit': '100'}
-    response = get_search_check_number_of_results(session, search_url, expected_number=1, params=params)
+    response = get_search_check_number_of_results(session, search_url, expected_number=expected_number, params=params)
     response_json = json.loads(response.content.decode('utf8'))
     # freetext concepts should be empty
     check_freetext_concepts(response_json['freetext_concepts'], [[], [], [], [], [], [], [], [], []])

@@ -114,13 +114,18 @@ def test_complete_multiple_words(session, search_url, query, query_2, expected_t
 
 
 @pytest.mark.parametrize("contextual,expected", [(True,
-                                                  ['malmö sverige', 'malmö skåne', 'malmö skåne län', 'malmö svenska',
-                                                   'malmö engelska', 'malmö budget', 'malmö ekonomi', 'malmö forskning',
-                                                   'malmö körkort', 'malmö microsoft office']),
-                                                 (False, ['malmö sverige', 'malmö svenska', 'malmö stockholms län',
-                                                          'malmö körkort', 'malmö stockholm', 'malmö engelska',
-                                                          'malmö västra götaland', 'malmö västra götalands län',
-                                                          'malmö skåne', 'malmö skåne län'])])
+                                                  ['malmö butikssäljare',
+                                                   'malmö sjuksköterska',
+                                                   'malmö civilingenjör',
+                                                   'malmö högskoleingenjör',
+                                                   'malmö lagerarbetare',
+                                                   'malmö redovisningsekonom']),
+                                                 (False, ['malmö butikssäljare',
+                                                          'malmö sjuksköterska',
+                                                          'malmö civilingenjör',
+                                                          'malmö högskoleingenjör',
+                                                          'malmö lagerarbetare',
+                                                          'malmö redovisningsekonom'])])
 def test_complete_for_locations_with_space_and_contextual_param(session, search_url, contextual, expected):
     """
     Test typeahead for location with trailing space after city name,

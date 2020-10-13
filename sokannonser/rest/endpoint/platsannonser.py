@@ -123,7 +123,7 @@ class Complete(Resource):
 
         # only get one suggestion
         if len(result.get('aggs')) == 1:
-            extra_words = platsannonser.suggest_extra_word(args, result.get('aggs')[0], self.querybuilder)
+            extra_words = platsannonser.suggest_extra_word(args, result.get('aggs')[0]['value'].strip(), self.querybuilder)
             result['aggs'] += extra_words
             log.debug('Extra words: %s' % result['aggs'])
 

@@ -80,15 +80,20 @@ def get_stats_for(taxonomy_type):
     return code_count
 
 
-def suggest(args, querybuilder, start_time=0, x_fields=None):  # TODO: unused arguments
-    # old auto complete part, keep this first
+def suggest(args, querybuilder):  # TODO: unused arguments
     result = find_platsannonser(args, querybuilder, start_time=0, x_fields=None)
     if result.get('aggs'):
         # before only return one word, add prefix word here, will change the logic in future
-        for item in result.get('aggs'):
-            value = item['value']
-            item['value'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
-            item['found_phrase'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
+        search_text = args[settings.FREETEXT_QUERY].strip()
+        search_text_type = _check_search_word_type(args, search_text, querybuilder)
+        if search_text_type == 'location' and not args[settings.TYPEAHEAD_QUERY].split(' ')[-1]:
+            extra_words = suggest_extra_word(args, args[settings.TYPEAHEAD_QUERY].strip(), querybuilder)
+            result['aggs'] = extra_words
+        else:
+            for item in result.get('aggs'):
+                value = item['value']
+                item['value'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
+                item['found_phrase'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
     elif args.get(settings.TYPEAHEAD_QUERY):  # TODO: this elif is not covered by tests (2020-04-21)
         result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
         if not result['aggs']:
@@ -96,9 +101,8 @@ def suggest(args, querybuilder, start_time=0, x_fields=None):  # TODO: unused ar
     return result
 
 
-def suggest_extra_word(args, original_word, querybuilder):
+def suggest_extra_word(args, search_text, querybuilder):
     # input one word and suggest extra word
-    search_text = original_word['value'].strip()
     search_text_type = _check_search_word_type(args, search_text, querybuilder)
     new_suggest_list = []
     if search_text_type:
@@ -436,9 +440,6 @@ def transform_platsannons_query_result(args, query_result, querybuilder):
 
     _modify_results(results)
     return results
-
-
-
 
 
 def _modify_results(results):

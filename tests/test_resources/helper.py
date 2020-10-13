@@ -112,6 +112,10 @@ def get_complete(session, url, params):
     response.raise_for_status()
     return json.loads(response.content.decode('utf8'))
 
+def get_complete_with_headers(session, url, params, headers):
+    response = session.get(f"{url}/complete", params=params, headers=headers)
+    response.raise_for_status()
+    return json.loads(response.content.decode('utf8'))
 
 def get_stream_expect_error(session, url, path, params, expected_http_code):
     r = session.get(f"{url}{path}", params=params)

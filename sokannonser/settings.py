@@ -31,6 +31,7 @@ BASE_PB_URL = os.getenv('BASE_PB_URL',
 
 BASE_TAXONOMY_URL = os.getenv('BASE_TAXONOMY_URL', 'https://taxonomy.api.jobtechdev.se/v1/taxonomy/')
 TAXONOMY_APIKEY = os.getenv('TAXONOMY_APIKEY')
+TAXONOMY_APIKEY = '111'
 TAXONOMY_MAX_TRY = int(os.getenv('TAXONOMY_MAX_TRY', 10))
 
 COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',

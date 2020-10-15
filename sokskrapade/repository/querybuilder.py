@@ -82,12 +82,15 @@ class QueryBuilder(object):
         return {"phrases": matches, "phrases_must": must_matches,
                 "phrases_must_not": neg_matches}, text.strip()
 
+    def _remove_unwanted_chars_from_querystring(self, querystring):
+        return ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
+
     def _build_freetext_query(self, querystring, queryfields):
         if not querystring:
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES.copy()
-        querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
+        querystring = self._remove_unwanted_chars_from_querystring(querystring)
         original_querystring = querystring
         (phrases, querystring) = self.extract_quoted_phrases(querystring)
         concepts = self.ttc.text_to_concepts(querystring)
@@ -122,9 +125,9 @@ class QueryBuilder(object):
                 if bool_type not in ft_query['bool']:
                     ft_query['bool'][bool_type] = []
                 ft_query['bool'][bool_type].append({"multi_match":
-                                                    {"query": phrase,
-                                                     "fields": ["originalJobPosting.title", ],
-                                                     "type": "phrase"}})
+                                                        {"query": phrase,
+                                                         "fields": ["originalJobPosting.title", ],
+                                                         "type": "phrase"}})
 
         return ft_query
 
@@ -195,23 +198,23 @@ class QueryBuilder(object):
 
     def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
         return [{
-                "multi_match": {
-                    "query": searchword,
-                    "type": "cross_fields",
-                    "operator": method,
-                    "fields": ["originalJobPosting.title" + "^3",
-                               f.KEYWORDS_EXTRACTED + ".location^5"]
-                }
+            "multi_match": {
+                "query": searchword,
+                "type": "cross_fields",
+                "operator": method,
+                "fields": ["originalJobPosting.title" + "^3",
+                           f.KEYWORDS_EXTRACTED + ".location^5"]
+            }
         }]
 
     def _freetext_wildcard(self, searchword, wildcard_side, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
         return [{
-                "multi_match": {
-                    "query": searchword,
-                    "type": "cross_fields",
-                    "operator": method,
-                    "fields": ["originalJobPosting.title" + "." + wildcard_side, ]
-                }
+            "multi_match": {
+                "query": searchword,
+                "type": "cross_fields",
+                "operator": method,
+                "fields": ["originalJobPosting.title" + "." + wildcard_side, ]
+            }
         }]
 
     def _freetext_headline(self, query_dict, querystring):

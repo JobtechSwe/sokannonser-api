@@ -13,11 +13,11 @@ filepath = currentdir + 'test_resources/test_companynames.txt'
 companynames = CompanynamesMapper(companynames_from_file=from_file, companynames_filepath=filepath)
 
 
-def print_result_output(input, output):
+def print_result_output(input_value, output_value):
     if print_result:
-        print('Input: %s' % input)
+        print('Input: %s' % input_value)
         print('Output:')
-        pprint(output)
+        pprint(output_value)
 
 
 @pytest.mark.unit

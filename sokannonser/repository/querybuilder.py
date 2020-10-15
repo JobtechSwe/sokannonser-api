@@ -415,7 +415,8 @@ class QueryBuilder(object):
     def _create_base_ft_query(self, querystring, method):
         # Creates a base query dict for "independent" freetext words
         # (e.g. words not found in text_to_concepts)
-        method = 'or' if method == 'or' else 'and'
+        # Set method to 'or' as default (i.e. if not being set)
+        method = 'and' if method == 'and' else 'or'
         suffix_words = ' '.join([w[1:] for w in querystring.split(' ')
                                  if w.startswith('*')])
         prefix_words = ' '.join([w[:-1] for w in querystring.split(' ')

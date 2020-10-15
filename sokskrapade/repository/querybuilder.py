@@ -128,7 +128,6 @@ class QueryBuilder(object):
                                                         {"query": phrase,
                                                          "fields": ["originalJobPosting.title", ],
                                                          "type": "phrase"}})
-
         return ft_query
 
     def _rewrite_querystring(self, querystring, concepts):

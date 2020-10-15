@@ -139,10 +139,7 @@ def test_collection_and_freetext(session, search_url):
 
 def test_all_collections(session, search_url):
     """
-    Do a search with too many 'occupation-collection'
-    There should be a "500 Internal server error" caused by
-    "RequestError(400, 'search_phase_execution_exception', 'failed to create query: maxClauseCount is set to 1024')"
-    The same error can be reproduced by using 'occupation-name' param and a long list of concept ids
+    Do a query with all occupation collections
     """
     all_collection_ids = []
     for tpl in get_occupation_collection_id_and_concept_ids():

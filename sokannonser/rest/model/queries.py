@@ -40,6 +40,8 @@ swagger_doc_params = {
     taxonomy.OCCUPATION: "One or more occupational codes according to the taxonomy",
     taxonomy.GROUP: "One or more occupational group codes according to the taxonomy",
     taxonomy.FIELD: "One or more occupational area codes according to the taxonomy",
+    taxonomy.COLLECTION: "One or more occupational collections according to the taxonomy. "
+                         "Excludes not matching occupations, groups, fields",
     taxonomy.SKILL: "One or more competency codes according to the taxonomy",
     taxonomy.LANGUAGE: "One or more language codes according to the taxonomy",
     taxonomy.DRIVING_LICENCE_REQUIRED: "Set to true if driving licence required"
@@ -123,6 +125,7 @@ base_annons_query.add_argument(settings.PUBLISHED_AFTER,
 base_annons_query.add_argument(taxonomy.OCCUPATION, action='append')
 base_annons_query.add_argument(taxonomy.GROUP, action='append')
 base_annons_query.add_argument(taxonomy.FIELD, action='append')
+base_annons_query.add_argument(taxonomy.COLLECTION, action='append')
 base_annons_query.add_argument(taxonomy.SKILL, action='append')
 base_annons_query.add_argument(taxonomy.LANGUAGE, action='append')
 base_annons_query.add_argument(taxonomy.WORKTIME_EXTENT, action='append')
@@ -155,19 +158,6 @@ annons_complete_query.add_argument(settings.LIMIT, type=inputs.int_range(0, sett
                                    default=10)
 annons_complete_query.add_argument(settings.CONTEXTUAL_TYPEAHEAD, type=inputs.boolean,
                                    default=True)
-annons_complete_query.add_argument(settings.X_FEATURE_ALLOW_EMPTY_TYPEAHEAD,
-                                   type=inputs.boolean, location='headers',
-                                   required=False)
-annons_complete_query.add_argument(settings.X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD,
-                                   type=inputs.boolean, location='headers',
-                                   required=False)
-annons_complete_query.add_argument(settings.X_FEATURE_SPELLCHECK_TYPEAHEAD,
-                                   type=inputs.boolean, location='headers',
-                                   required=False)
-
-annons_complete_query.add_argument(settings.X_FEATURE_SUGGEST_EXTRA_WORD,
-                                   type=inputs.boolean, location='headers',
-                                   required=False)
 
 
 pb_query = base_annons_query.copy()

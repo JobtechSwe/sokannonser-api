@@ -1,6 +1,10 @@
 import json
 import logging
-import tests.test_resources.settings
+import random
+
+import requests
+
+from sokannonser.repository.taxonomy import fetch_occupation_collections
 from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 log = logging.getLogger(__name__)
@@ -103,27 +107,15 @@ def get_search_check_number_of_results(session, url, expected_number, params):
     return _check_ok_response_and_number_of_ads(response, expected_number)
 
 
-def get_raw(session, url, path, params):
-    response = session.get(f"{url}{path}", params=params)
-    response.raise_for_status()
-
-
-def get_complete_with_headers(session, url, params, headers):
-    old_headers = tests.test_resources.settings.headers_search
-    session.headers.update(headers)
+def get_complete(session, url, params):
     response = session.get(f"{url}/complete", params=params)
     response.raise_for_status()
-    session.headers.update(old_headers)
-    return response
+    return json.loads(response.content.decode('utf8'))
 
-
-def get_search_with_headers(session, url, params, headers):
-    old_headers = tests.test_resources.settings.headers_search
-    session.headers.update(headers)
-    response = session.get(f"{url}/search", params=params)
-    session.headers.update(old_headers)
-    return response
-
+def get_complete_with_headers(session, url, params, headers):
+    response = session.get(f"{url}/complete", params=params, headers=headers)
+    response.raise_for_status()
+    return json.loads(response.content.decode('utf8'))
 
 def get_stream_expect_error(session, url, path, params, expected_http_code):
     r = session.get(f"{url}{path}", params=params)
@@ -142,8 +134,6 @@ def _check_ok_response_and_number_of_ads(response, expected_number):
     list_of_ads = json.loads(response.content.decode('utf8'))
     if '/search' in response.url:
         list_of_ads = list_of_ads['hits']
-    for hit in list_of_ads:
-        print(hit['id'])
     if expected_number is not None:
         compare(len(list_of_ads), expected_number)
     _check_list_of_ads(list_of_ads)
@@ -155,12 +145,13 @@ def _check_list_of_ads(list_of_ads):
         assert isinstance(ad['id'], str)
         checks = []
         checks.append(ad['id'])
-        checks.append(ad['headline'])
-        checks.append(ad['description'])
-        checks.append(ad['occupation'])
-        checks.append(ad['workplace_address']['country'])
-        for c in checks:
-            assert c is not None, ad
+        if not ad['removed']:
+            checks.append(ad['headline'])
+            checks.append(ad['description'])
+            checks.append(ad['occupation'])
+            checks.append(ad['workplace_address']['country'])
+            for c in checks:
+                assert c is not None, ad
 
 
 def check_freetext_concepts(free_text_concepts, list_of_expected):
@@ -198,3 +189,39 @@ def _get_nested_value(path, dictionary):
             value = element
             break
     return value
+
+
+def get_random_occupation_collection_id_and_concept_ids():
+    # returns a randomized list of collection ids and and a list of all the related concept ids
+    collections = get_occupation_collection_id_and_concept_ids()
+    random_collections = random.sample(collections, random.randint(1, len(collections)))
+
+    all_collection_ids = []
+    all_concept_ids = []
+    for c in random_collections:
+        all_collection_ids.append(c[0])
+        for c_id in c[1]:
+            all_concept_ids.append(c_id)
+    return all_collection_ids, all_collection_ids
+
+
+def get_occupation_collection_id_and_concept_ids():
+    """
+    returns a list of tuples
+    first element: collection id
+    second element: a list of concept ids related to the collection id
+    """
+    list_of_collections_with_id = []
+    collection = fetch_occupation_collections()
+    all_keys = list(collection.keys())
+    for k in all_keys:
+        list_of_collections_with_id.append((k, collection[k]))
+
+    return list_of_collections_with_id
+
+
+def get_search_with_headers(url, params, headers):
+
+    r = requests.get(url + '/search', params, headers=headers)
+    r.raise_for_status()
+    return json.loads(r.content.decode('utf8'))

@@ -44,6 +44,10 @@ Specifies which index contains taxonomy information.
     ES_SYSTEM_INDEX=apikeys
     
 Specifies which index contains api keys.
+    
+    TAXONOMY_APIKEY
+    
+Specifies the api key to be uses when sokannonser-api connects to taxonomy endpoints.
 
 ### Flask
 

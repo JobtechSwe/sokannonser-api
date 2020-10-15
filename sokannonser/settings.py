@@ -1,7 +1,7 @@
 import os
 import datetime
 
-API_VERSION = '1.14.1'
+API_VERSION = '1.15.0'
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "127.0.0.1")
@@ -29,6 +29,10 @@ BASE_URL = os.getenv('BASE_URL', 'https://jobsearch.api.jobtechdev.se/')
 BASE_PB_URL = os.getenv('BASE_PB_URL',
                         'https://arbetsformedlingen.se/platsbanken/annonser/')
 
+BASE_TAXONOMY_URL = os.getenv('BASE_TAXONOMY_URL', 'https://taxonomy.api.jobtechdev.se/v1/taxonomy/')
+TAXONOMY_APIKEY = os.getenv('TAXONOMY_APIKEY')
+TAXONOMY_MAX_TRY = int(os.getenv('TAXONOMY_MAX_TRY', 10))
+
 COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
                                   'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
 COMPANY_LOGO_FETCH_DISABLED = os.getenv('COMPANY_LOGO_FETCH_DISABLED', 'false').lower() == 'true'
@@ -36,11 +40,7 @@ COMPANY_LOGO_FETCH_DISABLED = os.getenv('COMPANY_LOGO_FETCH_DISABLED', 'false').
 APIKEY = 'api-key'
 # Feature toggles
 X_FEATURE_FREETEXT_BOOL_METHOD = 'x-feature-freetext-bool-method'
-X_FEATURE_ALLOW_EMPTY_TYPEAHEAD = 'x-feature-allow-empty-typeahead'
-X_FEATURE_INCLUDE_SYNONYMS_TYPEAHEAD = 'x-feature-include-synonyms-typeahead'
-X_FEATURE_SPELLCHECK_TYPEAHEAD = 'x-feature-spellcheck-typeahead'
 X_FEATURE_DISABLE_SMART_FREETEXT = 'x-feature-disable-smart-freetext'
-X_FEATURE_SUGGEST_EXTRA_WORD = 'x-feature-suggest-extra-word'
 X_FEATURE_ENABLE_FALSE_NEGATIVE = 'x-feature-enable-false-negative'
 
 # Query parameters

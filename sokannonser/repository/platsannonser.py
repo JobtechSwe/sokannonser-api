@@ -80,7 +80,7 @@ def get_stats_for(taxonomy_type):
     return code_count
 
 
-def suggest(args, querybuilder):  # TODO: unused arguments
+def suggest(args, querybuilder):
     result = find_platsannonser(args, querybuilder, start_time=0, x_fields=None)
     if result.get('aggs'):
         # before only return one word, add prefix word here, will change the logic in future

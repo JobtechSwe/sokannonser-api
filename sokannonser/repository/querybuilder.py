@@ -339,6 +339,9 @@ class QueryBuilder(object):
         return {"phrases": matches, "phrases_must": must_matches,
                 "phrases_must_not": neg_matches}, text.strip()
 
+    def _remove_unwanted_chars_from_querystring(self, querystring):
+        return ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
+
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
     def _build_freetext_query(self, querystring, queryfields, freetext_bool_method,
                               disable_smart_freetext, enable_false_negative=False):
@@ -346,7 +349,7 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES.copy()
-        querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
+        querystring = self._remove_unwanted_chars_from_querystring(querystring)
         original_querystring = querystring
         (phrases, querystring) = self.extract_quoted_phrases(querystring)
         concepts = {} if disable_smart_freetext else self.ttc.text_to_concepts(querystring)

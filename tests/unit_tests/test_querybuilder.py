@@ -536,6 +536,44 @@ def test_freetext_bool_structure(querystring, expected):
     assert _assert_json_structure(result, expected)
 
 
+@pytest.mark.unit
+def test_parse_args_query_with_slash():
+    # Todo test with 'and' & 'or
+    args = {'x-feature-freetext-bool-method': 'and', 'x-feature-disable-smart-freetext': None,
+            'x-feature-enable-false-negative': None, 'published-before': None, 'published-after': None,
+            'occupation-name': None, 'occupation-group': None, 'occupation-field': None, 'occupation-collection': None,
+            'skill': None, 'language': None, 'worktime-extent': None, 'parttime.min': None, 'parttime.max': None,
+            'driving-license-required': None, 'driving-license': None, 'employment-type': None, 'experience': None,
+            'municipality': None, 'region': None, 'country': None, 'unspecified-sweden-workplace': None,
+            'position': None, 'position.radius': None, 'employer': None, 'q': 'systemutvecklare/programmerare',
+            'qfields': None, 'relevance-threshold': None, 'sort': None, 'stats': None, 'stats.limit': None}
+
+    expected_query_dsl = {'from': 0, 'size': 10, 'track_total_hits': True, 'track_scores': True, 'query': {'bool': {
+        'must': [{'bool': {'must': [{'bool': {'should': [{'multi_match': {'query': 'systemutvecklare/programmerare',
+                                                                          'type': 'cross_fields', 'operator': 'and',
+                                                                          'fields': ['headline^3',
+                                                                                     'keywords.extracted.employer^2',
+                                                                                     'description.text', 'id',
+                                                                                     'external_id', 'source_type',
+                                                                                     'keywords.extracted.location^5']}},
+                                                         {'match': {'headline.words': {
+                                                             'query': 'systemutvecklare/programmerare',
+                                                             'operator': 'and', 'boost': 5}}}]}}]}}],
+        'filter': [{'range': {'publication_date': {'lte': 'now+2H/m'}}},
+                   {'range': {'last_publication_date': {'gte': 'now+2H/m'}}}, {'term': {'removed': False}}]}},
+                          'aggs': {'positions': {'sum': {'field': 'number_of_vacancies'}}, 'complete_00_occupation': {
+                              'terms': {'field': 'keywords.enriched_typeahead_terms.occupation.raw', 'size': 20.0,
+                                        'include': '.*'}}, 'complete_00_skill': {
+                              'terms': {'field': 'keywords.enriched_typeahead_terms.skill.raw', 'size': 20.0,
+                                        'include': '.*'}}, 'complete_00_location': {
+                              'terms': {'field': 'keywords.enriched_typeahead_terms.location.raw', 'size': 20.0,
+                                        'include': '.*'}}}, 'sort': ['_score', {'publication_date': 'desc'}]}
+
+    querybuilder = QueryBuilder(mock.MockTextToConcept())
+    query_dsl = querybuilder.parse_args(args)
+    assert query_dsl == expected_query_dsl
+
+
 def _assert_json_structure(result, expected):
     return _walk_dictionary(result, expected)
 

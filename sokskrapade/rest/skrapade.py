@@ -16,15 +16,10 @@ QUERY = 'q'
 LIMIT = 'limit'
 OFFSET = 'offset'
 
-#OCCUPATION = 'occupation-name'
-#SKILL = 'skill'
-#PLACE = 'place'
 
 @ns_skrapade.route('joblinks')
 class SearchJobLink(Resource):
     @ns_skrapade.doc(
-
-
         description='Search scraped ads using parameters and/or freetext\n'
         'Taxonomy service can be found: https://taxonomy.api.jobtechdev.se/v1/taxonomy/swagger-ui/ '
         'Use it to lookup concept IDs for occupation and location.',

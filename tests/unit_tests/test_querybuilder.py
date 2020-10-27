@@ -1,11 +1,12 @@
 import sys
-
+import datetime
+import pytz
+import pytest
+from dateutil import parser
 from sokannonser import settings
 from sokannonser.repository import taxonomy
 from sokannonser.repository.querybuilder import QueryBuilder
 from tests.unit_tests.test_resources import mock_for_querybuilder_tests as mock
-import pytest
-from dateutil import parser
 
 
 @pytest.mark.unit
@@ -548,6 +549,7 @@ def test_parse_args_query_with_slash():
             'position': None, 'position.radius': None, 'employer': None, 'q': 'systemutvecklare/programmerare',
             'qfields': None, 'relevance-threshold': None, 'sort': None, 'stats': None, 'stats.limit': None}
 
+    expected_utc_offset = f"now+{utc_offset()}H/m"
     expected_query_dsl = {'from': 0, 'size': 10, 'track_total_hits': True, 'track_scores': True, 'query': {'bool': {
         'must': [{'bool': {'must': [{'bool': {'should': [{'multi_match': {'query': 'systemutvecklare/programmerare',
                                                                           'type': 'cross_fields', 'operator': 'and',
@@ -559,8 +561,8 @@ def test_parse_args_query_with_slash():
                                                          {'match': {'headline.words': {
                                                              'query': 'systemutvecklare/programmerare',
                                                              'operator': 'and', 'boost': 5}}}]}}]}}],
-        'filter': [{'range': {'publication_date': {'lte': 'now+2H/m'}}},
-                   {'range': {'last_publication_date': {'gte': 'now+2H/m'}}}, {'term': {'removed': False}}]}},
+        'filter': [{'range': {'publication_date': {'lte': expected_utc_offset}}},
+                   {'range': {'last_publication_date': {'gte': expected_utc_offset}}}, {'term': {'removed': False}}]}},
                           'aggs': {'positions': {'sum': {'field': 'number_of_vacancies'}}, 'complete_00_occupation': {
                               'terms': {'field': 'keywords.enriched_typeahead_terms.occupation.raw', 'size': 20.0,
                                         'include': '.*'}}, 'complete_00_skill': {
@@ -572,6 +574,11 @@ def test_parse_args_query_with_slash():
     querybuilder = QueryBuilder(mock.MockTextToConcept())
     query_dsl = querybuilder.parse_args(args)
     assert query_dsl == expected_query_dsl
+
+
+def utc_offset():
+    offset = datetime.datetime.now(pytz.timezone('Europe/Stockholm')).utcoffset()
+    return int(offset.seconds / 3600)
 
 
 def _assert_json_structure(result, expected):

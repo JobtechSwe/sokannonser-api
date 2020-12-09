@@ -113,25 +113,16 @@ def test_complete_multiple_words(session, search_url, query, query_2, expected_t
     compare_typeahead(typeahead, expected_typeahead)
 
 
-@pytest.mark.parametrize("contextual,expected", [(True,
-                                                  ['malmö butikssäljare',
-                                                   'malmö sjuksköterska',
-                                                   'malmö civilingenjör',
-                                                   'malmö högskoleingenjör',
-                                                   'malmö lagerarbetare',
-                                                   'malmö redovisningsekonom']),
-                                                 (False, ['malmö butikssäljare',
-                                                          'malmö sjuksköterska',
-                                                          'malmö civilingenjör',
-                                                          'malmö högskoleingenjör',
-                                                          'malmö lagerarbetare',
-                                                          'malmö redovisningsekonom'])])
-def test_complete_for_locations_with_space_and_contextual_param(session, search_url, contextual, expected):
+@pytest.mark.parametrize("contextual", [True, False])
+def test_complete_for_locations_with_space_and_contextual_param(session, search_url, contextual):
     """
     Test typeahead for location with trailing space after city name,
     and using parameter 'contextual' True or False
     """
+
     query = 'Malmö '
+    expected = ['malmö butikssäljare', 'malmö sjuksköterska', 'malmö civilingenjör', 'malmö högskoleingenjör',
+                'malmö lagerarbetare', 'malmö redovisningsekonom']
     response_json = get_complete(session, search_url, {'q': query, 'limit': 10, 'contextual': contextual})
     typeahead = response_json['typeahead']
     suggestions = []

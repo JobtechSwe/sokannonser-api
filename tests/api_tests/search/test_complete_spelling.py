@@ -8,21 +8,22 @@ from tests.test_resources.helper import get_complete
     ("götteborg sjuksköterska", 'göteborg sjuksköterska'),
     ("götteborg sjukssköterska", 'göteborg sjuksköterska'),
     ("göteborg sjukssköterska", 'göteborg sjuksköterska'),
-    ("göteborg sjukssköterska läckare", 'göteborg sjuksköterska lärare'),
-    ("göteborg läckare sjukssköterska ", 'göteborg lärare sjuksköterska'),
-    ("göteborg sjukssköterska läkkare", 'göteborg sjuksköterska lärare'),
-    ("göteborg sjukssköterska lääkare", 'göteborg sjuksköterska lärare'),
-    ("göteborg sjukssköterska läkare", 'göteborg sjuksköterska lärare'),
-    ("läckare", 'läkare'),  # läKare
+    ("göteborg sjukssköterska läckare", 'göteborg sjuksköterska läkare'),
+    ("göteborg läckare sjukssköterska ", 'göteborg läkare sjuksköterska'),
+    ("göteborg sjukssköterska läkkare", 'göteborg sjuksköterska läkare'),
+    ("göteborg sjukssköterska lääkare", 'göteborg sjuksköterska läkare'),
+    ("göteborg sjukssköterska läkare", 'göteborg sjuksköterska läkare'),
+    ("läckare", 'läkare'),
     ("götteborg", 'göteborg'),
     ("stokholm", 'stockholm'),
     ("stokholm ", 'stockholm'),
-    ("stokholm lärarre", 'stockholms lärare'),
-    ("göteborg sjukssköterska läckare", 'göteborg sjuksköterska lärare'),  # lärare
-    ("göteborg läckare sjukssköterska ", 'göteborg lärare sjuksköterska'),  # lärare
-    ("götteborg läckare sjukssköterska ", 'götteborg lärare sjuksköterska'),  # götteborg
-    ("läckare götteborg", 'lärare göteborg'),
-    ("läckare göteborg", 'lärare göteborg')
+    ("stokholm lärarre", 'stockholm lärare'),  #  stockholms
+    ("göteborg sjukssköterska läckare", 'göteborg sjuksköterska läkare'),  # lärare
+    ("göteborg läckare sjukssköterska ", 'göteborg läkare sjuksköterska'),  # lärare
+    ("götteborg läckare sjukssköterska ", 'göteborg läkare sjuksköterska'),  # götteborg
+    ("läckare götteborg", 'läkare göteborg'),
+    ("läckare göteborg", 'läkare göteborg'),
+    ("stockholm läckare göteborg", 'lärare göteborg'),
 ])
 def test_complete_speling_correction_multiple_words(session, search_url, query, expected_typeahead):
     """

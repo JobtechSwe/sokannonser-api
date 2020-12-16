@@ -63,7 +63,8 @@ class QueryBuilder(object):
         must_queries.append(self._build_plats_query(args.get(taxonomy.MUNICIPALITY),
                                                     args.get(taxonomy.REGION),
                                                     args.get(taxonomy.COUNTRY),
-                                                    args.get(settings.UNSPECIFIED_SWEDEN_WORKPLACE)))
+                                                    args.get(settings.UNSPECIFIED_SWEDEN_WORKPLACE),
+                                                    args.get(settings.ABROAD)))
         # Replaced by _build_plats_query
         # must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
         must_queries.append(self._build_generic_query([f.MUST_HAVE_SKILLS + "." +
@@ -712,7 +713,7 @@ class QueryBuilder(object):
             return None
 
     # Parses MUNICIPALITY and REGION
-    def _build_plats_query(self, kommunkoder, lanskoder, landskoder, unspecify):
+    def _build_plats_query(self, kommunkoder, lanskoder, landskoder, unspecify, abroad):
         kommuner = []
         neg_komm = []
         lan = []
@@ -750,6 +751,17 @@ class QueryBuilder(object):
                         "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
                             "value": settings.SWEDEN_CONCEPT_ID}}},
                         "must_not": {"exists": {"field": f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID}},
+                        "boost": 1.0
+                    }
+                },
+            ]
+
+        if abroad:
+            plats_term_query += [
+                {
+                    "bool": {
+                        "must_not": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+                            "value": settings.SWEDEN_CONCEPT_ID}}},
                         "boost": 1.0
                     }
                 },

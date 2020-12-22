@@ -5,6 +5,7 @@ import random
 import requests
 
 from sokannonser.repository.taxonomy import fetch_occupation_collections
+from tests.test_resources.concept_ids import concept_ids_geo as geo
 from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 log = logging.getLogger(__name__)
@@ -112,10 +113,12 @@ def get_complete(session, url, params):
     response.raise_for_status()
     return json.loads(response.content.decode('utf8'))
 
+
 def get_complete_with_headers(session, url, params, headers):
     response = session.get(f"{url}/complete", params=params, headers=headers)
     response.raise_for_status()
     return json.loads(response.content.decode('utf8'))
+
 
 def get_stream_expect_error(session, url, path, params, expected_http_code):
     r = session.get(f"{url}{path}", params=params)
@@ -221,7 +224,14 @@ def get_occupation_collection_id_and_concept_ids():
 
 
 def get_search_with_headers(url, params, headers):
-
     r = requests.get(url + '/search', params, headers=headers)
     r.raise_for_status()
     return json.loads(r.content.decode('utf8'))
+
+
+def check_ads_for_country_in_address(hits, abroad):
+    for hit in hits:
+        country = hit['workplace_address']['country']
+        country_concept_id = hit['workplace_address']['country_concept_id']
+        assert (country == 'Sverige') != abroad
+        assert (country_concept_id == 'i46j_HmG_v64') != abroad

@@ -7,8 +7,8 @@ from tests.test_resources.settings import TEST_USE_STATIC_DATA
 @pytest.mark.skip("SLOW")
 @pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="the ids in the test data are no longer available")
 @pytest.mark.parametrize("id_concept_legacy", all_ids)
-def test_all_ads_for_concept_and_legacy_ids(session, search_url, id_concept_legacy):
-    json_response = get_with_path_return_json(session, search_url, path=f"/ad/{id_concept_legacy['id']}", params={})
+def test_all_ads_for_concept_and_legacy_ids( session, id_concept_legacy):
+    json_response = get_with_path_return_json( session, path=f"/ad/{id_concept_legacy['id']}", params={})
 
     assert json_response['occupation']['concept_id'] == id_concept_legacy['occupation_concept_id']
     assert json_response['occupation']['label'] == id_concept_legacy['occupation_label']

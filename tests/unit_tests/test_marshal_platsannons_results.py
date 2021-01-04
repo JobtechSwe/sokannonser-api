@@ -21,7 +21,7 @@ def get_static_ads_from_file():
 
 @pytest.mark.unit
 def test_properties_and_types_marshal_mocked_elastic_result():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
+
 
     esresult = get_static_ads_from_file()
 
@@ -86,7 +86,7 @@ def test_properties_and_types_marshal_mocked_elastic_result():
 
 @pytest.mark.unit
 def test_values_marshal_mocked_elastic_result():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
+
 
     esresult = get_static_ads_from_file()
 

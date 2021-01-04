@@ -6,7 +6,7 @@ from tests.test_resources.settings import TEST_USE_STATIC_DATA
 
 @pytest.mark.skipif(TEST_USE_STATIC_DATA, reason="too few ads in static test data to be meaningful")
 @pytest.mark.parametrize("relevance_threshold", [-1, 0, 0.1, 0.5, 0.8, 0.99, 1, 1.11])
-def test_search_relevance_multiple_times(session, search_url, relevance_threshold):
+def test_search_relevance_multiple_times( session, relevance_threshold):
     """
     This test is created to reproduce a bug where number of hits differ between queries
     """
@@ -18,7 +18,7 @@ def test_search_relevance_multiple_times(session, search_url, relevance_threshol
 
     for i in range(10):
 
-        result = get_search(session, search_url, params)
+        result = get_search(session,  params)
         total = result['total']
         pos = result['positions']
         # print(f"Total: {total}, positions: {pos}")

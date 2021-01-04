@@ -19,3 +19,4 @@ test_url = os.getenv('TEST_URL_SEARCH', 'http://localhost')
 port = os.getenv('TEST_PORT_SEARCH', 5000)
 
 SEARCH_URL = f"{test_url}:{port}"
+STREAM_URL = f"{test_url}:{port}"

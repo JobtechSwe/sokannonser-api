@@ -28,11 +28,3 @@ def session_stream(scope="session"):
     return s
 
 
-@pytest.fixture
-def stream_url(scope="session"):
-    """
-    returns an url
-    """
-    test_url = os.getenv('TEST_URL_STREAM', 'http://127.0.0.1')
-    port = os.getenv('TEST_PORT_STREAM', 5000)
-    return f"{test_url}:{port}"

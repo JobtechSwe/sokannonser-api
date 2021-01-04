@@ -6,7 +6,7 @@ import requests
 
 from sokannonser.repository.taxonomy import fetch_occupation_collections
 from tests.test_resources.concept_ids import concept_ids_geo as geo
-from tests.test_resources.settings import TEST_USE_STATIC_DATA, SEARCH_URL
+from tests.test_resources.settings import TEST_USE_STATIC_DATA, SEARCH_URL, STREAM_URL
 
 log = logging.getLogger(__name__)
 
@@ -81,8 +81,8 @@ def check_value_more_than(check_this, compare_to):
         _handle_failed_comparison(ex, error_msg)
 
 
-def get_stream_check_number_of_results(session, url, expected_number, params):
-    response = session.get(f"{url}/stream", params=params)
+def get_stream_check_number_of_results(session, expected_number, params):
+    response = session.get(f"{STREAM_URL}/stream", params=params)
     _check_ok_response_and_number_of_ads(response, expected_number)
 
 
@@ -92,8 +92,8 @@ def get_with_path_return_json(session, path, params):
     return json.loads(response.content.decode('utf8'))
 
 
-def get_stream(session, url, params):
-    response = session.get(f"{url}/stream", params=params)
+def get_stream(session, params):
+    response = session.get(f"{STREAM_URL}/stream", params=params)
     response.raise_for_status()
     return json.loads(response.content.decode('utf8'))
 
@@ -130,14 +130,14 @@ def get_complete_expect_error(session, params, expected_http_code):
     return response
 
 
-def get_stream_expect_error(session, url, path, params, expected_http_code):
-    r = session.get(f"{url}{path}", params=params)
+def get_stream_expect_error(session, params, expected_http_code):
+    r = session.get(f"{STREAM_URL}/stream", params=params)
     status = r.status_code
     assert status == expected_http_code, f"Expected http return code to be {expected_http_code} , but got {status}"
 
 
-def get_snapshot_check_number_of_results(session, url, expected_number):
-    response = session.get(f"{url}/snapshot")
+def get_snapshot_check_number_of_results(session, expected_number):
+    response = session.get(f"{STREAM_URL}/snapshot")
     return _check_ok_response_and_number_of_ads(response, expected_number)
 
 

@@ -6,10 +6,10 @@ from dateutil import parser
 from sokannonser import settings
 from sokannonser.repository import taxonomy
 from sokannonser.repository.querybuilder import QueryBuilder
-from tests.unit_tests.test_resources import mock_for_querybuilder_tests as mock
+from tests.integration_tests.test_resources import mock_for_querybuilder_tests as mock
 
 
-@pytest.mark.unit
+
 @pytest.mark.parametrize("collection_id, expected", [(["UdVa_jRr_9DE"],
                                                       {'bool': {'should': {'terms': {
                                                           'occupation.concept_id.keyword': ['fFkk_8X8_pym',
@@ -34,7 +34,7 @@ def test_build_occupation_collection_query(collection_id, expected):
     assert query_result == expected
 
 
-@pytest.mark.unit
+
 @pytest.mark.parametrize("querystring, expected", [('xx,', 'xx '),  # trailing space
                                                    ('xx.', 'xx'),
                                                    ('xx!', 'xx'),
@@ -82,7 +82,7 @@ def test_querystring_char_removal(querystring, expected):
     assert formatted == expected
 
 
-@pytest.mark.unit
+
 def test_parse_args_query_with_slash():
     args = {'x-feature-freetext-bool-method': 'and', 'x-feature-disable-smart-freetext': None,
             'x-feature-enable-false-negative': None, 'published-before': None, 'published-after': None,
@@ -141,7 +141,7 @@ def test_filter_timeframe(from_datetime, to_datetime):
         assert d['range']['publication_date']['lte'] == parser.parse(to_datetime).isoformat()
 
 
-@pytest.mark.unit
+
 @pytest.mark.parametrize("args, exist, expected",
                          [({settings.APIKEY: "",
                             settings.POSITION: ["66.6, 77.7"],
@@ -251,7 +251,7 @@ def test_geo_distance_filter(args, exist, expected):
     assert (expected in query_dsl["query"]["bool"]["filter"]) == exist
 
 
-@pytest.mark.unit
+
 @pytest.mark.parametrize("args, expected_pos, expected_neg",
                          [({settings.APIKEY: "",
                             taxonomy.REGION: ["01", "02"]},
@@ -348,7 +348,7 @@ def test_region_municipality_query(args, expected_pos, expected_neg):
             assert (e in neg_query)
 
 
-@pytest.mark.unit
+
 def test_rewrite_word_for_regex():
     querybuilder = QueryBuilder(mock.MockTextToConcept())
     assert querybuilder._rewrite_word_for_regex("[python3]") == "\\[python3\\]"
@@ -357,7 +357,7 @@ def test_rewrite_word_for_regex():
     assert querybuilder._rewrite_word_for_regex("c++") == "c\\+\\+"
 
 
-@pytest.mark.unit
+
 def test_rewrite_querystring():
     # concepts blob should be handled differently
     concepts = {'skill': [
@@ -417,7 +417,7 @@ def test_rewrite_querystring():
     assert querybuilder._rewrite_querystring("tcp/ip", concepts) == ""
 
 
-@pytest.mark.unit
+
 @pytest.mark.parametrize("querystring, expected_phrase, expected_returned_query, test_id", [
     # With these quotes, the query will be returned with some quote modification
     # the 'matches' field will be empty
@@ -465,7 +465,7 @@ def test_extract_querystring_different_quotes(querystring, expected_phrase, expe
     assert actual_returned_query == expected_returned_query, f"got {actual_returned_query} but expected {expected_returned_query}"
 
 
-@pytest.mark.unit
+
 @pytest.mark.parametrize("querystring, expected", [
     ("python \"grym kodare\"",
      ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": []}, "python")),
@@ -484,7 +484,7 @@ def test_extract_querystring_phrases(querystring, expected):
     assert expected == querybuilder.extract_quoted_phrases(querystring)
 
 
-@pytest.mark.unit
+
 @pytest.mark.parametrize("querystring, expected", [
     ("\"i am lazy", ({"phrases": ["i am lazy"], "phrases_must": [], "phrases_must_not": []}, "")),
     ("python \"grym kodare\" \"i am lazy java",
@@ -501,7 +501,7 @@ def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expecte
     assert expected == querybuilder.extract_quoted_phrases(querystring)
 
 
-@pytest.mark.unit
+
 @pytest.mark.parametrize("querystring, expected", [
     ("-php", {"bool": {"must_not": {"term": {"keywords.enriched.skill.raw": {"value": "php"}}}}}),
     ("+java", {"bool": {"must": {"term": {"keywords.enriched.skill.raw": {"value": "java"}}}}}),
@@ -537,7 +537,7 @@ def test_freetext_bool_structure(querystring, expected):
     assert _assert_json_structure(result, expected)
 
 
-@pytest.mark.unit
+
 def test_parse_args_query_with_slash():
     # Todo test with 'and' & 'or
     args = {'x-feature-freetext-bool-method': 'and', 'x-feature-disable-smart-freetext': None,

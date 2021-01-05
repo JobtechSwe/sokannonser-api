@@ -1,25 +1,23 @@
-import os
 import sys
 import time
 from operator import itemgetter
 import json
+import pathlib
 
-import pytest
 from sokannonser.rest.endpoint.platsannonser import Search
 from sokannonser import settings
 from sokannonser.repository.querybuilder import QueryBuilder
 from sokannonser.repository.platsannonser import transform_platsannons_query_result
-from tests.unit_tests.test_resources import mock_for_querybuilder_tests as mock
+from tests.integration_tests.test_resources import mock_for_querybuilder_tests as mock
 
-currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
+test_resources = pathlib.Path(__file__).parent.parent / 'test_resources'
 
 
 def get_static_ads_from_file():
-    with open(currentdir + 'test_resources/platsannons_results_eng.json') as f:
+    with open(test_resources / 'platsannons_results_eng.json') as f:
         return json.load(f)
 
 
-@pytest.mark.unit
 def test_properties_and_types_marshal_mocked_elastic_result():
     print('==================', sys._getframe().f_code.co_name, '================== ')
 
@@ -84,7 +82,6 @@ def test_properties_and_types_marshal_mocked_elastic_result():
     assert_has_properties(test_hit['scope_of_work'], ['min', 'max'])
 
 
-@pytest.mark.unit
 def test_values_marshal_mocked_elastic_result():
     print('==================', sys._getframe().f_code.co_name, '================== ')
 

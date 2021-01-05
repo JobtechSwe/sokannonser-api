@@ -24,7 +24,7 @@ def get_correct_logo_url_for_any_ad(list_of_ads):
 @pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
 @pytest.mark.integration
 def test_fetch_org_logo_url_by_ad_id(integration_session, integration_url):
-    print('==================', sys._getframe().f_code.co_name, '================== ')
+
     json_response = get_with_path_return_json(integration_session, integration_url, '/search', params={'limit': '100'})
     hits = json_response['hits']
     assert len(hits) > 0
@@ -40,7 +40,7 @@ def test_fetch_ad_logo_by_id(integration_session, integration_url):
     Find the first logo url in those hits
     GET that logo url
     """
-    print('==================', sys._getframe().f_code.co_name, '================== ')
+
 
     json_response = get_with_path_return_json(integration_session, integration_url, '/search', params={'limit': '100'})
     hits = json_response['hits']

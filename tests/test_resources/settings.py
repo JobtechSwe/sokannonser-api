@@ -1,8 +1,6 @@
 import datetime
 import os
 
-SYNONYM_INDEX = 'jae-synonym-dictionary'
-
 # environment variables must be set
 TEST_USE_STATIC_DATA = os.getenv('TEST_USE_STATIC_DATA', True)
 test_api_key_search = os.getenv('TEST_API_KEY_SEARCH')
@@ -15,8 +13,11 @@ current_time_stamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 headers_search = {'api-key': test_api_key_search, 'accept': 'application/json'}
 headers_stream = {'api-key': test_api_key_stream, 'accept': 'application/json'}
 
-test_url = os.getenv('TEST_URL_SEARCH', 'http://localhost')
-port = os.getenv('TEST_PORT_SEARCH', 5000)
+test_url_search = os.getenv('TEST_URL_SEARCH', 'http://localhost')
+test_port_search = os.getenv('TEST_PORT_SEARCH', 5000)
 
-SEARCH_URL = f"{test_url}:{port}"
-STREAM_URL = f"{test_url}:{port}"
+test_url_stream = os.getenv('TEST_URL_SEARCH', 'http://localhost')
+test_port_stream = os.getenv('TEST_PORT_SEARCH', 5000)
+
+SEARCH_URL = f"{test_url_search}:{test_port_search}"
+STREAM_URL = f"{test_url_stream}:{test_port_stream}"

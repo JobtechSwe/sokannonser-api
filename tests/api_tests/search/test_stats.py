@@ -19,7 +19,7 @@ def test_stats(session, limit, stats_limit, expected_number_of_hits, expected_va
 
 
 def test_stats_details(session):
-    params = {'stats': 'region', 'offset': 0, 'limit': 10, 'stats.limit': 5}
+    params = {'stats': 'region', 'offset': 0, 'limit': 0, 'stats.limit': 5}
     results_json = get_with_path_return_json(session, '/search', params)
 
     expected_results = [('Stockholms län', 410, geo.stockholms_lan, '01'),

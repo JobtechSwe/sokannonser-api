@@ -89,7 +89,6 @@ def test_freetext_two_work_and_two_locations(session, query, top_id, expected_nu
 @pytest.mark.parametrize("query, expected_number, top_id", [
     ('Bauhaus Kundtjänst', 38, '24419003'),
     ('Sirius crew', 2, '24416669'),
-    #   ('Sirius crew', 2, '10537882'), # when default is changed to 'or'
     ('super', 6, '24361060'),
     ('Säsong', 2, '24404500'),
 ])
@@ -100,7 +99,7 @@ def test_freetext_search(session, query, expected_number, top_id):
     and that freetext concepts are not included in search result
     """
 
-    params = {'q': query, 'limit': '100'}
+    params = {'q': query, 'limit': '40'}
     response = get_search_check_number_of_results(session, expected_number=expected_number, params=params)
     response_json = json.loads(response.content.decode('utf8'))
     # freetext concepts should be empty

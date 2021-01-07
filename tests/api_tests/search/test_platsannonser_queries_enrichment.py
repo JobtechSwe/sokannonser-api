@@ -26,6 +26,6 @@ def test_freetext_query_location_extracted_or_enriched(session, geo, expected_nu
 
 
 def test_freetext_query_synonym_param(session):
-    json_response = get_search(session, params={'q': 'montessori', 'limit': '100'})
+    json_response = get_search(session, params={'q': 'montessori', 'limit': '0'})
     assert json_response['freetext_concepts']['skill'][0] == 'montessoripedagogik'
     compare(json_response['total']['value'], 2)

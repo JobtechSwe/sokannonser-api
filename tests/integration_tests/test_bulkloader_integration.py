@@ -49,3 +49,4 @@ def test_format_removed_ad():
                 'occupation_group': 'Z8ci_bBE_tmx', 'occupation_field': 'NYW6_mP6_vwf', 'municipality': 'dJbx_FWY_tK6',
                 'region': 'NvUF_SP1_1zo', 'country': 'i46j_HmG_v64'}
     assert result == expected
+ 

@@ -28,7 +28,7 @@ def test_freetext_bool_method(session, query, expected, bool_method):
     Default value is 'OR' (used in test cases with None as param)
     Searches with 'or' returns more hits
     """
-    params = {'q': query, 'limit': 10}
+    params = {'q': query, 'limit': 0}
     # use default setting for X_FEATURE_FREETEXT_BOOL_METHOD == 'OR'
     if not bool_method:
         response_json = get_search(session, params)
@@ -49,7 +49,7 @@ def test_complete_endpoint_with_freetext_bool_method(session, query):
     test of /complete endpoint with X_FEATURE_FREETEXT_BOOL_METHOD set to 'and' / 'or' / default value
     Verifies that results are identical regardless of bool method
     """
-    params = {'q': query, 'limit': 50}
+    params = {'q': query, 'limit': 0}
 
     # no special header, default values are used
     result_default = get_complete(session, params)

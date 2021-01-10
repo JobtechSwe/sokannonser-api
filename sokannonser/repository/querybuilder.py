@@ -607,7 +607,7 @@ class QueryBuilder(object):
 
         yrke_term_query = [{
             "term": {
-                f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword": {
+                f.OCCUPATION + "." + f.CONCEPT_ID: {
                     "value": y,
                     "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
         yrke_term_query += [{
@@ -617,7 +617,7 @@ class QueryBuilder(object):
                     "boost": 2.0}}} for y in yrken if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION_GROUP + "." + f.CONCEPT_ID + ".keyword": {
+                f.OCCUPATION_GROUP + "." + f.CONCEPT_ID: {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
         yrke_term_query += [{
@@ -627,7 +627,7 @@ class QueryBuilder(object):
                     "boost": 1.0}}} for y in yrkesgrupper if y and not y.startswith('-')]
         yrke_term_query += [{
             "term": {
-                f.OCCUPATION_FIELD + "." + f.CONCEPT_ID + ".keyword": {
+                f.OCCUPATION_FIELD + "." + f.CONCEPT_ID: {
                     "value": y,
                     "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
         yrke_term_query += [{
@@ -637,7 +637,7 @@ class QueryBuilder(object):
                     "boost": 1.0}}} for y in yrkesomraden if y and not y.startswith('-')]
         neg_yrke_term_query = [{
             "term": {
-                f.OCCUPATION + "." + f.CONCEPT_ID + ".keyword": {
+                f.OCCUPATION + "." + f.CONCEPT_ID: {
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
@@ -645,7 +645,7 @@ class QueryBuilder(object):
                     "value": y[1:]}}} for y in yrken if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION_GROUP + "." + f.CONCEPT_ID + ".keyword": {
+                f.OCCUPATION_GROUP + "." + f.CONCEPT_ID: {
                     "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
@@ -653,7 +653,7 @@ class QueryBuilder(object):
                     "value": y[1:]}}} for y in yrkesgrupper if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {
-                f.OCCUPATION_FIELD + "." + f.CONCEPT_ID + ".keyword": {
+                f.OCCUPATION_FIELD + "." + f.CONCEPT_ID: {
                     "value": y[1:]}}} for y in yrkesomraden if y and y.startswith('-')]
         neg_yrke_term_query += [{
             "term": {

@@ -73,6 +73,17 @@ class Search(Resource):
                         if max_score > 0 else 0.0})
                 for hit in result.get('hits', [])]
 
+        for hit in result.get('hits', []):
+            for occupation in hit['_source']['occupation']:
+                if not occupation['legacy_ams_taxonomy_id']:
+                    hit['_source']['occupation'].remove(occupation)
+            for skill in hit['_source']['must_have']['skills']:
+                if not skill['legacy_ams_taxonomy_id']:
+                    hit['_source']['must_have']['skill'].remove(skill)
+            for skill in hit['_source']['nice_to_have']['skills']:
+                if not skill['legacy_ams_taxonomy_id']:
+                    hit['_source']['nice_to_have']['skill'].remove(skill)
+
         return self.marshal_results(result, hits, start_time)
 
     def marshal_results(self, esresult, hits, start_time):

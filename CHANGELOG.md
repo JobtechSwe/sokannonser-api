@@ -1,5 +1,10 @@
 Changelog Application Jobsearch
 ===============================
+# 1.16.0
+* Fix multi word /complete spelling bug
+* Set DEFAULT_FREETEXT_BOOL_METHOD to 'or'
+* Add "abroad" field
+
 # 1.15.0
 * Add occupation-collection filter parameter to search
 * Remove flags 'x-feature-allow-empty-typeahead', 'x-feature-include-synonyms-typeahead', 'x-feature-spellcheck-typeahead', 'x-feature-suggest-extra-word' and set behavior as if they were set to 'True'

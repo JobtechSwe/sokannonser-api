@@ -96,7 +96,7 @@ def suggest(args, querybuilder):
                 item['found_phrase'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
     elif args.get(settings.TYPEAHEAD_QUERY):  # TODO: this elif is not covered by tests (2020-04-21)
         result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
-        if not result['aggs']:
+        if not result:
             result = phrase_suggest(args, querybuilder, start_time=0, x_fields=None)
     return result
 
@@ -186,7 +186,16 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):  # TODO: 
         start_time = int(time.time() * 1000)
 
     input_words = args.get(settings.TYPEAHEAD_QUERY)
+
     word_list = input_words.split()
+    args_middle = args.copy()
+    prefix_word = word_list[:-1] if word_list else ''
+    if prefix_word:
+        args_middle[settings.TYPEAHEAD_QUERY] = ' '.join(prefix_word)
+        result = find_platsannonser(args_middle, querybuilder, start_time=0, x_fields=None)
+        if not result.get('aggs'):
+            return None
+
     word = word_list[-1] if word_list else ''
     if word_list and word_list[:-1]:
         prefix = ' '.join(input_words.split()[:-1])  # TODO not executed by tests
@@ -240,6 +249,7 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
 
     input_words = args.get(settings.TYPEAHEAD_QUERY)
     query_dsl = querybuilder.create_phrase_suggester(input_words, args)
+
     log.debug("Query constructed after %d milliseconds."
               % (int(time.time() * 1000) - start_time))
     try:

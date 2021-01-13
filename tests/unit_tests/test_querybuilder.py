@@ -89,7 +89,7 @@ def test_parse_args_query_with_slash():
             'occupation-name': None, 'occupation-group': None, 'occupation-field': None, 'occupation-collection': None,
             'skill': None, 'language': None, 'worktime-extent': None, 'parttime.min': None, 'parttime.max': None,
             'driving-license-required': None, 'driving-license': None, 'employment-type': None, 'experience': None,
-            'municipality': None, 'region': None, 'country': None, 'unspecified-sweden-workplace': None,
+            'municipality': None, 'region': None, 'country': None, 'unspecified-sweden-workplace': None, 'abroad': None,
             'position': None, 'position.radius': None, 'employer': None, 'q': 'systemutvecklare/programmerare',
             'qfields': None, 'relevance-threshold': None, 'sort': None, 'stats': None, 'stats.limit': None}
 
@@ -545,7 +545,7 @@ def test_parse_args_query_with_slash():
             'occupation-name': None, 'occupation-group': None, 'occupation-field': None, 'occupation-collection': None,
             'skill': None, 'language': None, 'worktime-extent': None, 'parttime.min': None, 'parttime.max': None,
             'driving-license-required': None, 'driving-license': None, 'employment-type': None, 'experience': None,
-            'municipality': None, 'region': None, 'country': None, 'unspecified-sweden-workplace': None,
+            'municipality': None, 'region': None, 'country': None, 'unspecified-sweden-workplace': None, 'abroad': None,
             'position': None, 'position.radius': None, 'employer': None, 'q': 'systemutvecklare/programmerare',
             'qfields': None, 'relevance-threshold': None, 'sort': None, 'stats': None, 'stats.limit': None}
 

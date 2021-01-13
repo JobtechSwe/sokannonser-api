@@ -1,5 +1,4 @@
 import os
-import datetime
 
 API_VERSION = '1.16.0'
 
@@ -26,8 +25,7 @@ RESTPLUS_ERROR_404_HELP = False
 
 # Base API URL
 BASE_URL = os.getenv('BASE_URL', 'https://jobsearch.api.jobtechdev.se/')
-BASE_PB_URL = os.getenv('BASE_PB_URL',
-                        'https://arbetsformedlingen.se/platsbanken/annonser/')
+BASE_PB_URL = os.getenv('BASE_PB_URL', 'https://arbetsformedlingen.se/platsbanken/annonser/')
 
 BASE_TAXONOMY_URL = os.getenv('BASE_TAXONOMY_URL', 'https://taxonomy.api.jobtechdev.se/v1/taxonomy/')
 TAXONOMY_APIKEY = os.getenv('TAXONOMY_APIKEY')

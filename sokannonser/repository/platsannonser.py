@@ -10,7 +10,6 @@ from elasticsearch import exceptions
 from sokannonser import settings
 from sokannonser.repository import elastic, taxonomy
 from sokannonser.rest.model import fields
-
 from operator import itemgetter
 
 log = logging.getLogger(__name__)
@@ -85,7 +84,7 @@ def suggest(args, querybuilder):
     if result.get('aggs'):
         # before only return one word, add prefix word here, will change the logic in future
         search_text = args[settings.FREETEXT_QUERY].strip()
-        search_text_type = _check_search_word_type(args, search_text, querybuilder)
+        search_text_type = _check_search_word_type(search_text, querybuilder)
         if search_text_type == 'location' and not args[settings.TYPEAHEAD_QUERY].split(' ')[-1]:
             extra_words = suggest_extra_word(args, args[settings.TYPEAHEAD_QUERY].strip(), querybuilder)
             result['aggs'] = extra_words
@@ -95,24 +94,23 @@ def suggest(args, querybuilder):
                 item['value'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
                 item['found_phrase'] = (args[settings.FREETEXT_QUERY] + ' ' + value).strip()
     elif args.get(settings.TYPEAHEAD_QUERY):  # TODO: this elif is not covered by tests (2020-04-21)
-        result = complete_suggest(args, querybuilder, start_time=0, x_fields=None)
+        result = complete_suggest(args, querybuilder, start_time=0)
         if not result:
-            result = phrase_suggest(args, querybuilder, start_time=0, x_fields=None)
+            result = phrase_suggest(args, querybuilder, start_time=0)
     return result
 
 
 def suggest_extra_word(args, search_text, querybuilder):
     # input one word and suggest extra word
-    search_text_type = _check_search_word_type(args, search_text, querybuilder)
+    search_text_type = _check_search_word_type(search_text, querybuilder)
     new_suggest_list = []
     if search_text_type:
         if search_text_type == 'location':
             second_suggest_type = 'occupation'
         else:
             second_suggest_type = 'location'  # TODO never executed by tests
-        query_dsl = querybuilder.create_suggest_extra_word_query(
-            search_text, search_text_type, second_suggest_type, args)
-        log.debug('QUERY suggest: %s' % query_dsl)
+        query_dsl = querybuilder.create_suggest_extra_word_query(search_text, search_text_type, second_suggest_type)
+        log.debug('QUERY(suggest_extra_word): %s' % query_dsl)
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         results = query_result.get('aggregations').get('first_word').get('second_word').get('buckets')
         for result in results:
@@ -127,9 +125,9 @@ def suggest_extra_word(args, search_text, querybuilder):
     return new_suggest_list
 
 
-def _check_search_word_type(args, search_text, querybuilder):
+def _check_search_word_type(search_text, querybuilder):
     # this function is used for checking input words type, return type location/skill/occupation
-    query_dsl = querybuilder.create_check_search_word_type_query(search_text, args)
+    query_dsl = querybuilder.create_check_search_word_type_query(search_text)
     log.debug('QUERY word_type: %s' % query_dsl)
     query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
     result = query_result['aggregations']
@@ -160,9 +158,9 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
         log.info("ARGS: %s" % args)
         log.info("QUERY: %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
-        log.debug("Elastic results after %d milliseconds." % (int(time.time() * 1000) - start_time))
+        log.debug("(find_platsannonser)Elastic results after %d milliseconds." % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
-        log.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception(f'Failed to connect to elasticsearch: {e}')
         abort(500, 'Failed to establish connection to database')
         return
 
@@ -175,13 +173,13 @@ def find_platsannonser(args, querybuilder, start_time=0, x_fields=None):
                 querybuilder.ttc.text_to_concepts(qs)
             )
 
-    log.debug("Elasticsearch reports: took=%d, timed_out=%s"
+    log.debug("Elasticsearch reports: took: %d, timed_out: %s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
     return transform_platsannons_query_result(args, query_result, querybuilder)
 
 
 # TODO not called at all
-def complete_suggest(args, querybuilder, start_time=0, x_fields=None):  # TODO: x_fields arg is not used
+def complete_suggest(args, querybuilder, start_time=0):
     if start_time == 0:
         start_time = int(time.time() * 1000)
 
@@ -202,24 +200,22 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):  # TODO: 
     else:
         prefix = ''
 
-    query_dsl = querybuilder.create_auto_complete_suggester(word, args)
+    query_dsl = querybuilder.create_auto_complete_suggester(word)
 
-    log.debug("Query constructed after %d milliseconds."
-              % (int(time.time() * 1000) - start_time))
+    log.debug("Query(complete_suggest) constructed after: %d milliseconds." % (int(time.time() * 1000) - start_time))
     try:
-        log.debug("ARGS: %s" % args)
-        log.debug("QUERY: %s" % json.dumps(query_dsl))
+        log.debug("ARGS(complete_suggest): %s" % args)
+        log.debug("QUERY(complete_suggest): %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
-        log.debug("Elastic results after %d milliseconds."
-                  % (int(time.time() * 1000) - start_time))
+        log.debug("Elastic(complete_suggest) results after: %d milliseconds." % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
-        log.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception(f'Failed to connect to elasticsearch: {e}')
         abort(500, 'Failed to establish connection to database')
         return
 
-    log.debug("Elasticsearch reports: took=%d, timed_out=%s"
+    log.debug("Elasticsearch(complete_suggest) reports. took: %d, timed_out: %s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
-    log.debug('QUERY result: %s' % query_result.get('suggest', {}))
+    log.debug('QUERY(complete_suggest) result: %s' % query_result.get('suggest', {}))
 
     aggs = []
     suggests = query_result.get('suggest', {})
@@ -238,32 +234,30 @@ def complete_suggest(args, querybuilder, start_time=0, x_fields=None):  # TODO: 
                 )
 
     # check occurrences even i think it will take some trouble and stupid
-    query_result['aggs'] = suggest_check_occurence(aggs[:50], args, querybuilder)
+    query_result['aggs'] = suggest_check_occurrence(aggs[:50], querybuilder)
 
     return query_result
 
 
-def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
+def phrase_suggest(args, querybuilder, start_time=0):
     if start_time == 0:
         start_time = int(time.time() * 1000)
 
     input_words = args.get(settings.TYPEAHEAD_QUERY)
-    query_dsl = querybuilder.create_phrase_suggester(input_words, args)
+    query_dsl = querybuilder.create_phrase_suggester(input_words)
 
-    log.debug("Query constructed after %d milliseconds."
-              % (int(time.time() * 1000) - start_time))
+    log.debug("Query(phrase_suggest) constructed after: %d milliseconds." % (int(time.time() * 1000) - start_time))
     try:
-        log.debug("ARGS: %s" % args)
-        log.debug("QUERY: %s" % json.dumps(query_dsl))
+        log.debug("ARGS(phrase_suggest): %s" % args)
+        log.debug("QUERY(phrase_suggest): %s" % json.dumps(query_dsl))
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
-        log.debug("Elastic results after %d milliseconds."
-                  % (int(time.time() * 1000) - start_time))
+        log.debug("Elastic(phrase_suggest) results after: %d milliseconds." % (int(time.time() * 1000) - start_time))
     except exceptions.ConnectionError as e:
-        log.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception(f'Failed to connect to elasticsearch: {e}')
         abort(500, 'Failed to establish connection to database')
         return
 
-    log.debug("Elasticsearch reports: took=%d, timed_out=%s"
+    log.debug("Elasticsearch(phrase_suggest) reports: took: %d, timed_out: %s"
               % (query_result.get('took', 0), query_result.get('timed_out', '')))
 
     aggs = []
@@ -283,15 +277,15 @@ def phrase_suggest(args, querybuilder, start_time=0, x_fields=None):
     query_result['aggs'] = aggs[:10]
 
     # check occurrences even i think it will take some trouble and stupid
-    query_result['aggs'] = suggest_check_occurence(aggs[:50], args, querybuilder)
+    query_result['aggs'] = suggest_check_occurrence(aggs[:50], querybuilder)
 
     return query_result
 
 
-def suggest_check_occurence(aggs, args, querybuilder):
-    # check the frequence one by one, future will change it
+def suggest_check_occurrence(aggs, querybuilder):
+    # check the frequency one by one, future will change it
     for agg in aggs:
-        query_dsl = querybuilder.create_suggest_search(agg['value'], args)
+        query_dsl = querybuilder.create_suggest_search(agg['value'])
         query_result = elastic.search(index=settings.ES_INDEX, body=query_dsl)
         occurrences = query_result.get('hits').get('total').get('value')
         agg['occurrences'] = occurrences
@@ -343,14 +337,14 @@ def fetch_platsannons(ad_id):
                 log.debug('Ad found by external id: %s' % ad_id)
                 return _format_ad(hits[0])
 
-            log.info("Ad %s not found, returning 404 message" % ad_id)
+            log.info("Ad: %s not found, returning 404 message" % ad_id)
             abort(404, 'Ad not found')
     except exceptions.NotFoundError:
         log.exception('Failed to find id: %s' % ad_id)
         abort(404, 'Ad not found')
         return
     except exceptions.ConnectionError as e:
-        log.exception('Failed to connect to elasticsearch: %s' % str(e))
+        log.exception(f'Failed to connect to elasticsearch: {e}')
         abort(500, 'Failed to establish connection to database')
         return
 

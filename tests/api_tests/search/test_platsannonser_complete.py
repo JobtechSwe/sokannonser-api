@@ -41,8 +41,6 @@ def test_complete_endpoint_synonyms_typeahead(session, search_url, query, synony
     ('angu', ['angular', 'angularjs', 'angular.js']),
     ('pyth', ['python', 'python stockholm', 'python stockholms län', 'python göteborg', 'python västra götaland',
               'python västra götalands län']),
-    ('#coro', ['creo', 'foto', 'core', 'code', 'cura']),
-    ('#coron', ['fordon', 'core']),
     ('c#', ['c#']),
     ('c+', ['c++']),
     ('ang', ['angular', 'angularjs', 'angular.js', 'angered']),
@@ -159,6 +157,72 @@ def test_complete_for_locations_with_space_and_contextual_param(session, search_
 def test_complete_spelling_correction_multiple_words(session, search_url, query, expected):
     """
     Test typeahead with multiple (misspelled) words
+    """
+    typeahead = get_complete(session, search_url, {'q': query})['typeahead']
+    values = []
+    for item in typeahead:
+        values.append(item['value'])
+    # check that expected typeahead is in one of the actual suggestions
+    for e in expected:
+        assert any(v == e for v in values), f"Error: expected: '{e}' not found in '{values}'. Query: {query}"
+
+
+@pytest.mark.parametrize("query, expected", [
+    ("läckare", ['läkare']),
+    ("götteborg", ['göteborg']),
+    ("stokholm", ['stockholm', 'stockholm city']),
+    ("stokholm ", ['stockholm', 'stockholm city']),  # trailing space
+    ("stockhlm", ['stockholm', 'stockholm city']),
+    ("stockhlm ", ['stockholm city']),  # trailing space
+    ("stockholm pythan", ['stockholm python']),
+    ("läkare götteborg", ['läkare göteborg']),
+    ("läkare götteborg", ['läkare göteborg']),
+])
+def test_spelling_correction_with_complete_suggest(session, search_url, query, expected):
+    """
+    Test typeahead with only one (misspelled) word
+    """
+    typeahead = get_complete(session, search_url, {'q': query})['typeahead']
+    values = []
+    for item in typeahead:
+        values.append(item['value'])
+    # check that expected typeahead is in one of the actual suggestions
+    for e in expected:
+        assert any(v == e for v in values), f"Error: expected: '{e}' not found in '{values}'. Query: {query}"
+
+
+@pytest.mark.parametrize("query, expected", [
+    ("götteborg sjukssköterska", ['göteborg sjuksköterska', 'göteborg sjuksköterskan']),
+    ("stokholm lärarre", ['stockholms lärare', 'stockholm lärare', 'stockholm läkare']),
+    ("göteborg sjukssköterska läckare", ['göteborg sjuksköterska lärare', 'göteborg sjuksköterska läkare']),
+    ("göteborg läckare sjukssköterska ", ['göteborg lärare sjuksköterska', 'göteborg läkare sjuksköterska']),
+    ("göteborg läckare sjukssköterska", ['göteborg lärare sjuksköterska', 'göteborg läkare sjuksköterska']),
+    ("läckare götteborg", ['läkare göteborg']),
+    ("läckare göteborg", ['läkare göteborg']),
+    ("stockholm läckare göteborg", ['stockholm lärare göteborg', 'stockholm läkare göteborg']),
+    ("stockhlm läckare göteborg", ['stockholm lärare göteborg', 'stockholm läkare göteborg']),
+    ("stockhlm läckare göteborg ", ['stockholm lärare göteborg', 'stockholm läkare göteborg']),
+])
+def test_spelling_correction_with_phrase_suggest(session, search_url, query, expected):
+    """
+    Test typeahead with several (misspelled) words
+    """
+    typeahead = get_complete(session, search_url, {'q': query})['typeahead']
+    values = []
+    for item in typeahead:
+        values.append(item['value'])
+    # check that expected typeahead is in one of the actual suggestions
+    for e in expected:
+        assert any(v == e for v in values), f"Error: expected: '{e}' not found in '{values}'. Query: {query}"
+
+
+@pytest.mark.parametrize("query, expected", [
+    ("python ", ['python sverige', 'python stockholms län']),
+    ("läkare ", ['läkare sverige', 'läkare svenska'])
+])
+def test_remove_same_word_function(session, search_url, query, expected):
+    """
+    Test when input is word with space, the result will not show the same word
     """
     typeahead = get_complete(session, search_url, {'q': query})['typeahead']
     values = []

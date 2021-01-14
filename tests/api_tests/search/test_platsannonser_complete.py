@@ -41,8 +41,6 @@ def test_complete_endpoint_synonyms_typeahead(session, search_url, query, synony
     ('angu', ['angular', 'angularjs', 'angular.js']),
     ('pyth', ['python', 'python stockholm', 'python stockholms län', 'python göteborg', 'python västra götaland',
               'python västra götalands län']),
-    ('#coro', ['creo', 'foto', 'core', 'code', 'cura']),
-    ('#coron', ['fordon', 'core']),
     ('c#', ['c#']),
     ('c+', ['c++']),
     ('ang', ['angular', 'angularjs', 'angular.js', 'angered']),
@@ -176,7 +174,7 @@ def test_complete_spelling_correction_multiple_words(session, search_url, query,
     ("stokholm ", ['stockholm', 'stockholm city']),  # trailing space
     ("stockhlm", ['stockholm', 'stockholm city']),
     ("stockhlm ", ['stockholm city']),  # trailing space
-    ("stockholm pythan", ['stockholm python', 'stockholm python-utvecklare']),
+    ("stockholm pythan", ['stockholm python']),
     ("läkare götteborg", ['läkare göteborg']),
     ("läkare götteborg", ['läkare göteborg']),
 ])

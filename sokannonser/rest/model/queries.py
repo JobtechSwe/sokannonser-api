@@ -61,7 +61,7 @@ swagger_doc_params = {
     "the taxonomy",
     taxonomy.REGION: "One or more region codes, code according to the taxonomy",
     taxonomy.COUNTRY: "One or more country codes, code according to the taxonomy",
-    settings.UNSPECIFIED_SWEDEN_WORKPLACE: "True will return all unspecified ads in Sweden ",
+    settings.UNSPECIFIED_SWEDEN_WORKPLACE: "True will return all unspecified ads in Sweden",
     settings.ABROAD: "True will return ads for work outside of Sweden even when searching for places "
                      "matching Swedish municipality/region/country. False does nothing",
     settings.POSITION: "Latitude and longitude in the format \"59.329,18.068\" "

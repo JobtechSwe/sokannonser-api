@@ -126,7 +126,7 @@ class Complete(Resource):
             result['aggs'] += extra_words
             log.debug('Extra words: %s' % result['aggs'])
 
-        # If there is space delete the same word with with input word
+        # If there is space delete the same word with input word
         if not freetext_query.split(' ')[-1]:
             result['aggs'] = platsannonser.find_agg_and_delete(freetext_query.strip().split(' ')[0], result['aggs'])
             log.debug('Empty typeahead. Removed item: %s Aggs after removal: %s' % (result['aggs'], result['aggs']))

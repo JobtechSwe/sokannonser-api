@@ -1,39 +1,32 @@
-import os
 import sys
 import time
 from operator import itemgetter
-# from pprint import pprint
 import json
+import pathlib
 
-import pytest
 from sokannonser.rest.endpoint.platsannonser import Search
 from sokannonser import settings
 from sokannonser.repository.querybuilder import QueryBuilder
 from sokannonser.repository.platsannonser import transform_platsannons_query_result
+from tests.integration_tests.test_resources import mock_for_querybuilder_tests as mock
 
-currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
+test_resources = pathlib.Path(__file__).parent.parent / 'test_resources'
 
 
 def get_static_ads_from_file():
-    with open(currentdir + 'test_resources/platsannons_results_eng.json') as f:
-        result = json.load(f)
-        # pprint(result)
-
-        return result
+    with open(test_resources / 'platsannons_results_eng.json') as f:
+        return json.load(f)
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
-@pytest.mark.unit
 def test_properties_and_types_marshal_mocked_elastic_result():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
+
 
     esresult = get_static_ads_from_file()
-    # pprint(esresult)
 
     args = {settings.FREETEXT_QUERY: False, settings.STATISTICS: False}
 
     pbsearch = Search()
-    querybuilder = QueryBuilder()
+    querybuilder = QueryBuilder(mock.MockTextToConcept)
 
     query_result = transform_platsannons_query_result(args, esresult, querybuilder)
     query_hits = [hit['_source'] for hit in query_result.get('hits', [])]
@@ -43,7 +36,6 @@ def test_properties_and_types_marshal_mocked_elastic_result():
 
     results = pbsearch.marshal_results(query_result, sorted_query_hits, start_time)
     assert_is_type(results, dict)
-    # pprint(results)
 
     assert_has_properties(results,
                           ['hits', 'positions', 'query_time_in_millis',
@@ -53,15 +45,7 @@ def test_properties_and_types_marshal_mocked_elastic_result():
     assert_is_type(results_hits, list)
     assert len(results_hits) > 0
 
-    # test_hit = None
-    # for hit in results_hits:
-    #     # print(hit['id'])
-    #     if hit['id'] == 8127938:
-    #         test_hit = hit
     test_hit = results_hits[0]
-
-    # pprint(test_hit)
-
     assert test_hit is not None
 
     assert_is_type(test_hit, dict)
@@ -98,29 +82,22 @@ def test_properties_and_types_marshal_mocked_elastic_result():
     assert_has_properties(test_hit['scope_of_work'], ['min', 'max'])
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
-@pytest.mark.unit
 def test_values_marshal_mocked_elastic_result():
-    print('==================', sys._getframe().f_code.co_name, '================== ')
+
 
     esresult = get_static_ads_from_file()
-    # pprint(esresult)
 
     args = {settings.FREETEXT_QUERY: False, settings.STATISTICS: False}
 
     pbsearch = Search()
-    querybuilder = QueryBuilder()
+    querybuilder = QueryBuilder(mock.MockTextToConcept)
 
     query_result = transform_platsannons_query_result(args, esresult, querybuilder)
     query_hits = [hit['_source'] for hit in query_result.get('hits', [])]
     sorted_query_hits = sorted(query_hits, key=itemgetter('id'), reverse=False)
-    # pprint(sorted_query_hits)
-    # print('sorted_query_hits[0][id]:', sorted_query_hits[0]['id'])
 
     start_time = int(round(time.time() * 1000)) - 1000
-
     results = pbsearch.marshal_results(query_result, sorted_query_hits, start_time)
-    # pprint(results)
 
     results_hits = results['hits']
     assert_is_type(results_hits, list)
@@ -129,10 +106,7 @@ def test_values_marshal_mocked_elastic_result():
     ad_id = '23174210'
 
     test_hit = [hit for hit in results_hits if hit['id'] == ad_id][0]
-    # pprint(test_hit)
-
     assert test_hit is not None
-    # print('test_hit[id]', test_hit['id'])
     assert sorted_query_hits[0]['id'] == test_hit['id']
 
     ansokningsdetaljer = test_hit['application_details']
@@ -206,9 +180,6 @@ def test_values_marshal_mocked_elastic_result():
     assert_has_list_values(keywords['occupation'])
     assert_has_list_values(keywords['skill'])
 
-    # print(test_hit['keywords'].keys())
-    # assert 'enriched' not in test_hit['keywords'].keys()
-
     krav = test_hit['must_have']
     assert_has_taxonomy_list_values(krav['skills'])
     assert_has_taxonomy_list_values(krav['languages'])
@@ -221,21 +192,12 @@ def test_values_marshal_mocked_elastic_result():
     assert_has_taxonomy_list_values(meriterande['skills'])
     assert_has_taxonomy_list_values(meriterande['languages'])
     assert_has_taxonomy_list_values(meriterande['work_experiences'])
-
     assert_has_str_value(test_hit['publication_date'])
-
     assert_has_str_value(test_hit['headline'])
-
     assert_has_str_value(test_hit['application_deadline'])
-
-    # status = test_hit['status']
-
     assert_has_bool_value(test_hit['removed'], False)
-
     assert_has_str_value(test_hit['last_publication_date'])
-
     assert_has_str_value(test_hit['access'])
-
     assert_has_int_value(test_hit['timestamp'], 1552410521222)
 
 

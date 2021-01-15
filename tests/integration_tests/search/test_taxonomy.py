@@ -16,7 +16,7 @@ tax_stat = [[t.OCCUPATION], [t.GROUP], [t.FIELD], [t.SKILL]]
 tax_other = [[t.MUNICIPALITY], [t.REGION]]
 tax_noexist = [['  ', 'blabla', '']]
 
-@pytest.mark.unit
+
 @pytest.mark.parametrize("taxonomy_type", tax_stat + tax_other + tax_noexist)
 def test_get_stats_for_taxonomy_type(taxonomy_type):
 
@@ -37,8 +37,8 @@ def test_get_stats_for_taxonomy_type(taxonomy_type):
 
 @pytest.mark.parametrize("taxonomy_type", tax_other + tax_noexist)
 def test_get_stats_for_taxonomy_type_neg(taxonomy_type):
-    result =  platsannonser.get_stats_for(taxonomy_type)
-    assert result == {}
+    assert platsannonser.get_stats_for(taxonomy_type) == {}
+
 
 
 @pytest.mark.parametrize("v", ['a', 'abc', '-1'])

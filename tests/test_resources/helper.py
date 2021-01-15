@@ -6,7 +6,7 @@ import requests
 
 from sokannonser.repository.taxonomy import fetch_occupation_collections
 from tests.test_resources.concept_ids import concept_ids_geo as geo
-from tests.test_resources.settings import TEST_USE_STATIC_DATA
+from tests.test_resources.settings import TEST_USE_STATIC_DATA, SEARCH_URL, STREAM_URL
 
 log = logging.getLogger(__name__)
 
@@ -57,6 +57,7 @@ def compare(actual, expected, msg=""):
     try:
         assert actual == expected
     except AssertionError as ex:
+        print(f"Expected: {expected} but got {actual}")
         _handle_failed_comparison(ex, error_msg)
 
 
@@ -80,54 +81,63 @@ def check_value_more_than(check_this, compare_to):
         _handle_failed_comparison(ex, error_msg)
 
 
-def get_stream_check_number_of_results(session, url, expected_number, params):
-    response = session.get(f"{url}/stream", params=params)
+def get_stream_check_number_of_results(session, expected_number, params):
+    response = session.get(f"{STREAM_URL}/stream", params=params)
     _check_ok_response_and_number_of_ads(response, expected_number)
 
 
-def get_with_path_return_json(session, url, path, params):
-    response = session.get(f"{url}{path}", params=params)
+def get_with_path_return_json(session, path, params):
+    response = session.get(f"{SEARCH_URL}/{path}", params=params)
     response.raise_for_status()
     return json.loads(response.content.decode('utf8'))
 
 
-def get_stream(session, url, params):
-    response = session.get(f"{url}/stream", params=params)
+def get_stream(session, params):
+    response = session.get(f"{STREAM_URL}/stream", params=params)
     response.raise_for_status()
     return json.loads(response.content.decode('utf8'))
 
 
-def get_search(session, url, params):
-    response = session.get(f"{url}/search", params=params)
+def get_search(session, params,):
+    response = session.get(f"{SEARCH_URL}/search", params=params)
     response.raise_for_status()
     return json.loads(response.content.decode('utf8'))
 
+def get_search_expect_error(session, params, expected_http_code):
+    response = session.get(f"{SEARCH_URL}/search", params=params)
+    assert response.status_code == expected_http_code, f"Expected http return code to be {expected_http_code} , but got {response.status_code}"
+    return response
 
-def get_search_check_number_of_results(session, url, expected_number, params):
-    response = session.get(f"{url}/search", params=params)
+def get_search_check_number_of_results(session, expected_number, params):
+    response = session.get(f"{SEARCH_URL}/search", params=params)
     return _check_ok_response_and_number_of_ads(response, expected_number)
 
 
-def get_complete(session, url, params):
-    response = session.get(f"{url}/complete", params=params)
+def get_complete(session,  params):
+    response = session.get(f"{SEARCH_URL}/complete", params=params)
     response.raise_for_status()
     return json.loads(response.content.decode('utf8'))
 
 
-def get_complete_with_headers(session, url, params, headers):
-    response = session.get(f"{url}/complete", params=params, headers=headers)
+def get_complete_with_headers(session, params, headers):
+    response = session.get(f"{SEARCH_URL}/complete", params=params, headers=headers)
     response.raise_for_status()
     return json.loads(response.content.decode('utf8'))
 
+def get_complete_expect_error(session, params, expected_http_code):
+    response = session.get(f"{SEARCH_URL}/complete", params=params)
+    assert response.status_code == expected_http_code, f"Expected http return code to be {expected_http_code} , but got {response.status_code}"
+    return response
 
-def get_stream_expect_error(session, url, path, params, expected_http_code):
-    r = session.get(f"{url}{path}", params=params)
+
+def get_stream_expect_error(session, params, expected_http_code):
+    r = session.get(f"{STREAM_URL}/stream", params=params)
     status = r.status_code
     assert status == expected_http_code, f"Expected http return code to be {expected_http_code} , but got {status}"
 
 
-def get_snapshot_check_number_of_results(session, url, expected_number):
-    response = session.get(f"{url}/snapshot")
+def get_snapshot_check_number_of_results(session, expected_number):
+    response = session.get(f"{STREAM_URL}/snapshot")
     return _check_ok_response_and_number_of_ads(response, expected_number)
 
 
@@ -169,8 +179,8 @@ def check_freetext_concepts(free_text_concepts, list_of_expected):
     assert free_text_concepts['location_must_not'] == list_of_expected[8]
 
 
-def _fetch_and_validate_result(session, search_url, query, resultfield, expected, non_negative=True):
-    json_response = get_search(session, search_url, query)
+def _fetch_and_validate_result(session, query, resultfield, expected, non_negative=True):
+    json_response = get_search(session, query)
     hits = json_response['hits']
     check_len_more_than(hits, 0)
     for hit in hits:
@@ -223,8 +233,8 @@ def get_occupation_collection_id_and_concept_ids():
     return list_of_collections_with_id
 
 
-def get_search_with_headers(url, params, headers):
-    r = requests.get(url + '/search', params, headers=headers)
+def get_search_with_headers( params, headers):
+    r = requests.get(SEARCH_URL + '/search', params, headers=headers)
     r.raise_for_status()
     return json.loads(r.content.decode('utf8'))
 

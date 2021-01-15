@@ -37,7 +37,8 @@ def test_get_stats_for_taxonomy_type(taxonomy_type):
 
 @pytest.mark.parametrize("taxonomy_type", tax_other + tax_noexist)
 def test_get_stats_for_taxonomy_type_neg(taxonomy_type):
-    assert platsannonser.get_stats_for(taxonomy_type) == {}
+    result =  platsannonser.get_stats_for(taxonomy_type)
+    assert result == {}
 
 
 @pytest.mark.parametrize("v", ['a', 'abc', '-1'])

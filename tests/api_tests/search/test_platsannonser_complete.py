@@ -145,10 +145,10 @@ def test_complete_for_locations_with_space_and_contextual_param(session, context
     ("göteborg sjukssköterska läkare", ['göteborg sjuksköterska läkare']),
     ("läckare", ['läkare']),
     ("götteborg", ['göteborg']),
-    ("stokholm", ['stockholms län', 'stockholm']),
-    ("stokholm ", ['stockholms län', 'stockholm']),  # trailing space
-    ("stockhlm", ['stockholms län', 'stockholm']),
-    ("stockhlm ", ['stockholms län', 'stockholm']),  # trailing space
+    ("stokholm", [ 'stockholm']),
+    ("stokholm ", [ 'stockholm']),  # trailing space
+    ("stockhlm", [ 'stockholm']),
+    ("stockhlm ", [ 'stockholm']),  # trailing space
     ("stokholm lärarre", ['stockholms lärare', 'stockholm lärare', 'stockholm läkare']),
     ("göteborg sjukssköterska läckare", ['göteborg sjuksköterska lärare', 'göteborg sjuksköterska läkare']),
     ("göteborg läckare sjukssköterska ", ['göteborg lärare sjuksköterska', 'göteborg läkare sjuksköterska']),
@@ -175,10 +175,10 @@ def test_complete_spelling_correction_multiple_words(session, query, expected):
 @pytest.mark.parametrize("query, expected", [
     ("läckare", ['läkare']),
     ("götteborg", ['göteborg']),
-    ("stokholm", ['stockholm', 'stockholm city']),
-    ("stokholm ", ['stockholm', 'stockholm city']),  # trailing space
-    ("stockhlm", ['stockholm', 'stockholm city']),
-    ("stockhlm ", ['stockholm city']),  # trailing space
+    ("stokholm", ['stockholm']),
+    ("stokholm ", ['stockholm']),  # trailing space
+    ("stockhlm", ['stockholm']),
+    ("stockhlm ", ['stockholm']),  # trailing space
     ("stockholm pythan", ['stockholm python']),
     ("läkare götteborg", ['läkare göteborg']),
     ("läkare götteborg", ['läkare göteborg']),
@@ -197,7 +197,7 @@ def test_spelling_correction_with_complete_suggest(session,  query, expected):
 
 
 @pytest.mark.parametrize("query, expected", [
-    ("götteborg sjukssköterska", ['göteborg sjuksköterska', 'göteborg sjuksköterskan']),
+    ("götteborg sjukssköterska", ['göteborg sjuksköterska']),
     ("stokholm lärarre", ['stockholms lärare', 'stockholm lärare', 'stockholm läkare']),
     ("göteborg sjukssköterska läckare", ['göteborg sjuksköterska lärare', 'göteborg sjuksköterska läkare']),
     ("göteborg läckare sjukssköterska ", ['göteborg lärare sjuksköterska', 'göteborg läkare sjuksköterska']),

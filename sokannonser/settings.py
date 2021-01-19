@@ -1,7 +1,6 @@
 import os
-import datetime
 
-API_VERSION = '1.15.0'
+API_VERSION = '1.16.0'
 
 # Elasticsearch settings
 ES_HOST = os.getenv("ES_HOST", "127.0.0.1")
@@ -26,8 +25,7 @@ RESTPLUS_ERROR_404_HELP = False
 
 # Base API URL
 BASE_URL = os.getenv('BASE_URL', 'https://jobsearch.api.jobtechdev.se/')
-BASE_PB_URL = os.getenv('BASE_PB_URL',
-                        'https://arbetsformedlingen.se/platsbanken/annonser/')
+BASE_PB_URL = os.getenv('BASE_PB_URL', 'https://arbetsformedlingen.se/platsbanken/annonser/')
 
 BASE_TAXONOMY_URL = os.getenv('BASE_TAXONOMY_URL', 'https://taxonomy.api.jobtechdev.se/v1/taxonomy/')
 TAXONOMY_APIKEY = os.getenv('TAXONOMY_APIKEY')
@@ -50,6 +48,7 @@ FREETEXT_QUERY = 'q'
 TYPEAHEAD_QUERY = 'typehead'
 CONTEXTUAL_TYPEAHEAD = 'contextual'
 UNSPECIFIED_SWEDEN_WORKPLACE = 'unspecified-sweden-workplace'
+ABROAD = 'abroad'
 FREETEXT_FIELDS = 'qfields'
 SORT = 'sort'
 PUBLISHED_BEFORE = 'published-before'
@@ -64,7 +63,7 @@ POSITION_RADIUS = 'position.radius'
 DEFAULT_POSITION_RADIUS = 5
 EMPLOYER = 'employer'
 
-DEFAULT_FREETEXT_BOOL_METHOD = 'and'
+DEFAULT_FREETEXT_BOOL_METHOD = 'or'
 
 MAX_OFFSET = 2000
 MAX_LIMIT = 100
@@ -121,5 +120,4 @@ URL_PROD = os.getenv('URL_PROD', 'https://jobsearch.api.jobtechdev.se/')
 # original index: narvalontology, new: jae-synonym-dictionary
 ONTOLOGY_INDEX = os.getenv('ONTOLOGY_INDEX', 'jae-synonym-dictionary')
 
-# scraped index
-ES_SCRAPED_INDEX = os.getenv("ES_SCRAPED_INDEX", "scrapedannons")
+

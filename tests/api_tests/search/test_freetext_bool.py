@@ -11,31 +11,25 @@ from tests.test_resources.settings import headers_search
 @pytest.mark.parametrize("query, expected, bool_method", [
     ('Bauhaus Kundtjänst', 1, 'and'),
     ('Bauhaus Kundtjänst', 33, 'or'),
-    ('Bauhaus Kundtjänst', 1, None),  # when default is 'and'
-    #     ('Bauhaus Kundtjänst', 33, None),  # when default is changed to 'or'
+    ('Bauhaus Kundtjänst', 33, None),
     ('Sirius crew', 1, 'and'),
     ('Sirius crew', 2, 'or'),
-    ('Sirius crew', 1, None),  # when default is 'and'
-    #      ('Sirius crew', 2, None),  # when default is changed to 'or'
+    ('Sirius crew',2, None),
     ('lagstiftning anställning ', 2, 'and'),
     ('lagstiftning anställning ', 252, 'or'),
-    ('lagstiftning anställning ', 2, None),  # when default is 'and'
-    #     ('lagstiftning anställning ', 252, None),  # when default is changed to 'or'
+    ('lagstiftning anställning ', 252, None),
     ('TechBuddy uppdrag', 1, 'and'),
     ('TechBuddy uppdrag', 284, 'or'),
-    ('TechBuddy uppdrag', 1, None),  # when default is 'and'
-    #    ('TechBuddy uppdrag', 284, None)  # when default is changed to 'or'
+    ('TechBuddy uppdrag', 284, None),
 ])
 def test_freetext_bool_method(session, search_url, query, expected, bool_method):
     """
     Test with 'or' & 'and' values for X_FEATURE_FREETEXT_BOOL_METHOD header flag
-    Default value is 'AND' (used in test cases with None as param)
+    Default value is 'OR' (used in test cases with None as param)
     Searches with 'or' returns more hits
     """
     params = {'q': query, 'limit': 0}
-
-    # Todo: change AND to OR in descriptions and docstring when default is changed
-    # use default setting for X_FEATURE_FREETEXT_BOOL_METHOD == 'AND'
+    # use default setting for X_FEATURE_FREETEXT_BOOL_METHOD == 'OR'
     if not bool_method:
         response_json = get_search(session, search_url, params)
     else:

@@ -62,6 +62,8 @@ swagger_doc_params = {
     taxonomy.REGION: "One or more region codes, code according to the taxonomy",
     taxonomy.COUNTRY: "One or more country codes, code according to the taxonomy",
     settings.UNSPECIFIED_SWEDEN_WORKPLACE: "True will return all unspecified ads in Sweden",
+    settings.ABROAD: "True will return ads for work outside of Sweden even when searching for places "
+                     "matching Swedish municipality/region/country. False does nothing",
     settings.POSITION: "Latitude and longitude in the format \"59.329,18.068\" "
     "(latitude,longitude)",
     settings.POSITION_RADIUS: "Radius from the specified " + settings.POSITION +
@@ -140,6 +142,7 @@ base_annons_query.add_argument(taxonomy.MUNICIPALITY, action='append')
 base_annons_query.add_argument(taxonomy.REGION, action='append')
 base_annons_query.add_argument(taxonomy.COUNTRY, action='append')
 base_annons_query.add_argument(settings.UNSPECIFIED_SWEDEN_WORKPLACE, type=inputs.boolean)
+base_annons_query.add_argument(settings.ABROAD, type=inputs.boolean)
 # Matches(lat,long) +90.0,-127.554334; 45,180; -90,-180; -90.000,-180.0000; +90,+180
 # r for raw, PEP8
 position_regex = r'^[-+]?([1-8]?\d(\.\d*)?|90(\.0*)?),' \

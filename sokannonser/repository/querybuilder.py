@@ -4,9 +4,7 @@ import re
 import time
 from collections import defaultdict
 from datetime import datetime, timedelta
-
 import elasticsearch_dsl
-
 from dateutil import parser
 from sokannonser import settings
 from sokannonser.repository import taxonomy, TextToConcept
@@ -63,9 +61,8 @@ class QueryBuilder(object):
         must_queries.append(self._build_plats_query(args.get(taxonomy.MUNICIPALITY),
                                                     args.get(taxonomy.REGION),
                                                     args.get(taxonomy.COUNTRY),
-                                                    args.get(settings.UNSPECIFIED_SWEDEN_WORKPLACE)))
-        # Replaced by _build_plats_query
-        # must_queries.append(self._build_country_query(args.get(taxonomy.COUNTRY)))
+                                                    args.get(settings.UNSPECIFIED_SWEDEN_WORKPLACE),
+                                                    args.get(settings.ABROAD)))
         must_queries.append(self._build_generic_query([f.MUST_HAVE_SKILLS + "." +
                                                        f.CONCEPT_ID + ".keyword",
                                                        f.MUST_HAVE_SKILLS + "." +
@@ -129,7 +126,8 @@ class QueryBuilder(object):
             }
         return query_dsl
 
-    def filter_aggs(self, aggs, freetext):
+    @staticmethod
+    def filter_aggs(aggs, freetext):
         # will not use in future
         fwords = freetext.split(' ') if freetext else []
         value_dicts = []
@@ -171,7 +169,8 @@ class QueryBuilder(object):
             return fieldslist
         return []
 
-    def _find_hits_subelement(self, text):
+    @staticmethod
+    def _find_hits_subelement(text):
         istart = []  # stack of indices of opening parentheses
         bracket_positions = {}
         for i, c in enumerate(text):
@@ -276,8 +275,7 @@ class QueryBuilder(object):
             x = 1
             for ngram in ngrams_complete:
                 if ngram != complete:
-                    query_dsl['aggs']["complete_%s_%s_remainder"
-                                      % (str(x).zfill(2), field)] = {
+                    query_dsl['aggs']["complete_%s_%s_remainder" % (str(x).zfill(2), field)] = {
                         "terms": {
                             "field": "%s.%s.raw" % (base_field, field),
                             "size": size,
@@ -291,7 +289,8 @@ class QueryBuilder(object):
             query_dsl['sort'] = f.sort_options.get('relevance')
         return query_dsl
 
-    def _escape_special_chars_for_complete(self, inputstr):
+    @staticmethod
+    def _escape_special_chars_for_complete(inputstr):
         escaped_str = inputstr
         chars_to_escape = ['#']
 
@@ -300,7 +299,8 @@ class QueryBuilder(object):
                 escaped_str = inputstr.replace(char, '[%s]' % char)
         return escaped_str
 
-    def _assemble_queries(self, query_dsl, additional_queries, additional_filters):
+    @staticmethod
+    def _assemble_queries(query_dsl, additional_queries, additional_filters):
         for query in additional_queries:
             if query:
                 query_dsl['query']['bool']['must'].append(query)
@@ -309,7 +309,8 @@ class QueryBuilder(object):
                 query_dsl['query']['bool']['filter'].append(af)
         return query_dsl
 
-    def _rewrite_word_for_regex(self, word):
+    @staticmethod
+    def _rewrite_word_for_regex(word):
         if word is None:
             word = ''
         bad_chars = ['+', '.', '[', ']', '{', '}', '(', ')', '^', '$',
@@ -323,7 +324,8 @@ class QueryBuilder(object):
             return modded_term
         return word
 
-    def extract_quoted_phrases(self, text):
+    @staticmethod
+    def extract_quoted_phrases(text):
         # Append quote to end of string if unbalanced
         if text.count('"') % 2 != 0:
             text += '"'
@@ -339,6 +341,10 @@ class QueryBuilder(object):
         return {"phrases": matches, "phrases_must": must_matches,
                 "phrases_must_not": neg_matches}, text.strip()
 
+    @staticmethod
+    def _remove_unwanted_chars_from_querystring(querystring):
+        return ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
+
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
     def _build_freetext_query(self, querystring, queryfields, freetext_bool_method,
                               disable_smart_freetext, enable_false_negative=False):
@@ -346,7 +352,7 @@ class QueryBuilder(object):
             return None
         if not queryfields:
             queryfields = queries.QF_CHOICES.copy()
-        querystring = ' '.join([w.strip(',.!?:; ') for w in re.split('\\s|\\,', querystring)])
+        querystring = self._remove_unwanted_chars_from_querystring(querystring)
         original_querystring = querystring
         (phrases, querystring) = self.extract_quoted_phrases(querystring)
         concepts = {} if disable_smart_freetext else self.ttc.text_to_concepts(querystring)
@@ -375,7 +381,8 @@ class QueryBuilder(object):
         return ft_query
 
     # Add phrase queries
-    def _add_phrases_query(self, ft_query, phrases):
+    @staticmethod
+    def _add_phrases_query(ft_query, phrases):
         for bool_type in ['should', 'must', 'must_not']:
             key = 'phrases' if bool_type == 'should' else "phrases_%s" % bool_type
 
@@ -413,9 +420,9 @@ class QueryBuilder(object):
         return querystring
 
     def _create_base_ft_query(self, querystring, method):
+        method = 'and' if method == 'and' else settings.DEFAULT_FREETEXT_BOOL_METHOD
         # Creates a base query dict for "independent" freetext words
         # (e.g. words not found in text_to_concepts)
-        method = 'or' if method == 'or' else 'and'
         suffix_words = ' '.join([w[1:] for w in querystring.split(' ')
                                  if w.startswith('*')])
         prefix_words = ' '.join([w[:-1] for w in querystring.split(' ')
@@ -455,7 +462,8 @@ class QueryBuilder(object):
             ft_query['bool']['must_not'] = mustnts
         return ft_query
 
-    def _freetext_fields(self, searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
+    @staticmethod
+    def _freetext_fields(searchword, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
         return [{
             "multi_match": {
                 "query": searchword,
@@ -467,7 +475,8 @@ class QueryBuilder(object):
             }
         }]
 
-    def _freetext_wildcard(self, searchword, wildcard_side, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
+    @staticmethod
+    def _freetext_wildcard(searchword, wildcard_side, method=settings.DEFAULT_FREETEXT_BOOL_METHOD):
         return [{
             "multi_match": {
                 "query": searchword,
@@ -477,7 +486,8 @@ class QueryBuilder(object):
             }
         }]
 
-    def _freetext_headline(self, query_dict, querystring):
+    @staticmethod
+    def _freetext_headline(query_dict, querystring):
         # Remove plus and minus from querystring for headline search
         querystring = re.sub(r'(^| )[\\+]{1}', ' ', querystring)
         querystring = ' '.join([word for word in querystring.split(' ')
@@ -567,7 +577,8 @@ class QueryBuilder(object):
         return query_dict
 
     # Parses EMPLOYER
-    def _build_employer_query(self, employers):
+    @staticmethod
+    def _build_employer_query(employers):
         if employers:
             bool_segment = {"bool": {"should": [], "must_not": [], "must": []}}
             for employer in employers:
@@ -596,7 +607,8 @@ class QueryBuilder(object):
         return None
 
     # Parses OCCUPATION, FIELD, GROUP and COLLECTIONS
-    def _build_yrkes_query(self, yrkesroller, yrkesgrupper, yrkesomraden):
+    @staticmethod
+    def _build_yrkes_query(yrkesroller, yrkesgrupper, yrkesomraden):
         yrken = yrkesroller or []
         yrkesgrupper = yrkesgrupper or []
         yrkesomraden = yrkesomraden or []
@@ -667,8 +679,7 @@ class QueryBuilder(object):
         else:
             return None
 
-        # Parses OCCUPATION, FIELD, GROUP and COLLECTIONS
-
+    # Parses OCCUPATION, FIELD, GROUP and COLLECTIONS
     def build_yrkessamlingar_query(self, yrkessamlingar):
         start_time = int(time.time() * 1000)
         if not yrkessamlingar:
@@ -709,7 +720,8 @@ class QueryBuilder(object):
             return None
 
     # Parses MUNICIPALITY and REGION
-    def _build_plats_query(self, kommunkoder, lanskoder, landskoder, unspecify):
+    @staticmethod
+    def _build_plats_query(kommunkoder, lanskoder, landskoder, unspecify, abroad):
         kommuner = []
         neg_komm = []
         lan = []
@@ -747,6 +759,17 @@ class QueryBuilder(object):
                         "filter": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
                             "value": settings.SWEDEN_CONCEPT_ID}}},
                         "must_not": {"exists": {"field": f.WORKPLACE_ADDRESS_REGION_CONCEPT_ID}},
+                        "boost": 1.0
+                    }
+                },
+            ]
+
+        if abroad:
+            plats_term_query += [
+                {
+                    "bool": {
+                        "must_not": {"term": {f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
+                            "value": settings.SWEDEN_CONCEPT_ID}}},
                         "boost": 1.0
                     }
                 },
@@ -802,40 +825,9 @@ class QueryBuilder(object):
 
         return plats_bool_query
 
-    # Parses COUNTRY (DEPRECATED)
-    def _build_country_query(self, landskoder):
-        lander = []
-        neg_land = []
-        country_term_query = []
-        neg_country_term_query = []
-        for lkod in landskoder if landskoder else []:
-            if lkod.startswith('-'):
-                neg_land.append(lkod[1:])
-            else:
-                lander.append(lkod)
-        country_term_query = [{"term": {
-            f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
-                "value": lkod, "boost": 1.0}}} for lkod in lander]
-        country_term_query += [{"term": {
-            f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
-                "value": lkod, "boost": 1.0}}} for lkod in lander]
-        country_bool_query = {"bool": {
-            "should": country_term_query}
-        } if country_term_query else {}
-        if neg_land:
-            neg_country_term_query = [{"term": {
-                f.WORKPLACE_ADDRESS_COUNTRY_CODE: {
-                    "value": lkod}}} for lkod in neg_land]
-            neg_country_term_query += [{"term": {
-                f.WORKPLACE_ADDRESS_COUNTRY_CONCEPT_ID: {
-                    "value": lkod}}} for lkod in neg_land]
-            if 'bool' not in country_bool_query:
-                country_bool_query['bool'] = {}
-            country_bool_query['bool']['must_not'] = neg_country_term_query
-        return country_bool_query
-
     # Parses PUBLISHED_AFTER and PUBLISHED_BEFORE
-    def _filter_timeframe(self, from_datestring, to_datetime):
+    @staticmethod
+    def _filter_timeframe(from_datestring, to_datetime):
         if not from_datestring and not to_datetime:
             return None
         range_query = {"range": {f.PUBLICATION_DATE: {}}}
@@ -854,7 +846,8 @@ class QueryBuilder(object):
         return range_query
 
     # Parses PARTTIME_MIN and PARTTIME_MAX
-    def _build_parttime_query(self, parttime_min, parttime_max):
+    @staticmethod
+    def _build_parttime_query(parttime_min, parttime_max):
         if not parttime_min and not parttime_max:
             return None
         if not parttime_min:
@@ -885,7 +878,8 @@ class QueryBuilder(object):
         }
         return parttime_query
 
-    def _build_generic_query(self, keys, itemlist):
+    @staticmethod
+    def _build_generic_query(keys, itemlist):
         items = [] if not itemlist else itemlist
         term_query = []
         neg_term_query = []
@@ -909,7 +903,8 @@ class QueryBuilder(object):
         return None
 
     # Parses POSITION and POSITION_RADIUS
-    def _build_geo_dist_filter(self, positions, coordinate_ranges):
+    @staticmethod
+    def _build_geo_dist_filter(positions, coordinate_ranges):
         geo_bool = {"bool": {"should": []}} if positions else {}
         for index, position in enumerate(positions or []):
             latitude = None
@@ -938,7 +933,8 @@ class QueryBuilder(object):
                 geo_bool['bool']['should'].append(geo_filter)
         return geo_bool
 
-    def create_auto_complete_suggester(self, word, args):
+    @staticmethod
+    def create_auto_complete_suggester(word):
         """"
         parse args and create auto complete suggester
         """
@@ -963,7 +959,8 @@ class QueryBuilder(object):
             )
         return search.to_dict()
 
-    def create_phrase_suggester(self, input, args):
+    @staticmethod
+    def create_phrase_suggester(input_words):
         """"
         parse args and create phrase suggester
         """
@@ -974,7 +971,7 @@ class QueryBuilder(object):
         search = search.source('suggest')
         search = search.suggest(
             '%s_simple_phrase' % field,
-            input,
+            input_words,
             phrase={
                 'field': '%s.trigram' % field,
                 'size': 10,
@@ -994,7 +991,8 @@ class QueryBuilder(object):
         )
         return search.to_dict()
 
-    def create_suggest_search(self, suggest, args):
+    @staticmethod
+    def create_suggest_search(suggest):
         enriched_typeahead_field = f.KEYWORDS_ENRICHED_SYNONYMS
 
         field = '%s.compound' % enriched_typeahead_field
@@ -1007,7 +1005,8 @@ class QueryBuilder(object):
 
         return json.dumps(search)
 
-    def create_check_search_word_type_query(self, word, args):
+    @staticmethod
+    def create_check_search_word_type_query(word):
         """"
             Create check search word type query
         """
@@ -1023,7 +1022,8 @@ class QueryBuilder(object):
             }
         return json.dumps(search)
 
-    def create_suggest_extra_word_query(self, word, first_word_type, second_word_type, args):
+    @staticmethod
+    def create_suggest_extra_word_query(word, first_word_type, second_word_type):
         """"
            Create suggest extra word query
         """

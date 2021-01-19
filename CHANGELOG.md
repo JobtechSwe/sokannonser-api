@@ -3,7 +3,7 @@ Changelog Application Jobsearch
 # 1.16.0
 * Fix multi word /complete spelling bug
 * Set DEFAULT_FREETEXT_BOOL_METHOD to 'or'
-* Add "abroad" field
+* Abroad filter added for inclusion of ads from other countries than sweden in region and municipality filtered searches
 
 # 1.15.0
 * Add occupation-collection filter parameter to search

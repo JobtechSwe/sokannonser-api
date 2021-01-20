@@ -31,10 +31,10 @@ def test_enrich(session):
 @pytest.mark.smoke
 @pytest.mark.integration
 @pytest.mark.parametrize("query, expected_number_of_hits, identifier", [
-    ('"gymnasielärare"', 2, 'a'),
-    ("'gymnasielärare'", 1, 'b'),
-    ("\"gymnasielärare\"", 2, 'c'),
-    ("\'gymnasielärare\'", 1, 'd'),
+    ('"gymnasielärare"', 11, 'a'),
+    ("'gymnasielärare'", 11, 'b'),
+    ("\"gymnasielärare\"", 11, 'c'),
+    ("\'gymnasielärare\'", 11, 'd'),
     ("""gymnasielärare""", 11, 'e'),
     ('''gymnasielärare''', 11, 'f'),
     ('gymnasielärare', 11, 'g'),

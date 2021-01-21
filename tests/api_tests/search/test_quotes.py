@@ -23,9 +23,9 @@ from tests.test_resources.helper import get_search, compare
     ('''"gymnasielärare lärare"''', 45, 'p'),
     ("\"gymnasielärare\"", 11, 'q'),
     ("\"gymnasielärare", 11, 'r'),
-    ('''"gymnasielärare"''', 11, 't'),
-    ("gymnasielärare", 11, 'u'),
-    ('gymnasielärare', 11, 'v'),
+    ('''"gymnasielärare"''', 11, 's'),
+    ("gymnasielärare", 11, 't'),
+    ('gymnasielärare', 11, 'u'),
 ])
 def test_query_with_different_quotes(session, query, expected_number_of_hits, identifier):
     json_response = get_search(session, params={'q': query, 'limit': '0'})

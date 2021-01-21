@@ -1,4 +1,3 @@
-import sys
 import pytest
 
 from tests.test_resources.helper import get_search
@@ -46,8 +45,17 @@ from tests.test_resources.settings import TEST_USE_STATIC_DATA
     ('.NET/C#', 5),
     ('.NET / C#', 8),
     ('.NET C#', 7),
+    ('.NET /C#', 8),
+    ('.NET/ C#', 4),
+    ('.NET', 17),
+    ('C#/.net', 8),
+    ('C# .net', 7),
+    ('C# /.net', 6),
+    ('C# / .net', 8),
+    ('C#', 16),
+    ('dotnet', 17)
 ])
-def test_freetext_search_slash( session, query, expected):
+def test_freetext_search_slash(session, query, expected):
     """
     Search with terms that are joined by a slash '/' included (x/y)
     with the terms separately (x y)
@@ -55,7 +63,7 @@ def test_freetext_search_slash( session, query, expected):
     """
 
     params = {'q': query, 'limit': '0'}
-    response_json = get_search(session,  params=params)
+    response_json = get_search(session, params=params)
     assert response_json['total']['value'] == expected
 
 
@@ -67,7 +75,7 @@ def test_freetext_search_slash( session, query, expected):
     ('Systemutvecklare Programmerare', 49),
     ('Systemutvecklare / Programmerare', 3)
 ])
-def test_freetext_search_slash_short( session, query, expected):
+def test_freetext_search_slash_short(session, query, expected):
     params = {'q': query, 'limit': '0'}
-    response_json = get_search(session,  params=params)
+    response_json = get_search(session, params=params)
     assert response_json['total']['value'] == expected

@@ -1,4 +1,3 @@
-import sys
 import os
 import pytest
 import requests
@@ -26,23 +25,6 @@ def test_enrich(session):
     query = 'stresstålig'
     json_response = get_search(session, params={'q': query, 'limit': '0'})
     compare(json_response['total']['value'], expected=46)
-
-
-@pytest.mark.smoke
-@pytest.mark.integration
-@pytest.mark.parametrize("query, expected_number_of_hits, identifier", [
-    ('"gymnasielärare"', 11, 'a'),
-    ("'gymnasielärare'", 11, 'b'),
-    ("\"gymnasielärare\"", 11, 'c'),
-    ("\'gymnasielärare\'", 11, 'd'),
-    ("""gymnasielärare""", 11, 'e'),
-    ('''gymnasielärare''', 11, 'f'),
-    ('gymnasielärare', 11, 'g'),
-    ("gymnasielärare""", 11, 'h'),
-])
-def test_query_with_different_quotes(session, query, expected_number_of_hits, identifier):
-    json_response = get_search(session, params={'q': query, 'limit': '0'})
-    compare(json_response['total']['value'], expected_number_of_hits, msg=f'Query: {query}')
 
 
 # Todo: different queries

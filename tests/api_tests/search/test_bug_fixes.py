@@ -25,8 +25,8 @@ def test_freetext_search_slash(session,  query, expected):
     assert response_json['total']['value'] == expected
 
 @pytest.mark.parametrize('param, return_code', [
-    ({'q': '"c++'}, requests.codes.internal_server_error),
-    ({'q': '"c++"'}, requests.codes.internal_server_error),
+    ({'q': '"c++'}, requests.codes.ok),
+    ({'q': '"c++"'}, requests.codes.ok),
     ({'q': '"c+'}, requests.codes.ok),
 ])
 def test_cplusplus_in_quotes(session, param, return_code):

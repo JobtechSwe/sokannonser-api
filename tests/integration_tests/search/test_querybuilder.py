@@ -33,28 +33,28 @@ def test_build_occupation_collection_query(collection_id, expected):
     assert query_result == expected
 
 
-@pytest.mark.parametrize("querystring, expected", [('xx,', 'xx '),  # trailing space
+@pytest.mark.parametrize("querystring, expected", [('xx,', 'xx'),  # trailing space
                                                    ('xx.', 'xx'),
                                                    ('xx!', 'xx'),
                                                    ('xx?', 'xx'),
                                                    ('xx:', 'xx'),
                                                    ('xx;', 'xx'),
                                                    ('.xx', 'xx'),
-                                                   (',xx', ' xx'),  # leading space
+                                                   (',xx', 'xx'),  # leading space
                                                    ('!xx', 'xx'),
                                                    ('?xx', 'xx'),
                                                    (':xx', 'xx'),
                                                    (';xx', 'xx'),
                                                    (';xx', 'xx'),
-                                                   (' xx', ' xx'),
+                                                   (' xx', 'xx'),
                                                    ('x x', 'x x'),
-                                                   ('x,x ', 'x x '),  # trailing space
-                                                   ('x.x ', 'x.x '),
-                                                   ('x!x ', 'x!x '),
-                                                   ('x?x ', 'x?x '),
-                                                   ('x:x ', 'x:x '),
-                                                   ('x;x ', 'x;x '),
-                                                   ('xx ', 'xx '),
+                                                   ('x,x ', 'x x'),  # trailing space
+                                                   ('x.x ', 'x.x'),
+                                                   ('x!x ', 'x!x'),
+                                                   ('x?x ', 'x?x'),
+                                                   ('x:x ', 'x:x'),
+                                                   ('x;x ', 'x;x'),
+                                                   ('xx ', 'xx'),
                                                    ('x/y', 'x/y'),
                                                    ('.x/y', 'x/y'),
                                                    ('x/y.', 'x/y'),
@@ -65,19 +65,19 @@ def test_build_occupation_collection_query(collection_id, expected):
                                                    ('.12345', '12345'),
                                                    ('.12345.', '12345'),
                                                    ('.12345.', '12345'),
-                                                   (',12345', ' 12345'),
-                                                   (',12345,', ' 12345 '),
+                                                   (',12345', '12345'),
+                                                   (',12345,', '12345'),
                                                    ('\\x', '\\x'),
-                                                   ('\\x,', '\\x '),
+                                                   ('\\x,', '\\x'),
                                                    ('\\x.', '\\x'),
                                                    ('\\.x.', '\\.x'),
                                                    ('.\\.x.', '\\.x'),
-                                                   (',\\.x.', ' \\.x'),
+                                                   (',\\.x.', '\\.x'),
                                                    ])
 def test_querystring_char_removal(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    formatted = querybuilder._remove_unwanted_chars_from_querystring(querystring)
-    assert formatted == expected
+    formatted = querybuilder.extract_quoted_phrases(querystring)
+    assert formatted[1] == expected
 
 
 def test_parse_args_query_with_slash():
@@ -466,7 +466,7 @@ def test_extract_querystring_different_quotes(querystring, expected_phrase, expe
 ])
 def test_extract_querystring_phrases(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    assert querybuilder.extract_quoted_phrases(querystring) == expected
+    assert querybuilder.extract_quoted_phrases(querystring)[1] == expected
 
 
 @pytest.mark.parametrize("querystring, expected", [
@@ -480,8 +480,7 @@ def test_extract_querystring_phrases(querystring, expected):
 ])
 def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    assert querybuilder.extract_quoted_phrases(querystring)== expected
-
+    assert querybuilder.extract_quoted_phrases(querystring) == expected
 
 
 @pytest.mark.parametrize("querystring, expected", [

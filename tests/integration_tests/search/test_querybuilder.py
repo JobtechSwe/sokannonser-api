@@ -33,14 +33,14 @@ def test_build_occupation_collection_query(collection_id, expected):
     assert query_result == expected
 
 
-@pytest.mark.parametrize("querystring, expected", [('xx,', 'xx'),  # trailing space
+@pytest.mark.parametrize("querystring, expected", [('xx,', 'xx'),
                                                    ('xx.', 'xx'),
                                                    ('xx!', 'xx'),
                                                    ('xx?', 'xx'),
                                                    ('xx:', 'xx'),
                                                    ('xx;', 'xx'),
                                                    ('.xx', 'xx'),
-                                                   (',xx', 'xx'),  # leading space
+                                                   (',xx', 'xx'),
                                                    ('!xx', 'xx'),
                                                    ('?xx', 'xx'),
                                                    (':xx', 'xx'),
@@ -48,7 +48,7 @@ def test_build_occupation_collection_query(collection_id, expected):
                                                    (';xx', 'xx'),
                                                    (' xx', 'xx'),
                                                    ('x x', 'x x'),
-                                                   ('x,x ', 'x x'),  # trailing space
+                                                   ('x,x ', 'x x'),
                                                    ('x.x ', 'x.x'),
                                                    ('x!x ', 'x!x'),
                                                    ('x?x ', 'x?x'),
@@ -470,9 +470,9 @@ def test_extract_querystring_phrases(querystring, expected):
      ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python grym kodare i am lazy java')),
     ("python \"grym kodare\" +\"i am lazy",
      ({'phrases': [], 'phrases_must': ['i am lazy'], 'phrases_must_not': []}, 'python grym kodare')),
-     ("python \"grym kodare\" -\"i am lazy",
-      ({'phrases': [], 'phrases_must': [], 'phrases_must_not': ['i am lazy']}, 'python grym kodare'))
-            ])
+    ("python \"grym kodare\" -\"i am lazy",
+     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': ['i am lazy']}, 'python grym kodare'))
+])
 def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
     assert querybuilder.extract_quoted_phrases(querystring) == expected

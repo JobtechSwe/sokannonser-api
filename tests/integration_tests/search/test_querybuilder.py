@@ -327,7 +327,6 @@ def test_geo_distance_filter(args, exist, expected):
                                {"term": {"workplace_address.municipality_concept_id": {"value": "2222"}}}
                            ])])
 def test_region_municipality_query(args, expected_pos, expected_neg):
-    print('================', sys._getframe().f_code.co_name, '===============')
     querybuilder = QueryBuilder(mock.MockTextToConcept())
     query_dsl = querybuilder.parse_args(args)
     if expected_pos:

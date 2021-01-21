@@ -453,15 +453,11 @@ def test_extract_querystring_different_quotes(querystring, expected_phrase, expe
 
 
 @pytest.mark.parametrize("querystring, expected", [
-    ("python \"grym kodare\"",
-     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python grym kodare')),
-    ("java \"malmö stad\"",
-     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'java malmö stad')),
-    ("python -\"grym kodare\" +\"i am lazy\"",
-     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python - grym kodare + i am lazy')
-     ),
-    ("\"python på riktigt\" -\"grym kodare\" +\"i am lazy\"",
-     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python på riktigt - grym kodare + i am lazy')),
+    ("python \"grym kodare\"", 'python grym kodare'),
+    ("java \"malmö stad\"", 'java malmö stad'),
+    ("python -\"grym kodare\" +\"i am lazy\"", 'python -"grym kodare +"i am lazy'),
+    ("\"python på riktigt\" -\"grym kodare\" +\"i am lazy\"", 'python på riktigt -"grym kodare +"i am lazy')
+
 ])
 def test_extract_querystring_phrases(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
@@ -473,10 +469,10 @@ def test_extract_querystring_phrases(querystring, expected):
     ("python \"grym kodare\" \"i am lazy java",
      ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python grym kodare i am lazy java')),
     ("python \"grym kodare\" +\"i am lazy",
-     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python grym kodare + i am lazy')),
-    ("python \"grym kodare\" -\"i am lazy",
-     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python grym kodare - i am lazy')),
-])
+     ({'phrases': [], 'phrases_must': ['i am lazy'], 'phrases_must_not': []}, 'python grym kodare')),
+     ("python \"grym kodare\" -\"i am lazy",
+      ({'phrases': [], 'phrases_must': [], 'phrases_must_not': ['i am lazy']}, 'python grym kodare'))
+            ])
 def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
     assert querybuilder.extract_quoted_phrases(querystring) == expected

@@ -67,12 +67,12 @@ def test_build_occupation_collection_query(collection_id, expected):
                                                    ('.12345.', '12345'),
                                                    (',12345', ' 12345'),
                                                    (',12345,', ' 12345 '),
-                                                   ('\\x', 'x'),
-                                                   ('\\x,', 'x '),
-                                                   ('\\x.', 'x'),
-                                                   ('\\.x.', 'x'),
-                                                   ('.\\.x.', 'x'),
-                                                   (',\\.x.', ' x'),
+                                                   ('\\x', '\\x'),
+                                                   ('\\x,', '\\x '),
+                                                   ('\\x.', '\\x'),
+                                                   ('\\.x.', '\\.x'),
+                                                   ('.\\.x.', '\\.x'),
+                                                   (',\\.x.', ' \\.x'),
                                                    ])
 def test_querystring_char_removal(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())

@@ -1,4 +1,3 @@
-import sys
 import pytest
 
 from tests.test_resources.helper import get_search
@@ -10,9 +9,6 @@ from tests.test_resources.settings import TEST_USE_STATIC_DATA
     ('försäljning/marknad', 2),
     ('försäljning marknad', 7),
     ('försäljning / marknad', 10),
-    ('C#/.net', 8),
-    ('C# .net', 7),
-    ('C# /.net', 6),
     ('lager/logistik', 3),
     ('lager / logistik', 2),
     ('lager logistik', 40),
@@ -43,20 +39,44 @@ from tests.test_resources.settings import TEST_USE_STATIC_DATA
     ('UX/UI Designer', 0),
     ('UX / UI Designer', 0),
     ('UX UI Designer', 0),
-    ('.NET/C#', 5),
-    ('.NET / C#', 8),
-    ('.NET C#', 7),
 ])
-def test_freetext_search_slash( session, query, expected):
+def test_freetext_search_slash(session, query, expected):
     """
     Search with terms that are joined by a slash '/' included (x/y)
     with the terms separately (x y)
     and with a slash surrounded by space (x / y)
     """
-
     params = {'q': query, 'limit': '0'}
-    response_json = get_search(session,  params=params)
-    assert response_json['total']['value'] == expected
+    assert get_search(session, params=params)['total']['value'] == expected
+
+
+@pytest.mark.skipif(not TEST_USE_STATIC_DATA, reason="depends on a fixed set of ads")
+@pytest.mark.parametrize("query, expected", [
+    ('.NET/C#', 7),
+    ('.NET / C#', 2),
+    ('.NET C#', 25),
+    ('.NET /C#', 1),
+    ('.NET/ C#', 6),
+    ('.NET', 17),
+    ('C#/.net', 8),
+    ('C# .net', 25),
+    ('C# /.net', 6),
+    ('C# / .net', 2),
+    ('C#', 16),
+    ('C#/.net', 8),
+    ('C# .net', 25),
+    ('C# /.net', 6),
+    ('dotnet', 17)
+])
+def test_freetext_search_dot_hash_slash(session, query, expected):
+    """
+    Search with terms that are joined by a slash '/' included (x/y)
+    with the terms separately (x y)
+    and with a slash surrounded by space (x / y)
+    for words that have . or # (e.g. '.net', 'c#')
+    """
+    params = {'q': query, 'limit': '0'}
+    assert get_search(session, params=params)['total']['value'] == expected
 
 
 @pytest.mark.smoke
@@ -67,7 +87,6 @@ def test_freetext_search_slash( session, query, expected):
     ('Systemutvecklare Programmerare', 49),
     ('Systemutvecklare / Programmerare', 3)
 ])
-def test_freetext_search_slash_short( session, query, expected):
+def test_freetext_search_slash_short(session, query, expected):
     params = {'q': query, 'limit': '0'}
-    response_json = get_search(session,  params=params)
-    assert response_json['total']['value'] == expected
+    assert get_search(session, params=params)['total']['value'] == expected

@@ -9,7 +9,6 @@ from sokannonser.repository.querybuilder import QueryBuilder
 from tests.integration_tests.test_resources import mock_for_querybuilder_tests as mock
 
 
-
 @pytest.mark.parametrize("collection_id, expected", [(["UdVa_jRr_9DE"],
                                                       {'bool': {'should': {'terms': {
                                                           'occupation.concept_id.keyword': ['fFkk_8X8_pym',
@@ -34,53 +33,51 @@ def test_build_occupation_collection_query(collection_id, expected):
     assert query_result == expected
 
 
-
-@pytest.mark.parametrize("querystring, expected", [('xx,', 'xx '),  # trailing space
-                                                   ('xx.', 'xx'),
+@pytest.mark.parametrize("querystring, expected", [('xx,', 'xx'),
+                                                   ('xx.', 'xx.'),
                                                    ('xx!', 'xx'),
                                                    ('xx?', 'xx'),
                                                    ('xx:', 'xx'),
                                                    ('xx;', 'xx'),
-                                                   ('.xx', 'xx'),
-                                                   (',xx', ' xx'),  # leading space
+                                                   ('.xx', '.xx'),
+                                                   (',xx', 'xx'),
                                                    ('!xx', 'xx'),
                                                    ('?xx', 'xx'),
                                                    (':xx', 'xx'),
                                                    (';xx', 'xx'),
                                                    (';xx', 'xx'),
-                                                   (' xx', ' xx'),
+                                                   (' xx', 'xx'),
                                                    ('x x', 'x x'),
-                                                   ('x,x ', 'x x '),  # trailing space
-                                                   ('x.x ', 'x.x '),
-                                                   ('x!x ', 'x!x '),
-                                                   ('x?x ', 'x?x '),
-                                                   ('x:x ', 'x:x '),
-                                                   ('x;x ', 'x;x '),
-                                                   ('xx ', 'xx '),
+                                                   ('x,x ', 'x x'),
+                                                   ('x.x ', 'x.x'),
+                                                   ('x!x ', 'x!x'),
+                                                   ('x?x ', 'x?x'),
+                                                   ('x:x ', 'x:x'),
+                                                   ('x;x ', 'x;x'),
+                                                   ('xx ', 'xx'),
                                                    ('x/y', 'x/y'),
-                                                   ('.x/y', 'x/y'),
-                                                   ('x/y.', 'x/y'),
-                                                   ('x / y.', 'x / y'),
-                                                   ('y,.!?:; x', 'y  x'),
+                                                   ('.x/y', '.x/y'),
+                                                   ('x/y.', 'x/y.'),
+                                                   ('x / y.', 'x / y.'),
+                                                   ('y,.!?:; x', 'y . x'),
                                                    ('x,y.z!1?2:3;4 x', 'x y.z!1?2:3;4 x'),
                                                    ('12345x', '12345x'),
-                                                   ('.12345', '12345'),
-                                                   ('.12345.', '12345'),
-                                                   ('.12345.', '12345'),
-                                                   (',12345', ' 12345'),
-                                                   (',12345,', ' 12345 '),
+                                                   ('.12345', '.12345'),
+                                                   ('.12345.', '.12345.'),
+                                                   ('.12345.', '.12345.'),
+                                                   (',12345', '12345'),
+                                                   (',12345,', '12345'),
                                                    ('\\x', '\\x'),
-                                                   ('\\x,', '\\x '),
-                                                   ('\\x.', '\\x'),
-                                                   ('\\.x.', '\\.x'),
-                                                   ('.\\.x.', '\\.x'),
-                                                   (',\\.x.', ' \\.x'),
+                                                   ('\\x,', '\\x'),
+                                                   ('\\x.', '\\x.'),
+                                                   ('\\.x.', '\\.x.'),
+                                                   ('.\\.x.', '.\\.x.'),
+                                                   (',\\.x.', '\\.x.'),
                                                    ])
 def test_querystring_char_removal(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    formatted = querybuilder._remove_unwanted_chars_from_querystring(querystring)
-    assert formatted == expected
-
+    formatted = querybuilder.extract_quoted_phrases(querystring)
+    assert formatted[1] == expected
 
 
 def test_parse_args_query_with_slash():
@@ -104,8 +101,8 @@ def test_parse_args_query_with_slash():
                                                          {'match': {'headline.words': {
                                                              'query': 'systemutvecklare/programmerare',
                                                              'operator': 'and', 'boost': 5}}}]}}]}}],
-        'filter': [{'range': {'publication_date': {'lte': 'now+2H/m'}}},
-                   {'range': {'last_publication_date': {'gte': 'now+2H/m'}}}, {'term': {'removed': False}}]}},
+        'filter': [{'range': {'publication_date': {'lte': 'now+1H/m'}}},
+                   {'range': {'last_publication_date': {'gte': 'now+1H/m'}}}, {'term': {'removed': False}}]}},
                           'aggs': {'positions': {'sum': {'field': 'number_of_vacancies'}}, 'complete_00_occupation': {
                               'terms': {'field': 'keywords.enriched_typeahead_terms.occupation.raw', 'size': 20.0,
                                         'include': '.*'}}, 'complete_00_skill': {
@@ -115,8 +112,7 @@ def test_parse_args_query_with_slash():
                                         'include': '.*'}}}, 'sort': ['_score', {'publication_date': 'desc'}]}
 
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    query_dsl = querybuilder.parse_args(args)
-    assert query_dsl == expected_query_dsl
+    assert querybuilder.parse_args(args) == expected_query_dsl
 
 
 @pytest.mark.parametrize("from_datetime", ["2018-09-28T00:00:00", '2018-09-28', '', None, []])
@@ -139,7 +135,6 @@ def test_filter_timeframe(from_datetime, to_datetime):
     if to_datetime:
         d = querybuilder._filter_timeframe(from_datetime, parser.parse(to_datetime))
         assert d['range']['publication_date']['lte'] == parser.parse(to_datetime).isoformat()
-
 
 
 @pytest.mark.parametrize("args, exist, expected",
@@ -251,7 +246,6 @@ def test_geo_distance_filter(args, exist, expected):
     assert (expected in query_dsl["query"]["bool"]["filter"]) == exist
 
 
-
 @pytest.mark.parametrize("args, expected_pos, expected_neg",
                          [({settings.APIKEY: "",
                             taxonomy.REGION: ["01", "02"]},
@@ -333,7 +327,6 @@ def test_geo_distance_filter(args, exist, expected):
                                {"term": {"workplace_address.municipality_concept_id": {"value": "2222"}}}
                            ])])
 def test_region_municipality_query(args, expected_pos, expected_neg):
-    print('================', sys._getframe().f_code.co_name, '===============')
     querybuilder = QueryBuilder(mock.MockTextToConcept())
     query_dsl = querybuilder.parse_args(args)
     if expected_pos:
@@ -348,14 +341,12 @@ def test_region_municipality_query(args, expected_pos, expected_neg):
             assert (e in neg_query)
 
 
-
 def test_rewrite_word_for_regex():
     querybuilder = QueryBuilder(mock.MockTextToConcept())
     assert querybuilder._rewrite_word_for_regex("[python3]") == "\\[python3\\]"
     assert querybuilder._rewrite_word_for_regex("python3") == "python3"
     assert querybuilder._rewrite_word_for_regex("asp.net") == "asp\\.net"
     assert querybuilder._rewrite_word_for_regex("c++") == "c\\+\\+"
-
 
 
 def test_rewrite_querystring():
@@ -417,30 +408,26 @@ def test_rewrite_querystring():
     assert querybuilder._rewrite_querystring("tcp/ip", concepts) == ""
 
 
-
 @pytest.mark.parametrize("querystring, expected_phrase, expected_returned_query, test_id", [
     # With these quotes, the query will be returned with some quote modification
     # the 'matches' field will be empty
-    ("'gymnasielärare'", [], "'gymnasielärare'", 'a'),
+    ("'gymnasielärare'", [], 'gymnasielärare', 'a'),
     ("""gymnasielärare""", [], 'gymnasielärare', 'b'),
     ('''gymnasielärare''', [], 'gymnasielärare', 'c'),
-    ("gymnasielärare\"", [], 'gymnasielärare""', 'd'),
-    ("gymnasielärare\'", [], "gymnasielärare'", 'e'),
-    ("\'gymnasielärare", [], "'gymnasielärare", 'f'),
+    ("gymnasielärare\"", [], 'gymnasielärare', 'd'),
+    ("gymnasielärare\'", [], 'gymnasielärare', 'e'),
+    ("\'gymnasielärare", [], 'gymnasielärare', 'f'),
     (r"""gymnasielärare""", [], 'gymnasielärare', 'g'),
     (r'''gymnasielärare''', [], 'gymnasielärare', 'h'),
     ("gymnasielärare lärare", [], 'gymnasielärare lärare', 'i'),
-    ("""'gymnasielärare'""", [], "'gymnasielärare'", 'j'),
-
-    # with these quotes, the 'phrases' field has data quoted with single quotes
-    # and the query is not returned
-    ('''"gymnasielärare" "lärare"''', ['gymnasielärare', 'lärare'], '', 'aa'),
-    ('''"gymnasielärare lärare"''', ['gymnasielärare lärare'], '', 'ab'),
-    ('"gymnasielärare"', ['gymnasielärare'], '', 'ac'),
-    ("\"gymnasielärare\"", ['gymnasielärare'], '', 'ad'),
-    ("\"gymnasielärare", ['gymnasielärare'], '', 'ae'),
-    ("\"gymnasielärare", ['gymnasielärare'], '', 'af'),
-    ('''"gymnasielärare"''', ['gymnasielärare'], '', 'ag'),
+    ("""'gymnasielärare'""", [], 'gymnasielärare', 'j'),
+    ('''"gymnasielärare" "lärare"''', [], 'gymnasielärare lärare', 'aa'),
+    ('''"gymnasielärare lärare"''', [], 'gymnasielärare lärare', 'ab'),
+    ('"gymnasielärare"', [], 'gymnasielärare', 'ac'),
+    ("\"gymnasielärare\"", [], 'gymnasielärare', 'ad'),
+    ("\"gymnasielärare", [], 'gymnasielärare', 'ae'),
+    ("\"gymnasielärare", [], 'gymnasielärare', 'af'),
+    ('''"gymnasielärare"''', [], 'gymnasielärare', 'ag'),
 
     # "normal" quotes, 'phrases' field empty, query returned
     ("gymnasielärare", [], 'gymnasielärare', 'x'),
@@ -465,41 +452,30 @@ def test_extract_querystring_different_quotes(querystring, expected_phrase, expe
     assert actual_returned_query == expected_returned_query, f"got {actual_returned_query} but expected {expected_returned_query}"
 
 
-
 @pytest.mark.parametrize("querystring, expected", [
-    ("python \"grym kodare\"",
-     ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": []}, "python")),
-    ("java \"malmö stad\"",
-     ({"phrases": ["malmö stad"], "phrases_must": [], "phrases_must_not": []}, "java")),
-    ("python -\"grym kodare\" +\"i am lazy\"",
-     ({"phrases": [], "phrases_must": ["i am lazy"], "phrases_must_not": ["grym kodare"]}, "python")),
-    ("\"python på riktigt\" -\"grym kodare\" +\"i am lazy\"",
-     (
-             {"phrases": ["python på riktigt"], "phrases_must": ["i am lazy"],
-              "phrases_must_not": ["grym kodare"]},
-             "")),
+    ("python \"grym kodare\"", 'python grym kodare'),
+    ("java \"malmö stad\"", 'java malmö stad'),
+    ("python -\"grym kodare\" +\"i am lazy\"", 'python -"grym kodare +"i am lazy'),
+    ("\"python på riktigt\" -\"grym kodare\" +\"i am lazy\"", 'python på riktigt -"grym kodare +"i am lazy')
+
 ])
 def test_extract_querystring_phrases(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    assert expected == querybuilder.extract_quoted_phrases(querystring)
-
+    assert querybuilder.extract_quoted_phrases(querystring)[1] == expected
 
 
 @pytest.mark.parametrize("querystring, expected", [
-    ("\"i am lazy", ({"phrases": ["i am lazy"], "phrases_must": [], "phrases_must_not": []}, "")),
+    ("\"i am lazy", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'i am lazy')),
     ("python \"grym kodare\" \"i am lazy java",
-     (
-             {"phrases": ["grym kodare", "i am lazy java"], "phrases_must": [], "phrases_must_not": []},
-             "python")),
+     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python grym kodare i am lazy java')),
     ("python \"grym kodare\" +\"i am lazy",
-     ({"phrases": ["grym kodare"], "phrases_must": ["i am lazy"], "phrases_must_not": []}, "python")),
+     ({'phrases': [], 'phrases_must': ['i am lazy'], 'phrases_must_not': []}, 'python grym kodare')),
     ("python \"grym kodare\" -\"i am lazy",
-     ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": ["i am lazy"]}, "python")),
+     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': ['i am lazy']}, 'python grym kodare'))
 ])
 def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    assert expected == querybuilder.extract_quoted_phrases(querystring)
-
+    assert querybuilder.extract_quoted_phrases(querystring) == expected
 
 
 @pytest.mark.parametrize("querystring, expected", [
@@ -535,45 +511,6 @@ def test_freetext_bool_structure(querystring, expected):
     result = querybuilder._build_freetext_query(querystring, queryfields=None, freetext_bool_method="and",
                                                 disable_smart_freetext=False)
     assert _assert_json_structure(result, expected)
-
-
-
-def test_parse_args_query_with_slash():
-    # Todo test with 'and' & 'or
-    args = {'x-feature-freetext-bool-method': 'and', 'x-feature-disable-smart-freetext': None,
-            'x-feature-enable-false-negative': None, 'published-before': None, 'published-after': None,
-            'occupation-name': None, 'occupation-group': None, 'occupation-field': None, 'occupation-collection': None,
-            'skill': None, 'language': None, 'worktime-extent': None, 'parttime.min': None, 'parttime.max': None,
-            'driving-license-required': None, 'driving-license': None, 'employment-type': None, 'experience': None,
-            'municipality': None, 'region': None, 'country': None, 'unspecified-sweden-workplace': None, 'abroad': None,
-            'position': None, 'position.radius': None, 'employer': None, 'q': 'systemutvecklare/programmerare',
-            'qfields': None, 'relevance-threshold': None, 'sort': None, 'stats': None, 'stats.limit': None}
-
-    expected_utc_offset = f"now+{utc_offset()}H/m"
-    expected_query_dsl = {'from': 0, 'size': 10, 'track_total_hits': True, 'track_scores': True, 'query': {'bool': {
-        'must': [{'bool': {'must': [{'bool': {'should': [{'multi_match': {'query': 'systemutvecklare/programmerare',
-                                                                          'type': 'cross_fields', 'operator': 'and',
-                                                                          'fields': ['headline^3',
-                                                                                     'keywords.extracted.employer^2',
-                                                                                     'description.text', 'id',
-                                                                                     'external_id', 'source_type',
-                                                                                     'keywords.extracted.location^5']}},
-                                                         {'match': {'headline.words': {
-                                                             'query': 'systemutvecklare/programmerare',
-                                                             'operator': 'and', 'boost': 5}}}]}}]}}],
-        'filter': [{'range': {'publication_date': {'lte': expected_utc_offset}}},
-                   {'range': {'last_publication_date': {'gte': expected_utc_offset}}}, {'term': {'removed': False}}]}},
-                          'aggs': {'positions': {'sum': {'field': 'number_of_vacancies'}}, 'complete_00_occupation': {
-                              'terms': {'field': 'keywords.enriched_typeahead_terms.occupation.raw', 'size': 20.0,
-                                        'include': '.*'}}, 'complete_00_skill': {
-                              'terms': {'field': 'keywords.enriched_typeahead_terms.skill.raw', 'size': 20.0,
-                                        'include': '.*'}}, 'complete_00_location': {
-                              'terms': {'field': 'keywords.enriched_typeahead_terms.location.raw', 'size': 20.0,
-                                        'include': '.*'}}}, 'sort': ['_score', {'publication_date': 'desc'}]}
-
-    querybuilder = QueryBuilder(mock.MockTextToConcept())
-    query_dsl = querybuilder.parse_args(args)
-    assert query_dsl == expected_query_dsl
 
 
 def utc_offset():

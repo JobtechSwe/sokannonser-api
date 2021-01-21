@@ -326,7 +326,7 @@ class QueryBuilder(object):
 
     @staticmethod
     def extract_quoted_phrases(text):
-        text = ' '.join([w.strip(',.!?:;" ').strip("' ") for w in re.split('\\s|\\,', text)])
+        text = ' '.join([w.strip(',!?:;" ').strip("' ") for w in re.split('\\s|\\,', text)])
 
         # Append quote to end of string if unbalanced
         if text.count('"') % 2 != 0:

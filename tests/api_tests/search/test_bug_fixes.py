@@ -1,7 +1,5 @@
 import pytest
-import requests
 from tests.test_resources.helper import get_search
-from tests.test_resources.settings import SEARCH_URL
 
 
 @pytest.mark.parametrize("query, expected", [

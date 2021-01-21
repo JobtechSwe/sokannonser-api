@@ -36,6 +36,7 @@ def test_query_with_different_quotes(session, query, expected_number_of_hits, id
     ('"c++', 16),
     ('"c++"', 16),
     ('"c+', 4),
+    ('"c( ', 4),
 ])
 def test_cplusplus_in_quotes(session, query, expected):
     """

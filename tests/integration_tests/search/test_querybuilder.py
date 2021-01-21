@@ -112,8 +112,7 @@ def test_parse_args_query_with_slash():
                                         'include': '.*'}}}, 'sort': ['_score', {'publication_date': 'desc'}]}
 
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    query_dsl = querybuilder.parse_args(args)
-    assert query_dsl == expected_query_dsl
+    assert querybuilder.parse_args(args) == expected_query_dsl
 
 
 @pytest.mark.parametrize("from_datetime", ["2018-09-28T00:00:00", '2018-09-28', '', None, []])
@@ -413,26 +412,23 @@ def test_rewrite_querystring():
 @pytest.mark.parametrize("querystring, expected_phrase, expected_returned_query, test_id", [
     # With these quotes, the query will be returned with some quote modification
     # the 'matches' field will be empty
-    ("'gymnasielärare'", [], "'gymnasielärare'", 'a'),
+    ("'gymnasielärare'", [], 'gymnasielärare', 'a'),
     ("""gymnasielärare""", [], 'gymnasielärare', 'b'),
     ('''gymnasielärare''', [], 'gymnasielärare', 'c'),
-    ("gymnasielärare\"", [], 'gymnasielärare', 'd'),  # gymnasielärare""
-    ("gymnasielärare\'", [], 'gymnasielärare', 'e'),  # gymnasielärare'
-    ("\'gymnasielärare", [], 'gymnasielärare', 'f'),  # 'gymnasielärare
+    ("gymnasielärare\"", [], 'gymnasielärare', 'd'),
+    ("gymnasielärare\'", [], 'gymnasielärare', 'e'),
+    ("\'gymnasielärare", [], 'gymnasielärare', 'f'),
     (r"""gymnasielärare""", [], 'gymnasielärare', 'g'),
     (r'''gymnasielärare''', [], 'gymnasielärare', 'h'),
     ("gymnasielärare lärare", [], 'gymnasielärare lärare', 'i'),
-    ("""'gymnasielärare'""", [], 'gymnasielärare', 'j'),  # 'gymnasielärare'
-
-    # with these quotes, the 'phrases' field has data quoted with single quotes
-    # and the query is not returned
-    ('''"gymnasielärare" "lärare"''', ['gymnasielärare', 'lärare'], '', 'aa'),
-    ('''"gymnasielärare lärare"''', ['gymnasielärare lärare'], '', 'ab'),
-    ('"gymnasielärare"', ['gymnasielärare'], '', 'ac'),
-    ("\"gymnasielärare\"", ['gymnasielärare'], '', 'ad'),
-    ("\"gymnasielärare", ['gymnasielärare'], '', 'ae'),
-    ("\"gymnasielärare", ['gymnasielärare'], '', 'af'),
-    ('''"gymnasielärare"''', ['gymnasielärare'], '', 'ag'),
+    ("""'gymnasielärare'""", [], 'gymnasielärare', 'j'),
+    ('''"gymnasielärare" "lärare"''', [], 'gymnasielärare lärare', 'aa'),
+    ('''"gymnasielärare lärare"''', [], 'gymnasielärare lärare', 'ab'),
+    ('"gymnasielärare"', [], 'gymnasielärare', 'ac'),
+    ("\"gymnasielärare\"", [], 'gymnasielärare', 'ad'),
+    ("\"gymnasielärare", [], 'gymnasielärare', 'ae'),
+    ("\"gymnasielärare", [], 'gymnasielärare', 'af'),
+    ('''"gymnasielärare"''', [], 'gymnasielärare', 'ag'),
 
     # "normal" quotes, 'phrases' field empty, query returned
     ("gymnasielärare", [], 'gymnasielärare', 'x'),
@@ -459,13 +455,14 @@ def test_extract_querystring_different_quotes(querystring, expected_phrase, expe
 
 @pytest.mark.parametrize("querystring, expected", [
     ("python \"grym kodare\"",
-     ({'phrases': ['grym kodare'], 'phrases_must': [], 'phrases_must_not': []}, 'python')),
+     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python grym kodare')),
     ("java \"malmö stad\"",
-     ({'phrases': ['malmö stad'], 'phrases_must': [], 'phrases_must_not': []}, 'java')),
+     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'java malmö stad')),
     ("python -\"grym kodare\" +\"i am lazy\"",
-     ({'phrases': [], 'phrases_must': ['i am lazy'], 'phrases_must_not': ['grym kodare']}, 'python')),
+     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python - grym kodare + i am lazy')
+     ),
     ("\"python på riktigt\" -\"grym kodare\" +\"i am lazy\"",
-     ({'phrases': ['python på riktigt'], 'phrases_must': ['i am lazy'], 'phrases_must_not': ['grym kodare']}, '')),
+     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python på riktigt - grym kodare + i am lazy')),
 ])
 def test_extract_querystring_phrases(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
@@ -473,19 +470,18 @@ def test_extract_querystring_phrases(querystring, expected):
 
 
 @pytest.mark.parametrize("querystring, expected", [
-    ("\"i am lazy", ({"phrases": ["i am lazy"], "phrases_must": [], "phrases_must_not": []}, ""),),
+    ("\"i am lazy", ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'i am lazy')),
     ("python \"grym kodare\" \"i am lazy java",
-     (
-             {"phrases": ["grym kodare", "i am lazy java"], "phrases_must": [], "phrases_must_not": []},
-             "python")),
+     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python grym kodare i am lazy java')),
     ("python \"grym kodare\" +\"i am lazy",
-     ({"phrases": ["grym kodare"], "phrases_must": ["i am lazy"], "phrases_must_not": []}, "python")),
+     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python grym kodare + i am lazy')),
     ("python \"grym kodare\" -\"i am lazy",
-     ({"phrases": ["grym kodare"], "phrases_must": [], "phrases_must_not": ["i am lazy"]}, "python")),
+     ({'phrases': [], 'phrases_must': [], 'phrases_must_not': []}, 'python grym kodare - i am lazy')),
 ])
 def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    assert querybuilder.extract_quoted_phrases(querystring) == expected
+    assert querybuilder.extract_quoted_phrases(querystring)== expected
+
 
 
 @pytest.mark.parametrize("querystring, expected", [

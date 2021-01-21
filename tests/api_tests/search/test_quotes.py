@@ -30,3 +30,16 @@ from tests.test_resources.helper import get_search, compare
 def test_query_with_different_quotes(session, query, expected_number_of_hits, identifier):
     json_response = get_search(session, params={'q': query, 'limit': '0'})
     compare(json_response['total']['value'], expected_number_of_hits, msg=f'Query: {query}')
+
+
+@pytest.mark.parametrize('query, expected', [
+    ({'q': '"c++'}, 2),
+    ({'q': '"c++"'}, 2),
+    ({'q': '"c+'}, 2),
+])
+def test_cplusplus_in_quotes(session, query, expected):
+    """
+    Test for a bug where some quotes caused an 'internal server error' response
+    """
+    param = {'q': query, 'limit': 0}
+    assert get_search(session, param)['total']['value'] == expected

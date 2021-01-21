@@ -343,7 +343,7 @@ class QueryBuilder(object):
 
     @staticmethod
     def _remove_unwanted_chars_from_querystring(querystring):
-        return ' '.join([w.strip('[\',\",\,,\.,\!,\?,\:,\;]') for w in re.split('\\s|\\,', querystring)])
+        return ' '.join([w.strip(',.!?:;" ').strip("' ") for w in re.split('\\s|\\,', querystring)])
 
     # Parses FREETEXT_QUERY and FREETEXT_FIELDS
     def _build_freetext_query(self, querystring, queryfields, freetext_bool_method,

@@ -448,8 +448,8 @@ def test_extract_querystring_different_quotes(querystring, expected_phrase, expe
     actual_result = querybuilder.extract_quoted_phrases(querystring)
     print(actual_result)
     # no plus or minus used in this test, so these fields must be empty
-    assert actual_result[0]['phrases_must'] == []
-    assert actual_result[0]['phrases_must_not'] == []
+    assert actual_result[0]['phrases_must'] == [], f"'phrases_must' was {actual_result[0]['phrases_must']}"
+    assert actual_result[0]['phrases_must_not'] == [], f"'phrases_must_not' was {actual_result[0]['phrases_must_not']}"
 
     actual_phrases = actual_result[0]['phrases']
     assert actual_phrases == expected_phrase, f"got {actual_phrases} but expected {expected_phrase}"

@@ -77,7 +77,7 @@ def test_build_occupation_collection_query(collection_id, expected):
 def test_querystring_char_removal(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
     formatted = querybuilder.extract_quoted_phrases(querystring)
-    assert formatted[0]['phrases'][0] == expected
+    assert formatted[1] == expected
 
 
 def test_parse_args_query_with_slash():
@@ -341,12 +341,16 @@ def test_region_municipality_query(args, expected_pos, expected_neg):
             assert (e in neg_query)
 
 
-def test_rewrite_word_for_regex():
+@pytest.mark.parametrize("query, expected", [
+    ("[python3]", "\\[python3\\]"),
+    ("python3", "python3"),
+    ("asp.net", "asp\\.net"),
+    ("c++", "c\\+\\+")
+])
+def test_rewrite_word_for_regex(query, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    assert querybuilder._rewrite_word_for_regex("[python3]") == "\\[python3\\]"
-    assert querybuilder._rewrite_word_for_regex("python3") == "python3"
-    assert querybuilder._rewrite_word_for_regex("asp.net") == "asp\\.net"
-    assert querybuilder._rewrite_word_for_regex("c++") == "c\\+\\+"
+    result = querybuilder._rewrite_word_for_regex(query)
+    assert result == expected, f"got {result} but expected {expected}"
 
 
 def test_rewrite_querystring():
@@ -441,6 +445,7 @@ def test_extract_querystring_different_quotes(querystring, expected_phrase, expe
     """
     querybuilder = QueryBuilder(mock.MockTextToConcept())
     actual_result = querybuilder.extract_quoted_phrases(querystring)
+    print(actual_result)
     # no plus or minus used in this test, so these fields must be empty
     assert actual_result[0]['phrases_must'] == []
     assert actual_result[0]['phrases_must_not'] == []
@@ -461,7 +466,8 @@ def test_extract_querystring_different_quotes(querystring, expected_phrase, expe
 ])
 def test_extract_querystring_phrases(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    assert querybuilder.extract_quoted_phrases(querystring)[1] == expected
+    result = querybuilder.extract_quoted_phrases(querystring)[1]
+    assert result == expected, f"got {result} but expected {expected}"
 
 
 @pytest.mark.parametrize("querystring, expected", [
@@ -475,7 +481,8 @@ def test_extract_querystring_phrases(querystring, expected):
 ])
 def test_extract_querystring_phrases_with_unbalanced_quotes(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
-    assert querybuilder.extract_quoted_phrases(querystring) == expected
+    result = querybuilder.extract_quoted_phrases(querystring)
+    assert result == expected, f"got {result} but expected {expected}"
 
 
 @pytest.mark.parametrize("querystring, expected", [

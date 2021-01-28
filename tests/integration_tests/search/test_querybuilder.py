@@ -419,20 +419,28 @@ def test_rewrite_querystring():
     ("'gymnasielärare'", [], 'gymnasielärare', 'a'),
     ("""gymnasielärare""", [], 'gymnasielärare', 'b'),
     ('''gymnasielärare''', [], 'gymnasielärare', 'c'),
-    ("gymnasielärare\"", [], 'gymnasielärare', 'd'),
+    ("gymnasielärare\"", [], 'gymnasielärare', 'd'), #
+    ("gymnasielärare\"", [], 'gymnasielärare"', 'd2'), #
     ("gymnasielärare\'", [], 'gymnasielärare', 'e'),
     ("\'gymnasielärare", [], 'gymnasielärare', 'f'),
     (r"""gymnasielärare""", [], 'gymnasielärare', 'g'),
     (r'''gymnasielärare''', [], 'gymnasielärare', 'h'),
     ("gymnasielärare lärare", [], 'gymnasielärare lärare', 'i'),
     ("""'gymnasielärare'""", [], 'gymnasielärare', 'j'),
-    ('''"gymnasielärare" "lärare"''', [], 'gymnasielärare lärare', 'aa'),
-    ('''"gymnasielärare lärare"''', [], 'gymnasielärare lärare', 'ab'),
-    ('"gymnasielärare"', [], 'gymnasielärare', 'ac'),
-    ("\"gymnasielärare\"", [], 'gymnasielärare', 'ad'),
-    ("\"gymnasielärare", [], 'gymnasielärare', 'ae'),
-    ("\"gymnasielärare", [], 'gymnasielärare', 'af'),
-    ('''"gymnasielärare"''', [], 'gymnasielärare', 'ag'),
+    ('''"gymnasielärare" "lärare"''', [], 'gymnasielärare lärare', 'aa'), #
+    ('''"gymnasielärare" "lärare"''', ['gymnasielärare', 'lärare'], '', 'aa2'), #
+    ('''"gymnasielärare lärare"''', [], 'gymnasielärare lärare', 'ab'), #
+    ('''"gymnasielärare lärare"''', ['gymnasielärare lärare'], '', 'ab2'), #
+    ('"gymnasielärare"', [], 'gymnasielärare', 'ac'),#
+    ('"gymnasielärare"', ['gymnasielärare'], '', 'ac2'),#
+    ("\"gymnasielärare\"", [], 'gymnasielärare', 'ad'),#
+    ("\"gymnasielärare\"", ['gymnasielärare'], '', 'ad2'),#
+    ("\"gymnasielärare", [], 'gymnasielärare', 'ae'),#
+    ("\"gymnasielärare", [], '"gymnasielärare', 'ae2'),#
+    ("\"gymnasielärare", [], 'gymnasielärare', 'af'),#
+    ("\"gymnasielärare", [], '"gymnasielärare', 'af2'),#
+    ('''"gymnasielärare"''', [], 'gymnasielärare', 'ag'),#
+    ('''"gymnasielärare"''', ['gymnasielärare'], '', 'ag2'),#
 
     # "normal" quotes, 'phrases' field empty, query returned
     ("gymnasielärare", [], 'gymnasielärare', 'x'),

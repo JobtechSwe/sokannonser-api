@@ -326,9 +326,7 @@ class QueryBuilder(object):
 
     @staticmethod
     def extract_quoted_phrases(text):
-        text = ' '.join([w.strip(',!?:;" ').strip("' ") for w in re.split('\\s|\\,', text)])
-
-        text = '"' + text + '"'
+        text = ' '.join([w.strip(',!?:;\' ').strip("' ") for w in re.split('\\s|\\,', text)])
 
         must_matches = re.findall(r'\+\"(.+?)\"', text)
         neg_matches = re.findall(r'\-\"(.+?)\"', text)
@@ -336,9 +334,10 @@ class QueryBuilder(object):
             text = re.sub('-"%s"' % neg_match, '', text)
         for must_match in must_matches:
             text = re.sub(r'\+"%s"' % must_match, '', text)
-        matches = re.findall(r'\"(.+?)\"', text)
+
+        matches = re.findall(r'\"([^\"]+?)\"', text)
         for match in matches:
-            text = re.sub('"%s"' % match, '', text)
+            text = re.sub(r'\"*%s\"*' % match, '', text)
         return {"phrases": matches, "phrases_must": must_matches,
                 "phrases_must_not": neg_matches}, text.strip()
 

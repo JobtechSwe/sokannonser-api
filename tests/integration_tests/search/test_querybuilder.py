@@ -33,30 +33,30 @@ def test_build_occupation_collection_query(collection_id, expected):
     assert query_result == expected
 
 
-@pytest.mark.parametrize("querystring, expected", [('xx,', 'xx'),
+@pytest.mark.parametrize("querystring, expected", [('xx,', 'xx '),
                                                    ('xx.', 'xx.'),
                                                    ('xx!', 'xx'),
                                                    ('xx?', 'xx'),
-                                                   ('xx:', 'xx'),
+                                                   ('yy:', 'yy'),
                                                    ('xx;', 'xx'),
                                                    ('.xx', '.xx'),
-                                                   (',xx', 'xx'),
+                                                   (',xx', ' xx'),
                                                    ('!xx', 'xx'),
-                                                   ('?xx', 'xx'),
+                                                   ('?yy', 'yy'),
                                                    (':xx', 'xx'),
                                                    (';xx', 'xx'),
                                                    (';xx', 'xx'),
-                                                   (' xx', 'xx'),
-                                                   ('x x', 'x x'),
-                                                   ('x,x ', 'x x'),
-                                                   ('x.x ', 'x.x'),
-                                                   ('x!x ', 'x!x'),
-                                                   ('x?x ', 'x?x'),
-                                                   ('x:x ', 'x:x'),
-                                                   ('x;x ', 'x;x'),
-                                                   ('xx ', 'xx'),
+                                                   (' xx', ' xx'),
+                                                   ('y y', 'y y'),
+                                                   ('x,x ', 'x x '),
+                                                   ('x.x ', 'x.x '),
+                                                   ('x!x ', 'x!x '),
+                                                   ('x?x ', 'x?x '),
+                                                   ('y:y ', 'y:y '),
+                                                   ('x;x ', 'x;x '),
+                                                   ('xx ', 'xx '),
                                                    ('x/y', 'x/y'),
-                                                   ('.x/y', '.x/y'),
+                                                   ('.z/y', '.z/y'),
                                                    ('x/y.', 'x/y.'),
                                                    ('x / y.', 'x / y.'),
                                                    ('y,.!?:; x', 'y . x'),
@@ -65,19 +65,19 @@ def test_build_occupation_collection_query(collection_id, expected):
                                                    ('.12345', '.12345'),
                                                    ('.12345.', '.12345.'),
                                                    ('.12345.', '.12345.'),
-                                                   (',12345', '12345'),
-                                                   (',12345,', '12345'),
+                                                   (',12345', ' 12345'),
+                                                   (',12345,', ' 12345 '),
                                                    ('\\x', '\\x'),
                                                    ('\\x,', '\\x'),
                                                    ('\\x.', '\\x.'),
                                                    ('\\.x.', '\\.x.'),
                                                    ('.\\.x.', '.\\.x.'),
-                                                   (',\\.x.', '\\.x.'),
+                                                   (',\\.x.', ' \\.x.'),
                                                    ])
 def test_querystring_char_removal(querystring, expected):
     querybuilder = QueryBuilder(mock.MockTextToConcept())
     formatted = querybuilder.extract_quoted_phrases(querystring)
-    assert formatted[1] == expected
+    assert formatted[0]['phrases'][0] == expected
 
 
 def test_parse_args_query_with_slash():
